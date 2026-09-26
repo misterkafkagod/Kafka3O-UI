@@ -1,18 +1,18 @@
 # Kafka3O-UI Design Specification
 
-**Version:** ~~0.7~~ **[NEW]** 0.8
+**Version:** ~~0.7~~ ~~0.8~~ **[NEW]** 0.9
 **Date:** ~~2026-09-25~~ **[NEW]** 2026-09-26
-**Status:** DRAFT - proposed UX and visual design for user review; not an approved implementation baseline
-**Functional baseline:** [FUNC-SPEC.md](FUNC-SPEC.md), revision ~~0.5~~ **[NEW]** 0.6.
-**Technical baseline:** [TECH-SPEC.md](TECH-SPEC.md), revision ~~0.12~~ **[NEW]** 0.16, including the approved consolidated contract addendum **[NEW]** revision 0.6.
+**Status:** ~~DRAFT - proposed UX and visual design for user review; not an approved implementation baseline~~ **[NEW]** APPROVED - v1 UX and visual implementation baseline (approved 2026-09-26 under TECH-SPEC section 14; section 14 below)
+**Functional baseline:** [FUNC-SPEC.md](FUNC-SPEC.md), revision ~~0.5~~ ~~0.6~~ **[NEW]** 0.7.
+**Technical baseline:** [TECH-SPEC.md](TECH-SPEC.md), revision ~~0.12~~ ~~0.16~~ **[NEW]** 0.17, including the approved consolidated contract addendum **[NEW]** revision ~~0.6~~ 0.7.
 
-**[NEW] Current release precedence:** The reduced-v1 scope approved on 2026-09-26 controls all earlier replay, continuation and all-operation statements in this draft. V1 has 26 active page IDs (P17 deferred), 40 command IDs / 46 operations, and 49 permission literals. M1/M3/M4 use one explicit partition and start/end offsets per bounded request. No replay/re-drive, latest/beginning/timestamp scan selector, multi-partition scan or resumable workflow is enabled. Other operations' time/partition controls are unchanged. Scope alignment does not approve the visual/UX draft.
+**[NEW] Current release precedence:** The reduced-v1 scope approved on 2026-09-26 controls all earlier replay, continuation and all-operation statements in this draft. V1 has 26 active page IDs (P17 deferred), 40 command IDs / 46 operations, and 49 permission literals. M1/M3/M4 use one explicit partition and start/end offsets per bounded request. No replay/re-drive, latest/beginning/timestamp scan selector, multi-partition scan or resumable workflow is enabled. Other operations' time/partition controls are unchanged. ~~Scope alignment does not approve the visual/UX draft.~~ **[NEW]** The visual/UX design is approved as the v1 baseline under section 14.
 
 ## 1. Purpose and Authority
 
 This document specifies the application experience: information architecture, screens, visual language, interactions, responsive behavior, accessibility, and design acceptance criteria. It does not replace the backend architecture or define new Gateway capabilities.
 
-The request for a design specification did not identify visual versus technical design, and the user was unavailable for clarification. This draft interprets it as UX/visual design because the technical specification already has a separate home. All new presentation decisions below are proposals pending review. Existing functional/security requirements remain authoritative.
+~~The request for a design specification did not identify visual versus technical design, and the user was unavailable for clarification. This draft interprets it as UX/visual design because the technical specification already has a separate home. All new presentation decisions below are proposals pending review. Existing functional/security requirements remain authoritative.~~ **[NEW]** This document is the UX/visual design; the technical specification has a separate home. The presentation decisions below, including the proposed tokens and components, were approved as the v1 baseline on 2026-09-26. Existing functional/security requirements remain authoritative where they conflict.
 
 No application code, prototype, design assets, or measured accessibility results are delivered by this document. Approval does not resolve the technical specification's blocked design status or pending release verification.
 
@@ -121,7 +121,7 @@ Command references such as `T2` are shorthand for the approved literal permissio
 - Hide unauthorized tabs/actions and do not fetch their data. A user with only a mutation permission can open its form using an explicit resource identifier without an unrelated list/detail permission. Autocomplete and optional resource context require their corresponding read permission; never obtain them implicitly.
 - ~~For snapshot-based M1/M3/M4/M8 workflows that must discover partition bounds, require `gateway.t2` as well as the operation permission before discovery. Explain the missing prerequisite and block that action without hiding an otherwise permitted form. Sufficient explicit inputs retain existing permission requirements; never silently fetch T2. Apply this conditional rule to P12 and P17, not as a blanket page-entry permission.~~ **[NEW]** P12 uses explicit single-partition offset inputs. Optional metadata discovery requires `gateway.t2` before fetching; no implicit T2 grant or blanket page-entry prerequisite. P17 is deferred and has no v1 entry permission.
 - If a destination has no allowed function, reject direct access and make zero unauthorized Gateway calls. Loss of permission clears now-protected data and disables further actions on the next authorized state refresh/request.
-- Preview, confirmation, execute, download, refresh, and each replay batch independently recheck permissions and scope. Preview uses its owning operation's permission, not a generic read grant.
+- ~~Preview, confirmation, execute, download, refresh, and each replay batch independently recheck permissions and scope.~~ **[NEW]** Preview, confirmation, execute, download, and refresh independently recheck permissions and scope. Preview uses its owning operation's permission, not a generic read grant.
 - Gateway capability, read-only mode, operation switches, credential tier, and audit availability are additional execution conditions, never substitutes for user permissions. S1/S2 list still use operator-tier Gateway credentials on the server without granting mutation permission.
 - The emergency identity passes application permission gates across configured clusters but retains all validation, audit, confirmation, session, and Gateway safety constraints. Override always requires the operation permission plus the separate override permission and an explicit request-scoped reason.
 
@@ -283,7 +283,7 @@ Changing inputs or targets invalidates the preview. A stale-plan response requir
 
 ### 6.3 Lock Override
 
-Offer an override only when both operation and override permissions are available. Require a non-empty reason and enforce the Gateway's 512-byte/control-character rules, not a 512-character approximation. Show which request receives the override. It never becomes a session-wide switch, and subsequent previews/executions/replay batches must not inherit it silently. Read-only mode and disabled operations remain blocking.
+Offer an override only when both operation and override permissions are available. Require a non-empty reason and enforce the Gateway's 512-byte/control-character rules, not a 512-character approximation. Show which request receives the override. It never becomes a session-wide switch, and subsequent previews/executions~~/replay batches~~ must not inherit it silently. Read-only mode and disabled operations remain blocking.
 
 ### 6.4 Messages, Continuation, and Replay
 
@@ -379,17 +379,17 @@ Manually review keyboard navigation, focus restoration, screen-reader announceme
 
 ## 11. Review Gate and Open Decisions
 
-Review the interpretation as UX/visual design, light palette/type choices, navigation grouping, screen layouts, and responsive behavior before treating this document as an implementation baseline. No mockup has been approved yet.
+~~Review the interpretation as UX/visual design, light palette/type choices, navigation grouping, screen layouts, and responsive behavior before treating this document as an implementation baseline. No mockup has been approved yet.~~ **[NEW]** The UX/visual interpretation, palette and type choices, navigation grouping, screen layouts, and responsive behavior are approved (section 14). No separate mockup is required; screenshots in section 10 are implementation evidence.
 
-TECH-SPEC section 8 records the approved fixed permission IDs, application route baseline, storage fields, explicit session-activity classification, cookie settings, HTTP error statuses, operational limits, and maintenance recovery direction. The UI must use that baseline; explicit navigation/submitted actions notify the activity endpoint, while polling/passive viewing/automatic replay batches do not. Gateway remains unchanged. Empty-confirm previews and backend multi-partition orchestration are still subject to the compatibility investigation, not assumed supported.
+~~TECH-SPEC section 8 records the approved fixed permission IDs, application route baseline, storage fields, explicit session-activity classification, cookie settings, HTTP error statuses, operational limits, and maintenance recovery direction. The UI must use that baseline; explicit navigation/submitted actions notify the activity endpoint, while polling/passive viewing/automatic replay batches do not. Gateway remains unchanged. Empty-confirm previews and backend multi-partition orchestration are still subject to the compatibility investigation, not assumed supported.~~ **[NEW]** TECH-SPEC section 8 records the approved fixed permission IDs, application route baseline, storage fields, explicit session-activity classification, cookie settings, HTTP error statuses, operational limits, and maintenance recovery direction. The UI must use that baseline; explicit navigation/submitted actions notify the activity endpoint, while polling and passive viewing do not. Gateway remains unchanged. Empty-confirm previews are resolved for the 17 active confirmation-bearing operations (TECH-SPEC section 12.1, P6); multi-partition orchestration is deferred.
 
 TECH-SPEC section 9 adds the approved explicit cluster route-mapping rule, separate audit-result failure metadata, session hashing and antiforgery handling, emergency throttle schedule/concurrency, controlled key initialization/rotation, and post-restore access reconciliation. The client keeps the antiforgery request token in memory, sends `X-CSRF-TOKEN` where required, and refreshes antiforgery state after login/logout. It displays the server's throttle response rather than calculating an independent unlock time. Restored sessions are invalidated; the UI cannot silently resume their operations.
 
 TECH-SPEC section 10 defines JSON operation results as `{data, meta: {requestId, auditStatus}}`; the UI checks audit metadata before presenting success and reads equivalent response headers for downloads without changing file contents. Role/assignment updates carry the exact strong revision ETag in `If-Match`; 412 requires conflict review, while 428 indicates a missing precondition. Application-owned lists use one-based `pageNumber`, default `pageSize` 50 and maximum 500, with the approved stable ordering; Gateway-backed lists retain their own contracts. The same section fixes rolling-window throttle admission, exact expiry boundaries, and separate Entra/Cognito callback paths.
 
-TECH-SPEC section 11 adds the conditional T2 discovery prerequisite for P12/P17. P22 exports enforce a 10,000,000-byte UI limit and check `X-Request-Id` / `X-Kafka3O-Audit-Status` before showing success; no successful truncated download is presented. Error outcomes distinguish `not_started`, `failed`, and `unknown` independently of audit status; failed does not imply rollback. Role/assignment edits distinguish malformed preconditions (400), missing preconditions (428), and stale revisions (412), and use the new revision after success. Audit history reflects hourly retention cleanup of strictly expired events, including unresolved attempts without outcome reclassification; no interactive deletion control is added.
+~~TECH-SPEC section 11 adds the conditional T2 discovery prerequisite for P12/P17.~~ **[NEW]** TECH-SPEC section 11's conditional T2 discovery prerequisite does not apply in v1 because P12 takes explicit inputs and P17 is deferred. P22 exports enforce a 10,000,000-byte UI limit and check `X-Request-Id` / `X-Kafka3O-Audit-Status` before showing success; no successful truncated download is presented. Error outcomes distinguish `not_started`, `failed`, and `unknown` independently of audit status; failed does not imply rollback. Role/assignment edits distinguish malformed preconditions (400), missing preconditions (428), and stale revisions (412), and use the new revision after success. Audit history reflects hourly retention cleanup of strictly expired events, including unresolved attempts without outcome reclassification; no interactive deletion control is added.
 
-~~Remaining technical blockers are listed in TECH-SPEC section 11.7, including full operation DTO/binding contracts, detailed schemas/security/recovery procedures, bounded export handling, lifecycle details, and Gateway compatibility.~~ **[NEW]** TECH-SPEC section 12 incorporates [CONSOLIDATED-PROPOSAL.md](CONSOLIDATED-PROPOSAL.md), revision 0.2, as the approved P1-P6 contract addendum. P26 reflects the enabled assignment field; replay failures display available typed progress without implying safe automatic retry. Its operation bindings, DTOs, resource/error states, persistence and recovery contracts now govern this draft. Section 12.2 retains B1/B2: latest-mode continuation/completion and aggregate multi-partition semantics/state remain unresolved. Fonts/icons require asset/license verification. The current technical design remains blocked; release verification remains pending. Approval of the contract package does not approve this entire visual-design draft or waive either gate.
+~~Remaining technical blockers are listed in TECH-SPEC section 11.7, including full operation DTO/binding contracts, detailed schemas/security/recovery procedures, bounded export handling, lifecycle details, and Gateway compatibility.~~ ~~**[NEW]** TECH-SPEC section 12 incorporates [CONSOLIDATED-PROPOSAL.md](CONSOLIDATED-PROPOSAL.md), revision 0.2, as the approved P1-P6 contract addendum. P26 reflects the enabled assignment field; replay failures display available typed progress without implying safe automatic retry. Its operation bindings, DTOs, resource/error states, persistence and recovery contracts now govern this draft. Section 12.2 retains B1/B2: latest-mode continuation/completion and aggregate multi-partition semantics/state remain unresolved. Fonts/icons require asset/license verification. The current technical design remains blocked; release verification remains pending. Approval of the contract package does not approve this entire visual-design draft or waive either gate.~~ **[NEW]** TECH-SPEC section 12 incorporates [CONSOLIDATED-PROPOSAL.md](CONSOLIDATED-PROPOSAL.md) as the approved P1-P6 contract addendum; P26 reflects the enabled assignment field. Its operation bindings, DTOs, resource/error states, persistence and recovery contracts govern this design. B1/B2 are deferred with their features. Font and icon sourcing is fixed in section 14; license/notice verification remains a release gate.
 
 ## 12. Revision History
 
@@ -398,6 +398,7 @@ TECH-SPEC section 11 adds the conditional T2 discovery prerequisite for P12/P17.
 | 0.6 | 2026-09-25 | Aligned with FUNC-SPEC 0.4 / TECH-SPEC 0.11: conditional discovery permission, export cap/audit headers, error and revision feedback, and audit-retention behavior. Visual draft status unchanged. |
 | 0.7 | 2026-09-25 | **[NEW]** Aligned with FUNC-SPEC 0.5 / TECH-SPEC 0.12 and the approved consolidated addendum: assignment enable/disable, replay-error progress, and updated B1/B2 blocker references. Visual draft status unchanged. |
 | 0.8 | 2026-09-26 | **[NEW]** Aligned with FUNC-SPEC 0.6 / TECH-SPEC 0.16 / addendum 0.6: reduced-v1 message controls, P17 and replay/re-drive links deferred, 26 active pages / 40 commands / 46 operations / 49 permissions, revised acceptance. Visual draft status unchanged. |
+| 0.9 | 2026-09-26 | **[NEW]** Approved as the v1 UX/visual baseline (Step 8 remediation F4). Added browser routes, icon/font sourcing and CSP-compatible styling in section 14; struck remaining replay-batch and blocker references. |
 | 0.5 | 2026-09-25 | Aligned with TECH-SPEC 0.10: response metadata handling, revision preconditions, application-list pagination, and the latest security/remaining-decision references. Visual draft status unchanged. |
 | 0.4 | 2026-09-25 | Aligned with TECH-SPEC 0.9: persistent audit-failure metadata warning, antiforgery transitions, server-driven throttling, invalidated restored sessions, and current remaining-decision references. Visual draft status unchanged. |
 | 0.3 | 2026-09-25 | Aligned page-access notation and technical handoff with the approved TECH-SPEC 0.8 contract batch; visual design remains a review draft and compatibility investigations remain open. |
@@ -410,4 +411,51 @@ TECH-SPEC section 11 adds the conditional T2 discovery prerequisite for P12/P17.
 
 **[NEW]** All retained operations keep existing authentication, authorization, confirmation, audit, numeric precision, secret isolation, cancellation and release safeguards. Required v1 screenshot/browser checks use bounded single-partition message results, including sparse/incomplete/empty states, and assert absence of replay/continuation controls. Original replay screenshots and workflow-specific checks are deferred with their feature; never report them as passed.
 
-**[NEW]** Pipeline Step 8 remains BLOCKED pending full reduced-v1 review and separate approved READY sign-off; release verification remains PENDING. Visual/UX choices in this document remain DRAFT and require their own approval. No application or Gateway code is changed by this alignment.
+~~**[NEW]** Pipeline Step 8 remains BLOCKED pending full reduced-v1 review and separate approved READY sign-off; release verification remains PENDING. Visual/UX choices in this document remain DRAFT and require their own approval. No application or Gateway code is changed by this alignment.~~ **[NEW]** Visual/UX choices are approved under section 14. Pipeline Step 8 status is recorded by the latest Spec Audit in TECH-SPEC; release verification remains PENDING. No application or Gateway code is changed by this alignment.
+## 14. Approved V1 Baseline, Browser Routes, and Assets
+
+**[NEW]** Approved on 2026-09-26 as Step 8 remediation F4 (TECH-SPEC section 14.9). Sections 1-10 and 13 of this document are the v1 UX and visual baseline, as amended by the reduced-v1 overlay. Where this document conflicts with FUNC-SPEC, TECH-SPEC, or the contract addendum, those remain authoritative. Browser routes (F9) were confirmed by the user with the Step 8 sign-off on 2026-09-26.
+
+### 14.1 Browser Routes
+
+**[NEW]** Page IDs map to these Blazor routes. `{clusterId}` is a configuration ID. `{topic}` is a Kafka topic name, whose legal characters (`[A-Za-z0-9._-]`) need no escaping. Other identifiers that may contain reserved characters travel in the query string, percent-encoded once. `{partition}` is a non-negative int32. `{offset}` is an `Int64String`, never parsed through a JavaScript or floating-point number. URLs never contain payloads, search expressions, credentials, audit reasons, session identifiers, or confirmation tokens (section 3.2).
+
+| Page | Route |
+|---|---|
+| Root | `/` redirects to `/clusters` with a session, otherwise to `/signin` |
+| P01 | `/signin` (optional `returnPath` query: a validated same-origin relative path) |
+| P02 | `/signin/emergency` |
+| P03 | `/clusters` |
+| P04 | `/clusters/{clusterId}` |
+| P05 | `/clusters/{clusterId}/brokers` |
+| P06 | `/clusters/{clusterId}/brokers/{brokerId}` (`brokerId` int32) |
+| P07 | `/clusters/{clusterId}/topics` |
+| P08 | `/clusters/{clusterId}/topics/{topic}` |
+| P09 | `/clusters/{clusterId}/create-topic` |
+| P10 | `/clusters/{clusterId}/bulk-create-topics` |
+| P11 | `/clusters/{clusterId}/bulk-delete-topics` |
+| P12 | `/clusters/{clusterId}/messages` (optional `topic` query) |
+| P13 | `/clusters/{clusterId}/topics/{topic}/partitions/{partition}/offsets/{offset}` (M2 deep link) |
+| P14 | `/clusters/{clusterId}/produce` (optional `topic` query) |
+| P15 | `/clusters/{clusterId}/upload-records` (optional `topic` query) |
+| P16 | `/clusters/{clusterId}/tombstone` (optional `topic` query) |
+| P17 | Deferred: no route |
+| P18 | `/clusters/{clusterId}/consumer-groups` |
+| P19 | `/clusters/{clusterId}/consumer-group?groupId={groupId}` |
+| P20 | `/clusters/{clusterId}/admin/quorum` |
+| P21 | `/clusters/{clusterId}/admin/reassignments` |
+| P22 | `/clusters/{clusterId}/admin/definitions` |
+| P23 | `/clusters/{clusterId}/kafka-security/scram` |
+| P24 | `/clusters/{clusterId}/kafka-security/quotas` |
+| P25 | `/access/roles` |
+| P26 | `/access/assignments` |
+| P27 | `/audit` (list) and `/audit/{eventId}` (event detail) |
+
+**[NEW]** Any other path renders a not-found page inside the shell and makes no API call. A route for an unauthorized or unknown cluster shows the permission-denied or not-found state after the backend decision, never cached protected data. Topic-scoped action routes (P09-P11) use distinct segments so a topic named, for example, `new` cannot collide with an action.
+
+### 14.2 Icons, Fonts, and Styling
+
+- **[NEW]** Icons: vendor the needed Lucide SVG files (ISC license) as static assets under `src/Kafka3O.UI.Client/wwwroot/icons/`, with the license file alongside. No icon package, icon font, or runtime third-party request.
+- **[NEW]** Fonts: vendor Source Sans 3 and IBM Plex Mono WOFF2 files (SIL Open Font License 1.1) under `wwwroot/fonts/`, with their license files, loaded through `@font-face` in the self-hosted stylesheet.
+- **[NEW]** Styling uses self-hosted CSS classes only, to satisfy the Content-Security-Policy in TECH-SPEC section 14.7: no inline `style` attributes, inline scripts, or inline event handlers. Dynamic visual state uses class changes.
+- **[NEW]** License and notice verification of vendored assets remains part of the release gate.
