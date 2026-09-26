@@ -1,11 +1,14 @@
 # Technical Specification
 
 **Product:** Kafka3O-UI
-**Version:** ~~0.2~~ ~~0.3~~ ~~0.4~~ ~~0.5~~ ~~0.6~~ **[NEW]** 0.7
-**Date:** ~~2026-09-22~~ **[NEW]** 2026-09-24
+**Version:** ~~0.2~~ ~~0.3~~ ~~0.4~~ ~~0.5~~ ~~0.6~~ ~~0.7~~ ~~0.8~~ ~~0.9~~ ~~0.10~~ ~~0.11~~ ~~0.12~~ ~~0.13~~ ~~0.14~~ ~~0.15~~ **[NEW]** 0.16
+**Date:** ~~2026-09-22~~ ~~2026-09-24~~ ~~2026-09-25~~ **[NEW]** 2026-09-26
 **Status:** ~~Technology and minimalist design-pattern baselines approved by the user; compatibility and release security verification pending~~ ~~Technology, minimalist design-pattern, and SOLID baselines approved by the user; compatibility and release security verification pending.~~ ~~Technology, design-pattern, SOLID, and testing-strategy baselines approved by the user; test-tool version pins, compatibility, and release security verification pending.~~ **[NEW]** Technology, design-pattern, SOLID, testing-strategy, and topology baselines approved by the user; test-tool version pins, compatibility, and release security verification pending.
 **Pipeline:** ~~Steps 3 and 4 completed. Detailed contracts, further architecture refinement, test design, and implementation remain subsequent steps.~~ ~~Steps 3 through 5 completed. Detailed contracts, further architecture refinement, test design, and implementation remain subsequent steps.~~ ~~Steps 3 through 6 completed. Detailed contracts, topology, executable test definitions, and implementation remain subsequent steps.~~ **[NEW]** Steps 3 through 7 completed. Spec audit, resolution of outstanding design details, executable task/test definitions, and implementation remain pending.
-**Functional baseline:** [FUNC-SPEC.md](FUNC-SPEC.md), revision ~~0.2~~ **[NEW]** 0.3.
+**Functional baseline:** [FUNC-SPEC.md](FUNC-SPEC.md), revision ~~0.2~~ ~~0.3~~ ~~0.4~~ ~~0.5~~ **[NEW]** 0.6.
+**Contract addendum:** **[NEW]** [CONSOLIDATED-PROPOSAL.md](CONSOLIDATED-PROPOSAL.md), revision ~~0.2~~ ~~0.3~~ ~~0.4~~ ~~0.5~~ **[NEW]** 0.6, approved under sections 12-13. Section 13's reduced-v1 scope supersedes the earlier v1-wide B1/B2/workflow requirements; those features remain deferred, not proven compatible.
+
+**[NEW] Current release precedence:** Section 13 controls earlier all-operation, replay, continuation, permission-count and B1/B2 handoff statements throughout this technical specification. V1 has 40 active command IDs / 46 operations / 49 permission literals. The Gateway source catalog is unchanged at 41 / 47. Design status remains BLOCKED pending full reduced-v1 review and separate approved READY sign-off; release verification remains PENDING.
 
 ## 1. Technology Stack
 
@@ -111,6 +114,11 @@ Upstream pages reviewed during technology selection; these are evidence sources,
 | 0.5 | 2026-09-24 | **[NEW]** Appended the user-approved Step 7 feature-first topology, three production projects, dependency boundaries, test alignment, and configuration/deployment locations. No application scaffolding; outstanding design and verification gates unchanged. |
 | 0.6 | 2026-09-24 | **[NEW]** Recorded approved audit remediation direction: separate design readiness from release verification, restrict the first release to one application replica with either database, and authorize proposals and read-only Gateway contract investigation. No readiness sign-off or security clearance. |
 | 0.7 | 2026-09-24 | **[NEW]** Recorded approved security/persistence design, API and operational direction, and Gateway count/health-route compatibility decisions. Detailed contracts and upstream continuation/dry-run compatibility remain blocked; no application tests or security clearance. |
+| 0.8 | 2026-09-25 | **[NEW]** Recorded the first approved detailed contract batch: unchanged Gateway constraint, compatibility investigation, fixed permission IDs, application routes, storage fields, session activity/cookies, errors, deadlines, polling, uploads, and maintenance recovery. Remaining design blockers and release gates retained. |
+| 0.9 | 2026-09-25 | **[NEW]** Recorded six approved refinements: explicit mirrored cluster routes, separate audit-result failure metadata, session identifier hashing and antiforgery header, emergency throttling schedule/concurrency, controlled key initialization/rotation, and post-restore session/access reconciliation. No readiness sign-off or Gateway modifications. |
+| 0.10 | 2026-09-25 | **[NEW]** Recorded six approved contracts for response metadata, revision preconditions, application-list pagination, throttle admission/window behavior, atomic session-expiry boundaries, and provider-specific OIDC callbacks. Gateway unchanged; remaining design and release gates retained. |
+| 0.11 | 2026-09-25 | **[NEW]** Recorded conditional T2 discovery authorization, export headers/finalization and byte limit, error outcomes, exact revision-header rejection rules, cross-provider persistence conventions, and scheduled audit retention. Snapshot continuation remains unproven; Gateway unchanged. |
+| 0.16 | 2026-09-26 | **[NEW]** Recorded approved reduced-v1 scope and addendum 0.6: 40 active command IDs / 46 operations / 49 permissions, one-shot explicit-offset single-partition M1/M3/M4, deferred M8 and message workflows, revised acceptance and B1/B2 classification. Repaired the damaged section 7.7 heading. Approvals for intervening revisions remain recorded in section 12; no READY or release sign-off. |
 
 Future stack revisions preserve superseded definitions with `~~strikethrough~~` and prefix replacement choices with `**[NEW]**`.
 
@@ -452,12 +460,453 @@ Future topology revisions preserve superseded definitions with `~~strikethrough~
 
 **[NEW]** Observed dry-run behavior: `internal/service/core/destructive.go` builds a plan and returns a dry-run before confirmation comparison; `internal/api/topic_delete_test.go` exercises token discovery without prior confirmation. However, the replay OpenAPI request schema still requires `confirm`. The service observation does not prove all HTTP routes accept missing confirmation. First-preview wire shapes and route-specific schema handling remain blocked pending an approved compatibility rule; do not silently relax execution confirmation.
 
-**[NEW]** Observed continuation shape: `internal/api/message/dto.go` defines one replay `source.from` and optional partition selection, but returns a per-partition cursor map. Read/search requests similarly lack a general per-partition input cursor. `internal/api/message_replay_test.go` covers single-partition resume. Multi-partition continuation, stable end bounds, and aggregation semantics remain blocked; do not invent a cursor-map request field, silently restart a range, or assume per-partition fan-out is equivalent without a reviewed contract and tests.
+**[NEW]** Observed continuation shape: `internal/api/message/dto.go` defines one replay `source.from` and optional partition selection, but returns a per-partition cursor map. Read/search requests similarly lack a general per-partition input cursor. `internal/api/message_replay_test.go` covers single-partition resume. Multi-partition continuation, stable end bounds, and aggregation semantics remain blocked; do not invent a cursor-map request field.
 
 ### 7.7 Remaining Design Blockers and Verification Status
 
 **[NEW]** Design status: `STATUS: BLOCKED`. Release verification: `PENDING`. This records approval of the design direction, not a complete Step 8 sign-off or permission to start task creation.
 
-**[NEW]** Remaining decisions include concrete API routes/DTOs/error and permission catalogs; persistence schemas and migration/recovery mechanics; session activity and cookie/antiforgery contracts; throttle progression/concurrency; key provisioning/rotation; operational deadlines/polling/shutdown limits; Gateway dry-run HTTP compatibility and multi-partition continuation. The approved choices above reduce the audit gaps but do not resolve these details by implication.
+~~Remaining decisions include concrete API routes/DTOs/error and permission catalogs; persistence schemas and migration/recovery mechanics; session activity and cookie/antiforgery contracts; throttle progression/concurrency; key provisioning/rotation; operational deadlines/polling/shutdown limits; Gateway dry-run HTTP compatibility and multi-partition continuation. The approved choices above reduce the audit gaps but do not resolve these details by implication.~~ **[NEW]** Section 8 records the next approved contract batch and supersedes earlier pending-decision statements only for its explicitly selected values. Section 8.7 lists the remaining gaps. Design remains blocked; this is not a Step 8 readiness sign-off.
 
 **[NEW]** No application tests, benchmarks, dependency compatibility checks, or artifact scans were run for this documentation change. Test-tool pins, deployment-version selections, and release evidence remain pending under sections 1 and 4. The all-severity zero-CVE policy remains unchanged; no unscanned component is certified clean.
+
+## 8. Approved Detailed Contract Batch 1
+
+**[NEW]** Approved on 2026-09-25. The user rejected Gateway modifications, retained operation-level permissions, selected explicit-user-request session activity and stopped-application migrations with backup, then approved this first detailed proposal. This section refines section 7; it does not approve application implementation, task creation, the entire visual-design draft, or a readiness verdict. Unspecified contracts remain open rather than being inferred from examples.
+
+### 8.1 Unchanged Gateway and Compatibility Investigation
+
+- **[NEW]** Kafka3O-Gateway remains unchanged. Preserve all 41 command IDs / 47 operations and the approved multi-partition requirements; refusal to change Gateway is not approval to drop features.
+- **[NEW]** For first previews, investigate supplying `confirm: ""` with `dryRun=true` where the existing HTTP schema requires a confirmation string. Checked-in `ReplayRequestBody.confirm` has type string without a non-empty constraint, and the shared destructive service returns a dry-run before checking confirmation. These source observations support a candidate adapter request shape, not proof that every HTTP route accepts it. Require route-specific HTTP tests proving successful preview and zero mutations before treating compatibility as established. Execution still requires the real exact target or plan token; never reuse the empty preview value for execution.
+- **[NEW]** Investigate UI-backend orchestration of existing single-partition calls using exact cursors and fixed end bounds. Approval covers investigation only. Before approval of an implementation contract, demonstrate ordering, aggregate limits, stable source/filter/window semantics, partial progress, replay auditing/authorization per request, and equivalence to required multi-partition behavior. Do not invent Gateway cursor fields, silently restart ranges, or automatically retry ambiguous mutations.
+- **[NEW]** No Gateway code, schema, or tests are changed by this decision. Target deployment compatibility remains unverified, and multi-partition orchestration remains a design blocker.
+
+### 8.2 Fixed Permission Identifiers
+
+**[NEW]** The catalog contains 47 literal Gateway operation permissions plus three separate permissions below. No wildcard grants or command-level parent grants are introduced for multi-operation commands. Roles remain user-created named bundles; environment/cluster assignment union and application-wide administration semantics remain as specified in FUNC-SPEC section 2.3.
+
+| Family | Literal permission IDs |
+|---|---|
+| Cluster | **[NEW]** `gateway.c1`, `gateway.c2`, `gateway.c3.live`, `gateway.c3.ready`, `gateway.c4`, `gateway.c5`, `gateway.c6`, `gateway.c7`, `gateway.c8`, `gateway.c9.start`, `gateway.c9.cancel`, `gateway.c9.elect`, `gateway.c10`, `gateway.c11`, `gateway.c12` |
+| Topics | **[NEW]** `gateway.t1`, `gateway.t2`, `gateway.t3`, `gateway.t4`, `gateway.t5`, `gateway.t6`, `gateway.t7`, `gateway.t8`, `gateway.t9`, `gateway.t10`, `gateway.t11`, `gateway.t12` |
+| Messages | **[NEW]** `gateway.m1`, `gateway.m2`, `gateway.m3`, `gateway.m4`, `gateway.m5`, `gateway.m6`, `gateway.m7`, `gateway.m8` |
+| Groups | **[NEW]** `gateway.g1`, `gateway.g2`, `gateway.g3`, `gateway.g4`, `gateway.g5`, `gateway.g6`, `gateway.g7` |
+| Kafka security | **[NEW]** `gateway.s1.list`, `gateway.s1.create`, `gateway.s1.delete`, `gateway.s2.list`, `gateway.s2.alter` |
+| Additional | **[NEW]** `app.access.manage`, `app.audit.view`, `gateway.lock.override` |
+
+**[NEW]** `app.access.manage` controls application role/assignment administration and can grant additional access; it does not itself grant Kafka operations. `app.audit.view` controls application audit viewing. `gateway.lock.override` supplements the selected operation permission and requires a request-scoped reason; it is not a standalone Kafka-operation grant or bypass of other safety controls. Credential selection stays server-side; S1/S2 lists still require configured operator-tier Gateway credentials without implying user mutation permission.
+
+### 8.3 Application Endpoint Baseline
+
+**[NEW]** All paths below use prefix `/api/v1`. These are UI-backend endpoints, not changes to Gateway. Non-public routes require a valid session; state-changing browser requests require antiforgery protection, including sign-in initiation, emergency login, activity, and logout. OIDC callbacks retain their protocol-specific validation rather than API antiforgery-header requirements. The table selects methods, paths, and the stated fields; it is not yet a complete DTO/OpenAPI schema.
+
+| Method | Path | Approved contract / access |
+|---|---|---|
+| GET | `/auth/bootstrap` | **[NEW]** Public bootstrap: configured provider IDs/display names and antiforgery request token; no credentials or configuration secrets. |
+| POST | `/auth/login/{providerId}` | **[NEW]** Public authentication entry: begin allowlisted OIDC flow with validated local `returnPath`. |
+| POST | `/auth/emergency` | **[NEW]** Public authentication entry: `{password}` for the single configured identity; throttle and audit before session issuance. |
+| GET | `/session` | **[NEW]** Current principal, login/idle/absolute expiry, and application permissions. |
+| POST | `/session/activity` | **[NEW]** Explicit activity notification; empty body; session and antiforgery required. |
+| POST | `/session/logout` | **[NEW]** Revoke current session and clear session cookie. |
+| GET | `/permissions` | **[NEW]** Fixed catalog; requires `app.access.manage`. |
+| GET | `/roles` | **[NEW]** List roles; requires `app.access.manage`. |
+| POST | `/roles` | **[NEW]** Create role from `{name, permissionIds}`; requires `app.access.manage`. |
+| PUT | `/roles/{id}` | **[NEW]** Replace editable role fields; requires `app.access.manage` and `If-Match` revision. |
+| GET | `/assignments` | **[NEW]** List assignments; requires `app.access.manage`. |
+| POST | `/assignments` | **[NEW]** Create provider-qualified role assignment; requires `app.access.manage`. |
+| PUT | `/assignments/{id}` | **[NEW]** Update assignment; requires `app.access.manage` and `If-Match` revision. |
+| GET | `/clusters` | **[NEW]** Authorized registrations and permitted observations, never registry credentials. |
+| GET | `/audit` | **[NEW]** Paginated/filterable audit history; requires `app.audit.view`. |
+| GET | `/audit/{id}` | **[NEW]** Audit event detail; requires `app.audit.view`. |
+
+**[NEW]** Register the 47 Gateway operations as explicit cluster-scoped UI endpoints, never as a catch-all proxy. Their full method/path/DTO/permission/tier/audit mapping remains a separate approval item. Resource identifiers must not grant an arbitrary upstream destination. Callback paths, complete request/response schemas, paging/filter parameters, antiforgery-header naming, and revision header serialization remain to be finalized; no route-table omission authorizes a new capability.
+
+### 8.4 Persistence Field Baseline
+
+**[NEW]** Use UUID entity IDs, UTC instants, UUID concurrency revisions, and canonical JSON only for structured snapshots. The following approved field baseline must be refined into provider-specific schemas, not treated as completed migrations. Never persist password material or message bodies in these tables; the emergency password hash remains secret-provisioned under section 7.2.
+
+| Table | Approved fields and selected constraints |
+|---|---|
+| Sessions | **[NEW]** `tokenHash`, `authSource`, `issuer`, `subject`, `claimsJson`, `createdAt`, `lastActivityAt`, `absoluteExpiresAt`, `revokedAt`, `credentialVersion`. |
+| Roles | **[NEW]** `id`, `name`, `normalizedName`, `revision`; unique normalized name. |
+| RolePermissions | **[NEW]** `roleId`, `permissionId`; composite primary key and role foreign key. |
+| Assignments | **[NEW]** `id`, `providerId`, `matchKind`, `claimType`, `matchValue`, `roleId`, `scopeKind`, `scopeId`, `revision`; reject duplicate mappings. |
+| LoginThrottle | **[NEW]** `accountId`, `sourceAddress`, `windowStartedAt`, `failureCount`, `nextAllowedAt`, `revision`; composite account/address key. |
+| AuditEvents | **[NEW]** `id`, `attemptId`, `occurredAt`, `correlationId`, principal identity, environment/cluster IDs, operation, sanitized target, phase/outcome, dry-run flag, override reason, error code. |
+
+**[NEW]** Final types, lengths, nullability, indexes, normalization/uniqueness rules, foreign-key behavior, session-token hashing details, canonical snapshot representation, and provider mappings remain subject to approval. Audit identity/target concepts in the table are not yet finalized individual column definitions. Preserve section 7.4's durable attempt, local transaction, independent result-write, cancellation, and unmatched-attempt rules throughout schema design.
+
+### 8.5 Session Activity, Cookies, and Error Envelope
+
+- **[NEW]** Session cookie name: `__Host-Kafka3O.Session`; Secure, HttpOnly, Path `/`, SameSite=Lax, no Domain. OIDC correlation/nonce cookies use framework-compatible Secure/SameSite=None settings. Continue to keep authentication tokens out of browser storage.
+- **[NEW]** Explicit authenticated navigation and submitted user actions invoke `POST /api/v1/session/activity`. Passive viewing, background polling, and automatic replay batches never invoke it. Use server time and an atomic monotonic `lastActivityAt` update only while the session remains valid. An activity request cannot revive an expired or revoked session. The 4-hour idle and 8-hour absolute limits remain unchanged.
+- **[NEW]** Error envelope fields: `{code, message, status, requestId, fieldErrors?, upstreamCode?, outcome}`. Sanitize every returned field. Exact code and outcome enums and field-error element schemas remain to be finalized.
+
+| Condition | Approved HTTP status / semantics |
+|---|---|
+| Input validation | **[NEW]** 400 |
+| Expired session | **[NEW]** 401; do not mistake Gateway credential failure for user-session expiry. |
+| Permission denied | **[NEW]** 403 |
+| Missing resource | **[NEW]** 404 |
+| Stale revision | **[NEW]** 412 |
+| Missing required revision precondition | **[NEW]** 428 |
+| Throttled | **[NEW]** 429 |
+| Audit/database unavailable | **[NEW]** 503; required pre-execution persistence failure blocks the action. |
+| Upstream timeout | **[NEW]** 504; mutation `outcome: "unknown"` unless non-execution is established. |
+
+**[NEW]** Preserve upstream safety error codes and per-item 207 outcomes. Post-execution audit-result failure must retain the known business result and distinguish audit persistence failure; a generic 503 must not erase a known result, imply rollback, or prompt automatic replay. The concrete response representation for this combined condition remains to be finalized. Never automatically retry ambiguous mutations.
+
+### 8.6 Operational Limits and Maintenance Recovery
+
+| Setting | Approved value / behavior |
+|---|---|
+| Gateway connection timeout | **[NEW]** 5 seconds |
+| Ordinary read deadline | **[NEW]** 30 seconds |
+| Mutation / replay-batch deadline | **[NEW]** 60 seconds |
+| Throughput sample deadline | **[NEW]** Requested sample duration + 10 seconds, maximum 70 seconds |
+| Audit write deadline | **[NEW]** 5 seconds each; result recording remains independent of request cancellation under section 7.4. |
+| Application operation deadline | **[NEW]** 85 seconds |
+| Ingress deadline | **[NEW]** 100 seconds |
+| Visible health polling | **[NEW]** Every 30 seconds; paused in hidden tabs; does not renew session activity. |
+| Message polling | **[NEW]** No automatic message polling. |
+| Upload limit | **[NEW]** 10,000,000 bytes, further constrained by Gateway. |
+| Shutdown | **[NEW]** Stop admission, drain for 90 seconds, Kubernetes termination grace 110 seconds. Interrupted mutations remain unknown; no automatic replay. |
+
+**[NEW]** Keep operation budgets compatible with requested scan/sample durations and the per-operation Gateway bounds. These are approved design values, not benchmarked performance claims. Detailed deadline propagation, admission/readiness sequencing, request-body limits for non-upload endpoints, and configured-bound validation still require concrete contracts.
+
+**[NEW]** Database upgrades use an explicit maintenance command while the application is stopped, with a backup first. Back up the database and required Data Protection key material, execute the selected provider's migrations, then validate schema compatibility before startup. Never migrate on normal startup. On migration failure, stay stopped and restore the matching backup rather than automatically down-migrating. Restoration never replays unmatched audit attempts or claims to reverse Kafka writes. Exact command syntax, backup/restore tooling, key/certificate handling, and post-restore session/security reconciliation remain approval items.
+
+### 8.7 Remaining Decisions and Verification Gate
+
+**[NEW]** Design status remains `STATUS: BLOCKED`; release verification remains `PENDING`. This approval records one contract batch, not the Step 8 audit sign-off required before Step 9.
+
+**[NEW]** The following list records the gaps at batch 1. Section 9 supersedes pending decisions only where it explicitly selects their values; section 9.7 is the current remaining-decision list.
+
+- **[NEW]** Finalize all 47 cluster endpoint mappings and request/response DTOs; full application endpoint schemas, OIDC callback/antiforgery details, error/outcome enumerations, concurrency header behavior, and audit-failure response representation.
+- **[NEW]** Finalize provider schemas/constraints/indexes, session hashing/expiry concurrency mechanics, throttle progression/concurrency, retention queries, migration tooling, first-install key provisioning, key/certificate rotation and restore security rules.
+- **[NEW]** Verify route-specific empty-confirm previews and resolve multi-partition orchestration semantics without Gateway changes or scope reduction. Source inspection alone does not close these gaps.
+- **[NEW]** Complete deadline propagation and lifecycle details, scan-bound validation, and remaining payload/resource limits. Existing test-tool/deployment selection and all-severity zero-CVE release gates remain mandatory.
+
+**[NEW]** This batch changes documentation only. No application scaffold, Gateway modifications, runtime/HTTP tests, migrations, benchmarks, or vulnerability scans were performed. Subsequent changes need approval at the relevant design gate; do not clean pending diff markers before their task actions exist.
+
+## 9. Approved Detailed Contract Batch 2
+
+**[NEW]** Approved on 2026-09-25. The user accepted all six proposed refinements below. These decisions refine sections 7 and 8 without modifying Gateway, reducing functional scope, approving the entire visual design, or issuing a Step 8 sign-off. Earlier statements that these particular choices are pending are superseded by this section; unselected details remain open.
+
+### 9.1 Explicit Cluster Route Mapping
+
+**[NEW]** Map every existing command operation at `/v1/...` to a UI endpoint at `/api/v1/clusters/{clusterId}/...`, preserving its HTTP method and the suffix after `/v1/`. Register all 47 command operations explicitly, with their individual permission IDs from section 8.2. This rule defines their path mapping, not a runtime catch-all or arbitrary forwarding endpoint.
+
+| Gateway command endpoint | Corresponding UI endpoint |
+|---|---|
+| GET `/v1/health/live` | **[NEW]** GET `/api/v1/clusters/{clusterId}/health/live`, permission `gateway.c3.live` |
+| GET `/v1/health/ready` | **[NEW]** GET `/api/v1/clusters/{clusterId}/health/ready`, permission `gateway.c3.ready` |
+| POST `/v1/replays` | **[NEW]** POST `/api/v1/clusters/{clusterId}/replays`, permission `gateway.m8` |
+
+**[NEW]** Resolve `clusterId` only against authorized configured registrations; never accept caller-controlled Gateway URLs or credentials. Preserve resource parameter encoding, current authorization, server-selected credential tier, audit, preview, and confirmation rules. Route mirroring does not imply raw DTO passthrough: exact numeric strings, sanitization, and UI response metadata remain UI contracts. Gateway documentation routes are not additional command operations.
+
+**[NEW]** Validation must enumerate the targeted Gateway command catalog and assert 47 distinct method/path mappings, 41 command IDs, no collisions, correct individual permissions, and rejection of unregistered destinations. Complete per-operation DTO/tier/audit bindings and target-deployment verification remain required; these examples are not a claim that endpoints exist in code.
+
+### 9.2 Business Result and Audit Recording Failure
+
+**[NEW]** When execution has a known business result but subsequent audit-result recording fails, preserve that result and return separate `auditStatus: "recording_failed"` metadata plus the correlation ID. The UI shows a persistent audit warning alongside the actual result. Do not relabel known success as operation failure, imply rollback, or automatically retry the operation. Preserve known partial/item outcomes as well; do not replace a 207 result with a generic failure.
+
+**[NEW]** Failure to persist required pre-execution audit data still blocks execution under sections 7.4 and 8.5. If the business outcome itself is unknown, audit metadata must not convert it to success. Crash-recovered unmatched attempts remain unresolved and are never replayed automatically. Detailed metadata placement, complete status enumeration, and download/non-JSON response handling remain to be specified; this decision selects semantics and the failure field/value, not a complete new response envelope.
+
+**[NEW]** Validation must inject result-write failure after a known successful or partially successful mutation, verify preserved result/correlation and the persistent warning, and assert exactly one business execution. Separate attempt-write failure tests require zero executions.
+
+### 9.3 Session Identifier and Antiforgery Handling
+
+- **[NEW]** Generate session identifiers from 32 cryptographically random bytes. Store only their SHA-256 hashes in the session database, never the raw bearer identifiers. Retain the protected cookie settings and database-backed validation rules in sections 7.1 and 8.5. This hashing choice applies to high-entropy session identifiers, not human passwords; emergency passwords retain the approved Identity password hasher.
+- **[NEW]** Use ASP.NET Core antiforgery with request header `X-CSRF-TOKEN`. Keep the request token in browser memory, not local/session storage or other persistent client storage. Refresh antiforgery state after login and logout so it is bound to the current authentication context. OIDC callbacks continue to use their distinct state/nonce/correlation validation.
+- **[NEW]** Check expiry and revocation before any activity update; expired sessions cannot be renewed. Explicit activity remains governed by section 8.5, including its monotonic server-time update and exclusion of automatic polling/replay batches.
+- **[NEW]** Validate random identifier generation/hash lookup without raw identifiers in database or diagnostics, missing/invalid antiforgery headers, authentication transitions, and expiry racing with activity. Cookie/token serialization, hash storage format, and the precise database concurrency mechanism remain to be finalized.
+
+### 9.4 Emergency Login Throttle Schedule
+
+**[NEW]** Retain persisted failed-verification state per emergency-account/source-address pair and the five-failure threshold within 15 minutes. Following the fifth failed verification, set the first delay before another verification is allowed; each subsequent failed verification advances the capped schedule below.
+
+| Failed verification count in the active sequence | Delay before another verification |
+|---|---|
+| 5 | **[NEW]** 1 second |
+| 6 | **[NEW]** 2 seconds |
+| 7 | **[NEW]** 4 seconds |
+| 8 | **[NEW]** 8 seconds |
+| 9 | **[NEW]** 16 seconds |
+| 10 | **[NEW]** 32 seconds |
+| 11 and later | **[NEW]** 60 seconds |
+
+**[NEW]** Reject requests arriving before the next allowed time with HTTP 429 and `Retry-After`, without running another password verification. An early rejected request is not a failed password verification. Reset the pair's sequence after successful login or 15 minutes without a failed verification. Never permanently lock the emergency account; retain trusted-proxy-only handling of forwarded source addresses.
+
+**[NEW]** Permit at most two concurrent password verifications application-wide, with no waiting queue. This limits expensive hashing work; it is not proof of protection from distributed guessing. Atomic counter/admission mechanics, exact rolling-window representation, reset boundary behavior, and the global-cap overload response contract remain to be finalized rather than inferred from the delay table.
+
+**[NEW]** Controlled-clock tests must cover the fifth-failure boundary, each delay, the 60-second cap, early rejection without hashing, reset after success/inactivity, restart persistence, and no more than two concurrent verifications with no queue. Run persistence-related cases against both approved database providers.
+
+### 9.5 Controlled Key Initialization and Rotation
+
+**[NEW]** Initialize the protected Data Protection key store through an explicit first-install maintenance command. Normal application startup fails if required keys are missing or unreadable; it must not silently recreate lost material. Keep the durable protected storage and secret-provisioned certificate requirements from section 7.3.
+
+**[NEW]** During certificate rotation, encrypt new keys with the new certificate. Retain old decryption certificates until no retained live or backup key material requires them. Removing a certificate merely because it is no longer used to encrypt new keys is not a valid retirement rule. Exact command syntax, first-install detection, permissions, backup inventories, and retirement verification procedures remain to be finalized.
+
+**[NEW]** Verification must distinguish deliberate first installation from a lost key store, reject normal startup with missing/unreadable keys, and exercise decryption of retained keys across rotation and restoration. No key-provisioning or rotation command has been implemented or executed for this documentation update.
+
+### 9.6 Post-Restore Access Reconciliation
+
+**[NEW]** Keep the application stopped during restoration. Restore matching database and key material, invalidate all restored sessions, and reconcile roles, assignments, and emergency credential versions before reopening access. This prevents restored session records from automatically granting access after recovery; it does not imply that restoring stale roles is safe without review.
+
+**[NEW]** Preserve unmatched audit attempts as unresolved. Never automatically replay them or claim that restoring the UI database rolls back Kafka changes. Retain section 8.6's backup-first maintenance process and stay-stopped behavior on migration/recovery failure. Exact recovery commands, the authoritative source/checklist for access reconciliation, and validation of completion remain design items.
+
+**[NEW]** Recovery tests must prove pre-restore cookies cannot authenticate after session invalidation, reopening is gated on the reconciliation procedure, and unmatched attempts remain visible without business re-execution. No production backup or restore is authorized by this specification edit.
+
+### 9.7 Remaining Decisions and Verification Gate
+
+**[NEW]** Design status remains `STATUS: BLOCKED`; release verification remains `PENDING`. Acceptance of these six decisions is not the Step 8 readiness sign-off required for Step 9 task creation.
+
+**[NEW]** This list records the remaining decisions at batch 2. Section 10 resolves the explicitly selected contracts below; section 10.7 is the current remaining-decision list.
+
+- **[NEW]** Complete the 47-operation request/response DTO, permission/tier/audit binding table under the approved route-mapping rule; application endpoint schemas, OIDC callback paths, revision headers, exact error/outcome codes, and audit metadata placement for JSON and non-JSON results.
+- **[NEW]** Finalize provider schemas, lengths/nullability/indexes/constraints, session representation and expiry concurrency, throttle window/admission/reset mechanics and overload responses, and retention queries.
+- **[NEW]** Finalize maintenance command syntax/tooling, key initialization/rotation/retirement procedures, and restore/access-reconciliation enforcement. The approved session invalidation and certificate-retention rules are mandatory, not pending choices.
+- **[NEW]** Verify route-specific empty-confirm previews and resolve multi-partition continuation/aggregation semantics without Gateway changes or feature reduction. Investigation approval is not compatibility evidence.
+- **[NEW]** Complete deadline propagation, lifecycle sequencing, scan-bound validation, and remaining request/resource limits. Existing package/deployment selections, executable tests, compatibility evidence, and all-severity zero-CVE release gates remain required.
+
+**[NEW]** This batch updates specifications only; no application code, Gateway files, tests, credentials, key stores, or deployed resources are changed. Runtime tests and security evidence remain pending. Keep diff history until corresponding task actions are created under the pipeline rules.
+
+## 10. Approved Detailed Contract Batch 3
+
+**[NEW]** Approved on 2026-09-25: all six proposed decisions were accepted. This section supersedes earlier pending-choice statements only for the contracts it explicitly defines. It does not change Gateway or authorize application implementation, scope reduction, or a Step 8 readiness sign-off.
+
+### 10.1 Response and Audit Metadata
+
+**[NEW]** JSON operation-result responses use `{data, meta: {requestId, auditStatus}}`. Preserve the business result in `data`, including per-item outcomes and HTTP 207 for partial results. `requestId` is the correlation identifier. The fixed audit-status values are:
+
+| Value | Meaning |
+|---|---|
+| `recorded` | **[NEW]** Required audit recording for the returned result completed. |
+| `recording_failed` | **[NEW]** Post-execution result recording failed; preserve the known business outcome and show a persistent warning. |
+| `not_required` | **[NEW]** The applicable audit policy requires no recording for this operation. Never use this to bypass emergency-action or other mandatory auditing. |
+
+**[NEW]** File downloads retain their original contents and expose equivalent correlation/audit metadata through response headers. The frontend checks metadata before presenting success, including download success. This does not authorize a payload wrapper inside an exported definitions file. Exact download metadata header names and response-finalization behavior remain to be specified.
+
+**[NEW]** Pre-execution audit failure still blocks execution; unknown business outcomes remain unknown. The existing classified error envelope in section 8.5 is not replaced by a successful-result wrapper. Application-list `{items, page}` results occupy `data` when returned through the JSON result envelope. Redirects, OIDC callbacks, and responses without a body do not acquire an invented JSON body through this rule.
+
+**[NEW]** Verification must distinguish known success with failed audit recording, partial 207 results, and genuinely failed/unknown operations; assert preserved payloads, metadata inspection, persistent warnings, and no automatic business retry. Download checks must verify byte-preserved file content and equivalent metadata handling.
+
+### 10.2 Role and Assignment Revision Preconditions
+
+**[NEW]** Return a strong `ETag` containing the quoted revision UUID for a role or assignment representation. An update requires that exact value in `If-Match`. Missing preconditions return 428; an outdated revision returns 412. Reject wildcard updates and never silently overwrite another administrator's changes. A weak validator does not satisfy the exact strong-revision requirement.
+
+**[NEW]** Revision comparison and the write must be atomic; a preliminary client or server read is insufficient to prevent a concurrent overwrite. Preserve the existing durable audit attempt and atomic local change/successful-result transaction. Verification must include two updates using the same revision, with only one committed change, and missing/stale/wildcard precondition cases. Detailed malformed-header errors and representation schemas remain part of the endpoint contract work.
+
+### 10.3 Application-Owned List Pagination
+
+**[NEW]** Roles, assignments, and audit history accept `pageNumber` starting at 1 and `pageSize` defaulting to 50 with a maximum of 500. Their list result is `{items, page: {number, size, total}}`, carried as `data` under section 10.1. `total` is the total matching item count, not merely the count returned on the current page. Retain all applicable authorization and approved audit filters.
+
+| List | Stable ordering |
+|---|---|
+| Roles | **[NEW]** Normalized name ascending, then ID ascending. |
+| Assignments | **[NEW]** ID ascending. |
+| Audit events | **[NEW]** UTC timestamp descending, then ID descending. |
+
+**[NEW]** Gateway-backed lists retain their existing pagination contracts; this decision does not rename Gateway parameters or change upstream ordering. Test default/maximum sizes, invalid bounds, empty results, filtering, and tied primary sort values. Stable ordering does not imply snapshot isolation across multiple requests while data changes.
+
+### 10.4 Throttle Window and Admission
+
+**[NEW]** Count failed emergency password verifications in a rolling 15-minute window until the fifth failure activates the delay sequence in section 9.4. Once triggered, retain escalation until a successful verification or 15 minutes without a failed verification. An early rejected request does not run password hashing or increment failures, and is not a failed verification that extends the inactivity reset.
+
+**[NEW]** Serialize verification admission for the same account/source-address pair so concurrent requests cannot bypass its threshold or delay. Enforce the previously approved application-wide maximum of two simultaneous password verifications. When both slots are occupied, return 429 with `Retry-After: 1`, without queuing, hashing, or incrementing failures. Preserve the no-waiting-queue rule; serialization must not introduce an unbounded request queue.
+
+**[NEW]** A rolling window requires enough persisted history to distinguish failures inside and outside that window; the section 8.4 counter/window field sketch is not, by itself, a complete rolling-window storage design. Final storage and atomic admission mechanisms remain part of the provider-schema work. Test burst concurrency, rolling-window boundaries, escalation persistence, reset behavior, overload response, and zero hash invocations for rejected admission.
+
+### 10.5 Atomic Activity and Expiry Boundary
+
+**[NEW]** A session is expired when `now >= expiry`, for either idle or absolute expiry. Atomically update activity only if the stored session is unrevoked and both deadlines remain valid. Compare against the existing idle deadline before renewing it, using server time; set the activity timestamp to the later of its existing value and server time. Concurrent requests must not move activity backward.
+
+**[NEW]** Logout or revocation must never be undone by a competing activity update. The operation must preserve revocation state and cannot recreate or reactivate an invalidated session. Absolute expiry never moves. The explicit-user-activity classification and 4-hour idle / 8-hour absolute limits remain unchanged.
+
+**[NEW]** Controlled-clock and real-provider concurrency tests must cover one instant before expiry, exact equality, after expiry, out-of-order activity writes, and logout/revocation racing with activity. Validate equivalent behavior on SQLite and PostgreSQL; no such tests have run for this specification update.
+
+### 10.6 Provider-Specific OIDC Callbacks
+
+| Provider | Fixed callback path |
+|---|---|
+| Entra ID | **[NEW]** `/signin-oidc/entra` |
+| Cognito | **[NEW]** `/signin-oidc/cognito` |
+
+**[NEW]** Register each path as an exact HTTPS redirect URI under the application's configured public origin at its provider. These callback paths are outside the `/api/v1` application-endpoint prefix. Bind each callback to its configured authentication scheme and retain issuer/audience, state, nonce, correlation, and PKCE validation. They do not use the browser API antiforgery-header requirement.
+
+**[NEW]** Permit only validated same-origin relative return paths; reject external and protocol-relative destinations. Never automatically resume a mutation after authentication. Verification must cover both providers in one deployment, callback/scheme mismatch, invalid protocol binding, and external/protocol-relative return-path rejection.
+
+### 10.7 Remaining Decisions and Verification Gate
+
+**[NEW]** Design status remains `STATUS: BLOCKED`; release verification remains `PENDING`. Approval of these contracts is not approval to start Step 9 or to waive the release gates.
+
+**[NEW]** This list records the gaps at batch 3. Section 11 supersedes the explicitly resolved choices; section 11.7 is the current remaining-decision list.
+
+- **[NEW]** Complete per-operation request/response DTOs and permission/tier/audit bindings, application endpoint field schemas, error/outcome enumerations, malformed-precondition behavior, and download metadata header names/finalization. The approved result wrapper, ETag rule, pagination, and callback paths are no longer pending choices.
+- **[NEW]** Finalize provider types/lengths/nullability/indexes/constraints, session/token representation and atomic database operations, persisted rolling-window throttle storage/admission mechanics, and retention queries. Preserve the approved expiry boundaries, throttle escalation/reset, and overload responses.
+- **[NEW]** Finalize maintenance and key-management commands/procedures and enforceable restore/access reconciliation, using the approved session invalidation and certificate-retention rules.
+- **[NEW]** Resolve empty-confirm HTTP preview compatibility and multi-partition continuation/aggregation semantics without Gateway changes or feature reduction. No source inspection or design approval substitutes for the required compatibility checks.
+- **[NEW]** Complete deadline propagation, lifecycle sequencing, scan-bound validation, and remaining resource limits. Package/deployment selections, executable tests, compatibility evidence, and zero-CVE release gates remain required.
+
+**[NEW]** This is a documentation-only approval record. No application or Gateway code, deployed resources, credentials, or key material changed; no runtime tests or security scans were performed. Preserve earlier history and pending diff markers until task actions exist.
+
+## 11. Approved Detailed Contract Batch 4
+
+**[NEW]** Approved on 2026-09-25: all six proposed decisions were accepted. These choices refine earlier sections without changing Gateway. They do not approve a complete continuation algorithm, the entire visual-design draft, or Step 8 readiness. Superseded pending-choice statements are historical; only the explicit decisions below are resolved.
+
+### 11.1 Conditional Topic-Details Permission
+
+**[NEW]** Snapshot-based browsing, searching, and replay require `gateway.t2` alongside the selected operation permission when the UI backend must discover partition bounds through T2. Never grant T2 implicitly or perform a T2 call solely because the principal has M1, M3, M4, or M8. Authorize T2 for the same configured cluster before the metadata call; apply the existing per-request audit and session rules.
+
+**[NEW]** Operations with sufficient explicit inputs retain their existing permission requirements; this is not a blanket T2 prerequisite for every message request. A user may open an otherwise permitted operation form, but discovery-dependent execution must stop with an actionable permission explanation when T2 is absent. Reused bounds, continuation state, and changed inputs must obey the eventual validated continuation contract; permission approval alone does not prove those inputs sufficient.
+
+**[NEW]** Test operation-only access with sufficient inputs, rejection of discovery without T2 with zero unauthorized metadata calls, permitted discovery with both permissions, cross-cluster denial, and permission revocation before a subsequent metadata request. Gateway remains unchanged, and stable bounds/ordering/aggregation still require compatibility investigation.
+
+### 11.2 Download Metadata and Export Limit
+
+**[NEW]** File downloads expose `X-Request-Id` and `X-Kafka3O-Audit-Status`. Use the same correlation identifier and `recorded`, `recording_failed`, or `not_required` semantics as JSON metadata in section 10.1. The frontend checks these headers before displaying success and retains a persistent warning for failed result recording.
+
+**[NEW]** Finish fetching the export and attempting required audit-result recording before sending response headers. Required pre-execution audit failure still prevents the upstream action. Preserve the export file contents: do not inject metadata or the UI JSON response wrapper into them.
+
+**[NEW]** Apply a UI export limit of 10,000,000 bytes. Exports exceeding it fail explicitly; never silently truncate or return a partial file as successful. This is a newly approved UI limit, not a claim about Gateway's configured restriction. Buffering/storage mechanics must remain bounded and within the operation deadlines; their concrete implementation remains to be specified.
+
+**[NEW]** Verify byte-preserved exports, headers consistent with actual audit recording, no early header commit, exact-limit acceptance, over-limit failure, and no successful partial file after upstream failure. Never replay a business operation to repair result-audit failure.
+
+### 11.3 Error Outcome Enumeration
+
+| Error envelope `outcome` | Required semantics |
+|---|---|
+| `not_started` | **[NEW]** The business operation did not start. Use for validation, permission denial, and failed required pre-execution audit. |
+| `failed` | **[NEW]** Failure is established; this does not imply rollback or prove that no effects occurred. Preserve reported progress/details. |
+| `unknown` | **[NEW]** The business outcome is not established, including ambiguous mutations after transport failure. Never automatically retry. |
+
+**[NEW]** These are error-envelope outcomes, separate from audit status. A known successful operation with `auditStatus: "recording_failed"` remains a known business success. Partial results retain HTTP 207 and per-item outcomes instead of becoming generic errors. Verify these distinctions through pre-execution, established-failure, partial-result, and ambiguous-transport scenarios.
+
+### 11.4 Exact Revision-Header Validation
+
+**[NEW]** Accept exactly one strong, quoted UUID revision in `If-Match` for role/assignment updates. Missing `If-Match` returns 428. Malformed, weak, wildcard, or multiple values return 400. A valid but stale revision returns 412. No business write occurs on any rejection; required rejection auditing is not an authorization-data write.
+
+**[NEW]** Successful updates return the new revision through the strong ETag contract. Preserve section 10.2's atomic compare-and-write and local change/result audit transaction. Verify every rejection category and that two updates with the same initial revision cannot both commit.
+
+### 11.5 Cross-Provider Persistence Conventions
+
+| Concern | Approved convention |
+|---|---|
+| UUID values | **[NEW]** Native UUIDs in PostgreSQL; canonical UUID text in SQLite. |
+| Stored timestamps | **[NEW]** UTC epoch-millisecond integers in both providers. This storage choice does not relax browser-boundary numeric-precision rules. |
+| Session hashes | **[NEW]** 32-byte binary SHA-256 session hashes; never raw session bearer identifiers. |
+| Equivalent behavior | **[NEW]** Explicit provider constraints and tests enforce equivalent semantics rather than relying on differing implicit database behavior. |
+| Role names | **[NEW]** Provider-independent normalization for role-name uniqueness. |
+| Identity/claim matching | **[NEW]** Preserve case-sensitive identity and claim matching; role-name normalization must not merge principals or alter claim matching. |
+
+**[NEW]** Final table definitions must enumerate lengths, nullability, indexes, relationships, and constraints. Exact canonical UUID formatting and role-name normalization algorithms still require definition; these conventions do not claim complete schemas. Persistence tests must cover both real providers, including duplicate normalized names, case-distinct identity/claim values, timestamp boundaries, and fixed hash length.
+
+### 11.6 Scheduled Audit Retention
+
+**[NEW]** Run audit-retention cleanup hourly in batches of at most 1,000 events, using the deployment-configured retention period, default 90 days. Delete only events strictly older than the cutoff; an event exactly at the cutoff remains. Expired unresolved attempts are eligible without changing their classification to success or failure. No interactive audit-deletion capability is introduced.
+
+**[NEW]** Cleanup failure produces an operational alert and retries at the next scheduled run. It never disables required audit recording or enables an audit bypass. Preserve in-window records even when their related attempt/result record is expired; final relationship/deletion rules must support the retention invariant without unintended cascading deletion.
+
+**[NEW]** Tests must cover the exact cutoff, configurable retention, expired unresolved attempts, bounded batches, preservation of in-window records, and failed-cleanup alert/next-run behavior on both providers. The cleanup alert mechanism and concrete scheduling/query implementation remain to be specified.
+
+### 11.7 Remaining Decisions and Verification Gate
+
+**[NEW]** Design status remains `STATUS: BLOCKED`; release verification remains `PENDING`. This approval does not authorize Step 9 or waive any release gate.
+
+- **[NEW]** Complete per-operation DTO/permission/tier/audit bindings, application field schemas and error codes, and bounded export buffering/error handling. The conditional T2 permission, download headers/limit, error outcomes, and revision rejection rules are now selected.
+- **[NEW]** Finalize provider table definitions, UUID/role-name normalization details, atomic session/throttle storage operations, and retention relationships/queries/scheduler/alert delivery under the approved conventions.
+- **[NEW]** Finalize maintenance/key-management commands and enforceable recovery/access reconciliation, deadline propagation, lifecycle sequencing, scan-bound validation, and remaining resource limits.
+- **[NEW]** Resolve empty-confirm HTTP preview compatibility and multi-partition continuation/aggregation without Gateway changes. Conditional T2 authorization enables a possible discovery step, not proof of a correct continuation algorithm.
+
+**[NEW]** Evidence boundary: the preceding investigation ran existing focused Go tests in `internal/api`, `internal/service/message`, `internal/service/core`, and `internal/scan` successfully for replay, single-partition cursor resume, dry-run sequencing, and scan continuation/latest behavior. This is limited fake-backed/source-level evidence, not an executed UI adapter, a test of every empty-confirm HTTP route, multi-partition orchestration proof, or a deployed-Gateway integration result. This approval update itself runs documentation checks only; application tests, artifact compatibility, and all-severity zero-CVE release verification remain pending.
+
+## 12. Approved Consolidated Contracts
+
+**[NEW]** Approved on 2026-09-25 by the user's "approve" response to the consolidated decision package. [CONSOLIDATED-PROPOSAL.md](CONSOLIDATED-PROPOSAL.md), revision 0.2, is incorporated by reference as a normative contract addendum. Its sections 2-6 implement approved decisions P1-P6; section 7 is historical compatibility evidence, section 8 preserves unresolved design blockers, and section 9 defines mandatory acceptance and handoff criteria. Its original proposal labels are retained history, not pending approval of P1-P6. This approval does not approve the entire visual-design draft.
+
+### 12.1 Adopted Contracts and Precedence
+
+| Decision | Normative addendum section | Approved selection |
+|---|---|---|
+| P1 | 2 | All 47 explicit operation/DTO/permission/tier/audit bindings, pinned Gateway schema reference, numeric transformations, message/upload exceptions, and safe status preservation. |
+| P2 | 3 | Application DTOs, 16 method/path contracts, exact validation and error catalog; Assignment.enabled supports individual mapping revocation, and optional typed replay-error progress preserves acknowledged work. |
+| P3 | 4 | Provider types/limits/constraints/indexes, role normalization, duplicate assignment detection, atomic session/access/throttle operations, retention scheduling and alerts. |
+| P4 | 5 | Bounded upload/export/response handling, admission, deadline propagation, probes, startup and shutdown. Required functionality must fit approved limits; failures do not authorize silent scope reduction. |
+| P5 | 6 | Explicit key initialization/verification, stopped-app migrations, backup/restore, recovery marker and access reconciliation, certificate rotation, and failure/exit semantics. |
+| P6 | 2.3 and 7 | Explicit empty confirmation on initial dry-run requests for the 18 tested confirmation-bearing operations; execution still requires the exact target or plan token. |
+
+**[NEW]** These selections supersede earlier pending-choice statements only for their explicit subjects, including the corresponding items in section 11.7. Preserve all other approved constraints: conditional T2 discovery permission, current per-call authorization, no inherited override, audit gates, no automatic ambiguous mutation retry, one non-overlapping replica, and all-severity zero-CVE release policy. The addendum's new fields and limits are expressly approved; no other behavior is introduced by implication. Gateway remains unchanged.
+
+### 12.2 Remaining Design Blockers
+
+**[NEW]** P7 is approved as retention of these blockers and authorization for further isolated adapter investigation, not approval of an algorithm or extra continuation DTO:
+
+- **B1:** Native latest-mode preceding-window continuation and completion reporting cannot yet satisfy the retained UI contract. The probes reproduced an empty preceding window and a byte-bound scan reporting completion without a stop reason.
+- **B2:** Per-partition explicit-window primitives do not prove aggregate multi-partition ordering, global bounds, buffered-record handling, sparse/compacted offset behavior, or ambiguous replay outcomes. The bounded continuation-state ownership, shape, expiry, tamper protection, and concurrency contract remains unresolved.
+
+**[NEW]** Resolve B1/B2 without changing Gateway or silently reducing requirements. The addendum's investigation direction remains non-normative until its design and proof are reviewed and approved. Section 12 is an approval record, not a complete Step 8 audit or a claim that no further audit findings are possible.
+
+### 12.3 Evidence and Handoff Gate
+
+**[NEW]** Design status remains `STATUS: BLOCKED`; release verification remains `PENDING`. Historical evidence in the addendum records six top-level tests and 20 subtests against actual HTTP handlers with fake Kafka, including the 18 initial-preview routes. Two tests deliberately reproduce limitations, not passing product criteria. That evidence does not establish real Kafka, full adapter correctness, large-offset precision, browser/application behavior, or release security.
+
+**[NEW]** Recording this approval runs documentation consistency checks only; the external harness was not edited or rerun. Test/deployment pins and mandatory implementation/integration/security evidence remain pending. Once the compatibility design is resolved, perform the full Step 8 review and obtain separate user sign-off. Only an approved `STATUS: READY` permits Step 9. No task plan, application code, commit, or release authorization is created by this approval.
+
+### 12.4 Approved B1/B2 Recommendations
+
+**[NEW]** On 2026-09-25 the user approved the recommended B1/B2 approach and starting limits. Incorporate [CONSOLIDATED-PROPOSAL.md](CONSOLIDATED-PROPOSAL.md), revision 0.3, section 8.1 as normative selections: explicit fixed per-partition offset windows, truthful incomplete results, and server-memory continuation state with session/cluster-bound 32-random-byte tokens; 10-minute idle and 30-minute absolute lifetime bounded by session expiry; at most 2 workflows per session and 20 overall; buffered-data limits of 20,000,000 bytes per workflow and 100,000,000 overall. Serialize continuation, reject competing requests and capacity overload explicitly, never silently evict active workflows, and require explicit restart on expiry/state loss with replay duplicate-risk warning. Recheck permissions on every continuation and never automatically retry uncertain writes. No message-payload persistence or Gateway modification is approved.
+
+**[NEW]** These selections supersede section 12.2's unresolved ownership/expiry/limit direction only to the stated extent. They do not select an exact workflow API, full state machine, token transport, byte-accounting/admission algorithm, idle-refresh semantics, ordering tie rule, or lost-response protocol. The addendum's section 8.2 identifies remaining contract work. Buffered-data caps are not a measurement of total process memory; implementation must account for overhead without silently relaxing the selected limits.
+
+**[NEW]** B1/B2 remain unresolved pending complete contract decisions and executable compatibility proof. `STATUS: BLOCKED` and release verification `PENDING` are unchanged. This approval update performs documentation checks only; historical compatibility results are not new evidence. It does not approve the whole visual-design draft or authorize Step 9.
+
+### 12.5 Approved Workflow Recommendations
+
+**[NEW]** On 2026-09-25 the user approved all six further workflow recommendations. Incorporate [CONSOLIDATED-PROPOSAL.md](CONSOLIDATED-PROPOSAL.md), revision 0.4, section 8.3 as normative W1-W6: separate create/advance/inspect/stop operations with tokens in a dedicated header, never URLs/logs; immutable operation/cluster/topics/partitions/filters/bounds; expected-revision advancement with rejection of stale/competing requests and no duplicate replay dispatch; states `ready`, `running`, `paused`, `completed`, `stopped`, `unknown`; idle refresh only for accepted user-directed advancement, with expiry stopping new calls while bounded result auditing finishes; reserve capacity before fetching and account for retained copies/in-flight buffers without silently dropping unreturned records.
+
+**[NEW]** These choices supersede earlier pending statements only for the stated principles. Existing workflow limits, per-call authorization/auditing, request-scoped overrides, and no automatic uncertain-write retry remain mandatory. Returning an already-retained result is not repeating the Kafka mutation and cannot bypass current authorization. This does not claim exactly-once delivery or authorize an unbounded result cache.
+
+**[NEW]** The addendum's section 8.4 now lists remaining exact API/DTO/header, revision/request identity, state-transition/error, expiry/cleanup, memory-accounting, and ordering/algorithm decisions and proof requirements. No new workflow route has been selected by implication. B1/B2 remain open, `STATUS: BLOCKED`, release verification `PENDING`; full Step 8 review and separate sign-off still precede Step 9. Only documentation checks are performed for this approval; Gateway and external compatibility harness are unchanged.
+
+### 12.6 Approved Item-1 Contract Package
+
+**[NEW]** On 2026-09-25 the user approved the six concrete recommendations for item 1. Incorporate [CONSOLIDATED-PROPOSAL.md](CONSOLIDATED-PROPOSAL.md), revision 0.5, section 8.5 as normative I1-I6: four UI-backend routes at `/api/v1/clusters/{clusterId}/message-workflows` (POST/GET base, POST `/advance`, POST `/stop`); `X-Kafka3O-Workflow-Token` using unpadded base64url for 32 random bytes, browser-memory-only retention, telemetry redaction and no-store; typed create/advance selections and metadata-only inspection; strong UUID revision plus client UUID `advanceId`, current authorization before duplicate lookup, duplicate lookup before stale-revision rejection, no repeated dispatch, latest-result retention until acknowledged by the next accepted advancement or expiry; selected six-state transitions with `stopRequested` and uncertainty precedence; selected 428/412/409/429/413/404 error uses and expiry cleanup; actual allocated-buffer accounting, atomic reservation and separate metadata caps of 1,000,000 bytes per workflow and 20,000,000 overall.
+
+**[NEW]** Preserve approved buffered-data caps of 20,000,000 bytes per workflow and 100,000,000 overall, 2 workflows per session and 20 overall, 10-minute idle/30-minute absolute lifetime bounded by session expiry, all per-call authorization/audit gates, request-scoped confirmation/overrides, and no automatic uncertain-write retry. Creation does not perform replay writes. Inspection and duplicate-result retrieval do not renew idle. No silent partition omission or record loss is authorized. These four workflow routes supplement, rather than replace, the 16 existing application routes and 47 Gateway-operation bindings. Gateway remains unchanged.
+
+**[NEW]** This supersedes earlier pending statements only for the explicit I1-I6 selections. Addendum section 8.6 tracks complete field-level schemas, remaining state/error/stop semantics, bounded request-identity history, cleanup/accounting mechanics, and latest/multi-partition algorithm and proof still required. Design remains `STATUS: BLOCKED`; release verification remains `PENDING`. Only documentation consistency checks are performed for this approval; no harness rerun, application test, benchmark, or security clearance is claimed. Full Step 8 review and separate approved READY sign-off still precede Step 9; no task plan or implementation is authorized here.
+
+## 13. Approved Reduced-V1 Scope and Contracts
+
+**[NEW]** Approved on 2026-09-26. Adopt FUNC-SPEC 0.6 section 1.5 and [CONSOLIDATED-PROPOSAL.md](CONSOLIDATED-PROPOSAL.md) revision 0.6 section 11 as the controlling first-release profile. This explicitly approved reduction supersedes earlier requirements to deliver every Gateway capability in v1, while preserving those requirements as deferred history. No Gateway modification or additional unapproved feature reduction is authorized.
+
+### 13.1 Active V1 Surface
+
+**[NEW]** Keep all cluster, topic, consumer-group, SCRAM and quota operations, plus M2 and M5-M7. M1/M3/M4 are one-shot bounded scans with exactly one explicit partition and explicit start/end offset selections; retain all applicable regex/JSONPath fields/operators and data semantics. Enforce restrictions in the backend with existing validation errors and zero scan dispatch on invalid/unsupported selection. Preserve Gateway record order and scan information; no automatic continuation or cross-request snapshot/exhaustive-search promise.
+
+**[NEW]** Active totals are 40 command IDs / 46 Gateway-operation bindings / 49 permission literals, plus the existing 16 application routes. Exclude `gateway.m8` from active permission input/output/storage catalogs and do not register replay or message-workflow routes. The source Gateway schema still enumerates 41 command IDs / 47 operations; compare the v1 projection to that unchanged fixture rather than changing Gateway or its schema. The active destructive-preview set has 17 operations; historical 18-route evidence includes M8.
+
+**[NEW]** Preserve dual SSO, emergency access, application roles/assignments, session expiry/revocation, audit durability, SQLite/PostgreSQL, maintenance/recovery, single-replica deployment, and every safety/release gate for retained operations. Emergency access cannot enable an excluded feature. Conditional T2 permission remains required only for actual optional metadata discovery, not sufficient explicit scan inputs.
+
+### 13.2 Deferred Features and Removed V1 Complexity
+
+**[NEW]** Defer M8 in full, including preview, replay and re-drive; latest-N and preceding-window message browsing; multi-partition M1/M3/M4; beginning/timestamp selectors for those three operations; resumable message browsing/search; and cross-request snapshot guarantees. Timestamp/multi-partition inputs on other retained operations are unchanged.
+
+**[NEW]** Sections 12.4-12.6 and addendum section 8's workflow API/token/revision/identity-ledger/retained-result/expiry/stop/memory-manager contracts are deferred with their feature. Do not scaffold a v1 ReplayService or workflow subsystem merely because the earlier topology/examples named one. Keep ordinary feature services and request-local bounded response handling. Role/assignment revisions, session state, audit history, and operational recovery are not deferred.
+
+**[NEW]** B1/B2 remain unresolved for deferred features; they are not v1 adapter dependencies or passing compatibility results. New scope approval, completed contracts and appropriate proof are required before reintroduction. No exactly-once or replay-recovery capability is introduced.
+
+### 13.3 V1 Completion, Resources and Verification
+
+**[NEW]** Scans preserve Gateway `reachedEnd`, `stoppedBy`, counts and cursor information, but item count, empty output or timeout alone never establish completion. Sparse/compacted logs can yield incomplete results; requested bounds are not evidence of immutable content or complete coverage. A separate user submission is an independent query. Use ordinary loading/result/error states; cancellation never claims rollback or non-execution.
+
+**[NEW]** Keep addendum section 5's request-local limits, deadlines and concurrency, including the 20,000,000-byte other-Gateway-response cap. Bound allocations and release request buffers on all exits; no server-side retained message-result cache. Existing browser transient-state and no-store rules apply. Partial/unknown outcomes and no automatic ambiguous retry remain mandatory for all retained mutations.
+
+**[NEW]** Addendum section 11.4 and FUNC-SPEC's revised V1/V12/V15 govern active acceptance. Test exactly 46 route bindings and 49 permissions, replay/workflow absence, unsupported scan rejection, one-partition explicit-offset scans, sparse/bounded/empty behavior, precision/data integrity, authorization/audit/override gates, buffer cleanup and cancellation. Preserve all retained V1-V20 obligations and normal database/browser/integration/deployment/security gates. Deferred-feature checks are explicitly deferred, never reported as passes or substituted for tests of retained behavior.
+
+### 13.4 Approval and Handoff Status
+
+**[NEW]** `STATUS: BLOCKED` pending the full reduced-v1 pipeline Step 8 consistency review and separate approved READY sign-off. B1/B2 are now deferred-feature blockers rather than retained-v1 requirements. Release verification remains `PENDING`; scope approval is neither compatibility proof nor security clearance. No task creation or implementation is authorized by this approval record.
+
+**[NEW]** This update runs documentation consistency checks only. Gateway and the external compatibility harness remain unchanged; no new runtime, browser, real Kafka, memory benchmark, or vulnerability evidence is claimed. The design document's scope/navigation is aligned, but its visual/UX draft is not approved by this decision.

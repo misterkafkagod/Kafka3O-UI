@@ -1,10 +1,12 @@
 # Kafka3O-UI Design Specification
 
-**Version:** 0.2
-**Date:** 2026-09-25
+**Version:** ~~0.7~~ **[NEW]** 0.8
+**Date:** ~~2026-09-25~~ **[NEW]** 2026-09-26
 **Status:** DRAFT - proposed UX and visual design for user review; not an approved implementation baseline
-**Functional baseline:** [FUNC-SPEC.md](FUNC-SPEC.md), revision 0.3.
-**Technical baseline:** [TECH-SPEC.md](TECH-SPEC.md), revision 0.7.
+**Functional baseline:** [FUNC-SPEC.md](FUNC-SPEC.md), revision ~~0.5~~ **[NEW]** 0.6.
+**Technical baseline:** [TECH-SPEC.md](TECH-SPEC.md), revision ~~0.12~~ **[NEW]** 0.16, including the approved consolidated contract addendum **[NEW]** revision 0.6.
+
+**[NEW] Current release precedence:** The reduced-v1 scope approved on 2026-09-26 controls all earlier replay, continuation and all-operation statements in this draft. V1 has 26 active page IDs (P17 deferred), 40 command IDs / 46 operations, and 49 permission literals. M1/M3/M4 use one explicit partition and start/end offsets per bounded request. No replay/re-drive, latest/beginning/timestamp scan selector, multi-partition scan or resumable workflow is enabled. Other operations' time/partition controls are unchanged. Scope alignment does not approve the visual/UX draft.
 
 ## 1. Purpose and Authority
 
@@ -58,6 +60,8 @@ Deep links carry only permitted resource identity and exact offset values. Do no
 
 Page IDs below identify design surfaces, not API endpoints or finalized browser routes. Tabs, review dialogs, and operation forms belong to their owning page and do not create extra permissions. Edges show navigation possibilities, not permission inheritance. Every destination independently enforces section 3.4.
 
+**[NEW]** The v1 diagram excludes P17. Its former cluster-navigation and P13 re-drive links are deferred along with replay; preserve P17's ID in the historical matrix without renumbering retained pages.
+
 ```mermaid
 flowchart TD
 	P01["P01 Sign in: Entra ID / Cognito"] --> AUTH{Authenticated session}
@@ -89,11 +93,9 @@ flowchart TD
 	CLUSTER --> P14["P14 Produce records"]
 	CLUSTER --> P15["P15 Upload records"]
 	CLUSTER --> P16["P16 Produce tombstone"]
-	CLUSTER --> P17["P17 Replay / re-drive"]
 	P12 --> P14
 	P12 --> P15
 	P13 --> P16
-	P13 --> P17
 	CLUSTER --> P18["P18 Consumer groups"]
 	P18 --> P19["P19 Group detail and operations"]
 	P08 --> P19
@@ -113,10 +115,11 @@ Authenticated deep links may open any permitted destination without passing thro
 
 `Session` means a valid authenticated application session. `Cluster` means a configured registration authorized for the principal through applicable environment/cluster assignments. In the following matrix, every cluster-scoped row requires both, plus **at least one** of the listed operation permissions; each displayed function requires its own permission. A page grant never authorizes all functions on that page.
 
-Command references such as `T2` are logical permission references from FUNC-SPEC section 2.3, not newly defined permission strings. `C3.live`, `C3.ready`, `C9.start`, `C9.cancel`, `C9.elect`, `S1.list`, `S1.create`, `S1.delete`, `S2.list`, and `S2.alter` are descriptive sub-operation labels only. Exact catalog IDs remain a technical contract decision. `Access administration` and `Audit viewing` refer to the existing application-wide permissions, not new roles.
+Command references such as `T2` are shorthand for the approved literal permissions in TECH-SPEC section 8.2: `T2` maps to `gateway.t2`; sub-operation labels such as `C3.live`, `C9.start`, and `S1.list` map to `gateway.c3.live`, `gateway.c9.start`, and `gateway.s1.list`. Use the complete fixed catalog there, not wildcard or parent-command grants. `Access administration` means `app.access.manage`, `Audit viewing` means `app.audit.view`, and the additional lock-override permission is `gateway.lock.override`. These are permissions, not fixed role names.
 
 - Roles are user-created sets of fixed permissions. Do not hard-code an `operator` or `administrator` role name as a page gate.
 - Hide unauthorized tabs/actions and do not fetch their data. A user with only a mutation permission can open its form using an explicit resource identifier without an unrelated list/detail permission. Autocomplete and optional resource context require their corresponding read permission; never obtain them implicitly.
+- ~~For snapshot-based M1/M3/M4/M8 workflows that must discover partition bounds, require `gateway.t2` as well as the operation permission before discovery. Explain the missing prerequisite and block that action without hiding an otherwise permitted form. Sufficient explicit inputs retain existing permission requirements; never silently fetch T2. Apply this conditional rule to P12 and P17, not as a blanket page-entry permission.~~ **[NEW]** P12 uses explicit single-partition offset inputs. Optional metadata discovery requires `gateway.t2` before fetching; no implicit T2 grant or blanket page-entry prerequisite. P17 is deferred and has no v1 entry permission.
 - If a destination has no allowed function, reject direct access and make zero unauthorized Gateway calls. Loss of permission clears now-protected data and disables further actions on the next authorized state refresh/request.
 - Preview, confirmation, execute, download, refresh, and each replay batch independently recheck permissions and scope. Preview uses its owning operation's permission, not a generic read grant.
 - Gateway capability, read-only mode, operation switches, credential tier, and audit availability are additional execution conditions, never substitutes for user permissions. S1/S2 list still use operator-tier Gateway credentials on the server without granting mutation permission.
@@ -137,12 +140,12 @@ Command references such as `T2` are logical permission references from FUNC-SPEC
 | P09 Create topic | Cluster; T5 | Enter name, partitions, replication factor and configuration; validate-only preview; create and display result. No T1 prerequisite; optional topic-list context requires T1. |
 | P10 Bulk create topics | Cluster; T6 | Enter multiple definitions, validate all, display all validation errors or per-item creation results. No implicit single-create or bulk-delete permission. |
 | P11 Bulk delete topics | Cluster; T8 | Enter explicit topic list or pattern; resolve preview targets, review plan token, confirm and display per-topic results. T1 may supply selection context but is not required for direct input. |
-| P12 Messages | Cluster; M1, M3 or M4 | M1: Browse mode. M3: Regex mode and field selector. M4: Structured mode with all supported operators. Each mode owns its bounds, scan statistics, results and supported continuation. Record detail and write actions need separate permissions. |
-| P13 Exact record detail | Cluster; M2 | Resolve cluster/topic/partition/exact-offset link; display record, missing/compacted state, encodings and repeated headers. M2 is required even when entered from M1/M3/M4 results. Authorized M7/M8 actions may use the viewed record as draft input; they require fresh validation/confirmation. |
+| P12 Messages | Cluster; M1, M3 or M4 | M1: Browse mode. M3: Regex mode and field selector. M4: Structured mode with all supported operators. ~~Each mode owns its bounds, scan statistics, results and supported continuation.~~ **[NEW]** Each mode requires one explicit partition and start/end offsets, displays bounded results and scan information, and has no continuation control. Record detail and write actions need separate permissions. |
+| P13 Exact record detail | Cluster; M2 | Resolve cluster/topic/partition/exact-offset link; display record, missing/compacted state, encodings and repeated headers. M2 is required even when entered from M1/M3/M4 results. ~~Authorized M7/M8 actions may use the viewed record as draft input; they require fresh validation/confirmation.~~ **[NEW]** An authorized M7 action may use the record as draft input subject to its own validation; no replay/re-drive action is offered. |
 | P14 Produce records | Cluster; M5 | Compose one/multiple records, encoding/partition/timestamp/header inputs, validate and produce, show assigned offsets and item outcomes. Does not grant upload, tombstone or replay. |
 | P15 Upload records | Cluster; M6 | Select JSON/NDJSON file, inspect format/size/validation, submit and show per-record outcomes. No M5 prerequisite. |
 | P16 Produce tombstone | Cluster; M7 | Enter key, encoding, optional partition and headers; explicitly represent null value; produce and show partition/offset. Reading an existing record is optional and needs M2. |
-| P17 Replay / re-drive | Cluster; M8 | Enter same-cluster source/target and offset/time bounds, optional partition preservation; preview, confirm target, run bounded batch, inspect progress/cursor, stop scheduling and explicitly continue when supported. Re-drive is a one-record range, not a new permission. No message-read grant is implied. |
+| P17 Replay / re-drive | ~~Cluster; M8~~ **[NEW]** Deferred beyond v1 | ~~Enter same-cluster source/target and offset/time bounds, optional partition preservation; preview, confirm target, run bounded batch, inspect progress/cursor, stop scheduling and explicitly continue when supported. Re-drive is a one-record range, not a new permission. No message-read grant is implied.~~ **[NEW]** No v1 page, navigation, action, permission or API route. |
 | P18 Consumer groups | Cluster; G1 | Page/filter groups by state; show ID/protocol/member count; link to P19 only with a destination permission. |
 | P19 Group detail and operations | Cluster; any of G2, G4, G5, G6, G7 | G2: coordinator/members/assignments/offsets/lag. G4: reset/pre-seed offsets. G5: delete inactive group. G6: remove selected/all members. G7: clone offsets to inactive target. Each operation has independent inputs, preview, target/group confirmation and result; read panels do not load without G2. |
 | P20 Quorum | Cluster; C6 | Show KRaft leader/epoch/voters/observers/lag; refresh; display unsupported-version errors explicitly. No quorum-edit capability. |
@@ -151,12 +154,12 @@ Command references such as `T2` are logical permission references from FUNC-SPEC
 | P23 SCRAM credentials | Cluster; S1.list, S1.create or S1.delete | S1.list: users/mechanisms. S1.create: credential form with write-only password. S1.delete: username/mechanism target, preview and exact username confirmation. Create/delete-only users enter identifiers without implicit listing; passwords never appear in results/history. |
 | P24 Quotas | Cluster; S2.list or S2.alter | S2.list: quota entities and values. S2.alter: explicit entity/values, set/remove preview, entity-descriptor confirmation and results. List is not a prerequisite for explicit entity input. |
 | P25 Roles | Session; Access administration | List roles, create/edit named roles using fixed permission choices, save with concurrency checking and audited outcomes. Clearly indicate that this application-wide privilege can grant additional access. No Kafka data access or role-deletion workflow is implied. |
-| P26 Assignments | Session; Access administration | View/edit provider-qualified subject/claim-to-role mappings and environment/cluster scopes; show application-wide meaning of administrative grants; save with concurrency checking and audit. No identity-provider directory management or Gateway registry editing. |
+| P26 Assignments | Session; Access administration | View/edit provider-qualified subject/claim-to-role mappings and environment/cluster scopes; show application-wide meaning of administrative grants; save with concurrency checking and audit. **[NEW]** Show enabled/disabled state and permit audited, revision-protected disabling/re-enabling; disabled mappings grant no access. No assignment deletion, identity-provider directory management or Gateway registry editing. |
 | P27 Audit history and event detail | Session; Audit viewing | Page/filter authorized application audit history by time/principal/environment/cluster/operation/outcome; inspect event phases, identity, non-secret target, correlation and unresolved attempts. No payload viewer, interactive deletion or unapproved export. |
 
 P25 and P26 are independently navigable tabs in the Roles and Assignments workspace. P20-P22 and P23-P24 are pages beneath navigation groups, not additional permission-bearing landing pages. Account identity and logout are shell controls available to every session, not a separate account-management page.
 
-For each page, component/browser tests must cover allowed entry, direct-link denial, absence of unauthorized fetches, partial permission sets, and permission loss. Include a mutation-only principal, a read-only principal, an application administrator without Kafka access, an audit-only principal, and the emergency identity. Verify all 27 page IDs appear in the diagram and matrix, and all 47 command operations have a function-level gate. These are design acceptance requirements, not executed application tests.
+For each **[NEW]** active page, component/browser tests must cover allowed entry, direct-link denial, absence of unauthorized fetches, partial permission sets, and permission loss. Include a mutation-only principal, a read-only principal, an application administrator without Kafka access, an audit-only principal, and the emergency identity. ~~Verify all 27 page IDs appear in the diagram and matrix, and all 47 command operations have a function-level gate.~~ **[NEW]** Verify all 26 active page IDs appear in the diagram and matrix, P17 is deferred and inaccessible, and all 46 active command operations have a function-level gate. These are design acceptance requirements, not executed application tests.
 
 ## 4. Visual System
 
@@ -198,7 +201,7 @@ Reserve icon/label/loading widths so state changes do not resize toolbars. Use a
 
 ## 5. Screen and Command Coverage
 
-Each row maps one command to its screen family; operations counts preserve the approved 41-command/47-operation inventory. A shared screen does not merge permissions or omit operation-specific inputs/results. Field schemas and bounds come from the functional and eventual API contracts, not this presentation table.
+Each row maps one command to its screen family; ~~operations counts preserve the approved 41-command/47-operation inventory~~ **[NEW]** active v1 counts are 40 commands / 46 operations, with M8 retained as a zero-operation deferred row. A shared screen does not merge permissions or omit operation-specific inputs/results. Field schemas and bounds come from the functional and approved API contracts, **[NEW]** including the reduced-v1 overlay, not this presentation table.
 
 | Command | Ops | Screen / interaction |
 |---|---|---|
@@ -226,14 +229,14 @@ Each row maps one command to its screen family; operations counts preserve the a
 | T10 | 1 | Increase partitions: from/to values, irreversible mapping warning, confirmation |
 | T11 | 1 | Truncate records: per-partition offset/range review and topic confirmation |
 | T12 | 1 | Purge topic: all-partition plan and topic confirmation |
-| M1 | 1 | Messages / Browse: topic, partitions, window, bounds, format, records and scan stats |
+| M1 | 1 | ~~Messages / Browse: topic, partitions, window, bounds, format, records and scan stats~~ **[NEW]** Messages / Browse: topic, one explicit partition, start/end offsets, bounds, format, records and scan stats |
 | M2 | 1 | Record detail: authorized exact-offset deep link or missing/compacted state |
-| M3 | 1 | Messages / Regex: key/value/header field selection, bounds, matches and skips |
-| M4 | 1 | Messages / Structured: JSONPath/operator/value inputs, matches and skips |
+| M3 | 1 | Messages / Regex: key/value/header field selection, bounds, matches and skips; **[NEW]** one explicit partition and start/end offsets, no continuation |
+| M4 | 1 | Messages / Structured: JSONPath/operator/value inputs, matches and skips; **[NEW]** one explicit partition and start/end offsets, no continuation |
 | M5 | 1 | Produce: single/multiple records, encoding/header editor, per-record outcomes |
 | M6 | 1 | Upload records: JSON/NDJSON selection, validation, per-record outcomes |
 | M7 | 1 | Tombstone: key/encoding/partition/header inputs, explicit null value |
-| M8 | 1 | Replay: source/target range, partition option, preview, progress and cursor |
+| M8 | ~~1~~ **[NEW]** 0 | ~~Replay: source/target range, partition option, preview, progress and cursor~~ **[NEW]** Deferred beyond v1, including re-drive |
 | G1 | 1 | Consumer Groups: paginated list with state filter |
 | G2 | 1 | Group detail: members, assignments, committed/end offsets and lag |
 | G3 | 1 | Topic / Consumers: consuming groups and partition lag |
@@ -286,11 +289,11 @@ Offer an override only when both operation and override permissions are availabl
 
 Browse, Regex, and Structured are distinct modes sharing a bounded scan result layout. Structured search exposes all approved operators: `eq`, `neq`, `contains`, `regex`, `exists`, `gt`, `lt`, `gte`, and `lte`. Keep source/filter/window context visible with scan statistics and partition offsets. Render payloads as inert text, including HTML-looking values.
 
-Display `scanned`, `matched`, `skipped`, bytes, elapsed time, stopped-by reason, and reached-end status. Bound exhaustion is a completed bounded scan with more data potentially available, not an error. Latest-N is not live tailing. Continuation uses exact returned partition offsets, not page numbers.
+Display `scanned`, `matched`, `skipped`, bytes, elapsed time, stopped-by reason, and reached-end status. Bound exhaustion is a completed bounded scan with more data potentially available, not an error. ~~Latest-N is not live tailing. Continuation uses exact returned partition offsets, not page numbers.~~ **[NEW]** V1 requires one explicit partition and explicit start/end offsets. Preserve returned cursors as informational statistics only; no next-page/resume control, latest mode, beginning/timestamp selector, or multi-partition scan. Do not label an incomplete scan as a completely searched range.
 
-Replay review distinguishes source from target and confirms the target. Progress shows copied count, batch outcome, cursor, and duplicate risk. `Stop` prevents new batches; it does not claim cancellation of writes already in flight. An interrupted/failed batch with reported progress offers explicit user-directed continuation only when its contract is supported. Unknown outcomes never offer a one-click automatic retry that silently duplicates the range.
+~~Replay review distinguishes source from target and confirms the target. Progress shows copied count, batch outcome, cursor, and duplicate risk. `Stop` prevents new batches; it does not claim cancellation of writes already in flight. An interrupted/failed batch with reported progress offers explicit user-directed continuation only when its contract is supported. Unknown outcomes never offer a one-click automatic retry that silently duplicates the range.~~ **[NEW]** Replay and its workflow UI are deferred. Retained write operations still display partial/unknown outcomes and never automatically retry an ambiguous write.
 
-Multi-partition continuation and route-specific dry-run compatibility are unresolved in TECH-SPEC section 7.6. Wireframes may show the intended states, but implementation must not enable unsupported flows or invent request fields. This is a blocker, not removal of the required feature.
+~~Multi-partition continuation and route-specific dry-run compatibility are unresolved in TECH-SPEC section 7.6. Wireframes may show the intended states, but implementation must not enable unsupported flows or invent request fields. This is a blocker, not removal of the required feature.~~ **[NEW]** TECH-SPEC section 13 defers B1/B2-dependent features explicitly. Empty or timed-out scans do not prove an empty range; show Gateway stop/incomplete information and the requested bounds without a snapshot guarantee. Separate submissions are independent requests. Retention/compaction may change observations. Backend scope enforcement is mandatory, not just omitted controls.
 
 ### 6.5 Bulk and Upload Outcomes
 
@@ -316,7 +319,7 @@ After execution, show total/ok/failed counts and each item outcome. HTTP 207 is 
 | Partially succeeded | Totals and per-item outcomes | Inspect failures; no blanket automatic retry |
 | Failed | Classified error, sanitized details, correlation | Correct preconditions; distinguish from unknown outcome |
 | Outcome unknown | Persistent warning that writes may have occurred | Inspect resulting state/audit if authorized; no auto-retry |
-| Result audit failed | Preserve known business result plus separate audit warning | Investigation; no rollback claim or mutation replay |
+| Result audit failed | Preserve known business result plus persistent audit warning from `auditStatus: "recording_failed"` and correlation ID | Investigation; no rollback claim or mutation replay |
 | Session expired | Sign-in transition; clear protected data and stale plans | Sign in, then reauthorize/review before any new mutation |
 
 Keep upstream credential failures separate from user-session expiry: a Gateway 401 must not log the user out. Distinguish `READ_ONLY_MODE`, `OPERATION_DISABLED`, `DATA_PLANE_LOCKED`, `TIER_FORBIDDEN`, active-group/conflict errors, and unsupported versions. Surface correlation IDs without echoing raw secret-bearing headers or unfiltered diagnostics.
@@ -356,16 +359,16 @@ These are proposed acceptance checks for implementation, not tests executed for 
 
 | Functional criteria | Design evidence required |
 |---|---|
-| V1 | Every section 5 command screen/sub-operation is reachable when permitted; count remains 41 IDs / 47 operations |
+| V1 | ~~Every section 5 command screen/sub-operation is reachable when permitted; count remains 41 IDs / 47 operations~~ **[NEW]** Every active command function is reachable when permitted: 40 IDs / 46 operations; 26 active pages, P17 deferred; 49 active permission choices |
 | V2, V3, V7 | Both provider entries and emergency login, distinct identities, no-access state, throttle/error states |
 | V4, V5 | Permission-filtered navigation/actions, direct-link denial, role conflict, next-request permission loss |
 | V6 | Expiry/logout removes protected view state; background polling cannot sustain the session; no mutation replay after login |
 | V8 | Independent provider/Gateway failures and separate Gateway/Kafka/audit health |
 | V9 | Sentinel-secret checks across rendered content, storage, network responses, diagnostics, and retained traces |
 | V10, V11 | Target-visible confirmations, stale-plan invalidation, request-scoped override, distinct safety failures |
-| V12, V13 | Exact large offsets, all data modes/operators, scan statistics, inert payload rendering, continuation states |
+| V12, V13 | Exact large offsets, all data modes/operators, scan statistics, inert payload rendering; ~~continuation states~~ **[NEW]** single-partition explicit-offset inputs, unsupported selection rejection, truthful bounded/incomplete/empty states, no continuation |
 | V14 | Malformed/oversized upload, validate-all errors, and truthful mixed per-item outcomes |
-| V15, V16 | Stop/partial-progress/unknown replay, cluster switch invalidation, rejected late responses, deep-link enforcement |
+| V15, V16 | ~~Stop/partial-progress/unknown replay~~ **[NEW]** Replay/re-drive/workflow absence, cluster switch invalidation, rejected late responses, deep-link enforcement; retained mutations still show partial/unknown outcomes |
 | V17, V18 | Audit-gated rejection, distinct result-audit failure, unresolved attempts, retention-backed history and restart behavior |
 | V20 | Every section 7 state exercised with keyboard and representative narrow/wide layouts |
 | V19 | Design fixtures are not proof of live compatibility; real integration results verify implemented behavior separately |
@@ -378,11 +381,33 @@ Manually review keyboard navigation, focus restoration, screen-reader announceme
 
 Review the interpretation as UX/visual design, light palette/type choices, navigation grouping, screen layouts, and responsive behavior before treating this document as an implementation baseline. No mockup has been approved yet.
 
-The remaining technical blockers in TECH-SPEC section 7.7 remain unchanged, particularly concrete API/error contracts, activity classification, operational limits, dry-run HTTP compatibility, and multi-partition continuation. Fonts/icons require asset/license verification. The current technical design remains blocked; release verification remains pending. A visual design approval cannot waive either gate.
+TECH-SPEC section 8 records the approved fixed permission IDs, application route baseline, storage fields, explicit session-activity classification, cookie settings, HTTP error statuses, operational limits, and maintenance recovery direction. The UI must use that baseline; explicit navigation/submitted actions notify the activity endpoint, while polling/passive viewing/automatic replay batches do not. Gateway remains unchanged. Empty-confirm previews and backend multi-partition orchestration are still subject to the compatibility investigation, not assumed supported.
+
+TECH-SPEC section 9 adds the approved explicit cluster route-mapping rule, separate audit-result failure metadata, session hashing and antiforgery handling, emergency throttle schedule/concurrency, controlled key initialization/rotation, and post-restore access reconciliation. The client keeps the antiforgery request token in memory, sends `X-CSRF-TOKEN` where required, and refreshes antiforgery state after login/logout. It displays the server's throttle response rather than calculating an independent unlock time. Restored sessions are invalidated; the UI cannot silently resume their operations.
+
+TECH-SPEC section 10 defines JSON operation results as `{data, meta: {requestId, auditStatus}}`; the UI checks audit metadata before presenting success and reads equivalent response headers for downloads without changing file contents. Role/assignment updates carry the exact strong revision ETag in `If-Match`; 412 requires conflict review, while 428 indicates a missing precondition. Application-owned lists use one-based `pageNumber`, default `pageSize` 50 and maximum 500, with the approved stable ordering; Gateway-backed lists retain their own contracts. The same section fixes rolling-window throttle admission, exact expiry boundaries, and separate Entra/Cognito callback paths.
+
+TECH-SPEC section 11 adds the conditional T2 discovery prerequisite for P12/P17. P22 exports enforce a 10,000,000-byte UI limit and check `X-Request-Id` / `X-Kafka3O-Audit-Status` before showing success; no successful truncated download is presented. Error outcomes distinguish `not_started`, `failed`, and `unknown` independently of audit status; failed does not imply rollback. Role/assignment edits distinguish malformed preconditions (400), missing preconditions (428), and stale revisions (412), and use the new revision after success. Audit history reflects hourly retention cleanup of strictly expired events, including unresolved attempts without outcome reclassification; no interactive deletion control is added.
+
+~~Remaining technical blockers are listed in TECH-SPEC section 11.7, including full operation DTO/binding contracts, detailed schemas/security/recovery procedures, bounded export handling, lifecycle details, and Gateway compatibility.~~ **[NEW]** TECH-SPEC section 12 incorporates [CONSOLIDATED-PROPOSAL.md](CONSOLIDATED-PROPOSAL.md), revision 0.2, as the approved P1-P6 contract addendum. P26 reflects the enabled assignment field; replay failures display available typed progress without implying safe automatic retry. Its operation bindings, DTOs, resource/error states, persistence and recovery contracts now govern this draft. Section 12.2 retains B1/B2: latest-mode continuation/completion and aggregate multi-partition semantics/state remain unresolved. Fonts/icons require asset/license verification. The current technical design remains blocked; release verification remains pending. Approval of the contract package does not approve this entire visual-design draft or waive either gate.
 
 ## 12. Revision History
 
 | Version | Date | Change |
 |---|---|---|
+| 0.6 | 2026-09-25 | Aligned with FUNC-SPEC 0.4 / TECH-SPEC 0.11: conditional discovery permission, export cap/audit headers, error and revision feedback, and audit-retention behavior. Visual draft status unchanged. |
+| 0.7 | 2026-09-25 | **[NEW]** Aligned with FUNC-SPEC 0.5 / TECH-SPEC 0.12 and the approved consolidated addendum: assignment enable/disable, replay-error progress, and updated B1/B2 blocker references. Visual draft status unchanged. |
+| 0.8 | 2026-09-26 | **[NEW]** Aligned with FUNC-SPEC 0.6 / TECH-SPEC 0.16 / addendum 0.6: reduced-v1 message controls, P17 and replay/re-drive links deferred, 26 active pages / 40 commands / 46 operations / 49 permissions, revised acceptance. Visual draft status unchanged. |
+| 0.5 | 2026-09-25 | Aligned with TECH-SPEC 0.10: response metadata handling, revision preconditions, application-list pagination, and the latest security/remaining-decision references. Visual draft status unchanged. |
+| 0.4 | 2026-09-25 | Aligned with TECH-SPEC 0.9: persistent audit-failure metadata warning, antiforgery transitions, server-driven throttling, invalidated restored sessions, and current remaining-decision references. Visual draft status unchanged. |
+| 0.3 | 2026-09-25 | Aligned page-access notation and technical handoff with the approved TECH-SPEC 0.8 contract batch; visual design remains a review draft and compatibility investigations remain open. |
 | 0.2 | 2026-09-25 | Added page-navigation diagram, 27-page access/function matrix, sub-operation gate notation, partial-permission behavior, and page-access verification requirements. Remains a review draft. |
 | 0.1 | 2026-09-24 | Initial review draft: UX direction, visual tokens, navigation, full command/screen mapping, safe interactions, states, accessibility, responsive behavior, and design verification. No changes to approved functional or technical scope. |
+
+## 13. Current Reduced-V1 Review Gate
+
+**[NEW]** The scope decision approved on 2026-09-26 supersedes section 11's earlier all-operation and B1/B2 handoff statements for v1. Apply FUNC-SPEC section 1.5, TECH-SPEC section 13, and CONSOLIDATED-PROPOSAL section 11. P17, message continuation and latest/multi-partition workflows are deferred, not enabled by the emergency identity or a stale link. No active v1 control offers `gateway.m8` or the four message-workflow APIs.
+
+**[NEW]** All retained operations keep existing authentication, authorization, confirmation, audit, numeric precision, secret isolation, cancellation and release safeguards. Required v1 screenshot/browser checks use bounded single-partition message results, including sparse/incomplete/empty states, and assert absence of replay/continuation controls. Original replay screenshots and workflow-specific checks are deferred with their feature; never report them as passed.
+
+**[NEW]** Pipeline Step 8 remains BLOCKED pending full reduced-v1 review and separate approved READY sign-off; release verification remains PENDING. Visual/UX choices in this document remain DRAFT and require their own approval. No application or Gateway code is changed by this alignment.

@@ -1,10 +1,12 @@
 # Functional Specification
 
 **Product:** Kafka3O-UI
-**Version:** ~~0.2~~ **[NEW]** 0.3
-**Date:** ~~2026-09-22~~ **[NEW]** 2026-09-24
-**Status:** User-approved functional baseline with session-timeout consistency correction
+**Version:** ~~0.2~~ ~~0.3~~ ~~0.4~~ ~~0.5~~ **[NEW]** 0.6
+**Date:** ~~2026-09-22~~ ~~2026-09-24~~ ~~2026-09-25~~ **[NEW]** 2026-09-26
+**Status:** **[NEW]** User-approved reduced-v1 functional baseline; pipeline Step 8 review and separate READY sign-off pending
 **Pipeline:** Objective and Step 2 behavior mapping completed; Step 3 stack baseline recorded in [TECH-SPEC.md](TECH-SPEC.md). Detailed technical design remains deferred.
+
+**[NEW] Release precedence:** The reduced-v1 scope approved on 2026-09-26 in section 1.5 controls earlier all-operation, replay, snapshot, and continuation requirements throughout this document. The Gateway catalog remains 41 command IDs / 47 operations; v1 implements 40 command IDs / 46 operations. Deferred requirements remain recorded for future review, not enabled v1 capabilities or passed acceptance criteria.
 
 ## 1. Objective & Scope
 
@@ -25,7 +27,7 @@ The application supports Microsoft Entra ID and Amazon Cognito simultaneously th
 | D5 | Exactly one local emergency account is always available, password-only, unrestricted within the application, and audited. It never bypasses Gateway safeguards automatically. |
 | D6 | Session defaults are 4 hours idle and 8 hours absolute. Application role changes apply on the next request; provider membership changes are re-evaluated at login. |
 | D7 | Persistence supports configuration selecting SQLite or a supported external database. Database product and implementation choices belong to technical design. |
-| D8 | Every specified Gateway command and sub-operation is in scope, including advanced administration and security operations. |
+| D8 | ~~Every specified Gateway command and sub-operation is in scope, including advanced administration and security operations.~~ **[NEW]** V1 retains all catalog operations except M8, with M1/M3/M4 restricted by section 1.5. Advanced administration and security operations remain in scope. |
 | D9 | Non-integration tests use fake dependencies. Only explicitly designated integration tests contact real Gateways. |
 | D10 | Audit retention is configurable, default 90 days. Mutations fail closed when their audit attempt cannot be persisted. |
 
@@ -33,7 +35,7 @@ The application supports Microsoft Entra ID and Amazon Cognito simultaneously th
 
 | ID | Objective | Acceptance measure |
 |---|---|---|
-| O1 | Complete Gateway feature coverage | Every command and enumerated sub-operation in section 2.5 maps to a UI workflow and contract test. |
+| O1 | ~~Complete Gateway feature coverage~~ **[NEW]** Complete reduced-v1 coverage | **[NEW]** All 40 active command IDs / 46 operations in section 2.5 map to a UI function and contract test, including enforced M1/M3/M4 restrictions and absence of M8. |
 | O2 | Central multi-environment management | Integration tests operate through two configured Gateways; one unavailable Gateway does not prevent operations against the other. |
 | O3 | Authentication and authorization enforcement | Both OIDC providers and the emergency account are tested; denied requests forward zero calls to the target Gateway operation. |
 | O4 | Secret isolation | Browser responses, storage, errors, and logs expose no Gateway keys, OIDC secrets/tokens, local password material, or SCRAM passwords. |
@@ -52,6 +54,20 @@ Gateway contracts are the source of truth for Kafka operations: Kafka3O-Gateway 
 ~~The Gateway implementation is in progress. Specified support is not evidence that a deployed version implements an operation. The UI distinguishes unavailable operations and incompatible deployments from permission denials and resource-not-found errors.~~ **[NEW]** Inspected Gateway source and its checked-in OpenAPI snapshot cover all 41 command IDs; tests contain an empty-pending-list assertion. This is not evidence that a particular deployed version implements the same contract, and those tests were not executed during this review. The UI distinguishes unavailable operations and incompatible deployments from permission denials and resource-not-found errors.
 
 Out of scope: direct Kafka access; cross-cluster message copying; Schema Registry and Avro/Protobuf decoding; Kafka Connect, ksqlDB, MirrorMaker, Kafka ACL management; additional local accounts; arbitrary custom authorization policies; topic/group-scoped permissions; message transformation; durable background replay jobs; historical Kafka metrics storage; live WebSocket/SSE tailing; runtime editing of Gateway startup safety switches. Exporting definitions from one cluster and explicitly importing them into another remains supported by C11/C12, with authorization on each cluster.
+
+### 1.5 Approved Reduced-V1 Scope
+
+**[NEW]** Approved on 2026-09-26. V1 is a Kafka administration UI with bounded message inspection. Keep both SSO providers, emergency access, roles/assignments, sessions, audit, both databases, maintenance/recovery, and single-replica Kubernetes deployment. Keep every cluster, topic, consumer-group, SCRAM, and quota operation, plus M2 exact lookup and M5-M7 produce/upload/tombstone.
+
+**[NEW]** M1/M3/M4 require one explicitly selected partition and explicit start/end offsets. Each user submission performs one bounded message scan, preserving the Gateway record order, encodings, statistics, stop reason, and cursor values as informational output. There is no continuation control, automatic next request, merged result set, or cross-request snapshot guarantee. Separate submissions are independent. Required scan and response limits still apply.
+
+**[NEW]** Defer M8 entirely, including preview, execution, and single-record re-drive; latest-N/preceding-window browsing; multi-partition message scans; beginning/timestamp selection for M1/M3/M4; resumable browsing/search; and the four message-workflow endpoints with their tokens, revisions, retained results, and memory manager. This does not defer timestamp or multi-partition inputs for other retained operations such as T4, T11, or G4.
+
+**[NEW]** Enforce these exclusions on the backend, including for the emergency identity. No replay/workflow endpoints or M8 permission are offered in v1. Reject unsupported message selection instead of silently substituting one partition or changing the requested mode. The active catalog has 46 Gateway permissions plus the three existing application/override permissions, 49 literals total. Topic metadata remains separately authorized; explicit scan inputs do not grant T2 implicitly.
+
+**[NEW]** Scans are bounded observations, not exhaustive search or immutable snapshots. Retention/compaction may affect results. Empty results or timeout alone never prove an empty range or complete scan; preserve incomplete state and Gateway stop information. Cancellation does not establish non-execution or rollback. Existing authentication, audit, confirmation, override, precision, secret-isolation, dependency-isolation, and all-severity zero-CVE requirements remain mandatory for retained functionality.
+
+**[NEW]** B1/B2 and the associated adapter proof move to deferred-feature work, not fixed incompatibilities. Reintroduction needs explicit scope approval, complete contracts, and compatibility proof. Reduced-v1 approval does not grant pipeline Step 8 READY, approve the visual draft, authorize task creation, or waive release verification. Technical details and acceptance overlays are in TECH-SPEC section 13 and CONSOLIDATED-PROPOSAL section 11.
 
 ## 2. Inputs, Outputs & Interfaces
 
@@ -104,6 +120,8 @@ Additional fixed application permissions cover role/assignment administration, a
 - Lock override requires the normal operation permission plus the separate override permission. No role may override Gateway read-only mode, per-operation switches, or credential tier restrictions.
 - The sole emergency identity has all application permissions on all configured clusters. Upstream availability, Gateway credentials, validation, audit, and Gateway safety still apply.
 
+**[NEW]** Approved on 2026-09-25: snapshot-based browsing/search/replay additionally requires `gateway.t2` when the UI backend must discover partition bounds through topic details. Require both permissions for the same configured cluster before discovery; never grant T2 implicitly. Operations with sufficient explicit inputs retain their existing permissions. An authorized operation form may remain accessible while a discovery-dependent action is blocked with a clear missing-permission explanation. This conditional prerequisite does not establish correctness of multi-partition continuation; TECH-SPEC section 11.1 retains that investigation gate.
+
 ### 2.4 Shared Gateway Contracts
 
 | Surface | UI/backend requirement |
@@ -123,7 +141,7 @@ Additional fixed application permissions cover role/assignment administration, a
 
 ### 2.5 Complete Gateway Workflow Coverage
 
-The command-specific input/output schemas in Gateway FUNC-SPEC section 8.7 and method/path table in TECH-SPEC section 6.2 are normative. The following inventory maps every command to its required UI workflow; `Ops` counts the distinct listed HTTP operations, not UI buttons or permission grants.
+The command-specific input/output schemas in Gateway FUNC-SPEC section 8.7 and method/path table in TECH-SPEC section 6.2 are normative, **[NEW]** subject to section 1.5's explicit v1 restrictions. The following inventory retains the complete Gateway catalog; **[NEW]** `Ops` counts active v1 HTTP operations, not UI buttons or permission grants. M8 remains as a deferred row and is excluded from the 40-command/46-operation v1 total.
 
 | ID | Ops | Workflow, inputs, and visible output |
 |---|---|---|
@@ -151,14 +169,14 @@ The command-specific input/output schemas in Gateway FUNC-SPEC section 8.7 and m
 | T10 | 1 | Increase partition count; preview from/to and irreversible key-to-partition mapping warning; confirm topic name. |
 | T11 | 1 | Truncate selected partitions to offsets; preview affected ranges and confirm topic name. |
 | T12 | 1 | Purge all topic partitions while preserving topic/configuration; preview and confirm topic name. |
-| M1 | 1 | Browse one/all partitions from beginning, latest-N, offset, or timestamp; configure bounds/format and show records plus scan state. |
+| M1 | 1 | ~~Browse one/all partitions from beginning, latest-N, offset, or timestamp; configure bounds/format and show records plus scan state.~~ **[NEW]** Browse one explicit partition between explicit start/end offsets in one bounded request; configure bounds/format and show records plus truthful scan state. |
 | M2 | 1 | Open a deep link containing cluster ID, topic, partition, and exact offset; show record or missing/compacted result after authorization. |
-| M3 | 1 | Search regex across selected value/key/header fields within a window; show matches, skips, scan bounds, and continuation. |
-| M4 | 1 | Search structured JSONPath `{ path, op, value }`; support all Gateway operators and show matches, skips, and continuation. |
+| M3 | 1 | ~~Search regex across selected value/key/header fields within a window; show matches, skips, scan bounds, and continuation.~~ **[NEW]** Bounded regex search across selected value/key/header fields in one explicit partition and offset range; show matches, skips, and scan state without continuation. |
+| M4 | 1 | ~~Search structured JSONPath `{ path, op, value }`; support all Gateway operators and show matches, skips, and continuation.~~ **[NEW]** Bounded structured JSONPath `{ path, op, value }` search in one explicit partition and offset range; retain all Gateway operators, matches, skips, and scan state without continuation. |
 | M5 | 1 | Produce one or multiple records with encodings, headers, optional partition/timestamp; show assigned partition/offset and item outcomes. |
 | M6 | 1 | Upload NDJSON or a JSON array; validate and show per-record production outcomes without hiding partial results. |
 | M7 | 1 | Produce a keyed null-value tombstone, preserving encoding/partition/headers; show resulting partition/offset. |
-| M8 | 1 | Replay an offset/time-bounded source range to a target topic on the same cluster, optionally preserving partitions; preview, confirm target, and display copied count/cursor. A one-record range supports re-drive. |
+| M8 | ~~1~~ **[NEW]** 0 | ~~Replay an offset/time-bounded source range to a target topic on the same cluster, optionally preserving partitions; preview, confirm target, and display copied count/cursor. A one-record range supports re-drive.~~ **[NEW]** Deferred beyond v1 in full, including re-drive. |
 | G1 | 1 | Paginated group list with state filter, group ID, protocol, and member count. |
 | G2 | 1 | Group details: coordinator, members, assignments, committed/end offsets, partition lag and total lag. |
 | G3 | 1 | From a topic, show consuming groups and partition/group lag. |
@@ -178,6 +196,8 @@ The command-specific input/output schemas in Gateway FUNC-SPEC section 8.7 and m
 - Single-target confirmations echo the exact topic, group, broker ID, username, or quota entity descriptor required by the Gateway. G7 and M8 confirm the target, not the source.
 - T8, C9, and C12 use the plan token returned by dry-run. The backend must not generate a substitute token or silently accept a refreshed plan on the user's behalf.
 - Dry-runs make zero Kafka mutations but still require authorization and obey Gateway locks. C12 supports plan review and token confirmation even when deletion is disabled, in accordance with its Gateway contract.
+
+**[NEW]** C11 exports have a UI limit of 10,000,000 bytes, separate from any Gateway restriction. Finish fetching the export and attempting required audit-result recording before sending response headers. Preserve file contents; oversized exports fail explicitly without silent truncation or a successful partial download. Expose `X-Request-Id` and `X-Kafka3O-Audit-Status`, using the technical spec's audit-status values, and check them before presenting download success.
 
 ## 3. Core Behaviors, State Transitions & Verification
 
@@ -253,11 +273,11 @@ An operation follows `idle -> validating -> previewing (when needed) -> awaiting
 
 Read/search displays the selected cluster/topic, partitions, window, format, bounds, result records, and scan statistics. M4 supports `eq`, `neq`, `contains`, `regex`, `exists`, `gt`, `lt`, `gte`, and `lte`. Invalid expressions show validation errors; skipped undecodable/non-JSON records retain their Gateway-reported count. Render message content as untrusted data, never executable markup.
 
-Continuation uses the Gateway's per-partition next offsets, with unchanged source/filter/window semantics and preserved end bounds; it is not a page-number approximation. Latest-N follows the Gateway's descending timestamp and preceding-window semantics, not a promise of unlimited live tailing. Reading/searching never commits consumer offsets or joins a consumer group.
+~~Continuation uses the Gateway's per-partition next offsets, with unchanged source/filter/window semantics and preserved end bounds; it is not a page-number approximation. Latest-N follows the Gateway's descending timestamp and preceding-window semantics, not a promise of unlimited live tailing.~~ **[NEW]** V1 follows section 1.5: one explicit partition/offset-range request, no latest mode or resumable continuation. Preserve returned cursor values as statistics only, not a continuation guarantee. Reading/searching never commits consumer offsets or joins a consumer group.
 
-Replay remains a sequence of bounded synchronous requests within one Gateway/cluster. Show source, target, bounds, copied count, continuation cursor, and at-least-once duplicate risk. Each batch is separately authorized and audited. User-directed continuation may schedule the next bounded batch only while the workflow/session remains valid; stopping prevents new batches and does not undo completed writes or guarantee cancellation of an in-flight request.
+~~Replay remains a sequence of bounded synchronous requests within one Gateway/cluster. Show source, target, bounds, copied count, continuation cursor, and at-least-once duplicate risk. Each batch is separately authorized and audited. User-directed continuation may schedule the next bounded batch only while the workflow/session remains valid; stopping prevents new batches and does not undo completed writes or guarantee cancellation of an in-flight request.~~ **[NEW]** M8 and its complete workflow are deferred beyond v1. The preceding replay requirements remain future design history.
 
-Mid-batch failure displays `details.progress.copied` and `cursor` when returned. Resuming requires an explicit user decision and preserves the reported progress; do not replay the whole range automatically. A transport failure after sending a mutation is `outcome unknown`, not proof of zero writes. No mutation is automatically retried after an ambiguous timeout. Closing the UI does not create a durable background replay job.
+~~Mid-batch failure displays `details.progress.copied` and `cursor` when returned. Resuming requires an explicit user decision and preserves the reported progress; do not replay the whole range automatically.~~ A transport failure after sending a mutation is `outcome unknown`, not proof of zero writes. No mutation is automatically retried after an ambiguous timeout. Closing the UI does not create a durable background replay job. **[NEW]** These mutation-safety rules continue to apply to all retained write operations.
 
 ### 3.7 Audit, Persistence, and Failure Semantics
 
@@ -269,6 +289,8 @@ If the audit attempt cannot be persisted, reject without executing or forwarding
 
 Default retention is 90 days, configurable by deployment. Retention cleanup deletes only expired records and is not an unrestricted interactive audit-deletion feature. Database outages do not fall back to anonymous sessions, stale permissive authorization, or bypassed mutation auditing. The exact durable audit mechanism and database failure recovery belong to technical design.
 
+**[NEW]** Approved retention refinement: run cleanup hourly in batches of at most 1,000 events. Delete only events strictly older than the configured cutoff, including expired unresolved attempts without reclassifying them. Preserve events at the cutoff and all in-window records. Cleanup failure raises an operational alert and retries at the next scheduled run; it never disables required audit recording. TECH-SPEC section 11.6 defines the verification requirements.
+
 ### 3.8 Verification Strategy
 
 **Normal automated suite:** Run backend, component, and browser tests with recording Gateway HTTP fakes and mock OIDC issuers. Fixtures cover both providers, claim mappings, all command contracts, failure injection, clocks, sessions, authorization, and audit storage. No real Gateway or production identity provider is contacted.
@@ -279,7 +301,7 @@ Default retention is 90 days, configurable by deployment. Retention cleanup dele
 
 | ID | Area | Validation criteria |
 |---|---|---|
-| V1 | Feature inventory | ~~Exactly 41 command IDs; C3 x2, C9 x3, S1 x3, S2 x2, others x1. Every operation has a workflow, input/output assertions, and an authorization test; reconcile the source's 48-operation claim.~~ **[NEW]** Exactly 41 command IDs and 47 operations; C3 x2, C9 x3, S1 x3, S2 x2, others x1. Every operation has a workflow, input/output assertions, and an authorization test. Use the approved section 1.4 count and health paths; verify the targeted deployed Gateway rather than inventing a 48th operation. |
+| V1 | Feature inventory | ~~Exactly 41 command IDs; C3 x2, C9 x3, S1 x3, S2 x2, others x1. Every operation has a workflow, input/output assertions, and an authorization test; reconcile the source's 48-operation claim.~~ ~~Exactly 41 command IDs and 47 operations; C3 x2, C9 x3, S1 x3, S2 x2, others x1. Every operation has a workflow, input/output assertions, and an authorization test. Use the approved section 1.4 count and health paths; verify the targeted deployed Gateway rather than inventing a 48th operation.~~ **[NEW]** Exactly 40 active command IDs / 46 operations, retaining C3 x2, C9 x3, S1 x3, S2 x2. Every active operation has input/output and authorization tests. Verify the 41-ID/47-operation Gateway source catalog separately, explicit M8/workflow absence, and backend M1/M3/M4 restrictions. |
 | V2 | Dual SSO | Both providers work in one deployment. Wrong issuer/audience, expired token, bad signature, invalid state/nonce, or callback mismatch creates no session. Equal emails from distinct issuers remain distinct principals. |
 | V3 | Claims and roles | Correct provider-qualified values map to roles; missing/unmapped/incomplete claims grant no access. Environment and cluster assignments produce the expected union without cross-environment leakage. |
 | V4 | Enforcement | Every operation denied by role or scope makes zero target-operation Gateway calls. Forged browser roles/headers/cluster IDs do not bypass checks. Application administration alone cannot read messages. |
@@ -290,10 +312,10 @@ Default retention is 90 days, configurable by deployment. Retention cleanup dele
 | V9 | Secret isolation | Inspect rendered content, browser storage, network responses, diagnostics, and audit records for sentinel secrets. None escape; arbitrary destinations and credential-leaking redirects are rejected. |
 | V10 | Destructive plans | Each destructive operation requires review and correct target/token. Changed inputs invalidate preview; changed resolved targets require new confirmation. Dry-runs cause zero mutations. |
 | V11 | Gateway safety | Exercise read-only, operation disabled, data-plane lock, invalid keys, unsupported versions, active-group, and conflict responses. Override requires permission plus reason and bypasses only the data-plane lock. |
-| V12 | Bounds and reads | Above-ceiling input is handled; each bound stop shows statistics/continuation. Reads do not mutate Kafka; latest-N, multiple partitions, skipped JSON, invalid regex/JSONPath, and missing offsets are covered. |
+| V12 | Bounds and reads | ~~Above-ceiling input is handled; each bound stop shows statistics/continuation. Reads do not mutate Kafka; latest-N, multiple partitions, skipped JSON, invalid regex/JSONPath, and missing offsets are covered.~~ **[NEW]** Cover single-partition explicit-offset reads/searches, missing/invalid/unsupported selection rejection with zero scan calls, above-ceiling input, sparse/compacted offsets, nonmatching/skipped records, byte/time/count stops, and truthful incomplete/empty results. Reads do not mutate Kafka; no continuation or exhaustive-search claim. |
 | V13 | Data integrity | Large offsets round-trip exactly; JSON/string/base64, null values, repeated/binary headers, and timestamps retain semantics. Message HTML/script content never executes. |
 | V14 | Bulk and uploads | Invalid item shows all validation failures with zero execution; 207 displays per-item outcomes. Oversized and malformed JSON/NDJSON are rejected without false success. |
-| V15 | Replay | Preserve key/value/header/timestamp semantics, partition rules, cursor, and partial progress. Stop schedules no new batches. Expired/denied sessions block continuation; ambiguous failure never auto-retries. |
+| V15 | ~~Replay~~ **[NEW]** Deferred replay exclusion | ~~Preserve key/value/header/timestamp semantics, partition rules, cursor, and partial progress. Stop schedules no new batches. Expired/denied sessions block continuation; ambiguous failure never auto-retries.~~ **[NEW]** V1 exposes no replay/re-drive UI, M8 permission, replay endpoint, or message-workflow endpoint; attempts dispatch zero replay calls, including for emergency users. Original replay acceptance is deferred, not passed. Retained mutation uncertainty/no-retry tests remain required under V14/V17/V20. |
 | V16 | Cluster context | Switching clusters cannot reuse another cluster's plan/cursor or display its late response as current data. Deep links re-check authentication, scope, and message permissions. |
 | V17 | Audit gate | Inject audit-attempt failure: zero mutation calls and zero role changes. Result-write failure after execution causes no duplicate execution or rollback claim. Human identity and correlation ID remain traceable. |
 | V18 | Retention and storage | Configured retention preserves in-window records and removes expired ones. SQLite and supported external databases pass equivalent persistence/session/role/audit tests. |
@@ -308,6 +330,12 @@ Select the application stack, packaging/process topology, database engine(s) bey
 
 **[NEW]** Approved security/persistence refinements are in TECH-SPEC section 7: durable auditing gates successful login, emergency reads, destructive previews, and overrides; denied requests remain denied when logging fails. Role/assignment changes and their successful result records commit atomically after a durable attempt. API numeric encoding, restart-only configuration, and single-replica deployment follow the technical baseline. Outstanding detailed contracts still block design readiness.
 
+~~**[NEW]** Subsequent approved contracts are recorded in TECH-SPEC sections 8-11. Section 11 adds conditional T2 discovery authorization, bounded exports with audit headers, error outcomes, revision precondition validation, cross-provider storage conventions, and scheduled retention. Its section 11.7 lists current remaining design decisions; Gateway remains unchanged and readiness remains blocked.~~ **[NEW]** Approved contracts are recorded in TECH-SPEC sections 8-12. Section 12 incorporates [CONSOLIDATED-PROPOSAL.md](CONSOLIDATED-PROPOSAL.md), revision 0.2, as a normative addendum for P1-P6. This supersedes earlier outstanding-detail statements for the explicitly selected contracts, including the initial-preview wire shape for the 18 tested confirmation-bearing operations. Latest-mode and multi-partition continuation remain blocked under section 12.2; Gateway remains unchanged.
+
+**[NEW]** The consolidated approval adds an enabled flag to individual assignments: disabled mappings grant no permissions, and disabling/re-enabling uses the existing revision-protected, audited update workflow. Empty role bundles remain valid; no role/assignment deletion API is introduced. Replay errors preserve typed copied-count and per-partition cursor progress when available without implying safe automatic retry. Approved API field rules, resource bounds, retention, and maintenance/recovery behavior are defined by the addendum; limits never authorize silently omitting required workflows.
+
+**[NEW]** This approval retains all 41 commands / 47 operations and V1-V20. It is not Step 8 READY status, visual-design approval, or release verification. Missing implementation evidence remains a release gate, while B1/B2 remain unresolved design requirements. The full audit and separate sign-off are still required before task creation.
+
 ## 4. Revision History
 
 | Version | Date | Change |
@@ -315,5 +343,8 @@ Select the application stack, packaging/process topology, database engine(s) bey
 | 0.1 | 2026-09-21 | Initial objective, complete Gateway workflow inventory, interfaces, dual-provider SSO, emergency account, scoped roles, persistence/audit behavior, execution diagram, and verification criteria. Written after explicit user approval. Gateway operation-count discrepancy recorded without altering Gateway files. |
 | 0.2 | 2026-09-22 | **[NEW]** Reconciled section 3.1 and V6 with the user-confirmed D6 default of 4 hours idle and 8 hours absolute. Superseded timeout text retained. Linked the approved Step 3 technical stack baseline; security verification remains pending. |
 | 0.3 | 2026-09-24 | **[NEW]** Adopted the inspected Gateway 41-command/47-operation inventory and prefixed health routes; linked approved security/persistence refinements. Preserved unresolved dry-run/continuation blockers and distinguished source inspection from deployment verification. |
+| 0.4 | 2026-09-25 | **[NEW]** Recorded approved conditional T2 discovery permission, UI export byte limit/metadata, and scheduled audit retention; linked TECH-SPEC batch 4. Command inventory and Gateway remain unchanged; continuation correctness remains blocked. |
+| 0.5 | 2026-09-25 | **[NEW]** Adopted the approved consolidated contract addendum through TECH-SPEC section 12; recorded assignment enable/disable and replay-error progress, verified-preview evidence boundary, and retained B1/B2 design blockers. No READY or release sign-off. |
+| 0.6 | 2026-09-26 | **[NEW]** Approved reduced v1: 40 command IDs / 46 operations; bounded single-partition explicit-offset M1/M3/M4; M8 and resumable/latest/multi-partition message workflows deferred. Updated active acceptance and permission scope while preserving security/release gates and historical requirements; separate pipeline Step 8 review still required. |
 
 Future behavior revisions preserve superseded definitions with `~~strikethrough~~` and prefix replacement choices with `**[NEW]**`; new sections may be appended. The initial document has no superseded history to strike out.
