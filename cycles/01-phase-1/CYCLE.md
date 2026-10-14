@@ -1,6 +1,6 @@
 # Cycle 01 · Phase 1 — A developer can browse topics and read messages end to end (UI → gateway → Kafka)
 - **Type:** Phase
-- **Status:** Planned
+- **Status:** Building
 - **Features:** F1, F2, F3, F4
 
 ## Scope
