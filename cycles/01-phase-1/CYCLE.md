@@ -36,7 +36,7 @@ Full Phase 1 design, recorded in SPEC.md `## Technical`. No POC, so no POC revie
 5. Stop the gateway. Expect a full-page "Gateway unreachable" message. Start it again and click **Retry**; expect the app to come back.
 
 **Tasks**
-- [ ] **T1.1 Gateway skeleton and config** — Covers: convention (config via constructors)
+- [x] **T1.1 Gateway skeleton and config** — Covers: convention (config via constructors)
   - Files: go.mod (new), cmd/kafka3o-gateway/main.go (new), internal/config/config.go (new), internal/config/config_test.go (new)
   - Do: read `KAFKA3O_BROKERS` (required, comma-separated), `KAFKA3O_LISTEN` (default `:8080`), `KAFKA3O_UI_DIR` (optional). Exit with a clear message if brokers are missing. JSON `slog` logging. Graceful shutdown on SIGINT/SIGTERM.
   - Done when: `go test ./internal/config` passes cases *missing brokers → error*, *defaults applied*, *comma list split and trimmed*; `go build ./...` succeeds.
