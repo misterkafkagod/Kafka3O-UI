@@ -40,7 +40,7 @@ Full Phase 1 design, recorded in SPEC.md `## Technical`. No POC, so no POC revie
   - Files: go.mod (new), cmd/kafka3o-gateway/main.go (new), internal/config/config.go (new), internal/config/config_test.go (new)
   - Do: read `KAFKA3O_BROKERS` (required, comma-separated), `KAFKA3O_LISTEN` (default `:8080`), `KAFKA3O_UI_DIR` (optional). Exit with a clear message if brokers are missing. JSON `slog` logging. Graceful shutdown on SIGINT/SIGTERM.
   - Done when: `go test ./internal/config` passes cases *missing brokers → error*, *defaults applied*, *comma list split and trimmed*; `go build ./...` succeeds.
-- [ ] **T1.2 Health and cluster endpoints** — Covers: F1-AC1, F1-AC2, F1-AC3
+- [x] **T1.2 Health and cluster endpoints** — Covers: F1-AC1, F1-AC2, F1-AC3
   - Files: internal/api/cluster.go (new; `Cluster` interface and types), internal/api/errors.go (new; `writeError`), internal/api/server.go (new; routes), internal/api/health.go (new), internal/api/health_test.go (new), internal/api/fake_test.go (new; fake `Cluster`)
   - Do: `GET /api/health` always returns 200 with `gateway:"up"`. The cluster check runs `Ping` with a 3 s timeout; on failure it returns `reachable:false` and the error text. `GET /api/cluster` returns cluster id, controller id, and brokers; if the cluster is unreachable it returns 503 `cluster_unreachable`.
   - Done when: `go test ./internal/api -run 'TestHealth|TestCluster'` passes cases *reachable*, *ping fails → reachable false with error*, *3 brokers with controller*, *describe fails → 503 with error body*.
