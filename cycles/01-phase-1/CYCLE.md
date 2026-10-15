@@ -44,11 +44,11 @@ Full Phase 1 design, recorded in SPEC.md `## Technical`. No POC, so no POC revie
   - Files: internal/api/cluster.go (new; `Cluster` interface and types), internal/api/errors.go (new; `writeError`), internal/api/server.go (new; routes), internal/api/health.go (new), internal/api/health_test.go (new), internal/api/fake_test.go (new; fake `Cluster`)
   - Do: `GET /api/health` always returns 200 with `gateway:"up"`. The cluster check runs `Ping` with a 3 s timeout; on failure it returns `reachable:false` and the error text. `GET /api/cluster` returns cluster id, controller id, and brokers; if the cluster is unreachable it returns 503 `cluster_unreachable`.
   - Done when: `go test ./internal/api -run 'TestHealth|TestCluster'` passes cases *reachable*, *ping fails → reachable false with error*, *3 brokers with controller*, *describe fails → 503 with error body*.
-- [ ] **T1.3a Kafka test helper** — Covers: Testing (plan amendment 2026-10-15: the testcontainers Kafka module only supports Confluent's image)
+- [x] **T1.3a Kafka test helper** — Covers: Testing (plan amendment 2026-10-15: the testcontainers Kafka module only supports Confluent's image)
   - Files: internal/kafka/kafkatest/kafkatest.go (new, `integration` tag), go.mod (edit), go.sum (edit)
   - Do: `kafkatest.Start(t)` starts `apache/kafka:4.3.1` in single-node KRaft mode with core testcontainers. Once the port is mapped, set the advertised listener to it, wait for "Kafka Server started", return the broker address, and remove the container on test cleanup. Remove the unused Kafka module from go.mod.
   - Done when: `go vet -tags=integration ./...` passes locally; in CI, the T1.3 integration tests that use it pass.
-- [ ] **T1.3 Kafka adapter: ping and describe cluster** — Covers: F1-AC2, F1-AC3
+- [x] **T1.3 Kafka adapter: ping and describe cluster** — Covers: F1-AC2, F1-AC3
   - Files: internal/kafka/client.go (new), internal/kafka/client_integration_test.go (new, `integration` tag), cmd/kafka3o-gateway/main.go (edit), go.mod (edit), go.sum (edit)
   - Do: a franz-go client plus kadm implementing `Ping` and `DescribeCluster`. Every call takes a context with a timeout. Wire it into main.
   - Done when: `go vet -tags=integration ./...` passes locally. In CI, `go test -tags=integration ./internal/kafka -run 'TestDescribeCluster|TestPingUnreachable'` passes (*container → 1 broker and a controller*; *`localhost:1` → error within 3 s*).
@@ -56,7 +56,7 @@ Full Phase 1 design, recorded in SPEC.md `## Technical`. No POC, so no POC revie
   - Files: internal/api/static.go (new), internal/api/static_test.go (new), internal/api/server.go (edit)
   - Do: if `KAFKA3O_UI_DIR` is set, serve its files. Paths not under `/api` that don't match a file get `index.html`, so deep links work. Unknown `/api/*` paths return a JSON 404. Block path traversal.
   - Done when: `go test ./internal/api -run TestStatic` passes cases *file served*, *`/topics/x` → index.html*, *`/api/nope` → JSON 404*, *`/../etc/passwd` not served*.
-- [ ] **T1.5 Gateway CI** — Covers: Testing (integration in CI)
+- [x] **T1.5 Gateway CI** — Covers: Testing (integration in CI)
   - Files: .github/workflows/ci.yml (new)
   - Do: on push and pull request, set up Go 1.27.2 and run a `gofmt -l` check (must be empty), `go vet ./...`, `go test ./...`, and `go test -tags=integration ./...`.
   - Done when: the workflow passes on GitHub for the pushed commit (`gh run list --limit 1` shows `completed success`).
