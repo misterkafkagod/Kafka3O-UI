@@ -72,7 +72,7 @@ Full Phase 1 design, recorded in SPEC.md `## Technical`. No POC, so no POC revie
   - Files: src/pages/ClusterPage.tsx (new), src/pages/ClusterPage.test.tsx (new), src/App.tsx (edit; route `/cluster`)
   - Do: show cluster id and a broker table (id, host, port, rack), with the controller marked. A 503 shows "Cluster unreachable".
   - Done when: `npm test -- ClusterPage` passes cases *3 brokers, controller marked*, *503 → "Cluster unreachable"*.
-- [ ] **T1.9 UI CI** — Covers: Testing
+- [x] **T1.9 UI CI** — Covers: Testing
   - Files: .github/workflows/ci.yml (new)
   - Do: set up Node from `.nvmrc`, then run `npm ci`, `npm run typecheck`, `npm test`, `npm run build`.
   - Done when: the workflow passes on GitHub (`gh run list --limit 1` shows `completed success`).
