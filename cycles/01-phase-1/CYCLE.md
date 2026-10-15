@@ -86,11 +86,11 @@ Full Phase 1 design, recorded in SPEC.md `## Technical`. No POC, so no POC revie
 5. Go to `/topics/missing`. Expect "Topic not found".
 
 **Tasks**
-- [ ] **T2.1 Topics endpoints** — Covers: F2-AC1, F2-AC3, F3-AC1, F3-AC2, F3-AC3, F3-AC4
+- [x] **T2.1 Topics endpoints** — Covers: F2-AC1, F2-AC3, F3-AC1, F3-AC2, F3-AC3, F3-AC4
   - Files: internal/api/cluster.go (edit), internal/api/topics.go (new), internal/api/topics_test.go (new), internal/api/fake_test.go (edit), internal/api/server.go (edit)
   - Do: `GET /api/topics` returns name, partition count, `approxMessages` (sum of end − start), and `internal` (name starts with `_`). `GET /api/topics/{name}` returns partitions with `underReplicated` (in-sync replicas < replicas) and configs with `isDefault`. Sensitive config values are left out. A missing topic returns 404 `topic_not_found`.
   - Done when: `go test ./internal/api -run 'TestTopics|TestTopicDetail'` passes cases *counts summed*, *`_` prefix → internal*, *under-replicated flagged*, *override vs. default*, *sensitive value omitted*, *missing → 404*.
-- [ ] **T2.2 Kafka adapter: list and describe topics** — Covers: F2-AC1, F3-AC1, F3-AC2
+- [x] **T2.2 Kafka adapter: list and describe topics** — Covers: F2-AC1, F3-AC1, F3-AC2
   - Files: internal/kafka/topics.go (new), internal/kafka/topics_integration_test.go (new)
   - Do: implement `ListTopics` and `DescribeTopic` with kadm (metadata, start and end offsets, describe configs). Map Kafka's unknown-topic error to the API's not-found error.
   - Done when: `go vet -tags=integration ./...` passes locally. In CI, `go test -tags=integration ./internal/kafka -run 'TestListTopics|TestDescribeTopic'` passes (*`orders` 3 partitions ≈10*, *`retention.ms` overridden*, *unknown topic → not found*).
