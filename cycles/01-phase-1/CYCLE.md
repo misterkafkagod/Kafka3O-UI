@@ -52,7 +52,7 @@ Full Phase 1 design, recorded in SPEC.md `## Technical`. No POC, so no POC revie
   - Files: internal/kafka/client.go (new), internal/kafka/client_integration_test.go (new, `integration` tag), cmd/kafka3o-gateway/main.go (edit), go.mod (edit), go.sum (edit)
   - Do: a franz-go client plus kadm implementing `Ping` and `DescribeCluster`. Every call takes a context with a timeout. Wire it into main.
   - Done when: `go vet -tags=integration ./...` passes locally. In CI, `go test -tags=integration ./internal/kafka -run 'TestDescribeCluster|TestPingUnreachable'` passes (*container → 1 broker and a controller*; *`localhost:1` → error within 3 s*).
-- [ ] **T1.4 Gateway serves the built UI** — Covers: architecture (same origin)
+- [x] **T1.4 Gateway serves the built UI** — Covers: architecture (same origin)
   - Files: internal/api/static.go (new), internal/api/static_test.go (new), internal/api/server.go (edit)
   - Do: if `KAFKA3O_UI_DIR` is set, serve its files. Paths not under `/api` that don't match a file get `index.html`, so deep links work. Unknown `/api/*` paths return a JSON 404. Block path traversal.
   - Done when: `go test ./internal/api -run TestStatic` passes cases *file served*, *`/topics/x` → index.html*, *`/api/nope` → JSON 404*, *`/../etc/passwd` not served*.
