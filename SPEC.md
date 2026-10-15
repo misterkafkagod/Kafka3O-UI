@@ -79,7 +79,8 @@ Gateway (Kafka3O-Gateway):
 - Language: Go 1.27.2 — current stable; CVE status: none known in OSV (2026-10-13), pending scan
 - Kafka client: github.com/twmb/franz-go v1.22.2 + pkg/kadm v1.19.0 — pure Go, maintained, direct partition reads without a consumer group; CVE status: none known in OSV, transitive pending scan
 - HTTP / logging / JSON: standard library (`net/http` routing, `log/slog`, `encoding/json`)
-- Integration testing: github.com/testcontainers/testcontainers-go v0.44.0 + modules/kafka v0.44.0, image `apache/kafka:4.3.1`; CVE status: modules none known in OSV, image pending scan
+- Integration testing: github.com/testcontainers/testcontainers-go v0.44.0 (core only), image `apache/kafka:4.3.1` started by the `internal/kafka/kafkatest` helper; CVE status: none known in OSV, image pending scan
+  - The testcontainers Kafka module was dropped: its start script only works with Confluent's `confluent-local` image.
 
 UI (Kafka3O-UI):
 - Node 24.21.0 LTS (build-time only), npm
@@ -133,6 +134,7 @@ Kafka3O-Gateway/
   internal/kafka/           franz-go adapter (implements Cluster)
   internal/api/             HTTP handlers, Cluster interface, writeError
   internal/msgfmt/          format detection and truncation
+  internal/kafka/kafkatest/ starts a disposable apache/kafka container (integration tests only)
   *_test.go                 unit tests next to code
   *_integration_test.go     build tag `integration`
   .github/workflows/ci.yml
@@ -149,7 +151,7 @@ Kafka3O-UI/
 ```
 
 ### Testing
-- Gateway: standard `testing` package. Unit = handlers against a fake `Cluster`, plus `msgfmt`. Integration = testcontainers with `apache/kafka:4.3.1` behind the `integration` build tag, CI only.
+- Gateway: standard `testing` package. Unit = handlers against a fake `Cluster`, plus `msgfmt`. Integration = `kafkatest.Start` (core testcontainers, `apache/kafka:4.3.1`) behind the `integration` build tag, CI only.
   - Run: `go test ./...` (local) · `go test -tags=integration ./...` (CI)
 - UI: vitest + jsdom + Testing Library; the gateway API is faked with msw. No integration tests (the UI only talks to the gateway).
   - Run: `npm test` and `npm run typecheck`
