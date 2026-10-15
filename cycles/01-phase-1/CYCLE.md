@@ -64,7 +64,7 @@ Full Phase 1 design, recorded in SPEC.md `## Technical`. No POC, so no POC revie
   - Files: package.json (new), package-lock.json (new), tsconfig.json (new), vite.config.ts (new; `/api` proxy to `:8080`), index.html (new), .nvmrc (new), src/main.tsx (new), src/App.tsx (new), src/api/types.ts (new), src/api/client.ts (new), src/api/client.test.ts (new), src/test/setup.ts (new), src/test/server.ts (new; msw)
   - Do: React app with router layout. `client.ts` exposes `getHealth` and `getCluster`; non-2xx responses with an error body become a typed `ApiError`; a network failure becomes `GatewayUnreachableError`. Pin exact versions from SPEC.md. Scripts: `dev`, `build`, `test`, `typecheck`.
   - Done when: `npm run typecheck` and `npm test -- client` pass cases *200 parsed*, *503 → ApiError with code `cluster_unreachable`*, *network error → GatewayUnreachableError*; `npm run build` succeeds.
-- [ ] **T1.7 Status bar and gateway-unreachable page** — Covers: F1-AC1, F1-AC2, F1-AC4
+- [x] **T1.7 Status bar and gateway-unreachable page** — Covers: F1-AC1, F1-AC2, F1-AC4
   - Files: src/components/StatusBar.tsx (new), src/components/StatusBar.test.tsx (new), src/App.tsx (edit), src/App.test.tsx (new)
   - Do: poll `/api/health` every 5 s and show gateway and cluster state separately, with the error when the cluster is unreachable. If the gateway is unreachable, replace the page with a "Gateway unreachable" message and a Retry button.
   - Done when: `npm test -- StatusBar App` passes cases *up and reachable*, *cluster unreachable shows the error*, *network error → "Gateway unreachable"*, *Retry calls health again and recovers*.
