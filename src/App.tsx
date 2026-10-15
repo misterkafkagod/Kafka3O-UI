@@ -3,6 +3,7 @@ import { NavLink, Outlet, Route, Routes } from 'react-router';
 import { GatewayUnreachableError, getHealth } from './api/client';
 import type { Health } from './api/types';
 import { GatewayUnreachable, StatusBar } from './components/StatusBar';
+import ClusterPage from './pages/ClusterPage';
 
 export const HEALTH_POLL_MS = 5000;
 
@@ -12,7 +13,7 @@ function Layout({ health }: { health: Health | null }) {
       <header>
         <strong>Kafka3O</strong>
         <nav>
-          <NavLink to="/">Home</NavLink>
+          <NavLink to="/">Home</NavLink> <NavLink to="/cluster">Cluster</NavLink>
         </nav>
         <StatusBar health={health} />
       </header>
@@ -48,6 +49,7 @@ export default function App({ pollMs = HEALTH_POLL_MS }: { pollMs?: number }) {
     <Routes>
       <Route element={<Layout health={health} />}>
         <Route index element={<p>Welcome to Kafka3O.</p>} />
+        <Route path="cluster" element={<ClusterPage />} />
       </Route>
     </Routes>
   );

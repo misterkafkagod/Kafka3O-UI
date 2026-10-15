@@ -68,7 +68,7 @@ Full Phase 1 design, recorded in SPEC.md `## Technical`. No POC, so no POC revie
   - Files: src/components/StatusBar.tsx (new), src/components/StatusBar.test.tsx (new), src/App.tsx (edit), src/App.test.tsx (new)
   - Do: poll `/api/health` every 5 s and show gateway and cluster state separately, with the error when the cluster is unreachable. If the gateway is unreachable, replace the page with a "Gateway unreachable" message and a Retry button.
   - Done when: `npm test -- StatusBar App` passes cases *up and reachable*, *cluster unreachable shows the error*, *network error → "Gateway unreachable"*, *Retry calls health again and recovers*.
-- [ ] **T1.8 Cluster page** — Covers: F1-AC3, F1-AC2 (page message)
+- [x] **T1.8 Cluster page** — Covers: F1-AC3, F1-AC2 (page message)
   - Files: src/pages/ClusterPage.tsx (new), src/pages/ClusterPage.test.tsx (new), src/App.tsx (edit; route `/cluster`)
   - Do: show cluster id and a broker table (id, host, port, rack), with the controller marked. A 503 shows "Cluster unreachable".
   - Done when: `npm test -- ClusterPage` passes cases *3 brokers, controller marked*, *503 → "Cluster unreachable"*.
