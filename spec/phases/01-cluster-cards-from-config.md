@@ -2,7 +2,7 @@
 - **Milestone:** M1
 - **Covers:** F1-AC1, F1-AC6
 - **Discovery:** —
-- **Status:** Building        <!-- Planned | Building | Review | Done -->
+- **Status:** Review        <!-- Planned | Building | Review | Done -->
 
 ## Demo
 1. In `Kafka3O-UI`, run `npm ci && npm run dev` and open http://localhost:5173.
