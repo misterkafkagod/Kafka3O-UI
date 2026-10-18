@@ -40,7 +40,7 @@ Covers both repositories: **Kafka3O-Gateway** (one per Kafka cluster) and **Kafk
 - Rules (Gateway): every Kafka call uses the request `ctx` with the configured timeout (default 5 s)
 - Rules (Gateway): errors are problem JSON with a stable `code` (`cluster_unreachable`, `not_found`, …)
 - Rules (Gateway): no state survives a restart
-- Rules (UI): components never call `fetch`; all I/O goes through the injected `GatewayHttp`
+- Rules (UI): components never call `fetch`; all I/O goes through the injected `FetchJson` (`src/gateway/fetchJson.ts`)
 - Rules (UI): every query key starts with the gateway ID
 - Rules (UI): the gateway list comes only from runtime `/config.json`, never build-time env, so one build serves any deployment
 

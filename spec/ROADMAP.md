@@ -29,9 +29,33 @@ Kafka3O is a multi-cluster Kafka console for developers and operators: one web U
 
 ## Milestones
 ### M1 — See all my clusters and what topics they hold, from one screen
-- **Status:** Planned
+- **Status:** Active
 - **Features:** F1, F2, F3
-- **Phases:** <filled by skill-phase-breakdown>
+- **Phases:**
+  - **P01** F1-B1 + F1-B6 · Cluster cards from config, and the "no gateways" case — Covers: F1-AC1, F1-AC6 · Discovery: — · Status: Building
+    - Demo: `npm run dev` with `config.json` listing "dev" and "prod" shows two cards; emptying the list shows "No gateways configured".
+  - **P02** F1-B2 · Healthy cluster shows its ID and broker count — Covers: F1-AC2 · Discovery: — · Status: Defined
+    - Demo: `docker compose -f deploy/compose.dev.yaml up` + `npm run dev` shows both cards Healthy with cluster ID and "1 broker".
+  - **P03** F1-B3 · Unreachable gateway is isolated to its card — Covers: F1-AC3 · Discovery: — · Status: Defined
+    - Demo: stopping `gateway-prod` and reloading shows "prod" as "Gateway unreachable" while "dev" stays Healthy.
+  - **P04** F1-B4 · Gateway up but Kafka down — Covers: F1-AC4 · Discovery: — · Status: Defined
+    - Demo: stopping `kafka-prod` and reloading shows "prod" as "Cluster unreachable" with the gateway's message.
+  - **P05** F1-B5 · Status refreshes every 15 s — Covers: F1-AC5 · Discovery: — · Status: Defined
+    - Demo: with the page open, stopping `gateway-prod` turns its card "Gateway unreachable" within 15 s without a reload.
+  - **P06** F2-B1 · Cluster page with brokers and controller — Covers: F2-AC1 · Discovery: — · Status: Defined
+    - Demo: clicking the "dev" card shows cluster ID, controller ID and the broker table.
+  - **P07** F2-B2 · Cluster page error with Retry — Covers: F2-AC2 · Discovery: — · Status: Defined
+    - Demo: with `gateway-dev` stopped, `/clusters/dev` shows an error and Retry; starting it and clicking Retry shows the brokers.
+  - **P08** F2-B3 · Unknown cluster ID — Covers: F2-AC3 · Discovery: — · Status: Defined
+    - Demo: `/clusters/unknown` shows "Cluster not found" with a link back to `/`.
+  - **P09** F3-B1 · Topic list with partitions, RF, approximate count — Covers: F3-AC1 · Discovery: — · Status: Defined
+    - Demo: after creating `orders` and `audit` and producing messages, the Topics tab lists them sorted by name with counts.
+  - **P10** F3-B2 + F3-B4 · Internal topics hidden; "No topics" — Covers: F3-AC2, F3-AC4 · Discovery: — · Status: Defined
+    - Demo: a fresh cluster shows "No topics"; toggling "Show internal" lists `__consumer_offsets`.
+  - **P11** F3-B3 · Filter topics by name — Covers: F3-AC3 · Discovery: — · Status: Defined
+    - Demo: typing "ORD" leaves only `orders`.
+  - **P12** F3-B5 · Topic list error with Retry — Covers: F3-AC5 · Discovery: — · Status: Defined
+    - Demo: with `kafka-dev` stopped, the Topics tab shows an error and Retry.
 
 ### M2 — Look inside a topic and read its messages
 - **Status:** Planned
