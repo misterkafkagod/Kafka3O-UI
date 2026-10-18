@@ -16,7 +16,7 @@
   - Do: `package.json` pins the exact TECH-SPEC versions (React 19.3.1, TypeScript 7.0.2, Vite 8.3.4, @vitejs/plugin-react 6.1.2, Vitest 5.0.5, Testing Library react 16.3.3 / user-event 14.6.8 / dom, jsdom 30.1.3, MSW 3.0.3); engines Node ≥ 24.21.0 and `.nvmrc` 24.21.0; scripts `dev`, `build` (`tsc --noEmit && vite build`), `test` (`vitest run`), `typecheck`. `vite.config.ts` configures Vitest (jsdom, setup file). `src/test/server.ts` exports one MSW `setupServer()`; `setup.ts` starts it with `onUnhandledRequest: "error"`, resets handlers after each test and closes it at the end. `App` renders a "Kafka3O" header; `main.tsx` is the composition root that mounts it.
   - Done when: `npm ci && npm test` passes `App.test.tsx › renders the Kafka3O header`, and `npm run build` exits 0.
 
-- [ ] **T01.2 Load and validate the gateway config** — Covers: F1-AC1, F1-AC6
+- [x] **T01.2 Load and validate the gateway config** — Covers: F1-AC1, F1-AC6
   - Files: src/gateway/types.ts (new), src/gateway/HttpError.ts (new), src/gateway/fetchJson.ts (new), src/gateway/fetchJson.test.ts (new), src/config/parseGatewayConfig.ts (new), src/config/parseGatewayConfig.test.ts (new), src/config/loadGatewayConfig.ts (new), src/config/loadGatewayConfig.test.ts (new), package.json (adds @tanstack/react-query 5.104.4)
   - Do:
     - `types.ts`: data-only `GatewayEntry {id, name, url}`. `HttpError`: data-only error class carrying `status`.
