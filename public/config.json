@@ -1,0 +1,6 @@
+{
+  "gateways": [
+    { "id": "dev", "name": "Dev", "url": "http://localhost:8081" },
+    { "id": "prod", "name": "Prod", "url": "http://localhost:8082" }
+  ]
+}
