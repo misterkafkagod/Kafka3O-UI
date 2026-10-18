@@ -11,7 +11,7 @@
 4. Rename `public/config.json` to `config.json.bak` and reload → expect "No gateways configured". Restore the file.
 
 ## Tasks
-- [ ] **T01.1 UI skeleton** — Covers: TECH-SPEC Stack (UI), Testing (UI)
+- [x] **T01.1 UI skeleton** — Covers: TECH-SPEC Stack (UI), Testing (UI)
   - Files: package.json (new), package-lock.json (new), .nvmrc (new), .gitignore (new), tsconfig.json (new), vite.config.ts (new), index.html (new), src/main.tsx (new), src/App.tsx (new), src/App.test.tsx (new), src/test/setup.ts (new), src/test/server.ts (new)
   - Do: `package.json` pins the exact TECH-SPEC versions (React 19.3.1, TypeScript 7.0.2, Vite 8.3.4, @vitejs/plugin-react 6.1.2, Vitest 5.0.5, Testing Library react 16.3.3 / user-event 14.6.8 / dom, jsdom 30.1.3, MSW 3.0.3); engines Node ≥ 24.21.0 and `.nvmrc` 24.21.0; scripts `dev`, `build` (`tsc --noEmit && vite build`), `test` (`vitest run`), `typecheck`. `vite.config.ts` configures Vitest (jsdom, setup file). `src/test/server.ts` exports one MSW `setupServer()`; `setup.ts` starts it with `onUnhandledRequest: "error"`, resets handlers after each test and closes it at the end. `App` renders a "Kafka3O" header; `main.tsx` is the composition root that mounts it.
   - Done when: `npm ci && npm test` passes `App.test.tsx › renders the Kafka3O header`, and `npm run build` exits 0.
