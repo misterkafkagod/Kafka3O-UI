@@ -89,9 +89,10 @@ Tests live next to the file they test (`*_test.go`, `*.test.ts(x)`).
 ### Gateway
 - Framework: Go `testing` + go-cmp · Fakes: hand-written interface fakes for Kafka ports
 - Unit: go-cmp v0.7.0; HTTP routes via Huma `humatest`
-- Integration: testcontainers-go v0.44.0 + `modules/kafka` v0.44.0 with `apache/kafka:4.3.1` (requires a Docker-compatible runtime)
+- Integration: core testcontainers-go v0.44.0 with `apache/kafka:4.3.1`, started by `test/integration/start_kafka.go` (requires a Docker-compatible runtime)
+- Rejected: testcontainers `modules/kafka` — v0.44.0 only starts Confluent images; `confluent-local` — different distribution than the dev stack; `kfake` — not a real broker
 - Remote Docker is fine: `docker context` over SSH, plus `TESTCONTAINERS_HOST_OVERRIDE=<host>` for integration tests (container ports must be reachable from the dev machine); demo ports via `ssh -N -L 8081:localhost:8081 -L 8082:localhost:8082 <host>`
-- Run: `go test ./...` (unit) · `go test -tags integration ./test/integration/...` (integration)
+- Run: `go test ./...` (unit) · `CGO_ENABLED=0 go test -tags integration ./test/integration/...` (integration; cgo off avoids linking macOS frameworks, which fails with mismatched Command Line Tools)
 
 ### UI
 - Framework: Vitest 5.0.5, Testing Library (react 16.3.3, user-event 14.6.8, dom 10.4.2), jsdom 30.1.3 · Fakes: MSW 3.0.3, one handler set per fake gateway (`onUnhandledFrame: "error"`) · CVE status: `npm audit` 2026-10-18: 0 findings
