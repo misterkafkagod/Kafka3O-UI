@@ -2,7 +2,7 @@
 - **Milestone:** M1
 - **Covers:** F1-AC2
 - **Discovery:** —
-- **Status:** Building        <!-- Planned | Building | Review | Done -->
+- **Status:** Review        <!-- Planned | Building | Review | Done -->
 
 ## Demo
 0. If Docker is remote, open a tunnel: `ssh -N -L 8081:localhost:8081 -L 8082:localhost:8082 you@docker-host`.
