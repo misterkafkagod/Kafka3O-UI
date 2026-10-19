@@ -42,8 +42,8 @@ Covers both repositories: **Kafka3O-Gateway** (one per Kafka cluster) and **Kafk
 - Patterns: Ports and adapters (light) — actions depend on Kafka interfaces, franz-go lives only in `internal/kafka`; solves unit testing without a broker
 - Patterns: Composition root — wiring only in `cmd/gateway/main.go` and `src/main.tsx`; solves assembling the mandatory DI in one place
 - Rules (Gateway): HTTP handlers never see franz-go types; adapters map to DTOs
-- Rules (Gateway): every Kafka call uses the request `ctx` with the configured timeout (default 5 s)
-- Rules (Gateway): errors are problem JSON with a stable `code` (`cluster_unreachable`, `not_found`, …)
+- Rules (Gateway): every Kafka call uses the request `ctx` with the configured timeout (default 3 s), which must stay below the UI's gateway timeout (5 s)
+- Rules (Gateway): errors are problem JSON with a stable `code` (`cluster_unreachable`, `not_found`, …), built as `httpapi.Problem` (embeds `huma.ErrorModel`, adds `code`)
 - Rules (Gateway): no state survives a restart
 - Rules (UI): components never call `fetch`; all I/O goes through the injected `FetchJson` (`src/gateway/fetchJson.ts`)
 - Rules (UI): every query key starts with the gateway ID
@@ -111,4 +111,4 @@ Tests live next to the file they test (`*_test.go`, `*.test.ts(x)`).
 - `GET /api/v1/topics` → `[{name, partitions, replicationFactor, internal, approxMessages}]`; 503 `cluster_unreachable`
 - Errors: RFC 9457 problem JSON with `code`
 - OpenAPI document served at `/openapi.json`
-- UI timeout per gateway call: 5 s; status polling every 15 s
+- UI timeout per gateway call: 5 s; status polling every 15 s; gateway Kafka timeout 3 s (must stay below the UI timeout)
