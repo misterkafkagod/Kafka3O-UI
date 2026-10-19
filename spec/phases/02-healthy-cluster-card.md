@@ -35,7 +35,7 @@
   - Files: src/gateway/types.ts, src/gateway/getCluster.ts (new), src/gateway/getCluster.test.ts (new), src/hooks/useClusterStatus.ts (new), src/hooks/useClusterStatus.test.tsx (new), src/components/ClusterCard.tsx, src/components/ClusterCard.test.tsx, src/pages/ClustersPage.tsx, src/pages/ClustersPage.test.tsx, src/App.tsx, src/App.test.tsx, src/main.tsx
   - Do: `types.ts` adds `ClusterInfo` and `Broker`. `getCluster(fetchJson, gatewayUrl)` calls `GET {url}/api/v1/cluster`. `useClusterStatus(gateway, getCluster)` runs one query per gateway with key `["gateway", id, "cluster"]`. `ClusterCard` shows "Checking…" while loading; on success **Healthy**, the cluster ID and "1 broker" / "N brokers"; on failure a plain "Status unavailable" placeholder (refined in P03/P04). `getCluster` is injected from `main.tsx` through `App` and `ClustersPage` into `ClusterCard`.
   - Done when: `npm test` passes `ClustersPage.test.tsx › shows Healthy, cluster ID and 3 brokers (F1-AC2)` (MSW fake gateway at `http://localhost:8081` with 3 brokers), plus `getCluster.test.ts`, `useClusterStatus.test.tsx` and the P01 tests; `npm run build` exits 0.
-- [ ] **T02.6 Run the Docker checks** — Covers: F1-AC2
+- [x] **T02.6 Run the Docker checks** — Covers: F1-AC2
   - Files: none (verification only; fixes, if any, become new tasks)
   - Do: With a Docker-compatible runtime reachable (local, or remote via `docker context` + `TESTCONTAINERS_HOST_OVERRIDE`), run the integration test deferred from T02.2.
   - Done when: `CGO_ENABLED=0 go test -tags integration ./test/integration/...` passes `TestDescribeCluster_ReturnsClusterIDAndOneBroker`.
