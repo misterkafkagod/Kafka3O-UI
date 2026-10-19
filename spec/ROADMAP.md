@@ -32,7 +32,7 @@ Kafka3O is a multi-cluster Kafka console for developers and operators: one web U
 - **Status:** Active
 - **Features:** F1, F2, F3
 - **Phases:**
-  - **P01** F1-B1 + F1-B6 · Cluster cards from config, and the "no gateways" case — Covers: F1-AC1, F1-AC6 · Discovery: — · Status: Review
+  - **P01** F1-B1 + F1-B6 · Cluster cards from config, and the "no gateways" case — Covers: F1-AC1, F1-AC6 · Discovery: — · Status: Done
     - Demo: `npm run dev` with `config.json` listing "dev" and "prod" shows two cards; emptying the list shows "No gateways configured".
   - **P02** F1-B2 · Healthy cluster shows its ID and broker count — Covers: F1-AC2 · Discovery: — · Status: Defined
     - Demo: `docker compose -f deploy/compose.dev.yaml up` + `npm run dev` shows both cards Healthy with cluster ID and "1 broker".
@@ -80,3 +80,5 @@ Kafka3O is a multi-cluster Kafka console for developers and operators: one web U
 
 ## Learnings
 - 2026-10-18 (planning): Restarted with a multi-cluster design — one gateway per cluster, one UI for all. Earlier attempts were single-cluster. Gateway list is a static `/config.json` deployed with the UI. Auth (F12) is deferred to M5, ahead of any write feature; M1–M4 assume gateways run on a trusted network, because holding several gateway credentials in a browser needs its own design.
+- 2026-10-18 (M1 / P01): DI rule clarified — pure functions and child components are imported directly; only I/O and side-effecting actions are injected (literal injection everywhere would mean prop-drilling every component).
+- 2026-10-18 (M1 / P01): MSW 3 renamed `onUnhandledRequest` to `onUnhandledFrame`; check major-version API changes when pinning fresh majors.

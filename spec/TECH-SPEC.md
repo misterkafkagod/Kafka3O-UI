@@ -21,8 +21,10 @@ Covers both repositories: **Kafka3O-Gateway** (one per Kafka cluster) and **Kafk
 
 ### UI (Kafka3O-UI)
 - Runtime: Node 24.21.0 LTS; CVE status: pending scan
-- Language/framework: TypeScript 7.0.2, React 19.3.1, React Router 8.4.0, Vite 8.3.4; CVE status: pending scan
-- Data fetching: TanStack Query 5.104.4 — one independent query per gateway with its own polling, timeout, error state and retry, so one slow gateway never blocks another; CVE status: pending scan
+- Language/framework: TypeScript 7.0.2, React 19.3.1, Vite 8.3.4; CVE status: `npm audit` 2026-10-18: 0 findings
+- Routing: React Router 8.4.0; CVE status: pending scan (not installed yet)
+- Type definitions (dev): @types/react 19.3.0, @types/react-dom 19.3.0; CVE status: `npm audit` 2026-10-18: 0 findings
+- Data fetching: TanStack Query 5.104.4 — one independent query per gateway with its own polling, timeout, error state and retry, so one slow gateway never blocks another; CVE status: `npm audit` 2026-10-18: 0 findings
 - Styling: plain CSS modules
 - Rejected: Next.js — a static SPA suffices; no server needed
 - Rejected: MUI / Tailwind — unnecessary weight for M1
@@ -33,7 +35,8 @@ Covers both repositories: **Kafka3O-Gateway** (one per Kafka cluster) and **Kafk
 - One method per file: one class (or function) with one method, no private helpers (helpers are their own files, injected)
 - Naming (Go): file named after the action — `list_topics.go` → interface `ListTopics` with `Execute(ctx)`, unexported struct `listTopics`, constructor `NewListTopics(deps)`
 - Naming (TS): `listTopics.ts` → exported function type `ListTopics` and `export function listTopics(gateway, clusterId)`; components and hooks likewise (`TopicTable.tsx` → `TopicTable`, `useTopics.ts` → `useTopics`)
-- Exempt: data-only types (DTOs, records, enums, TS types); test files (`list_topics_test.go`, `listTopics.test.ts`; many tests each)
+- Injection scope: I/O and side-effecting actions are always injected; pure functions without I/O and child components may be imported directly
+- Exempt: data-only types (DTOs, records, enums, TS types); test files (`list_topics_test.go`, `listTopics.test.ts`; many tests each); the composition root and test helpers need no own test file (covered by build and demo)
 - Patterns: Ports and adapters (light) — actions depend on Kafka interfaces, franz-go lives only in `internal/kafka`; solves unit testing without a broker
 - Patterns: Composition root — wiring only in `cmd/gateway/main.go` and `src/main.tsx`; solves assembling the mandatory DI in one place
 - Rules (Gateway): HTTP handlers never see franz-go types; adapters map to DTOs
@@ -85,7 +88,7 @@ Tests live next to the file they test (`*_test.go`, `*.test.ts(x)`).
 - Run: `go test ./...` (unit) · `go test -tags integration ./test/integration/...` (integration)
 
 ### UI
-- Framework: Vitest 5.0.5, Testing Library (react 16.3.3, user-event 14.6.8), jsdom 30.1.3 · Fakes: MSW 3.0.3, one handler set per fake gateway
+- Framework: Vitest 5.0.5, Testing Library (react 16.3.3, user-event 14.6.8, dom 10.4.2), jsdom 30.1.3 · Fakes: MSW 3.0.3, one handler set per fake gateway (`onUnhandledFrame: "error"`) · CVE status: `npm audit` 2026-10-18: 0 findings
 - Run: `npm test`
 
 ## Integrations

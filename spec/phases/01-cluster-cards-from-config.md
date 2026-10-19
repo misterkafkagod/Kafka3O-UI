@@ -2,7 +2,7 @@
 - **Milestone:** M1
 - **Covers:** F1-AC1, F1-AC6
 - **Discovery:** —
-- **Status:** Review        <!-- Planned | Building | Review | Done -->
+- **Status:** Done        <!-- Planned | Building | Review | Done -->
 
 ## Demo
 1. In `Kafka3O-UI`, run `npm ci && npm run dev` and open http://localhost:5173.
@@ -31,3 +31,9 @@
   - Done when: `npm test` passes `ClustersPage.test.tsx` with MSW serving `/config.json` — two gateways → "Dev" and "Prod" cards (F1-AC1); 404 → "No gateways configured" (F1-AC6); `{"gateways":[]}` → "No gateways configured" (F1-AC6) — plus the `ClusterCard`, `NoGatewaysConfigured` and `useGatewayConfig` tests; `npm run build` exits 0.
 
 ## Review
+- **Demo:** passed (user, 2026-10-18)
+- **Vulnerability scan:** `npm audit`: 0 findings (prod and dev)
+- **Notes:**
+  - Convention clarified: pure functions without I/O and child components may be imported directly; only I/O and side-effecting actions are injected.
+  - MSW 3 renamed `onUnhandledRequest` to `onUnhandledFrame`.
+  - `@types/react` / `@types/react-dom` 19.3.0 added to TECH-SPEC Stack; composition root and test helpers have no own test files (covered by build and demo).
