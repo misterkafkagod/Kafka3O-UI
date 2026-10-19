@@ -1,9 +1,15 @@
 import { ClusterCard } from "../components/ClusterCard";
 import { NoGatewaysConfigured } from "../components/NoGatewaysConfigured";
 import type { LoadGatewayConfig } from "../config/loadGatewayConfig";
+import type { GetCluster } from "../gateway/getCluster";
 import { useGatewayConfig } from "../hooks/useGatewayConfig";
 
-export function ClustersPage({ loadGatewayConfig }: { loadGatewayConfig: LoadGatewayConfig }) {
+type ClustersPageProps = {
+  loadGatewayConfig: LoadGatewayConfig;
+  getCluster: GetCluster;
+};
+
+export function ClustersPage({ loadGatewayConfig, getCluster }: ClustersPageProps) {
   const { data: gateways } = useGatewayConfig(loadGatewayConfig);
 
   if (gateways === undefined) {
@@ -15,7 +21,7 @@ export function ClustersPage({ loadGatewayConfig }: { loadGatewayConfig: LoadGat
   return (
     <main>
       {gateways.map((gateway) => (
-        <ClusterCard key={gateway.id} gateway={gateway} />
+        <ClusterCard key={gateway.id} gateway={gateway} getCluster={getCluster} />
       ))}
     </main>
   );

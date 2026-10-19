@@ -1,10 +1,30 @@
+import type { GetCluster } from "../gateway/getCluster";
 import type { GatewayEntry } from "../gateway/types";
+import { useClusterStatus } from "../hooks/useClusterStatus";
 
-export function ClusterCard({ gateway }: { gateway: GatewayEntry }) {
+type ClusterCardProps = {
+  gateway: GatewayEntry;
+  getCluster: GetCluster;
+};
+
+export function ClusterCard({ gateway, getCluster }: ClusterCardProps) {
+  const { data: cluster, isError } = useClusterStatus(gateway, getCluster);
+
   return (
     <article aria-label={gateway.name}>
       <h2>{gateway.name}</h2>
       <p>{gateway.url}</p>
+      {cluster ? (
+        <>
+          <p>Healthy</p>
+          <p>Cluster ID: {cluster.clusterId}</p>
+          <p>{cluster.brokers.length === 1 ? "1 broker" : `${cluster.brokers.length} brokers`}</p>
+        </>
+      ) : isError ? (
+        <p>Status unavailable</p>
+      ) : (
+        <p>Checking…</p>
+      )}
     </article>
   );
 }
