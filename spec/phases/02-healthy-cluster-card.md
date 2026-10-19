@@ -11,7 +11,7 @@
 3. In `Kafka3O-UI`, run `npm run dev` and open http://localhost:5173 → "Dev" and "Prod" cards each show **Healthy**, their cluster ID and **"1 broker"**.
 
 ## Tasks
-- [ ] **T02.1 Gateway skeleton: config and liveness** — Covers: TECH-SPEC Stack (Gateway), Testing (Gateway)
+- [x] **T02.1 Gateway skeleton: config and liveness** — Covers: TECH-SPEC Stack (Gateway), Testing (Gateway)
   - Files: go.mod (new), go.sum (new), .gitignore (new), cmd/gateway/main.go (new), internal/config/config.go (new), internal/config/load_config.go (new), internal/config/load_config_test.go (new), internal/httpapi/register_live.go (new), internal/httpapi/register_live_test.go (new), configs/config.example.yaml (new)
   - Do: Module `github.com/misterkafkagod/Kafka3O-Gateway`. Data-only `Config`: `http.listen` (default `:8080`), `http.cors.allowedOrigins`, `kafka.brokers`, `kafka.timeout` (default `5s`). `LoadConfig(path)` reads YAML via koanf, then `KAFKA3O_*` env overrides (`__` separates nested keys, e.g. `KAFKA3O_KAFKA__TIMEOUT`); error if `kafka.brokers` is empty or the named file is missing. `RegisterLive(api)` registers `GET /api/v1/health/live` → 200 `{"status":"ok"}` (Huma 2.39.1, `humago` adapter). `main.go` is the composition root: `-config` flag, slog JSON logger, graceful shutdown on SIGINT/SIGTERM.
   - Done when: `go test ./...` passes — defaults applied, env overrides YAML, empty brokers → error, missing file → error, live returns 200 with body — and `go build ./...` exits 0.
