@@ -10,7 +10,9 @@ Covers both repositories: **Kafka3O-Gateway** (one per Kafka cluster) and **Kafk
 - Runtime: Go 1.27.2 — small static binary, strong concurrency, continuity with the earlier attempt; CVE status: pending scan
 - Kafka client: franz-go v1.22.2 + kadm v1.19.0 — pure Go, complete admin API (metadata, start/end offsets); CVE status: pending scan
 - HTTP: Huma v2.39.1 on the stdlib `net/http` mux — typed handlers, OpenAPI 3.1 generated from code, RFC 9457 problem errors; CVE status: pending scan
-- Config: koanf v2.3.8 (YAML file + `KAFKA3O_*` env overrides; secrets only from env) — v2.4.1 released 2026-10-18, not adopted yet; CVE status: pending scan
+- Module path: `github.com/misterkafkagod/Kafka3O-Gateway`
+- Config: koanf v2.3.8 with providers/file v1.2.1, providers/env/v2 v2.0.2, parsers/yaml v1.1.1 (YAML file + `KAFKA3O_*` env overrides, `__` separates nested keys; secrets only from env) — v2.4.1 released 2026-10-18, not adopted yet; CVE status: pending scan
+- Container images: `golang:1.27.2` (build), `gcr.io/distroless/static-debian12:nonroot` (runtime), `apache/kafka:4.3.1` (dev/test); CVE status: pending scan (no image scanner installed)
 - Logging: stdlib `log/slog` (JSON)
 - Kafka security supported from M1: PLAINTEXT, TLS, SASL PLAIN, SCRAM-SHA-256/512
 - CORS: allowed origins from config (`http.cors.allowedOrigins`)
@@ -59,7 +61,9 @@ Kafka3O-Gateway/
 │   └── httpapi/                     # register_get_cluster.go, register_list_topics.go, cors.go …
 ├── test/integration/                # testcontainers tests, build tag `integration`
 ├── configs/config.example.yaml
+├── Dockerfile
 ├── deploy/compose.dev.yaml          # 2 Kafka clusters + 2 gateways for the local multi-cluster demo
+├── deploy/dev/                      # gateway-dev.yaml, gateway-prod.yaml
 └── spec/README.md                   # points to Kafka3O-UI/spec/
 
 Kafka3O-UI/
@@ -84,7 +88,9 @@ Tests live next to the file they test (`*_test.go`, `*.test.ts(x)`).
 ## Testing
 ### Gateway
 - Framework: Go `testing` + go-cmp · Fakes: hand-written interface fakes for Kafka ports
-- Integration: testcontainers-go v0.44.0 with `apache/kafka:4.3.1` (requires Docker)
+- Unit: go-cmp v0.7.0; HTTP routes via Huma `humatest`
+- Integration: testcontainers-go v0.44.0 + `modules/kafka` v0.44.0 with `apache/kafka:4.3.1` (requires a Docker-compatible runtime)
+- Remote Docker is fine: `docker context` over SSH, plus `TESTCONTAINERS_HOST_OVERRIDE=<host>` for integration tests (container ports must be reachable from the dev machine); demo ports via `ssh -N -L 8081:localhost:8081 -L 8082:localhost:8082 <host>`
 - Run: `go test ./...` (unit) · `go test -tags integration ./test/integration/...` (integration)
 
 ### UI

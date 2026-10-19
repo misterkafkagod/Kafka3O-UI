@@ -10,6 +10,7 @@ Every configured gateway is shown as a cluster card with live health.
 - **F1-B4** Gateway answers but cannot reach Kafka → card shows **Cluster unreachable** with the gateway's error message
 - **F1-B5** Page stays open → each card's status refreshes every 15 s without a reload
 - **F1-B6** `/config.json` is missing, invalid or lists no gateways → page shows **No gateways configured** with a hint on the expected format
+- **F1-B7** Gateway is configured for a secured cluster (TLS and/or SASL PLAIN, SCRAM-SHA-256/512) → it connects and the card shows **Healthy**
 
 **Acceptance criteria**
 - **F1-AC1** (B1) Given a config with gateways "dev" and "prod", when the UI opens → two cards labelled "dev" and "prod" are shown
@@ -18,6 +19,7 @@ Every configured gateway is shown as a cluster card with live health.
 - **F1-AC4** (B4) Given a gateway returning 503 with code `cluster_unreachable`, when its card loads → it shows "Cluster unreachable" and the message
 - **F1-AC5** (B5) Given a Healthy card, when its gateway starts failing and 15 s pass → the card changes to "Gateway unreachable" without a reload
 - **F1-AC6** (B6) Given `/config.json` returns 404 or `{"gateways":[]}`, when the UI opens → "No gateways configured" is shown
+- **F1-AC7** (B7) Given a gateway configured with TLS and SASL SCRAM-SHA-512 credentials for a cluster that requires them, when its card loads → it shows "Healthy"
 
 **External dependencies:** Gateway HTTP API (UI tests fake it with MSW); Kafka cluster behind each gateway (gateway unit tests fake it behind interfaces; integration tests use testcontainers `apache/kafka:4.3.1`)
 
