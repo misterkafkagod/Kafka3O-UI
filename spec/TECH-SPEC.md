@@ -48,6 +48,7 @@ Covers both repositories: **Kafka3O-Gateway** (one per Kafka cluster) and **Kafk
 - Rules (UI): components never call `fetch`; all I/O goes through the injected `FetchJson` (`src/gateway/fetchJson.ts`)
 - Rules (UI): every query key starts with the gateway ID
 - Rules (UI): the gateway list comes only from runtime `/config.json`, never build-time env, so one build serves any deployment
+- Rules (UI): the static host serves `index.html` for client routes (`/clusters/*`); Vite dev already does
 
 ## Structure
 ```
