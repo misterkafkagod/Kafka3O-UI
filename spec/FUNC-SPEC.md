@@ -44,7 +44,7 @@ A cluster's topics with their size, filterable by name.
 **Behaviors**
 - **F3-B1** User opens a cluster's **Topics** tab → system lists topics with name, partitions, replication factor and approximate message count (sum of end − start offsets), sorted by name
 - **F3-B2** Internal topics are hidden by default → toggling **Show internal** lists them too
-- **F3-B3** User types in the filter box → list shows only topics whose name contains the text, case-insensitive
+- **F3-B3** User types in the filter box → list shows only topics whose name contains the text, case-insensitive; when topics exist but none match → `No topics match "<text>"`
 - **F3-B4** Cluster has no non-internal topics → **No topics** is shown
 - **F3-B5** Gateway or cluster fails → error message with a Retry button
 

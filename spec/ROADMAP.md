@@ -48,13 +48,13 @@ Kafka3O is a multi-cluster Kafka console for developers and operators: one web U
     - Demo: with `gateway-dev` stopped, `/clusters/dev` shows an error and Retry; starting it and clicking Retry shows the brokers.
   - **P08** F2-B3 · Unknown cluster ID — Covers: F2-AC3 · Discovery: — · Status: Planned
     - Demo: `/clusters/unknown` shows "Cluster not found" with a link back to `/`.
-  - **P09** F3-B1 · Topic list with partitions, RF, approximate count — Covers: F3-AC1 · Discovery: — · Status: Defined
+  - **P09** F3-B1 · Topic list with partitions, RF, approximate count — Covers: F3-AC1 · Discovery: — · Status: Planned
     - Demo: after creating `orders` and `audit` and producing messages, the Topics tab lists them sorted by name with counts.
-  - **P10** F3-B2 + F3-B4 · Internal topics hidden; "No topics" — Covers: F3-AC2, F3-AC4 · Discovery: — · Status: Defined
+  - **P10** F3-B2 + F3-B4 · Internal topics hidden; "No topics" — Covers: F3-AC2, F3-AC4 · Discovery: — · Status: Planned
     - Demo: a fresh cluster shows "No topics"; toggling "Show internal" lists `__consumer_offsets`.
-  - **P11** F3-B3 · Filter topics by name — Covers: F3-AC3 · Discovery: — · Status: Defined
+  - **P11** F3-B3 · Filter topics by name — Covers: F3-AC3 · Discovery: — · Status: Planned
     - Demo: typing "ORD" leaves only `orders`.
-  - **P12** F3-B5 · Topic list error with Retry — Covers: F3-AC5 · Discovery: — · Status: Defined
+  - **P12** F3-B5 · Topic list error with Retry — Covers: F3-AC5 · Discovery: — · Status: Planned
     - Demo: with `kafka-dev` stopped, the Topics tab shows an error and Retry.
   - **P13** F1-B7 · Gateway connects to TLS/SASL-secured clusters — Covers: F1-AC7 · Discovery: kafka-tls-scram-dev · Status: Defined
     - Demo: a gateway pointed at a TLS + SCRAM-SHA-512 cluster shows its card as Healthy.
