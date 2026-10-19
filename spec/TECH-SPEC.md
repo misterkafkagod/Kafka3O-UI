@@ -64,7 +64,6 @@ Kafka3O-Gateway/
 ├── configs/config.example.yaml
 ├── Dockerfile
 ├── deploy/compose.dev.yaml          # 2 Kafka clusters + 2 gateways for the local multi-cluster demo
-├── deploy/dev/                      # gateway-dev.yaml, gateway-prod.yaml
 └── spec/README.md                   # points to Kafka3O-UI/spec/
 
 Kafka3O-UI/
@@ -92,7 +91,8 @@ Tests live next to the file they test (`*_test.go`, `*.test.ts(x)`).
 - Unit: go-cmp v0.7.0; HTTP routes via Huma `humatest`
 - Integration: core testcontainers-go v0.44.0 with `apache/kafka:4.3.1`, started by `test/integration/start_kafka.go` (requires a Docker-compatible runtime)
 - Rejected: testcontainers `modules/kafka` — v0.44.0 only starts Confluent images; `confluent-local` — different distribution than the dev stack; `kfake` — not a real broker
-- Remote Docker is fine: `docker context` over SSH, plus `TESTCONTAINERS_HOST_OVERRIDE=<host>` for integration tests (container ports must be reachable from the dev machine); demo ports via `ssh -N -L 8081:localhost:8081 -L 8082:localhost:8082 <host>`
+- Remote Docker (current dev setup: `docker-host`, 192.168.1.194, SSH only): forward the daemon socket with `ssh -nNT -o ExitOnForwardFailure=yes -o StreamLocalBindUnlink=yes -L $HOME/.docker/docker-host.sock:/var/run/docker.sock docker-host`, then `source ~/.docker/docker-host.env` (`DOCKER_HOST=unix://$HOME/.docker/docker-host.sock`, `TESTCONTAINERS_HOST_OVERRIDE=192.168.1.194`, `TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=/var/run/docker.sock`); Ryuk stays enabled. Not `ssh://` contexts — testcontainers-go doesn't reliably support them. Demo ports: `ssh -nNT -L 8081:localhost:8081 -L 8082:localhost:8082 docker-host`
+- Compose must not bind-mount local files (they would resolve on the remote host); configure services via environment variables
 - Run: `go test ./...` (unit) · `CGO_ENABLED=0 go test -tags integration ./test/integration/...` (integration; cgo off avoids linking macOS frameworks, which fails with mismatched Command Line Tools)
 
 ### UI

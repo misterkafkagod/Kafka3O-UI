@@ -26,9 +26,9 @@
   - Do: `WithCORS(next, allowedOrigins)` wraps the mux, exact origin match (no `*`). Allowed origin → `Access-Control-Allow-Origin: <origin>`, `Vary: Origin`; `OPTIONS` preflight → 204 with `Allow-Methods: GET`, `Allow-Headers: Accept, Content-Type`. Unlisted origin → no CORS headers, request still served.
   - Done when: `go test ./internal/httpapi/...` passes — allowed origin gets headers, allowed preflight → 204, unlisted origin → no headers, no `Origin` → no headers.
 
-- [ ] **T02.4 Dev stack: two clusters and two gateways** — Covers: TECH-SPEC Structure (`deploy/compose.dev.yaml`)
-  - Files: Dockerfile (new), .dockerignore (new), deploy/compose.dev.yaml (new), deploy/dev/gateway-dev.yaml (new), deploy/dev/gateway-prod.yaml (new)
-  - Do: Multi-stage Dockerfile (`golang:1.27.2` build → `gcr.io/distroless/static-debian12:nonroot`). Compose runs `kafka-dev` and `kafka-prod` (`apache/kafka:4.3.1`, single-node KRaft, node ID 1), `gateway-dev` on `8081:8080` and `gateway-prod` on `8082:8080`, each with its own config pointing at its cluster and allowing origin `http://localhost:5173`.
+- [x] **T02.4 Dev stack: two clusters and two gateways** — Covers: TECH-SPEC Structure (`deploy/compose.dev.yaml`)
+  - Files: Dockerfile (new), .dockerignore (new), deploy/compose.dev.yaml (new)
+  - Do: Multi-stage Dockerfile (`golang:1.27.2` build → `gcr.io/distroless/static-debian12:nonroot`). Compose runs `kafka-dev` and `kafka-prod` (`apache/kafka:4.3.1`, single-node KRaft, node ID 1), `gateway-dev` on `8081:8080` and `gateway-prod` on `8082:8080`, each configured through `KAFKA3O_*` environment variables (amended: no `deploy/dev/*.yaml` bind mounts, which would resolve on a remote Docker host) pointing at its own cluster and allowing origin `http://localhost:5173`. Each Kafka gets its own `CLUSTER_ID` (the image otherwise uses one fixed default).
   - Done when: after `docker compose -f deploy/compose.dev.yaml up -d --build`, `curl -s localhost:8081/api/v1/cluster` returns JSON with `clusterId`, `"controllerId":1` and one broker; 8082 returns a different `clusterId`; `curl -si -H 'Origin: http://localhost:5173' localhost:8081/api/v1/cluster` includes `Access-Control-Allow-Origin: http://localhost:5173`.
 
 - [x] **T02.5 Cards show Healthy, cluster ID and broker count** — Covers: F1-AC2
