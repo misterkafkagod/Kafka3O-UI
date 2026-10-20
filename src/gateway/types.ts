@@ -16,3 +16,5 @@ export type ClusterInfo = {
   controllerId: number;
   brokers: Broker[];
 };
+
+export type GatewayErrorKind = "gateway-unreachable" | "other";

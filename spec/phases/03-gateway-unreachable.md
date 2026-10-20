@@ -2,7 +2,7 @@
 - **Milestone:** M1
 - **Covers:** F1-AC3
 - **Discovery:** —
-- **Status:** Planned        <!-- Planned | Building | Review | Done -->
+- **Status:** Building        <!-- Planned | Building | Review | Done -->
 
 ## Demo
 0. If Docker is remote, open the SSH tunnel for 8081/8082.
@@ -10,7 +10,7 @@
 2. `docker compose -f deploy/compose.dev.yaml stop gateway-prod`, reload → within 5 s "Prod" shows **Gateway unreachable**; "Dev" stays Healthy.
 
 ## Tasks
-- [ ] **T03.1 Classify gateway errors** — Covers: F1-AC3
+- [x] **T03.1 Classify gateway errors** — Covers: F1-AC3
   - Files: src/gateway/types.ts (adds `GatewayErrorKind`), src/gateway/classifyGatewayError.ts (new), src/gateway/classifyGatewayError.test.ts (new)
   - Do: Pure `classifyGatewayError(error)` → `"gateway-unreachable"` for fetch network failure (`TypeError`), timeout (`TimeoutError`) or abort (`AbortError`); `"other"` for `HttpError` and anything else.
   - Done when: `npm test -- classifyGatewayError` passes: TypeError / TimeoutError / AbortError → gateway-unreachable; HttpError 500 and plain Error → other.
