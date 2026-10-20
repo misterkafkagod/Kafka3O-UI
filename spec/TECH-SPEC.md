@@ -7,12 +7,12 @@ Covers both repositories: **Kafka3O-Gateway** (one per Kafka cluster) and **Kafk
 
 ## Stack
 ### Gateway (Kafka3O-Gateway)
-- Runtime: Go 1.27.2 — small static binary, strong concurrency, continuity with the earlier attempt; CVE status: pending scan
-- Kafka client: franz-go v1.22.2 + kadm v1.19.0 — pure Go, complete admin API (metadata, start/end offsets); CVE status: pending scan
-- HTTP: Huma v2.39.1 on the stdlib `net/http` mux — typed handlers, OpenAPI 3.1 generated from code, RFC 9457 problem errors; CVE status: pending scan
+- Runtime: Go 1.27.2 — small static binary, strong concurrency, continuity with the earlier attempt; CVE status: `govulncheck` v1.9.0 2026-10-20: 0 affecting (stdlib included)
+- Kafka client: franz-go v1.22.2 + kadm v1.19.0 — pure Go, complete admin API (metadata, start/end offsets); CVE status: `govulncheck` v1.9.0 2026-10-20: 0 affecting
+- HTTP: Huma v2.39.1 on the stdlib `net/http` mux — typed handlers, OpenAPI 3.1 generated from code, RFC 9457 problem errors; CVE status: `govulncheck` v1.9.0 2026-10-20: 0 affecting
 - Module path: `github.com/misterkafkagod/Kafka3O-Gateway`
-- Config: koanf v2.3.8 with providers/file v1.2.1, providers/env/v2 v2.0.2, parsers/yaml v1.1.1 (YAML file + `KAFKA3O_*` env overrides, `__` separates nested keys; secrets only from env) — v2.4.1 released 2026-10-18, not adopted yet; CVE status: pending scan
-- Container images: `golang:1.27.2` (build), `gcr.io/distroless/static-debian12:nonroot` (runtime), `apache/kafka:4.3.1` (dev/test); CVE status: pending scan (no image scanner installed)
+- Config: koanf v2.3.8 with providers/file v1.2.1, providers/env/v2 v2.0.2, parsers/yaml v1.1.1 (YAML file + `KAFKA3O_*` env overrides, `__` separates nested keys; secrets only from env) — v2.4.1 released 2026-10-18, not adopted yet; CVE status: `govulncheck` v1.9.0 2026-10-20: 0 affecting
+- Container images: `golang:1.27.2` (build), `gcr.io/distroless/static-debian12:nonroot` (runtime), `apache/kafka:4.3.1` (dev/test); CVE status: gateway image `kafka3o-gateway:dev` Trivy 0.75.0 2026-10-20: 0 critical/high (1 UNKNOWN: tzdata DLA-4792-1, fixed in a newer distroless base); `golang` and `apache/kafka` not scanned (build/dev only)
 - Logging: stdlib `log/slog` (JSON)
 - Kafka security supported from M1: PLAINTEXT, TLS, SASL PLAIN, SCRAM-SHA-256/512
 - CORS: allowed origins from config (`http.cors.allowedOrigins`)
@@ -90,6 +90,7 @@ Tests live next to the file they test (`*_test.go`, `*.test.ts(x)`).
 ### Gateway
 - Framework: Go `testing` + go-cmp · Fakes: hand-written interface fakes for Kafka ports
 - Unit: go-cmp v0.7.0; HTTP routes via Huma `humatest`
+- Vulnerability scan: `CGO_ENABLED=0 go run golang.org/x/vuln/cmd/govulncheck@v1.9.0 -test -tags integration ./...` (include tests: testcontainers pulls its own dependencies); test-only deps 2026-10-20: 0 affecting, 1 module-level advisory without fix and not called (GO-2026-5932, golang.org/x/crypto)
 - Integration: core testcontainers-go v0.44.0 with `apache/kafka:4.3.1`, started by `test/integration/start_kafka.go` (requires a Docker-compatible runtime)
 - Rejected: testcontainers `modules/kafka` — v0.44.0 only starts Confluent images; `confluent-local` — different distribution than the dev stack; `kfake` — not a real broker
 - Remote Docker (current dev setup: `docker-host`, 192.168.1.194, SSH only): forward the daemon socket with `ssh -nNT -o ExitOnForwardFailure=yes -o StreamLocalBindUnlink=yes -L $HOME/.docker/docker-host.sock:/var/run/docker.sock docker-host`, then `source ~/.docker/docker-host.env` (`DOCKER_HOST=unix://$HOME/.docker/docker-host.sock`, `TESTCONTAINERS_HOST_OVERRIDE=192.168.1.194`, `TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=/var/run/docker.sock`); Ryuk stays enabled. Not `ssh://` contexts — testcontainers-go doesn't reliably support them. Demo ports: `ssh -nNT -L 8081:localhost:8081 -L 8082:localhost:8082 docker-host`

@@ -2,7 +2,7 @@
 - **Milestone:** M1
 - **Covers:** F1-AC2
 - **Discovery:** —
-- **Status:** Review        <!-- Planned | Building | Review | Done -->
+- **Status:** Done        <!-- Planned | Building | Review | Done -->
 
 ## Demo
 0. If Docker is remote, open a tunnel: `ssh -N -L 8081:localhost:8081 -L 8082:localhost:8082 you@docker-host`.
@@ -50,3 +50,12 @@
   - Done when: `CGO_ENABLED=0 go run golang.org/x/vuln/cmd/govulncheck@v1.9.0 -test -tags integration ./...` reports no vulnerabilities, and `CGO_ENABLED=0 go test -tags integration ./test/integration/...` still passes on remote Docker.
 
 ## Review
+- **Demo:** passed (user, 2026-10-19) — both cards Healthy with distinct cluster IDs and "1 broker"; gateways rebuilt after T02.7 and still serving
+- **Vulnerability scan:**
+  - Gateway `govulncheck` v1.9.0: 0 affecting (shipped code); with `-test -tags integration`: 3 found in testcontainers' deps → fixed in T02.8, now 0 affecting (1 module-level advisory without fix, not called: GO-2026-5932)
+  - Gateway image Trivy 0.75.0: 0 critical/high (1 UNKNOWN: tzdata DLA-4792-1)
+  - UI `npm audit`: 0 findings
+- **Notes:**
+  - Convention tightened: named logic (transforms, comparators) gets its own file; only logic-free framework glue may be inline (T02.7, later phase plans amended).
+  - Run govulncheck with `-test -tags integration`: test-only dependencies have their own findings.
+  - Remote Docker via an SSH-forwarded socket works for compose and testcontainers (Ryuk enabled); `~/.docker/docker-host-up.sh` restores the tunnels after sleep.
