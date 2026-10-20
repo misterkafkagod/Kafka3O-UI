@@ -39,7 +39,7 @@
   - Files: none (verification only; fixes, if any, become new tasks)
   - Do: With a Docker-compatible runtime reachable (local, or remote via `docker context` + `TESTCONTAINERS_HOST_OVERRIDE`), run the integration test deferred from T02.2.
   - Done when: `CGO_ENABLED=0 go test -tags integration ./test/integration/...` passes `TestDescribeCluster_ReturnsClusterIDAndOneBroker`.
-- [ ] **T02.7 Fix: extract inline helpers** — Covers: TECH-SPEC Conventions
+- [x] **T02.7 Fix: extract inline helpers** — Covers: TECH-SPEC Conventions
   - Files: internal/config/env_key.go (new), internal/config/env_key_test.go (new), internal/config/load_config.go, internal/cluster/compare_brokers_by_id.go (new), internal/cluster/compare_brokers_by_id_test.go (new), internal/cluster/get_cluster.go, internal/httpapi/with_cors.go, internal/httpapi/with_cors_test.go, internal/kafka/new_client_test.go (new)
   - Do: `EnvKey(key, value)` maps `KAFKA3O_KAFKA__TIMEOUT` → `kafka.timeout`; `LoadConfig` passes `TransformFunc: EnvKey`. `CompareBrokersByID(a, b)` is the comparator for `slices.SortFunc`. `WithCORS` returns a `corsHandler{next, allowed}` whose single `ServeHTTP` holds the CORS logic (no closure). Huma route handlers stay inline (glue exception). `new_client_test.go`: a valid config builds a client without connecting.
   - Done when: `go test ./...` passes — EnvKey (prefix stripped, `__` → `.`, lowercased, value passed through), CompareBrokersByID (less / equal / greater), NewClient builds without connecting, and all existing CORS and config tests unchanged.
