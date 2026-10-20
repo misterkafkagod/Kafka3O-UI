@@ -2,7 +2,7 @@
 - **Milestone:** M1
 - **Covers:** F1-AC4
 - **Discovery:** —
-- **Status:** Building        <!-- Planned | Building | Review | Done -->
+- **Status:** Review        <!-- Planned | Building | Review | Done -->
 
 ## Demo
 1. `docker compose -f deploy/compose.dev.yaml stop kafka-prod`.
