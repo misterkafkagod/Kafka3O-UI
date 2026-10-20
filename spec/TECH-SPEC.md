@@ -38,6 +38,7 @@ Covers both repositories: **Kafka3O-Gateway** (one per Kafka cluster) and **Kafk
 - Naming (Go): file named after the action — `list_topics.go` → interface `ListTopics` with `Execute(ctx)`, unexported struct `listTopics`, constructor `NewListTopics(deps)`
 - Naming (TS): `listTopics.ts` → exported function type `ListTopics` and `export function listTopics(gateway, clusterId)`; components and hooks likewise (`TopicTable.tsx` → `TopicTable`, `useTopics.ts` → `useTopics`)
 - Injection scope: I/O and side-effecting actions are always injected; pure functions without I/O and child components may be imported directly
+- Inline functions: named logic (transforms, comparators, predicates, mappers) lives in its own file with its own test. Only logic-free framework glue may be inline: an HTTP handler closure that just calls an injected action, a JSX `.map` render callback, composition-root wiring
 - Exempt: data-only types (DTOs, records, enums, TS types); test files (`list_topics_test.go`, `listTopics.test.ts`; many tests each); the composition root and test helpers need no own test file (covered by build and demo)
 - Patterns: Ports and adapters (light) — actions depend on Kafka interfaces, franz-go lives only in `internal/kafka`; solves unit testing without a broker
 - Patterns: Composition root — wiring only in `cmd/gateway/main.go` and `src/main.tsx`; solves assembling the mandatory DI in one place
