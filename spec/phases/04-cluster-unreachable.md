@@ -2,7 +2,7 @@
 - **Milestone:** M1
 - **Covers:** F1-AC4
 - **Discovery:** —
-- **Status:** Planned        <!-- Planned | Building | Review | Done -->
+- **Status:** Building        <!-- Planned | Building | Review | Done -->
 
 ## Demo
 1. `docker compose -f deploy/compose.dev.yaml stop kafka-prod`.
@@ -10,7 +10,7 @@
 3. Reload the UI → "Prod" shows **Cluster unreachable** with the gateway's message.
 
 ## Tasks
-- [ ] **T04.1 Gateway: 503 cluster_unreachable** — Covers: F1-AC4
+- [x] **T04.1 Gateway: 503 cluster_unreachable** — Covers: F1-AC4
   - Files: internal/httpapi/problem.go (new), internal/httpapi/new_cluster_unreachable.go (new), internal/httpapi/new_cluster_unreachable_test.go (new), internal/httpapi/register_get_cluster.go, internal/httpapi/register_get_cluster_test.go, internal/kafka/describe_cluster_test.go (new), internal/config/load_config.go, internal/config/load_config_test.go, configs/config.example.yaml
   - Do: `Problem` is data-only: embeds `huma.ErrorModel` (inherits `Error()`/`GetStatus()`, declares no methods) plus `Code string`. `NewClusterUnreachable(err)` → 503, title "Cluster unreachable", detail "Kafka is unreachable: <err>", code `cluster_unreachable`. `RegisterGetCluster` returns it on any `GetCluster` error and documents 503 in OpenAPI. Default `kafka.timeout` 5 s → 3 s so the gateway answers before the UI's 5 s timeout.
   - Done when: `go test ./...` passes: route → 503 with code and detail when GetCluster fails; NewClusterUnreachable fields; adapter against `127.0.0.1:1` with a 500 ms context errors within 2 s (no Docker); default timeout is 3 s.
