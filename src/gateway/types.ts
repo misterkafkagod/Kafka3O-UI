@@ -17,4 +17,10 @@ export type ClusterInfo = {
   brokers: Broker[];
 };
 
-export type GatewayErrorKind = "gateway-unreachable" | "other";
+export type GatewayErrorKind = "gateway-unreachable" | "cluster-unreachable" | "other";
+
+// RFC 9457 problem body sent by the gateway on errors (only the fields the UI uses).
+export type Problem = {
+  code?: string;
+  detail?: string;
+};

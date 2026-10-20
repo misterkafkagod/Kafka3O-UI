@@ -22,6 +22,38 @@ describe("fetchJson", () => {
     expect((error as HttpError).status).toBe(404);
   });
 
+  it("attaches the problem code and detail from an error body", async () => {
+    server.use(
+      http.get(url, () =>
+        HttpResponse.json(
+          { title: "Cluster unreachable", code: "cluster_unreachable", detail: "Kafka is unreachable: refused" },
+          { status: 503, headers: { "Content-Type": "application/problem+json" } },
+        ),
+      ),
+    );
+
+    const error = (await fetchJson(fetch, url, 1000).catch((e: unknown) => e)) as HttpError;
+
+    expect(error.status).toBe(503);
+    expect(error.problem).toEqual({ code: "cluster_unreachable", detail: "Kafka is unreachable: refused" });
+  });
+
+  it("leaves the problem empty when the error body is missing", async () => {
+    server.use(http.get(url, () => new HttpResponse(null, { status: 503 })));
+
+    const error = (await fetchJson(fetch, url, 1000).catch((e: unknown) => e)) as HttpError;
+
+    expect(error.problem).toBeUndefined();
+  });
+
+  it("leaves the problem empty when the error body is not JSON", async () => {
+    server.use(http.get(url, () => HttpResponse.text("Bad Gateway", { status: 502 })));
+
+    const error = (await fetchJson(fetch, url, 1000).catch((e: unknown) => e)) as HttpError;
+
+    expect(error.problem).toBeUndefined();
+  });
+
   it("throws when the body is not JSON", async () => {
     server.use(http.get(url, () => HttpResponse.html("<!doctype html><html></html>")));
 

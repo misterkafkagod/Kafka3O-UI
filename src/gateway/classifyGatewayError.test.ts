@@ -15,6 +15,16 @@ describe("classifyGatewayError", () => {
     expect(classifyGatewayError(new DOMException("aborted", "AbortError"))).toBe("gateway-unreachable");
   });
 
+  it("treats a cluster_unreachable problem as cluster-unreachable", () => {
+    const error = new HttpError(503, "GET failed with 503", { code: "cluster_unreachable", detail: "refused" });
+
+    expect(classifyGatewayError(error)).toBe("cluster-unreachable");
+  });
+
+  it("treats a 503 without a problem code as other", () => {
+    expect(classifyGatewayError(new HttpError(503, "GET failed with 503"))).toBe("other");
+  });
+
   it("treats an HTTP error as other", () => {
     expect(classifyGatewayError(new HttpError(500, "GET failed with 500"))).toBe("other");
   });

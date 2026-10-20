@@ -89,6 +89,31 @@ describe("ClustersPage", () => {
     expect(await within(prodCard).findByText("Gateway unreachable")).toBeDefined();
   });
 
+  it("shows Cluster unreachable with the gateway message (F1-AC4)", async () => {
+    server.use(
+      http.get("/config.json", () => HttpResponse.json({ gateways: [prod] })),
+      http.get("http://localhost:8082/api/v1/cluster", () =>
+        HttpResponse.json(
+          {
+            title: "Cluster unreachable",
+            status: 503,
+            code: "cluster_unreachable",
+            detail: "Kafka is unreachable: unable to dial: dial tcp: lookup kafka-prod: no such host",
+          },
+          { status: 503, headers: { "Content-Type": "application/problem+json" } },
+        ),
+      ),
+    );
+
+    renderWithQuery(<ClustersPage loadGatewayConfig={load} getCluster={realGetCluster} />);
+
+    const prodCard = await screen.findByRole("article", { name: "Prod" });
+    expect(await within(prodCard).findByText("Cluster unreachable")).toBeDefined();
+    expect(
+      within(prodCard).getByText("Kafka is unreachable: unable to dial: dial tcp: lookup kafka-prod: no such host"),
+    ).toBeDefined();
+  });
+
   it("shows No gateways configured when config.json is missing (F1-AC6)", async () => {
     server.use(http.get("/config.json", () => new HttpResponse(null, { status: 404 })));
 

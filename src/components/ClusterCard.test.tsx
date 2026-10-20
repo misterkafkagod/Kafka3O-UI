@@ -1,5 +1,6 @@
 import { screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
+import { HttpError } from "../gateway/HttpError";
 import type { ClusterInfo } from "../gateway/types";
 import { renderWithQuery } from "../test/renderWithQuery";
 import { ClusterCard } from "./ClusterCard";
@@ -52,6 +53,23 @@ describe("ClusterCard", () => {
     );
 
     expect(await screen.findByText("Gateway unreachable")).toBeDefined();
+  });
+
+  it("shows Cluster unreachable with the gateway's message", async () => {
+    renderWithQuery(
+      <ClusterCard
+        gateway={gateway}
+        getCluster={async () => {
+          throw new HttpError(503, "GET failed with 503", {
+            code: "cluster_unreachable",
+            detail: "Kafka is unreachable: dial tcp: connection refused",
+          });
+        }}
+      />,
+    );
+
+    expect(await screen.findByText("Cluster unreachable")).toBeDefined();
+    expect(screen.getByText("Kafka is unreachable: dial tcp: connection refused")).toBeDefined();
   });
 
   it("shows Status unavailable when the status cannot be read", async () => {
