@@ -6,5 +6,7 @@ export function useClusterStatus(gateway: GatewayEntry, getCluster: GetCluster) 
   return useQuery({
     queryKey: ["gateway", gateway.id, "cluster"],
     queryFn: () => getCluster(gateway.url),
+    // No automatic retries: 3 retries × 5 s timeout would hide an unreachable gateway for ~20 s.
+    retry: false,
   });
 }

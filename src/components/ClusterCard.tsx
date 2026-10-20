@@ -1,3 +1,4 @@
+import { classifyGatewayError } from "../gateway/classifyGatewayError";
 import type { GetCluster } from "../gateway/getCluster";
 import type { GatewayEntry } from "../gateway/types";
 import { useClusterStatus } from "../hooks/useClusterStatus";
@@ -8,7 +9,7 @@ type ClusterCardProps = {
 };
 
 export function ClusterCard({ gateway, getCluster }: ClusterCardProps) {
-  const { data: cluster, isError } = useClusterStatus(gateway, getCluster);
+  const { data: cluster, isError, error } = useClusterStatus(gateway, getCluster);
 
   return (
     <article aria-label={gateway.name}>
@@ -21,7 +22,7 @@ export function ClusterCard({ gateway, getCluster }: ClusterCardProps) {
           <p>{cluster.brokers.length === 1 ? "1 broker" : `${cluster.brokers.length} brokers`}</p>
         </>
       ) : isError ? (
-        <p>Status unavailable</p>
+        <p>{classifyGatewayError(error) === "gateway-unreachable" ? "Gateway unreachable" : "Status unavailable"}</p>
       ) : (
         <p>Checking…</p>
       )}

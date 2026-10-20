@@ -41,6 +41,19 @@ describe("ClusterCard", () => {
     expect(await screen.findByText("1 broker")).toBeDefined();
   });
 
+  it("shows Gateway unreachable when the gateway cannot be reached", async () => {
+    renderWithQuery(
+      <ClusterCard
+        gateway={gateway}
+        getCluster={async () => {
+          throw new TypeError("Failed to fetch");
+        }}
+      />,
+    );
+
+    expect(await screen.findByText("Gateway unreachable")).toBeDefined();
+  });
+
   it("shows Status unavailable when the status cannot be read", async () => {
     renderWithQuery(
       <ClusterCard
