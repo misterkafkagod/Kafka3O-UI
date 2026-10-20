@@ -2,7 +2,7 @@
 - **Milestone:** M1
 - **Covers:** F1-AC3
 - **Discovery:** —
-- **Status:** Building        <!-- Planned | Building | Review | Done -->
+- **Status:** Review        <!-- Planned | Building | Review | Done -->
 
 ## Demo
 0. If Docker is remote, open the SSH tunnel for 8081/8082.
