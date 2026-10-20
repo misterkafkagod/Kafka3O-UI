@@ -19,6 +19,7 @@ Every configured gateway is shown as a cluster card with live health.
 - **F1-AC4** (B4) Given a gateway returning 503 with code `cluster_unreachable`, when its card loads → it shows "Cluster unreachable" and the message
 - **F1-AC5** (B5) Given a Healthy card, when its gateway starts failing and 15 s pass → the card changes to "Gateway unreachable" without a reload
 - **F1-AC6** (B6) Given `/config.json` returns 404 or `{"gateways":[]}`, when the UI opens → "No gateways configured" is shown
+- **F1-AC8** (B4) Given a card showing Healthy, when that cluster's Kafka stops while its gateway keeps running → within 15 s the card shows "Cluster unreachable"
 - **F1-AC7** (B7) Given a gateway configured with TLS and SASL SCRAM-SHA-512 credentials for a cluster that requires them, when its card loads → it shows "Healthy"
 
 **External dependencies:** Gateway HTTP API (UI tests fake it with MSW); Kafka cluster behind each gateway (gateway unit tests fake it behind interfaces; integration tests use testcontainers `apache/kafka:4.3.1`)

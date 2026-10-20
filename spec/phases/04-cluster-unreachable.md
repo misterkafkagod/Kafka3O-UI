@@ -5,7 +5,7 @@
 - **Status:** Review        <!-- Planned | Building | Review | Done -->
 
 ## Demo
-1. `docker compose -f deploy/compose.dev.yaml stop kafka-prod`.
+1. `docker compose -f deploy/compose.dev.yaml stop kafka-prod`, then `docker compose -f deploy/compose.dev.yaml restart gateway-prod` (amended: a running gateway serves cached metadata until P14 fixes it; a fresh gateway has no cache).
 2. `curl -si localhost:8082/api/v1/cluster` → 503 with `"code":"cluster_unreachable"` within ~3 s.
 3. Reload the UI → "Prod" shows **Cluster unreachable** with the gateway's message.
 

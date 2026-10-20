@@ -56,6 +56,9 @@ Kafka3O is a multi-cluster Kafka console for developers and operators: one web U
     - Demo: typing "ORD" leaves only `orders`.
   - **P12** F3-B5 · Topic list error with Retry — Covers: F3-AC5 · Discovery: — · Status: Planned
     - Demo: with `kafka-dev` stopped, the Topics tab shows an error and Retry.
+  - **P14** F1-B4 (correction) · Status reflects a cluster that goes down after a healthy check — Covers: F1-AC8 · Discovery: — · Status: Defined
+    - Demo: with both cards Healthy, `docker compose stop kafka-prod` (gateway keeps running) → within 15 s "Prod" shows "Cluster unreachable".
+    - Scope: the cluster adapter (and the topic metadata adapter from P09) send a direct `kmsg.MetadataRequest` via `kgo.Client.Request` instead of kadm's cached `BrokerMetadata` / `ListTopicsWithInternal`; integration test stops Kafka after a successful call.
   - **P13** F1-B7 · Gateway connects to TLS/SASL-secured clusters — Covers: F1-AC7 · Discovery: kafka-tls-scram-dev · Status: Defined
     - Demo: a gateway pointed at a TLS + SCRAM-SHA-512 cluster shows its card as Healthy.
 
@@ -84,6 +87,7 @@ Kafka3O is a multi-cluster Kafka console for developers and operators: one web U
 - 2026-10-18 (planning): Restarted with a multi-cluster design — one gateway per cluster, one UI for all. Earlier attempts were single-cluster. Gateway list is a static `/config.json` deployed with the UI. Auth (F12) is deferred to M5, ahead of any write feature; M1–M4 assume gateways run on a trusted network, because holding several gateway credentials in a browser needs its own design.
 - 2026-10-18 (M1 / P01): DI rule clarified — pure functions and child components are imported directly; only I/O and side-effecting actions are injected (literal injection everywhere would mean prop-drilling every component).
 - 2026-10-18 (M1 / P02 planning): TLS/SASL support was promised in TECH-SPEC but had no phase; added F1-B7 and P13. No local container runtime on the dev Mac — Docker may run on another machine (docker context over SSH).
+- 2026-10-20 (M1 / P04): kadm's metadata helpers serve franz-go's metadata cache, and broker-only requests never refresh it — a gateway that saw a healthy cluster keeps reporting it Healthy after Kafka stops. Kept as is for now (user decision); correction planned as P14. P04's demo restarts the gateway after stopping Kafka.
 - 2026-10-20 (M1 / P03): Under jsdom, fetch's `DOMException` comes from another realm than the global one; the UI classifies errors by `name`, not `instanceof`.
 - 2026-10-20 (M1 / P02): Inline-helper rule tightened (named transforms/comparators get their own file; only logic-free framework glue inline). govulncheck must include `-test -tags integration`: testcontainers brought 3 fixable findings. Gateway image scanned with Trivy: 0 critical/high.
 - 2026-10-19 (M1 / P02): Remote Docker works via an SSH-forwarded Unix socket plus `TESTCONTAINERS_HOST_OVERRIDE`; compose configures gateways via env vars because bind mounts resolve on the remote host. `apache/kafka` falls back to one fixed cluster ID, so each dev cluster sets its own `CLUSTER_ID`.
