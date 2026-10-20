@@ -2,7 +2,7 @@
 - **Milestone:** M1
 - **Covers:** F1-AC3
 - **Discovery:** —
-- **Status:** Review        <!-- Planned | Building | Review | Done -->
+- **Status:** Done        <!-- Planned | Building | Review | Done -->
 
 ## Demo
 0. If Docker is remote, open the SSH tunnel for 8081/8082.
@@ -21,3 +21,7 @@
   - Done when: `npm test` passes `ClustersPage` › "isolates an unreachable gateway to its card (F1-AC3)" (Dev healthy, Prod `HttpResponse.error()`) and › "shows Gateway unreachable when a gateway times out (F1-AC3)" (MSW delay > injected 50 ms timeout); `useClusterStatus` no-retry test (getCluster called once on failure); `npm run build` exits 0.
 
 ## Review
+- **Demo:** passed (user, 2026-10-20) — with `gateway-prod` stopped, Dev stayed Healthy and Prod showed "Gateway unreachable"
+- **Vulnerability scan:** not required — no dependency changes in this phase (full scan at M1's last phase)
+- **Notes:**
+  - Under jsdom, Node's fetch throws a `DOMException` from a different realm than the global one; classify errors by `name`, not `instanceof`.
