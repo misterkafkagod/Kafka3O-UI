@@ -2,7 +2,7 @@
 - **Milestone:** M1
 - **Covers:** F1-AC2
 - **Discovery:** —
-- **Status:** Building        <!-- Planned | Building | Review | Done -->
+- **Status:** Review        <!-- Planned | Building | Review | Done -->
 
 ## Demo
 0. If Docker is remote, open a tunnel: `ssh -N -L 8081:localhost:8081 -L 8082:localhost:8082 you@docker-host`.
@@ -44,7 +44,7 @@
   - Do: `EnvKey(key, value)` maps `KAFKA3O_KAFKA__TIMEOUT` → `kafka.timeout`; `LoadConfig` passes `TransformFunc: EnvKey`. `CompareBrokersByID(a, b)` is the comparator for `slices.SortFunc`. `WithCORS` returns a `corsHandler{next, allowed}` whose single `ServeHTTP` holds the CORS logic (no closure). Huma route handlers stay inline (glue exception). `new_client_test.go`: a valid config builds a client without connecting.
   - Done when: `go test ./...` passes — EnvKey (prefix stripped, `__` → `.`, lowercased, value passed through), CompareBrokersByID (less / equal / greater), NewClient builds without connecting, and all existing CORS and config tests unchanged.
 
-- [ ] **T02.8 Fix: bump vulnerable test-only dependencies** — Covers: TECH-SPEC Policies (CVE)
+- [x] **T02.8 Fix: bump vulnerable test-only dependencies** — Covers: TECH-SPEC Policies (CVE)
   - Files: go.mod, go.sum
   - Do: Raise `golang.org/x/crypto` to v0.56.0 (GO-2026-6354, GO-2026-6355) and `github.com/moby/go-archive` to v0.3.0 (GO-2026-6253), both pulled in by testcontainers.
   - Done when: `CGO_ENABLED=0 go run golang.org/x/vuln/cmd/govulncheck@v1.9.0 -test -tags integration ./...` reports no vulnerabilities, and `CGO_ENABLED=0 go test -tags integration ./test/integration/...` still passes on remote Docker.
