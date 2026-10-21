@@ -16,11 +16,20 @@ describe("useClusterStatus", () => {
     const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
     const getCluster = vi.fn(async () => cluster);
 
-    const { result } = renderHook(() => useClusterStatus(gateway, getCluster), { wrapper: wrapperFor(client) });
+    const { result } = renderHook(() => useClusterStatus(gateway, getCluster, 60_000), { wrapper: wrapperFor(client) });
 
     await waitFor(() => expect(result.current.data).toEqual(cluster));
     expect(getCluster).toHaveBeenCalledWith("http://localhost:8081");
     expect(client.getQueryData(["gateway", "dev", "cluster"])).toEqual(cluster);
+  });
+
+  it("refetches every refreshMs", async () => {
+    const client = new QueryClient();
+    const getCluster = vi.fn(async () => cluster);
+
+    renderHook(() => useClusterStatus(gateway, getCluster, 20), { wrapper: wrapperFor(client) });
+
+    await waitFor(() => expect(getCluster.mock.calls.length).toBeGreaterThanOrEqual(3));
   });
 
   it("does not retry a failed status call", async () => {
@@ -30,7 +39,7 @@ describe("useClusterStatus", () => {
       throw new TypeError("Failed to fetch");
     });
 
-    const { result } = renderHook(() => useClusterStatus(gateway, getCluster), { wrapper: wrapperFor(client) });
+    const { result } = renderHook(() => useClusterStatus(gateway, getCluster, 60_000), { wrapper: wrapperFor(client) });
 
     await waitFor(() => expect(result.current.isError).toBe(true));
     expect(getCluster).toHaveBeenCalledTimes(1);

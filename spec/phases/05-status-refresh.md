@@ -2,14 +2,14 @@
 - **Milestone:** M1
 - **Covers:** F1-AC5
 - **Discovery:** —
-- **Status:** Planned        <!-- Planned | Building | Review | Done -->
+- **Status:** Building        <!-- Planned | Building | Review | Done -->
 
 ## Demo
 1. With both cards Healthy, `docker compose -f deploy/compose.dev.yaml stop gateway-prod` → within 15 s "Prod" turns **Gateway unreachable** without a reload.
 2. `docker compose -f deploy/compose.dev.yaml start gateway-prod` → within 15 s "Prod" is Healthy again.
 
 ## Tasks
-- [ ] **T05.1 Poll cluster status** — Covers: F1-AC5
+- [x] **T05.1 Poll cluster status** — Covers: F1-AC5
   - Files: src/hooks/useClusterStatus.ts, src/hooks/useClusterStatus.test.tsx, src/components/ClusterCard.tsx, src/components/ClusterCard.test.tsx, src/pages/ClustersPage.tsx, src/pages/ClustersPage.test.tsx, src/App.tsx, src/App.test.tsx, src/main.tsx
   - Do: `useClusterStatus(gateway, getCluster, refreshMs)` sets `refetchInterval: refreshMs`; `main.tsx` injects 15000 through `App` → `ClustersPage` → `ClusterCard` (tests use ms). `ClusterCard` checks the **error state before data**: React Query keeps the last data after a failed refetch, so otherwise a failing gateway would stay "Healthy".
   - Done when: `npm test` passes `ClustersPage` › "turns a Healthy card into Gateway unreachable on the next refresh (F1-AC5)" (refreshMs 50, MSW handler switched to error after first success), `ClusterCard` › "error wins over stale data", `useClusterStatus` › "refetches every refreshMs"; build exits 0.

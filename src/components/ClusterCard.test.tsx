@@ -15,7 +15,7 @@ const clusterWith = (brokerCount: number): ClusterInfo => ({
 
 describe("ClusterCard", () => {
   it("shows the gateway name and URL as text", () => {
-    renderWithQuery(<ClusterCard gateway={gateway} getCluster={() => new Promise(() => {})} />);
+    renderWithQuery(<ClusterCard gateway={gateway} statusRefreshMs={60_000} getCluster={() => new Promise(() => {})} />);
 
     expect(screen.getByRole("heading", { name: "Dev" })).toBeDefined();
     expect(screen.getByText("http://localhost:8081")).toBeDefined();
@@ -23,13 +23,13 @@ describe("ClusterCard", () => {
   });
 
   it("shows Checking… while the status loads", () => {
-    renderWithQuery(<ClusterCard gateway={gateway} getCluster={() => new Promise(() => {})} />);
+    renderWithQuery(<ClusterCard gateway={gateway} statusRefreshMs={60_000} getCluster={() => new Promise(() => {})} />);
 
     expect(screen.getByText("Checking…")).toBeDefined();
   });
 
   it("shows Healthy, the cluster ID and the broker count", async () => {
-    renderWithQuery(<ClusterCard gateway={gateway} getCluster={async () => clusterWith(3)} />);
+    renderWithQuery(<ClusterCard gateway={gateway} statusRefreshMs={60_000} getCluster={async () => clusterWith(3)} />);
 
     expect(await screen.findByText("Healthy")).toBeDefined();
     expect(screen.getByText("Cluster ID: abc")).toBeDefined();
@@ -37,7 +37,7 @@ describe("ClusterCard", () => {
   });
 
   it("uses the singular for one broker", async () => {
-    renderWithQuery(<ClusterCard gateway={gateway} getCluster={async () => clusterWith(1)} />);
+    renderWithQuery(<ClusterCard gateway={gateway} statusRefreshMs={60_000} getCluster={async () => clusterWith(1)} />);
 
     expect(await screen.findByText("1 broker")).toBeDefined();
   });
@@ -45,7 +45,7 @@ describe("ClusterCard", () => {
   it("shows Gateway unreachable when the gateway cannot be reached", async () => {
     renderWithQuery(
       <ClusterCard
-        gateway={gateway}
+        gateway={gateway} statusRefreshMs={60_000}
         getCluster={async () => {
           throw new TypeError("Failed to fetch");
         }}
@@ -58,7 +58,7 @@ describe("ClusterCard", () => {
   it("shows Cluster unreachable with the gateway's message", async () => {
     renderWithQuery(
       <ClusterCard
-        gateway={gateway}
+        gateway={gateway} statusRefreshMs={60_000}
         getCluster={async () => {
           throw new HttpError(503, "GET failed with 503", {
             code: "cluster_unreachable",
@@ -72,10 +72,27 @@ describe("ClusterCard", () => {
     expect(screen.getByText("Kafka is unreachable: dial tcp: connection refused")).toBeDefined();
   });
 
+  it("error wins over stale data", async () => {
+    let calls = 0;
+    const getCluster = async () => {
+      calls += 1;
+      if (calls === 1) {
+        return clusterWith(1);
+      }
+      throw new TypeError("Failed to fetch");
+    };
+
+    renderWithQuery(<ClusterCard gateway={gateway} statusRefreshMs={20} getCluster={getCluster} />);
+
+    expect(await screen.findByText("Healthy")).toBeDefined();
+    expect(await screen.findByText("Gateway unreachable")).toBeDefined();
+    expect(screen.queryByText("Healthy")).toBeNull();
+  });
+
   it("shows Status unavailable when the status cannot be read", async () => {
     renderWithQuery(
       <ClusterCard
-        gateway={gateway}
+        gateway={gateway} statusRefreshMs={60_000}
         getCluster={async () => {
           throw new Error("down");
         }}

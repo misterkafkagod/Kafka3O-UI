@@ -7,15 +7,16 @@ type AppProps = {
   queryClient: QueryClient;
   loadGatewayConfig: LoadGatewayConfig;
   getCluster: GetCluster;
+  statusRefreshMs: number;
 };
 
-export function App({ queryClient, loadGatewayConfig, getCluster }: AppProps) {
+export function App({ queryClient, loadGatewayConfig, getCluster, statusRefreshMs }: AppProps) {
   return (
     <QueryClientProvider client={queryClient}>
       <header>
         <h1>Kafka3O</h1>
       </header>
-      <ClustersPage loadGatewayConfig={loadGatewayConfig} getCluster={getCluster} />
+      <ClustersPage loadGatewayConfig={loadGatewayConfig} getCluster={getCluster} statusRefreshMs={statusRefreshMs} />
     </QueryClientProvider>
   );
 }

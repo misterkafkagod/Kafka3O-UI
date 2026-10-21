@@ -7,9 +7,10 @@ import { useGatewayConfig } from "../hooks/useGatewayConfig";
 type ClustersPageProps = {
   loadGatewayConfig: LoadGatewayConfig;
   getCluster: GetCluster;
+  statusRefreshMs: number;
 };
 
-export function ClustersPage({ loadGatewayConfig, getCluster }: ClustersPageProps) {
+export function ClustersPage({ loadGatewayConfig, getCluster, statusRefreshMs }: ClustersPageProps) {
   const { data: gateways } = useGatewayConfig(loadGatewayConfig);
 
   if (gateways === undefined) {
@@ -21,7 +22,7 @@ export function ClustersPage({ loadGatewayConfig, getCluster }: ClustersPageProp
   return (
     <main>
       {gateways.map((gateway) => (
-        <ClusterCard key={gateway.id} gateway={gateway} getCluster={getCluster} />
+        <ClusterCard key={gateway.id} gateway={gateway} getCluster={getCluster} statusRefreshMs={statusRefreshMs} />
       ))}
     </main>
   );
