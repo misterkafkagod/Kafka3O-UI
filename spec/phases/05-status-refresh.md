@@ -2,7 +2,7 @@
 - **Milestone:** M1
 - **Covers:** F1-AC5
 - **Discovery:** —
-- **Status:** Building        <!-- Planned | Building | Review | Done -->
+- **Status:** Review        <!-- Planned | Building | Review | Done -->
 
 ## Demo
 1. With both cards Healthy, `docker compose -f deploy/compose.dev.yaml stop gateway-prod` → within 15 s "Prod" turns **Gateway unreachable** without a reload.
