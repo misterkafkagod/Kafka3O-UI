@@ -2,7 +2,7 @@
 - **Milestone:** M1
 - **Covers:** F1-AC4
 - **Discovery:** —
-- **Status:** Review        <!-- Planned | Building | Review | Done -->
+- **Status:** Done        <!-- Planned | Building | Review | Done -->
 
 ## Demo
 1. `docker compose -f deploy/compose.dev.yaml stop kafka-prod`, then `docker compose -f deploy/compose.dev.yaml restart gateway-prod` (amended: a running gateway serves cached metadata until P14 fixes it; a fresh gateway has no cache).
@@ -21,3 +21,8 @@
   - Done when: `npm test` passes `ClustersPage` › "shows Cluster unreachable with the gateway message (F1-AC4)" (MSW 503 problem), fetchJson problem cases (valid, empty body, non-JSON), classify cluster-unreachable case; build exits 0.
 
 ## Review
+- **Demo:** passed (user, 2026-10-20) — amended steps (stop `kafka-prod`, restart `gateway-prod`): Prod showed "Cluster unreachable" with the gateway's message, Dev stayed Healthy; gateway answered 503 `cluster_unreachable` in 2.3 s
+- **Vulnerability scan:** not required — no dependency changes in this phase
+- **Notes:**
+  - Known limitation: a running gateway serves cached metadata and keeps reporting Healthy after Kafka stops — correction planned as P14 (F1-AC8).
+  - Timeout ordering works: gateway 503 in ~2.3 s, under its 3 s Kafka timeout and the UI's 5 s gateway timeout.
