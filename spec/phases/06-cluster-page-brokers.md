@@ -2,7 +2,7 @@
 - **Milestone:** M1
 - **Covers:** F2-AC1
 - **Discovery:** —
-- **Status:** Planned        <!-- Planned | Building | Review | Done -->
+- **Status:** Building        <!-- Planned | Building | Review | Done -->
 
 ## Demo
 1. With the dev stack up and `npm run dev`, click the "Dev" card name.
@@ -17,7 +17,7 @@
 
 - [ ] **T06.2 Cluster page with brokers** — Covers: F2-AC1
   - Files: src/pages/ClusterPage.tsx (new), src/pages/ClusterPage.test.tsx (new), src/components/ClusterDetails.tsx (new), src/components/ClusterDetails.test.tsx (new), src/components/BrokerTable.tsx (new), src/components/BrokerTable.test.tsx (new), src/brokers/compareBrokersById.ts (new), src/brokers/compareBrokersById.test.ts (new), src/App.tsx, src/App.test.tsx
-  - Do: `ClusterPage` reads `:gatewayId`, loads config via `useGatewayConfig`, finds the entry; "Loading…" while loading; renders `ClusterDetails` when found (not found is P08 — renders nothing until then). `ClusterDetails` shows name, URL, "Cluster ID: …", "Controller: N" and `BrokerTable`, using `useClusterStatus` with the same query key as the card (shared cache); "Checking…" while loading. `BrokerTable`: columns ID, Host:Port, Rack ("—" when empty), sorted by ID (copy, using `compareBrokersById`). `App` adds route `/clusters/:gatewayId`.
+  - Do: `ClusterPage` reads `:gatewayId`, loads config via `useGatewayConfig`, finds the entry; "Loading…" while loading; renders `ClusterDetails` when found (not found is P08 — renders nothing until then). `ClusterDetails` shows name, URL, "Cluster ID: …", "Controller: N" and `BrokerTable`, using `useClusterStatus` with the same query key as the card (shared cache) and a `statusRefreshMs` prop passed from `main.tsx` through `App` → `ClusterPage` → `ClusterDetails` (amended after P05 made the interval a required argument); "Checking…" while loading. `BrokerTable`: columns ID, Host:Port, Rack ("—" when empty), sorted by ID (copy, using `compareBrokersById`). `App` adds route `/clusters/:gatewayId`.
   - Done when: `npm test` passes `ClusterPage` › "shows cluster ID, controller and brokers in ID order (F2-AC1)" (MemoryRouter at `/clusters/dev`, MSW brokers 3, 1, 2 with controller 2 → rows 1, 2, 3 and "Controller: 2"), `BrokerTable` sort and rack-dash cases, `App` › "clicking the Dev card opens its cluster page"; build exits 0.
 
 ## Review
