@@ -2,7 +2,7 @@
 - **Milestone:** M1
 - **Covers:** F1-AC5
 - **Discovery:** —
-- **Status:** Review        <!-- Planned | Building | Review | Done -->
+- **Status:** Done        <!-- Planned | Building | Review | Done -->
 
 ## Demo
 1. With both cards Healthy, `docker compose -f deploy/compose.dev.yaml stop gateway-prod` → within 15 s "Prod" turns **Gateway unreachable** without a reload.
@@ -15,3 +15,7 @@
   - Done when: `npm test` passes `ClustersPage` › "turns a Healthy card into Gateway unreachable on the next refresh (F1-AC5)" (refreshMs 50, MSW handler switched to error after first success), `ClusterCard` › "error wins over stale data", `useClusterStatus` › "refetches every refreshMs"; build exits 0.
 
 ## Review
+- **Demo:** passed (user, 2026-10-22) — without reloading, Prod went Healthy → Gateway unreachable after stopping `gateway-prod`, and back to Healthy after starting it, each within 15 s
+- **Vulnerability scan:** not required — no dependency changes in this phase
+- **Notes:**
+  - React Query keeps the last data after a failed refetch; views must check the error state before data (P07, P12 already plan for it).
