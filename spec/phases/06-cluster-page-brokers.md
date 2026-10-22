@@ -2,7 +2,7 @@
 - **Milestone:** M1
 - **Covers:** F2-AC1
 - **Discovery:** —
-- **Status:** Building        <!-- Planned | Building | Review | Done -->
+- **Status:** Review        <!-- Planned | Building | Review | Done -->
 
 ## Demo
 1. With the dev stack up and `npm run dev`, click the "Dev" card name.
