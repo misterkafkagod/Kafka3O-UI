@@ -19,7 +19,13 @@ describe("ClusterCard", () => {
 
     expect(screen.getByRole("heading", { name: "Dev" })).toBeDefined();
     expect(screen.getByText("http://localhost:8081")).toBeDefined();
-    expect(screen.queryByRole("link")).toBeNull();
+    expect(screen.queryByRole("link", { name: "http://localhost:8081" })).toBeNull();
+  });
+
+  it("links the name to /clusters/dev", () => {
+    renderWithQuery(<ClusterCard gateway={gateway} statusRefreshMs={60_000} getCluster={() => new Promise(() => {})} />);
+
+    expect(screen.getByRole("link", { name: "Dev" }).getAttribute("href")).toBe("/clusters/dev");
   });
 
   it("shows Checking… while the status loads", () => {

@@ -1,3 +1,4 @@
+import { Link } from "react-router";
 import { classifyGatewayError } from "../gateway/classifyGatewayError";
 import type { GetCluster } from "../gateway/getCluster";
 import { HttpError } from "../gateway/HttpError";
@@ -17,7 +18,9 @@ export function ClusterCard({ gateway, getCluster, statusRefreshMs }: ClusterCar
 
   return (
     <article aria-label={gateway.name}>
-      <h2>{gateway.name}</h2>
+      <h2>
+        <Link to={`/clusters/${gateway.id}`}>{gateway.name}</Link>
+      </h2>
       <p>{gateway.url}</p>
       {errorKind === "gateway-unreachable" ? (
         <p>Gateway unreachable</p>

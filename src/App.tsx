@@ -1,4 +1,5 @@
 import { type QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Link, Route, Routes } from "react-router";
 import type { LoadGatewayConfig } from "./config/loadGatewayConfig";
 import type { GetCluster } from "./gateway/getCluster";
 import { ClustersPage } from "./pages/ClustersPage";
@@ -14,9 +15,22 @@ export function App({ queryClient, loadGatewayConfig, getCluster, statusRefreshM
   return (
     <QueryClientProvider client={queryClient}>
       <header>
-        <h1>Kafka3O</h1>
+        <h1>
+          <Link to="/">Kafka3O</Link>
+        </h1>
       </header>
-      <ClustersPage loadGatewayConfig={loadGatewayConfig} getCluster={getCluster} statusRefreshMs={statusRefreshMs} />
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <ClustersPage
+              loadGatewayConfig={loadGatewayConfig}
+              getCluster={getCluster}
+              statusRefreshMs={statusRefreshMs}
+            />
+          }
+        />
+      </Routes>
     </QueryClientProvider>
   );
 }

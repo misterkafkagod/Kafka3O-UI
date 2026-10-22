@@ -1,6 +1,7 @@
 import { QueryClient } from "@tanstack/react-query";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import { BrowserRouter } from "react-router";
 import { App } from "./App";
 import { loadGatewayConfig } from "./config/loadGatewayConfig";
 import { fetchJson } from "./gateway/fetchJson";
@@ -13,11 +14,13 @@ const queryClient = new QueryClient();
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <App
+    <BrowserRouter>
+      <App
       queryClient={queryClient}
       loadGatewayConfig={() => loadGatewayConfig(boundFetchJson)}
       getCluster={(gatewayUrl) => getCluster(boundFetchJson, gatewayUrl)}
       statusRefreshMs={statusRefreshMs}
-    />
+      />
+    </BrowserRouter>
   </StrictMode>,
 );

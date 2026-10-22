@@ -10,7 +10,7 @@
 3. Click "Kafka3O" in the header → back to the overview.
 
 ## Tasks
-- [ ] **T06.1 Routing and card link** — Covers: F2-AC1
+- [x] **T06.1 Routing and card link** — Covers: F2-AC1
   - Files: package.json, package-lock.json (adds react-router 8.4.0), src/main.tsx, src/App.tsx, src/App.test.tsx, src/components/ClusterCard.tsx, src/components/ClusterCard.test.tsx, src/test/renderWithQuery.tsx
   - Do: `main.tsx` wraps `App` in `BrowserRouter`. `App` renders the header "Kafka3O" as a link to `/` and `Routes` with `/` → `ClustersPage`. The card name becomes a `Link` to `/clusters/{id}`; the gateway URL stays plain text. `renderWithQuery` accepts an optional initial route and wraps in `MemoryRouter`.
   - Done when: `npm test` passes `ClusterCard` › "links the name to /clusters/dev", `App` › "header links to /", plus all earlier tests; build exits 0.
