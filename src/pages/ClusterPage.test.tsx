@@ -16,6 +16,7 @@ const dev = { id: "dev", name: "Dev", url: "http://localhost:8081" };
 function renderClusterPage(route: string) {
   return renderWithQuery(
     <Routes>
+      <Route path="/" element={<p>Overview</p>} />
       <Route
         path="/clusters/:gatewayId"
         element={
@@ -80,5 +81,16 @@ describe("ClusterPage", () => {
     expect(await screen.findByRole("table", { name: "Brokers" })).toBeDefined();
     expect(screen.getByText("kafka-dev:9092")).toBeDefined();
     expect(screen.queryByRole("alert")).toBeNull();
+  });
+
+  it("shows Cluster not found with a link to / (F2-AC3)", async () => {
+    // Only config is handled: any gateway call fails the test via onUnhandledFrame: "error".
+    server.use(http.get("/config.json", () => HttpResponse.json({ gateways: [dev] })));
+
+    renderClusterPage("/clusters/unknown");
+
+    expect(await screen.findByRole("heading", { name: "Cluster not found" })).toBeDefined();
+    await userEvent.click(screen.getByRole("link", { name: "Back to all clusters" }));
+    expect(screen.getByText("Overview")).toBeDefined();
   });
 });

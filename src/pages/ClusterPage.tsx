@@ -1,5 +1,6 @@
 import { useParams } from "react-router";
 import { ClusterDetails } from "../components/ClusterDetails";
+import { ClusterNotFound } from "../components/ClusterNotFound";
 import { findGatewayById } from "../config/findGatewayById";
 import type { LoadGatewayConfig } from "../config/loadGatewayConfig";
 import type { GetCluster } from "../gateway/getCluster";
@@ -20,7 +21,7 @@ export function ClusterPage({ loadGatewayConfig, getCluster, statusRefreshMs }: 
   }
   const gateway = findGatewayById(gateways, gatewayId);
   if (gateway === undefined) {
-    return null;
+    return <ClusterNotFound gatewayId={gatewayId} />;
   }
   return <ClusterDetails gateway={gateway} getCluster={getCluster} statusRefreshMs={statusRefreshMs} />;
 }
