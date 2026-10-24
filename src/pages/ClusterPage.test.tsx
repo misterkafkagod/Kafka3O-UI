@@ -1,4 +1,5 @@
 import { screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import { Route, Routes } from "react-router";
 import { describe, expect, it } from "vitest";
@@ -56,5 +57,28 @@ describe("ClusterPage", () => {
       .getAllByRole("row")
       .map((row) => within(row).getAllByRole("cell")[0].textContent);
     expect(ids).toEqual(["1", "2", "3"]);
+  });
+
+  it("shows an error with Retry, then the brokers after Retry (F2-AC2)", async () => {
+    server.use(
+      http.get("/config.json", () => HttpResponse.json({ gateways: [dev] })),
+      http.get("http://localhost:8081/api/v1/cluster", () => HttpResponse.error()),
+    );
+
+    renderClusterPage("/clusters/dev");
+
+    const alert = await screen.findByRole("alert");
+    expect(within(alert).getByText("Gateway unreachable")).toBeDefined();
+
+    server.use(
+      http.get("http://localhost:8081/api/v1/cluster", () =>
+        HttpResponse.json({ clusterId: "abc", controllerId: 1, brokers: [{ id: 1, host: "kafka-dev", port: 9092 }] }),
+      ),
+    );
+    await userEvent.click(within(alert).getByRole("button", { name: "Retry" }));
+
+    expect(await screen.findByRole("table", { name: "Brokers" })).toBeDefined();
+    expect(screen.getByText("kafka-dev:9092")).toBeDefined();
+    expect(screen.queryByRole("alert")).toBeNull();
   });
 });
