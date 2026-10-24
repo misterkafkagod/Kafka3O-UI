@@ -2,7 +2,7 @@
 - **Milestone:** M1
 - **Covers:** F3-AC1
 - **Discovery:** —
-- **Status:** Building        <!-- Planned | Building | Review | Done -->
+- **Status:** Review        <!-- Planned | Building | Review | Done -->
 
 ## Demo
 1. `docker compose -f deploy/compose.dev.yaml exec kafka-dev /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --create --topic orders --partitions 6`, and the same for `audit` with `--partitions 1`.
@@ -31,7 +31,7 @@
   - Do: `ClusterPage` takes `view: "brokers" | "topics"`; still resolves the gateway (and not found, from P08), then renders `ClusterTabs` and either `ClusterDetails` or `TopicList`. `App` routes `/clusters/:gatewayId/topics`. `ClusterTabs` links Brokers / Topics with `aria-current` on the active one. `TopicList` shows "Loading topics…", then `TopicTable` sorted by name (`compareTopicsByName`); on error a "Topics unavailable" placeholder until P12. `TopicTable` columns Name, Partitions, Replication, Messages (`~N`). `listTopics` injected from `main.tsx`.
   - Done when: `npm test` passes `ClusterPage` › "lists topics sorted by name with partitions, RF and ~count (F3-AC1)" (at `/clusters/dev/topics`, MSW `orders` 6/3/1000 and `audit` → `audit` first, then `orders` with 6, 3, ~1000), `ClusterTabs` active-tab case, `TopicTable` formatting; build exits 0.
 
-- [ ] **T09.5 Run the Docker checks** — Covers: F3-AC1
+- [x] **T09.5 Run the Docker checks** — Covers: F3-AC1
   - Files: none (verification only; fixes become new tasks)
   - Do: With the remote Docker setup from TECH-SPEC Testing, run the integration tests.
   - Done when: `CGO_ENABLED=0 go test -tags integration ./test/integration/...` passes `TestListTopics_CountsMessages` and still passes `TestDescribeCluster_ReturnsClusterIDAndOneBroker`.
