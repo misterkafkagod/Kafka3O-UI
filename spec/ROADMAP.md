@@ -46,7 +46,7 @@ Kafka3O is a multi-cluster Kafka console for developers and operators: one web U
     - Demo: clicking the "dev" card shows cluster ID, controller ID and the broker table.
   - **P07** F2-B2 · Cluster page error with Retry — Covers: F2-AC2 · Discovery: — · Status: Done
     - Demo: with `gateway-dev` stopped, `/clusters/dev` shows an error and Retry; starting it and clicking Retry shows the brokers.
-  - **P08** F2-B3 · Unknown cluster ID — Covers: F2-AC3 · Discovery: — · Status: Review
+  - **P08** F2-B3 · Unknown cluster ID — Covers: F2-AC3 · Discovery: — · Status: Done
     - Demo: `/clusters/unknown` shows "Cluster not found" with a link back to `/`.
   - **P09** F3-B1 · Topic list with partitions, RF, approximate count — Covers: F3-AC1 · Discovery: — · Status: Planned
     - Demo: after creating `orders` and `audit` and producing messages, the Topics tab lists them sorted by name with counts.

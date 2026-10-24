@@ -2,7 +2,7 @@
 - **Milestone:** M1
 - **Covers:** F2-AC3
 - **Discovery:** —
-- **Status:** Review        <!-- Planned | Building | Review | Done -->
+- **Status:** Done        <!-- Planned | Building | Review | Done -->
 
 ## Demo
 1. Open http://localhost:5173/clusters/unknown → **Cluster not found** with a link back.
@@ -15,3 +15,5 @@
   - Done when: `npm test` passes `ClusterPage` › "shows Cluster not found with a link to / (F2-AC3)" at `/clusters/unknown` (MSW unhandled-request error proves no gateway call; clicking the link shows the overview); build exits 0.
 
 ## Review
+- **Demo:** passed (user, 2026-10-24) — run by Claude in headless Chromium against the dev stack, screenshots reviewed by the user: `/clusters/unknown` showed Cluster not found, the ID and the link, with no gateway requests; the link opened the overview with both cards
+- **Vulnerability scan:** not required — no dependency changes in this phase
