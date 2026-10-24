@@ -2,14 +2,14 @@
 - **Milestone:** M1
 - **Covers:** F2-AC2
 - **Discovery:** —
-- **Status:** Planned        <!-- Planned | Building | Review | Done -->
+- **Status:** Building        <!-- Planned | Building | Review | Done -->
 
 ## Demo
 1. `docker compose -f deploy/compose.dev.yaml stop gateway-dev`, open `/clusters/dev` → **Gateway unreachable** and a **Retry** button.
 2. `docker compose -f deploy/compose.dev.yaml start gateway-dev`, click Retry → brokers appear.
 
 ## Tasks
-- [ ] **T07.1 Error message and Retry components** — Covers: F2-AC2
+- [x] **T07.1 Error message and Retry components** — Covers: F2-AC2
   - Files: src/gateway/describeGatewayError.ts (new), src/gateway/describeGatewayError.test.ts (new), src/components/ErrorWithRetry.tsx (new), src/components/ErrorWithRetry.test.tsx (new)
   - Do: `describeGatewayError(error)` → `{title, detail?}` using `classifyGatewayError` (from T03.1/T04.2): gateway-unreachable → "Gateway unreachable"; cluster-unreachable → "Cluster unreachable" + problem detail; other → "Something went wrong" + error message. `ErrorWithRetry({error, onRetry})` renders `role="alert"` with title, detail and a **Retry** button.
   - Done when: `npm test -- describeGatewayError ErrorWithRetry` passes the three kinds and "Retry calls onRetry once".
