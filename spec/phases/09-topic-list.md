@@ -2,7 +2,7 @@
 - **Milestone:** M1
 - **Covers:** F3-AC1
 - **Discovery:** —
-- **Status:** Planned        <!-- Planned | Building | Review | Done -->
+- **Status:** Building        <!-- Planned | Building | Review | Done -->
 
 ## Demo
 1. `docker compose -f deploy/compose.dev.yaml exec kafka-dev /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --create --topic orders --partitions 6`, and the same for `audit` with `--partitions 1`.
@@ -11,7 +11,7 @@
 4. UI: Dev → **Topics** tab → `audit`, then `orders · 6 · 1 · ~1000`.
 
 ## Tasks
-- [ ] **T09.1 Gateway: topic action and route** — Covers: F3-AC1
+- [x] **T09.1 Gateway: topic action and route** — Covers: F3-AC1
   - Files: internal/topics/topic.go (new), internal/topics/list_topic_metadata.go (new), internal/topics/count_topic_messages.go (new), internal/topics/list_topics.go (new), internal/topics/list_topics_test.go (new), internal/topics/compare_topics_by_name.go (new), internal/topics/compare_topics_by_name_test.go (new), internal/httpapi/register_list_topics.go (new), internal/httpapi/register_list_topics_test.go (new)
   - Do: Data-only `Topic` and `TopicMetadata`. Ports: `ListTopicMetadata` and `CountTopicMessages` (`Execute(ctx, names) (map[string]int64, error)`). `ListTopics` depends on both ports and the timeout, merges metadata with counts, sorts by name with `CompareTopicsByName`; empty cluster → `[]` (not null); port errors pass through. `RegisterListTopics`: `GET /api/v1/topics` → array `[{name, partitions, replicationFactor, internal, approxMessages}]`; any error → `NewClusterUnreachable` (from T04.1) 503.
   - Done when: `go test ./...` passes — ListTopics merges and sorts, empty → `[]`, errors pass through, deadline applied; route returns the JSON shape and 503 `cluster_unreachable` on error.
