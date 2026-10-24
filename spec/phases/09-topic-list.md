@@ -16,7 +16,7 @@
   - Do: Data-only `Topic` and `TopicMetadata`. Ports: `ListTopicMetadata` and `CountTopicMessages` (`Execute(ctx, names) (map[string]int64, error)`). `ListTopics` depends on both ports and the timeout, merges metadata with counts, sorts by name with `CompareTopicsByName`; empty cluster → `[]` (not null); port errors pass through. `RegisterListTopics`: `GET /api/v1/topics` → array `[{name, partitions, replicationFactor, internal, approxMessages}]`; any error → `NewClusterUnreachable` (from T04.1) 503.
   - Done when: `go test ./...` passes — ListTopics merges and sorts, empty → `[]`, errors pass through, deadline applied; route returns the JSON shape and 503 `cluster_unreachable` on error.
 
-- [ ] **T09.2 Gateway: Kafka adapters and wiring** — Covers: F3-AC1
+- [x] **T09.2 Gateway: Kafka adapters and wiring** — Covers: F3-AC1
   - Files: internal/kafka/list_topic_metadata.go (new), internal/kafka/count_topic_messages.go (new), test/integration/list_topics_test.go (new), cmd/gateway/main.go
   - Do: Metadata adapter via kadm `ListTopicsWithInternal` — partitions = count, replication factor = max replicas across partitions, `Internal` = `IsInternal`; topic-level error → error. Count adapter via `ListStartOffsets` + `ListEndOffsets`, summing `max(end − start, 0)` per partition (approximate: compaction, transaction markers). `main.go` wires adapters → `ListTopics` → route.
   - Done when: `go vet -tags integration ./...` exits 0 and `go test ./...` passes (running `TestListTopics_CountsMessages` — 6-partition `orders`, 10 records → 6 / 1 / 10 — is T09.5).
