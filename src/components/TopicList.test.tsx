@@ -66,4 +66,32 @@ describe("TopicList", () => {
     expect(await screen.findByText("No topics")).toBeDefined();
     expect(screen.queryByRole("table", { name: "Topics" })).toBeNull();
   });
+
+  it("filters by name ignoring case (F3-AC3)", async () => {
+    renderWithQuery(<TopicList gateway={gateway} listTopics={async () => [topic("orders"), topic("audit")]} />);
+
+    await screen.findByRole("table", { name: "Topics" });
+    await userEvent.type(screen.getByRole("searchbox", { name: "Filter topics" }), "ORD");
+
+    expect(topicNames()).toEqual(["orders"]);
+  });
+
+  it("shows No topics match when nothing matches", async () => {
+    renderWithQuery(<TopicList gateway={gateway} listTopics={async () => [topic("orders"), topic("audit")]} />);
+
+    await screen.findByRole("table", { name: "Topics" });
+    await userEvent.type(screen.getByRole("searchbox", { name: "Filter topics" }), "zzz");
+
+    expect(screen.getByText('No topics match "zzz"')).toBeDefined();
+    expect(screen.queryByText("No topics")).toBeNull();
+    expect(screen.queryByRole("table", { name: "Topics" })).toBeNull();
+  });
+
+  it("keeps No topics when only internal topics exist, even with filter text", async () => {
+    renderWithQuery(<TopicList gateway={gateway} listTopics={async () => [topic("__consumer_offsets", true)]} />);
+
+    await userEvent.type(await screen.findByRole("searchbox", { name: "Filter topics" }), "zzz");
+
+    expect(screen.getByText("No topics")).toBeDefined();
+  });
 });

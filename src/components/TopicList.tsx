@@ -14,6 +14,7 @@ type TopicListProps = {
 export function TopicList({ gateway, listTopics }: TopicListProps) {
   const { data: topics, isError } = useTopics(gateway, listTopics);
   const [showInternal, setShowInternal] = useState(false);
+  const [text, setText] = useState("");
 
   // Error is checked before data: React Query keeps the last data after a failed refetch.
   if (isError) {
@@ -22,15 +23,25 @@ export function TopicList({ gateway, listTopics }: TopicListProps) {
   if (topics === undefined) {
     return <p>Loading topics…</p>;
   }
-  const visible = filterTopics(topics, { showInternal }).sort(compareTopicsByName);
+  const available = filterTopics(topics, { showInternal, text: "" });
+  const visible = filterTopics(topics, { showInternal, text }).sort(compareTopicsByName);
 
   return (
     <>
       <label>
+        Filter topics <input type="search" value={text} onChange={(event) => setText(event.target.value)} />
+      </label>{" "}
+      <label>
         <input type="checkbox" checked={showInternal} onChange={(event) => setShowInternal(event.target.checked)} /> Show
         internal
       </label>
-      {visible.length === 0 ? <p>No topics</p> : <TopicTable topics={visible} />}
+      {available.length === 0 ? (
+        <p>No topics</p>
+      ) : visible.length === 0 ? (
+        <p>No topics match "{text}"</p>
+      ) : (
+        <TopicTable topics={visible} />
+      )}
     </>
   );
 }
