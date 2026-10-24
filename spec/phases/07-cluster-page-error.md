@@ -2,7 +2,7 @@
 - **Milestone:** M1
 - **Covers:** F2-AC2
 - **Discovery:** —
-- **Status:** Review        <!-- Planned | Building | Review | Done -->
+- **Status:** Done        <!-- Planned | Building | Review | Done -->
 
 ## Demo
 1. `docker compose -f deploy/compose.dev.yaml stop gateway-dev`, open `/clusters/dev` → **Gateway unreachable** and a **Retry** button.
@@ -20,3 +20,7 @@
   - Done when: `npm test` passes `ClusterPage` › "shows an error with Retry, then the brokers after Retry (F2-AC2)" (MSW network error → alert + Retry; handler switched to success; click Retry → broker rows); build exits 0.
 
 ## Review
+- **Demo:** passed (user, 2026-10-24) — run by Claude in headless Chromium against the dev stack, screenshots reviewed by the user: with `gateway-dev` stopped `/clusters/dev` showed Gateway unreachable + Retry; after starting it, Retry showed Controller: 1 and row `1 · kafka-dev:9092 · —`
+- **Vulnerability scan:** not required — no dependency changes in this phase
+- **Notes:**
+  - A dropped 8081/8082 SSH forward looks exactly like a stopped gateway; demo runs check the forward first.
