@@ -50,7 +50,7 @@ Kafka3O is a multi-cluster Kafka console for developers and operators: one web U
     - Demo: `/clusters/unknown` shows "Cluster not found" with a link back to `/`.
   - **P09** F3-B1 · Topic list with partitions, RF, approximate count — Covers: F3-AC1 · Discovery: — · Status: Done
     - Demo: after creating `orders` and `audit` and producing messages, the Topics tab lists them sorted by name with counts.
-  - **P10** F3-B2 + F3-B4 · Internal topics hidden; "No topics" — Covers: F3-AC2, F3-AC4 · Discovery: — · Status: Planned
+  - **P10** F3-B2 + F3-B4 · Internal topics hidden; "No topics" — Covers: F3-AC2, F3-AC4 · Discovery: — · Status: Review
     - Demo: a fresh cluster shows "No topics"; toggling "Show internal" lists `__consumer_offsets`.
   - **P11** F3-B3 · Filter topics by name — Covers: F3-AC3 · Discovery: — · Status: Planned
     - Demo: typing "ORD" leaves only `orders`.

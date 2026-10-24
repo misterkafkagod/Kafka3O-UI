@@ -1,7 +1,9 @@
+import { useState } from "react";
 import type { ListTopics } from "../gateway/listTopics";
 import type { GatewayEntry } from "../gateway/types";
 import { useTopics } from "../hooks/useTopics";
 import { compareTopicsByName } from "../topics/compareTopicsByName";
+import { filterTopics } from "../topics/filterTopics";
 import { TopicTable } from "./TopicTable";
 
 type TopicListProps = {
@@ -11,6 +13,7 @@ type TopicListProps = {
 
 export function TopicList({ gateway, listTopics }: TopicListProps) {
   const { data: topics, isError } = useTopics(gateway, listTopics);
+  const [showInternal, setShowInternal] = useState(false);
 
   // Error is checked before data: React Query keeps the last data after a failed refetch.
   if (isError) {
@@ -19,5 +22,15 @@ export function TopicList({ gateway, listTopics }: TopicListProps) {
   if (topics === undefined) {
     return <p>Loading topics…</p>;
   }
-  return <TopicTable topics={[...topics].sort(compareTopicsByName)} />;
+  const visible = filterTopics(topics, { showInternal }).sort(compareTopicsByName);
+
+  return (
+    <>
+      <label>
+        <input type="checkbox" checked={showInternal} onChange={(event) => setShowInternal(event.target.checked)} /> Show
+        internal
+      </label>
+      {visible.length === 0 ? <p>No topics</p> : <TopicTable topics={visible} />}
+    </>
+  );
 }
