@@ -4,6 +4,7 @@ import type { GatewayEntry } from "../gateway/types";
 import { useTopics } from "../hooks/useTopics";
 import { compareTopicsByName } from "../topics/compareTopicsByName";
 import { filterTopics } from "../topics/filterTopics";
+import { ErrorWithRetry } from "./ErrorWithRetry";
 import { TopicTable } from "./TopicTable";
 
 type TopicListProps = {
@@ -12,13 +13,13 @@ type TopicListProps = {
 };
 
 export function TopicList({ gateway, listTopics }: TopicListProps) {
-  const { data: topics, isError } = useTopics(gateway, listTopics);
+  const { data: topics, isError, error, refetch } = useTopics(gateway, listTopics);
   const [showInternal, setShowInternal] = useState(false);
   const [text, setText] = useState("");
 
   // Error is checked before data: React Query keeps the last data after a failed refetch.
   if (isError) {
-    return <p>Topics unavailable</p>;
+    return <ErrorWithRetry error={error} onRetry={() => void refetch()} />;
   }
   if (topics === undefined) {
     return <p>Loading topics…</p>;

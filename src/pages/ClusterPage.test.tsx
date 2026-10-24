@@ -118,4 +118,33 @@ describe("ClusterPage", () => {
     ]);
     expect(screen.getByRole("link", { name: "Topics" }).getAttribute("aria-current")).toBe("page");
   });
+
+  it("shows the topics error with Retry, then topics after Retry (F3-AC5)", async () => {
+    server.use(
+      http.get("/config.json", () => HttpResponse.json({ gateways: [dev] })),
+      http.get("http://localhost:8081/api/v1/topics", () =>
+        HttpResponse.json(
+          { title: "Cluster unreachable", status: 503, detail: "Kafka is unreachable: dial tcp: connection refused", code: "cluster_unreachable" },
+          { status: 503, headers: { "Content-Type": "application/problem+json" } },
+        ),
+      ),
+    );
+
+    renderClusterPage("/clusters/dev/topics");
+
+    const alert = await screen.findByRole("alert");
+    expect(within(alert).getByText("Cluster unreachable")).toBeDefined();
+    expect(within(alert).getByText("Kafka is unreachable: dial tcp: connection refused")).toBeDefined();
+
+    server.use(
+      http.get("http://localhost:8081/api/v1/topics", () =>
+        HttpResponse.json([{ name: "orders", partitions: 6, replicationFactor: 1, internal: false, approxMessages: 1000 }]),
+      ),
+    );
+    await userEvent.click(within(alert).getByRole("button", { name: "Retry" }));
+
+    expect(await screen.findByRole("table", { name: "Topics" })).toBeDefined();
+    expect(screen.getByText("orders")).toBeDefined();
+    expect(screen.queryByRole("alert")).toBeNull();
+  });
 });

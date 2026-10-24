@@ -32,7 +32,7 @@ describe("TopicList", () => {
     expect(names).toEqual(["audit", "orders"]);
   });
 
-  it("shows Topics unavailable when the request fails", async () => {
+  it("shows the error with Retry when the request fails", async () => {
     renderWithQuery(
       <TopicList
         gateway={gateway}
@@ -42,7 +42,10 @@ describe("TopicList", () => {
       />,
     );
 
-    expect(await screen.findByText("Topics unavailable")).toBeDefined();
+    const alert = await screen.findByRole("alert");
+    expect(within(alert).getByText("Gateway unreachable")).toBeDefined();
+    expect(within(alert).getByRole("button", { name: "Retry" })).toBeDefined();
+    expect(screen.queryByRole("table", { name: "Topics" })).toBeNull();
   });
 
   it("hides internal topics until Show internal is on (F3-AC2)", async () => {
