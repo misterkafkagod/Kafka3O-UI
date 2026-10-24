@@ -50,7 +50,7 @@ Kafka3O is a multi-cluster Kafka console for developers and operators: one web U
     - Demo: `/clusters/unknown` shows "Cluster not found" with a link back to `/`.
   - **P09** F3-B1 · Topic list with partitions, RF, approximate count — Covers: F3-AC1 · Discovery: — · Status: Done
     - Demo: after creating `orders` and `audit` and producing messages, the Topics tab lists them sorted by name with counts.
-  - **P10** F3-B2 + F3-B4 · Internal topics hidden; "No topics" — Covers: F3-AC2, F3-AC4 · Discovery: — · Status: Review
+  - **P10** F3-B2 + F3-B4 · Internal topics hidden; "No topics" — Covers: F3-AC2, F3-AC4 · Discovery: — · Status: Done
     - Demo: a fresh cluster shows "No topics"; toggling "Show internal" lists `__consumer_offsets`.
   - **P11** F3-B3 · Filter topics by name — Covers: F3-AC3 · Discovery: — · Status: Planned
     - Demo: typing "ORD" leaves only `orders`.
@@ -84,6 +84,7 @@ Kafka3O is a multi-cluster Kafka console for developers and operators: one web U
 - **F17** User can add or remove gateways from the UI instead of a config file
 
 ## Learnings
+- 2026-10-24 (M1 / P10): On Kafka 4.3, describing an unknown consumer group fails and creates nothing; to create `__consumer_offsets` without creating a normal topic, run a console consumer with `--include '.*' --group <g>`.
 - 2026-10-24 (M1 / P07): A dropped 8081/8082 SSH forward looks exactly like a stopped gateway; demo runs check the forward before stopping containers.
 - 2026-10-24 (M1 / P06): Cluster page and card share the cluster-status query key, so the page renders from cache after a card click. Demos can be driven by Claude with Playwright headless Chromium (installed in the session scratchpad) and screenshots shown to the user.
 - 2026-10-18 (planning): Restarted with a multi-cluster design — one gateway per cluster, one UI for all. Earlier attempts were single-cluster. Gateway list is a static `/config.json` deployed with the UI. Auth (F12) is deferred to M5, ahead of any write feature; M1–M4 assume gateways run on a trusted network, because holding several gateway credentials in a browser needs its own design.
