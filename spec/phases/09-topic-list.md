@@ -21,7 +21,7 @@
   - Do: Metadata adapter via kadm `ListTopicsWithInternal` — partitions = count, replication factor = max replicas across partitions, `Internal` = `IsInternal`; topic-level error → error. Count adapter via `ListStartOffsets` + `ListEndOffsets`, summing `max(end − start, 0)` per partition (approximate: compaction, transaction markers). `main.go` wires adapters → `ListTopics` → route.
   - Done when: `go vet -tags integration ./...` exits 0 and `go test ./...` passes (running `TestListTopics_CountsMessages` — 6-partition `orders`, 10 records → 6 / 1 / 10 — is T09.5).
 
-- [ ] **T09.3 UI: topic data access** — Covers: F3-AC1
+- [x] **T09.3 UI: topic data access** — Covers: F3-AC1
   - Files: src/gateway/types.ts (adds `Topic`), src/gateway/listTopics.ts (new), src/gateway/listTopics.test.ts (new), src/hooks/useTopics.ts (new), src/hooks/useTopics.test.tsx (new)
   - Do: `listTopics(fetchJson, gatewayUrl)` → `GET {url}/api/v1/topics`. `useTopics(gateway, listTopics)`, key `["gateway", id, "topics"]`, `retry: false`.
   - Done when: `npm test -- listTopics useTopics` passes: URL, trailing slash, HttpError; useTopics calls the injected function.
