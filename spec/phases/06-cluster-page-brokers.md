@@ -2,7 +2,7 @@
 - **Milestone:** M1
 - **Covers:** F2-AC1
 - **Discovery:** —
-- **Status:** Review        <!-- Planned | Building | Review | Done -->
+- **Status:** Done        <!-- Planned | Building | Review | Done -->
 
 ## Demo
 1. With the dev stack up and `npm run dev`, click the "Dev" card name.
@@ -21,3 +21,7 @@
   - Done when: `npm test` passes `ClusterPage` › "shows cluster ID, controller and brokers in ID order (F2-AC1)" (MemoryRouter at `/clusters/dev`, MSW brokers 3, 1, 2 with controller 2 → rows 1, 2, 3 and "Controller: 2"), `BrokerTable` sort and rack-dash cases, `App` › "clicking the Dev card opens its cluster page"; build exits 0.
 
 ## Review
+- **Demo:** passed (user, 2026-10-24) — run by Claude in headless Chromium against the dev stack, screenshots reviewed by the user: `/clusters/dev` showed the cluster ID, Controller: 1 and row `1 · kafka-dev:9092 · —`; header link returned to the overview
+- **Vulnerability scan:** `npm audit` (react-router 8.4.0 added): 0 findings
+- **Notes:**
+  - The cluster page and the card share the cluster-status query key, so the page shows cached data instantly after a card click.
