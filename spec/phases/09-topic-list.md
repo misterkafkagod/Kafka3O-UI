@@ -2,7 +2,7 @@
 - **Milestone:** M1
 - **Covers:** F3-AC1
 - **Discovery:** —
-- **Status:** Review        <!-- Planned | Building | Review | Done -->
+- **Status:** Done        <!-- Planned | Building | Review | Done -->
 
 ## Demo
 1. `docker compose -f deploy/compose.dev.yaml exec kafka-dev /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --create --topic orders --partitions 6`, and the same for `audit` with `--partitions 1`.
@@ -37,3 +37,8 @@
   - Done when: `CGO_ENABLED=0 go test -tags integration ./test/integration/...` passes `TestListTopics_CountsMessages` and still passes `TestDescribeCluster_ReturnsClusterIDAndOneBroker`.
 
 ## Review
+- **Demo:** passed (user's standing approval, 2026-10-24) — run by Claude against the dev stack (gateways rebuilt): `curl /api/v1/topics` → `audit` then `orders` 6/1/1000; UI Dev → Topics showed `audit · 1 · 1 · ~0`, `orders · 6 · 1 · ~1000`
+- **Vulnerability scan:** not required — no dependency changes (`kgo` is part of the existing franz-go module); integration tests pass on remote Docker
+- **Notes:**
+  - The Topics view shows tabs but not the cluster's name/URL (only the Brokers view has that heading) — backlog idea: move the heading into `ClusterPage` above the tabs.
+  - Demo topics `orders` (1000 records) and `audit` now exist on `kafka-dev`; later demos build on them.
