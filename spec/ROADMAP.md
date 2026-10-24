@@ -54,7 +54,7 @@ Kafka3O is a multi-cluster Kafka console for developers and operators: one web U
     - Demo: a fresh cluster shows "No topics"; toggling "Show internal" lists `__consumer_offsets`.
   - **P11** F3-B3 · Filter topics by name — Covers: F3-AC3 · Discovery: — · Status: Done
     - Demo: typing "ORD" leaves only `orders`.
-  - **P12** F3-B5 · Topic list error with Retry — Covers: F3-AC5 · Discovery: — · Status: Review
+  - **P12** F3-B5 · Topic list error with Retry — Covers: F3-AC5 · Discovery: — · Status: Done
     - Demo: with `kafka-dev` stopped, the Topics tab shows an error and Retry.
   - **P14** F1-B4 (correction) · Status reflects a cluster that goes down after a healthy check — Covers: F1-AC8 · Discovery: — · Status: Defined
     - Demo: with both cards Healthy, `docker compose stop kafka-prod` (gateway keeps running) → within 15 s "Prod" shows "Cluster unreachable".
