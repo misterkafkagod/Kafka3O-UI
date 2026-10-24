@@ -6,6 +6,7 @@ import { App } from "./App";
 import { loadGatewayConfig } from "./config/loadGatewayConfig";
 import { fetchJson } from "./gateway/fetchJson";
 import { getCluster } from "./gateway/getCluster";
+import { listTopics } from "./gateway/listTopics";
 
 const gatewayTimeoutMs = 5000;
 const statusRefreshMs = 15_000;
@@ -16,10 +17,11 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <BrowserRouter>
       <App
-      queryClient={queryClient}
-      loadGatewayConfig={() => loadGatewayConfig(boundFetchJson)}
-      getCluster={(gatewayUrl) => getCluster(boundFetchJson, gatewayUrl)}
-      statusRefreshMs={statusRefreshMs}
+        queryClient={queryClient}
+        loadGatewayConfig={() => loadGatewayConfig(boundFetchJson)}
+        getCluster={(gatewayUrl) => getCluster(boundFetchJson, gatewayUrl)}
+        listTopics={(gatewayUrl) => listTopics(boundFetchJson, gatewayUrl)}
+        statusRefreshMs={statusRefreshMs}
       />
     </BrowserRouter>
   </StrictMode>,

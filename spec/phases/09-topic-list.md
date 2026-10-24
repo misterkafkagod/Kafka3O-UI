@@ -26,7 +26,7 @@
   - Do: `listTopics(fetchJson, gatewayUrl)` → `GET {url}/api/v1/topics`. `useTopics(gateway, listTopics)`, key `["gateway", id, "topics"]`, `retry: false`.
   - Done when: `npm test -- listTopics useTopics` passes: URL, trailing slash, HttpError; useTopics calls the injected function.
 
-- [ ] **T09.4 UI: Topics tab and table** — Covers: F3-AC1
+- [x] **T09.4 UI: Topics tab and table** — Covers: F3-AC1
   - Files: src/components/ClusterTabs.tsx (new), src/components/ClusterTabs.test.tsx (new), src/components/TopicList.tsx (new), src/components/TopicList.test.tsx (new), src/components/TopicTable.tsx (new), src/components/TopicTable.test.tsx (new), src/topics/compareTopicsByName.ts (new), src/topics/compareTopicsByName.test.ts (new), src/pages/ClusterPage.tsx (from T06.2), src/pages/ClusterPage.test.tsx (from T06.2), src/App.tsx, src/App.test.tsx, src/main.tsx
   - Do: `ClusterPage` takes `view: "brokers" | "topics"`; still resolves the gateway (and not found, from P08), then renders `ClusterTabs` and either `ClusterDetails` or `TopicList`. `App` routes `/clusters/:gatewayId/topics`. `ClusterTabs` links Brokers / Topics with `aria-current` on the active one. `TopicList` shows "Loading topics…", then `TopicTable` sorted by name (`compareTopicsByName`); on error a "Topics unavailable" placeholder until P12. `TopicTable` columns Name, Partitions, Replication, Messages (`~N`). `listTopics` injected from `main.tsx`.
   - Done when: `npm test` passes `ClusterPage` › "lists topics sorted by name with partitions, RF and ~count (F3-AC1)" (at `/clusters/dev/topics`, MSW `orders` 6/3/1000 and `audit` → `audit` first, then `orders` with 6, 3, ~1000), `ClusterTabs` active-tab case, `TopicTable` formatting; build exits 0.

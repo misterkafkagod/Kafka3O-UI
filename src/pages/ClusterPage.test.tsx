@@ -6,6 +6,7 @@ import { describe, expect, it } from "vitest";
 import { loadGatewayConfig } from "../config/loadGatewayConfig";
 import { fetchJson } from "../gateway/fetchJson";
 import { getCluster } from "../gateway/getCluster";
+import { listTopics } from "../gateway/listTopics";
 import { renderWithQuery } from "../test/renderWithQuery";
 import { server } from "../test/server";
 import { ClusterPage } from "./ClusterPage";
@@ -13,20 +14,19 @@ import { ClusterPage } from "./ClusterPage";
 const realFetchJson = (url: string) => fetchJson(fetch, url, 1000);
 const dev = { id: "dev", name: "Dev", url: "http://localhost:8081" };
 
+const pageProps = {
+  loadGatewayConfig: () => loadGatewayConfig(realFetchJson),
+  getCluster: (url: string) => getCluster(realFetchJson, url),
+  listTopics: (url: string) => listTopics(realFetchJson, url),
+  statusRefreshMs: 60_000,
+};
+
 function renderClusterPage(route: string) {
   return renderWithQuery(
     <Routes>
       <Route path="/" element={<p>Overview</p>} />
-      <Route
-        path="/clusters/:gatewayId"
-        element={
-          <ClusterPage
-            loadGatewayConfig={() => loadGatewayConfig(realFetchJson)}
-            getCluster={(url) => getCluster(realFetchJson, url)}
-            statusRefreshMs={60_000}
-          />
-        }
-      />
+      <Route path="/clusters/:gatewayId" element={<ClusterPage {...pageProps} view="brokers" />} />
+      <Route path="/clusters/:gatewayId/topics" element={<ClusterPage {...pageProps} view="topics" />} />
     </Routes>,
     route,
   );
@@ -92,5 +92,30 @@ describe("ClusterPage", () => {
     expect(await screen.findByRole("heading", { name: "Cluster not found" })).toBeDefined();
     await userEvent.click(screen.getByRole("link", { name: "Back to all clusters" }));
     expect(screen.getByText("Overview")).toBeDefined();
+  });
+
+  it("lists topics sorted by name with partitions, RF and ~count (F3-AC1)", async () => {
+    server.use(
+      http.get("/config.json", () => HttpResponse.json({ gateways: [dev] })),
+      http.get("http://localhost:8081/api/v1/topics", () =>
+        HttpResponse.json([
+          { name: "orders", partitions: 6, replicationFactor: 3, internal: false, approxMessages: 1000 },
+          { name: "audit", partitions: 1, replicationFactor: 3, internal: false, approxMessages: 0 },
+        ]),
+      ),
+    );
+
+    renderClusterPage("/clusters/dev/topics");
+
+    const table = await screen.findByRole("table", { name: "Topics" });
+    const [, body] = within(table).getAllByRole("rowgroup");
+    const rows = within(body)
+      .getAllByRole("row")
+      .map((row) => within(row).getAllByRole("cell").map((cell) => cell.textContent));
+    expect(rows).toEqual([
+      ["audit", "1", "3", "~0"],
+      ["orders", "6", "3", "~1000"],
+    ]);
+    expect(screen.getByRole("link", { name: "Topics" }).getAttribute("aria-current")).toBe("page");
   });
 });

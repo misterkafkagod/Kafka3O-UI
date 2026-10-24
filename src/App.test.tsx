@@ -6,6 +6,7 @@ import { describe, expect, it } from "vitest";
 import { App } from "./App";
 
 const pendingGetCluster = () => new Promise<never>(() => {});
+const pendingListTopics = () => new Promise<never>(() => {});
 
 function renderApp() {
   return render(
@@ -14,6 +15,7 @@ function renderApp() {
         queryClient={new QueryClient()}
         loadGatewayConfig={async () => []}
         getCluster={pendingGetCluster}
+        listTopics={pendingListTopics}
         statusRefreshMs={60_000}
       />
     </MemoryRouter>,
@@ -41,6 +43,7 @@ describe("App", () => {
           queryClient={new QueryClient()}
           loadGatewayConfig={async () => [{ id: "dev", name: "Dev", url: "http://localhost:8081" }]}
           getCluster={async () => ({ clusterId: "abc", controllerId: 1, brokers: [{ id: 1, host: "kafka-dev", port: 9092 }] })}
+          listTopics={async () => [{ name: "orders", partitions: 6, replicationFactor: 1, internal: false, approxMessages: 10 }]}
           statusRefreshMs={60_000}
         />
       </MemoryRouter>,
@@ -50,6 +53,26 @@ describe("App", () => {
 
     expect(await screen.findByText("Controller: 1")).toBeDefined();
     expect(screen.getByRole("table", { name: "Brokers" })).toBeDefined();
+  });
+
+  it("the Topics tab opens the cluster's topic list", async () => {
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter initialEntries={["/clusters/dev"]}>
+        <App
+          queryClient={new QueryClient()}
+          loadGatewayConfig={async () => [{ id: "dev", name: "Dev", url: "http://localhost:8081" }]}
+          getCluster={pendingGetCluster}
+          listTopics={async () => [{ name: "orders", partitions: 6, replicationFactor: 1, internal: false, approxMessages: 10 }]}
+          statusRefreshMs={60_000}
+        />
+      </MemoryRouter>,
+    );
+
+    await user.click(await screen.findByRole("link", { name: "Topics" }));
+
+    expect(await screen.findByRole("table", { name: "Topics" })).toBeDefined();
+    expect(screen.getByText("orders")).toBeDefined();
   });
 
   it("renders the clusters page with the injected config loader", async () => {
