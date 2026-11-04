@@ -7,6 +7,7 @@ import { App } from "./App";
 
 const pendingGetCluster = () => new Promise<never>(() => {});
 const pendingListTopics = () => new Promise<never>(() => {});
+const pendingListConsumerGroups = () => new Promise<never>(() => {});
 const pendingGetTopicDetail = () => new Promise<never>(() => {});
 const pendingListLatestTopicMessages = () => new Promise<never>(() => {});
 const pendingSearchTopicMessages = () => new Promise<never>(() => {});
@@ -21,6 +22,7 @@ function renderApp() {
         loadGatewayConfig={async () => []}
         getCluster={pendingGetCluster}
         listTopics={pendingListTopics}
+        listConsumerGroups={pendingListConsumerGroups}
         getTopicDetail={pendingGetTopicDetail}
         listLatestTopicMessages={pendingListLatestTopicMessages}
         searchTopicMessages={pendingSearchTopicMessages}
@@ -54,6 +56,7 @@ describe("App", () => {
           loadGatewayConfig={async () => [{ id: "dev", name: "Dev", url: "http://localhost:8081" }]}
           getCluster={async () => ({ clusterId: "abc", controllerId: 1, brokers: [{ id: 1, host: "kafka-dev", port: 9092 }] })}
           listTopics={async () => [{ name: "orders", partitions: 6, replicationFactor: 1, internal: false, approxMessages: 10 }]}
+          listConsumerGroups={pendingListConsumerGroups}
           getTopicDetail={pendingGetTopicDetail}
           listLatestTopicMessages={pendingListLatestTopicMessages}
           searchTopicMessages={pendingSearchTopicMessages}
@@ -79,6 +82,7 @@ describe("App", () => {
           loadGatewayConfig={async () => [{ id: "dev", name: "Dev", url: "http://localhost:8081" }]}
           getCluster={pendingGetCluster}
           listTopics={async () => [{ name: "orders", partitions: 6, replicationFactor: 1, internal: false, approxMessages: 10 }]}
+          listConsumerGroups={pendingListConsumerGroups}
           getTopicDetail={pendingGetTopicDetail}
           listLatestTopicMessages={pendingListLatestTopicMessages}
           searchTopicMessages={pendingSearchTopicMessages}
@@ -95,6 +99,33 @@ describe("App", () => {
     expect(screen.getByText("orders")).toBeDefined();
   });
 
+  it("opens consumer groups with the injected gateway client", async () => {
+    const user = userEvent.setup();
+    const listGroups = vi.fn(async () => [
+      { id: "orders-group", protocol: "classic" as const, state: "Empty", members: [], topics: [], partitions: [] },
+    ]);
+    render(
+      <MemoryRouter initialEntries={["/clusters/dev"]}>
+        <App
+          queryClient={new QueryClient()}
+          loadGatewayConfig={async () => [{ id: "dev", name: "Dev", url: "http://localhost:8081" }]}
+          getCluster={pendingGetCluster}
+          listTopics={pendingListTopics}
+          listConsumerGroups={listGroups}
+          getTopicDetail={pendingGetTopicDetail}
+          listLatestTopicMessages={pendingListLatestTopicMessages}
+          searchTopicMessages={pendingSearchTopicMessages}
+          linkOrigin={linkOrigin}
+          copyMessageLink={copyMessageLink}
+          statusRefreshMs={60_000}
+        />
+      </MemoryRouter>,
+    );
+    await user.click(await screen.findByRole("link", { name: "Consumer groups" }));
+    expect(await screen.findByRole("heading", { name: "orders-group" })).toBeDefined();
+    expect(listGroups).toHaveBeenCalledWith("http://localhost:8081");
+  });
+
   it("clicking a topic opens its detail page", async () => {
     const user = userEvent.setup();
     render(
@@ -104,6 +135,7 @@ describe("App", () => {
           loadGatewayConfig={async () => [{ id: "dev", name: "Dev", url: "http://localhost:8081" }]}
           getCluster={pendingGetCluster}
           listTopics={async () => [{ name: "orders", partitions: 1, replicationFactor: 1, internal: false, approxMessages: 1 }]}
+          listConsumerGroups={pendingListConsumerGroups}
           getTopicDetail={async () => ({
             name: "orders",
             partitions: [{ id: 0, leader: 1, replicas: [1], isr: [1], startOffset: 0, endOffset: 1 }],
@@ -134,6 +166,7 @@ describe("App", () => {
           loadGatewayConfig={async () => [{ id: "dev", name: "Dev", url: "http://localhost:8081" }]}
           getCluster={pendingGetCluster}
           listTopics={async () => [{ name: "orders", partitions: 1, replicationFactor: 1, internal: false, approxMessages: 1 }]}
+          listConsumerGroups={pendingListConsumerGroups}
           getTopicDetail={async () => ({ name: "orders", partitions: [], config: [] })}
           listLatestTopicMessages={pendingListLatestTopicMessages}
           searchTopicMessages={pendingSearchTopicMessages}
@@ -161,6 +194,7 @@ describe("App", () => {
         loadGatewayConfig={async () => [{ id: "dev & west", name: "Dev", url: "http://localhost:8081" }]}
         getCluster={pendingGetCluster}
         listTopics={pendingListTopics}
+        listConsumerGroups={pendingListConsumerGroups}
         getTopicDetail={pendingGetTopicDetail}
         listLatestTopicMessages={list}
         searchTopicMessages={pendingSearchTopicMessages}

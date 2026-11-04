@@ -7,6 +7,7 @@ import { loadGatewayConfig } from "./config/loadGatewayConfig";
 import { fetchJson } from "./gateway/fetchJson";
 import { getCluster } from "./gateway/getCluster";
 import { getTopicDetail } from "./gateway/getTopicDetail";
+import { listConsumerGroups } from "./gateway/listConsumerGroups";
 import { listLatestTopicMessages } from "./gateway/listLatestTopicMessages";
 import { listTopics } from "./gateway/listTopics";
 import { searchTopicMessages } from "./gateway/searchTopicMessages";
@@ -24,6 +25,7 @@ createRoot(document.getElementById("root")!).render(
         loadGatewayConfig={() => loadGatewayConfig(boundFetchJson)}
         getCluster={(gatewayUrl) => getCluster(boundFetchJson, gatewayUrl)}
         listTopics={(gatewayUrl) => listTopics(boundFetchJson, gatewayUrl)}
+        listConsumerGroups={(gatewayUrl) => listConsumerGroups(boundFetchJson, gatewayUrl)}
         getTopicDetail={(gatewayUrl, topicName) => getTopicDetail(boundFetchJson, gatewayUrl, topicName)}
         listLatestTopicMessages={(gatewayUrl, topicName, position) =>
           listLatestTopicMessages(boundFetchJson, gatewayUrl, topicName, position)

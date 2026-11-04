@@ -1,12 +1,14 @@
 import type { ReactElement } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import type { ListConsumerGroups } from "./gateway/listConsumerGroups";
 import type { ListLatestTopicMessages } from "./gateway/listLatestTopicMessages";
 import type { SearchTopicMessages } from "./gateway/searchTopicMessages";
 
-const { renderApp, listMessages, searchMessages } = vi.hoisted(() => ({
+const { renderApp, listMessages, searchMessages, listGroups } = vi.hoisted(() => ({
   renderApp: vi.fn<(element: unknown) => void>(),
   listMessages: vi.fn<(...args: unknown[]) => Promise<unknown[]>>().mockResolvedValue([]),
   searchMessages: vi.fn<(...args: unknown[]) => Promise<unknown>>().mockResolvedValue({ messages: [], scanned: 0, truncated: false }),
+  listGroups: vi.fn<(...args: unknown[]) => Promise<unknown[]>>().mockResolvedValue([]),
 }));
 
 vi.mock("react-dom/client", () => ({
@@ -21,11 +23,16 @@ vi.mock("./gateway/searchTopicMessages", () => ({
   searchTopicMessages: searchMessages,
 }));
 
+vi.mock("./gateway/listConsumerGroups", () => ({
+  listConsumerGroups: listGroups,
+}));
+
 type AppTree = ReactElement<{
   children: ReactElement<{
     children: ReactElement<{
       listLatestTopicMessages: ListLatestTopicMessages;
       searchTopicMessages: SearchTopicMessages;
+      listConsumerGroups: ListConsumerGroups;
       linkOrigin: string;
       copyMessageLink: (text: string) => Promise<void>;
     }>;
@@ -54,6 +61,8 @@ describe("main composition", () => {
     expect(listMessages).toHaveBeenNthCalledWith(2, expect.any(Function), "http://gateway", "orders", timestamp);
     await tree.props.children.props.children.props.searchTopicMessages("http://gateway", "orders", "needle");
     expect(searchMessages).toHaveBeenCalledWith(expect.any(Function), "http://gateway", "orders", "needle");
+    await tree.props.children.props.children.props.listConsumerGroups("http://gateway");
+    expect(listGroups).toHaveBeenCalledWith(expect.any(Function), "http://gateway");
     const writeText = vi.fn(async () => {});
     vi.stubGlobal("navigator", { clipboard: { writeText } });
     expect(tree.props.children.props.children.props.linkOrigin).toBe(window.location.origin);

@@ -2,7 +2,7 @@
 - **Milestone:** M4
 - **Covers:** F10-AC1, F10-AC2, F10-AC3
 - **Discovery:** —
-- **Status:** Building
+- **Status:** Review
 
 ## Demo
 1. Produce and consume records in a consumer group, then open the cluster's Consumer groups tab.
@@ -25,7 +25,7 @@
   - Files: `src/gateway/listConsumerGroups.ts` (new), client tests (new), `src/gateway/types.ts`, `src/hooks/useConsumerGroups.ts` (new), hook tests (new)
   - Do: Fetch and cache groups by gateway without automatic retries.
   - Done when: focused UI client/hook tests and `npm test` pass; `npm run build` succeeds.
-- [ ] **T22.5 Show consumer groups** — Covers: F10-AC1, F10-AC2, F10-AC3
+- [x] **T22.5 Show consumer groups** — Covers: F10-AC1, F10-AC2, F10-AC3
   - Files: `src/components/ConsumerGroups.tsx` (new), related row and component tests, `src/components/ClusterTabs.tsx`, `src/pages/ClusterPage.tsx`, `src/App.tsx`, `src/main.tsx`
   - Do: Add the cluster tab and render group state, members, lag rows, unknown/error states and Retry.
   - Done when: focused UI tests cover populated, empty, missing/out-of-range/unavailable and failure/retry cases; `npm test` and `npm run build` pass.

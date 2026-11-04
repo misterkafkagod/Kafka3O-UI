@@ -6,6 +6,7 @@ import { describe, expect, it } from "vitest";
 import { loadGatewayConfig } from "../config/loadGatewayConfig";
 import { fetchJson } from "../gateway/fetchJson";
 import { getCluster } from "../gateway/getCluster";
+import { listConsumerGroups } from "../gateway/listConsumerGroups";
 import { listTopics } from "../gateway/listTopics";
 import { renderWithQuery } from "../test/renderWithQuery";
 import { server } from "../test/server";
@@ -18,6 +19,7 @@ const pageProps = {
   loadGatewayConfig: () => loadGatewayConfig(realFetchJson),
   getCluster: (url: string) => getCluster(realFetchJson, url),
   listTopics: (url: string) => listTopics(realFetchJson, url),
+  listConsumerGroups: (url: string) => listConsumerGroups(realFetchJson, url),
   statusRefreshMs: 60_000,
 };
 
@@ -27,12 +29,26 @@ function renderClusterPage(route: string) {
       <Route path="/" element={<p>Overview</p>} />
       <Route path="/clusters/:gatewayId" element={<ClusterPage {...pageProps} view="brokers" />} />
       <Route path="/clusters/:gatewayId/topics" element={<ClusterPage {...pageProps} view="topics" />} />
+      <Route path="/clusters/:gatewayId/consumer-groups" element={<ClusterPage {...pageProps} view="consumer-groups" />} />
     </Routes>,
     route,
   );
 }
 
 describe("ClusterPage", () => {
+  it("opens consumer groups through the cluster tab", async () => {
+    server.use(
+      http.get("/config.json", () => HttpResponse.json({ gateways: [dev] })),
+      http.get("http://localhost:8081/api/v1/cluster", () => HttpResponse.json({ clusterId: "abc", controllerId: 1, brokers: [] })),
+      http.get("http://localhost:8081/api/v1/consumer-groups", () =>
+        HttpResponse.json([{ id: "orders-group", protocol: "classic", state: "Empty", members: [], topics: [], partitions: [] }]),
+      ),
+    );
+    renderClusterPage("/clusters/dev");
+    await userEvent.click(await screen.findByRole("link", { name: "Consumer groups" }));
+    expect(await screen.findByRole("heading", { name: "orders-group" })).toBeDefined();
+    expect(screen.getByRole("link", { name: "Consumer groups" }).getAttribute("aria-current")).toBe("page");
+  });
   it("shows cluster ID, controller and brokers in ID order (F2-AC1)", async () => {
     server.use(
       http.get("/config.json", () => HttpResponse.json({ gateways: [dev] })),

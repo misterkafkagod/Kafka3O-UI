@@ -3,6 +3,7 @@ import { Link, Route, Routes } from "react-router";
 import type { LoadGatewayConfig } from "./config/loadGatewayConfig";
 import type { GetCluster } from "./gateway/getCluster";
 import type { GetTopicDetail } from "./gateway/getTopicDetail";
+import type { ListConsumerGroups } from "./gateway/listConsumerGroups";
 import type { ListLatestTopicMessages } from "./gateway/listLatestTopicMessages";
 import type { ListTopics } from "./gateway/listTopics";
 import type { SearchTopicMessages } from "./gateway/searchTopicMessages";
@@ -15,6 +16,7 @@ type AppProps = {
   loadGatewayConfig: LoadGatewayConfig;
   getCluster: GetCluster;
   listTopics: ListTopics;
+  listConsumerGroups: ListConsumerGroups;
   getTopicDetail: GetTopicDetail;
   listLatestTopicMessages: ListLatestTopicMessages;
   searchTopicMessages: SearchTopicMessages;
@@ -28,6 +30,7 @@ export function App({
   loadGatewayConfig,
   getCluster,
   listTopics,
+  listConsumerGroups,
   getTopicDetail,
   listLatestTopicMessages,
   searchTopicMessages,
@@ -61,6 +64,7 @@ export function App({
               loadGatewayConfig={loadGatewayConfig}
               getCluster={getCluster}
               listTopics={listTopics}
+              listConsumerGroups={listConsumerGroups}
               statusRefreshMs={statusRefreshMs}
               view="brokers"
             />
@@ -73,8 +77,22 @@ export function App({
               loadGatewayConfig={loadGatewayConfig}
               getCluster={getCluster}
               listTopics={listTopics}
+              listConsumerGroups={listConsumerGroups}
               statusRefreshMs={statusRefreshMs}
               view="topics"
+            />
+          }
+        />
+        <Route
+          path="/clusters/:gatewayId/consumer-groups"
+          element={
+            <ClusterPage
+              loadGatewayConfig={loadGatewayConfig}
+              getCluster={getCluster}
+              listTopics={listTopics}
+              listConsumerGroups={listConsumerGroups}
+              statusRefreshMs={statusRefreshMs}
+              view="consumer-groups"
             />
           }
         />
