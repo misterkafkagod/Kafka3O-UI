@@ -21,7 +21,7 @@
   - Files: `internal/httpapi/register_list_consumer_groups.go` (new), `internal/httpapi/register_list_consumer_groups_test.go` (new), `cmd/gateway/main.go`, group DTO/lag conversion and related tests (amended)
   - Do: Wire a group-list endpoint with decimal-string offsets and explicit failure responses; use nullable string DTO fields so the generated OpenAPI schema matches the JSON wire format.
   - Done when: HTTP tests cover response shape, empty list, group errors and unavailable Kafka; `go test ./...` passes.
-- [ ] **T22.4 Add the group client and hook** — Covers: F10-AC1, F10-AC3
+- [x] **T22.4 Add the group client and hook** — Covers: F10-AC1, F10-AC3
   - Files: `src/gateway/listConsumerGroups.ts` (new), client tests (new), `src/gateway/types.ts`, `src/hooks/useConsumerGroups.ts` (new), hook tests (new)
   - Do: Fetch and cache groups by gateway without automatic retries.
   - Done when: focused UI client/hook tests and `npm test` pass; `npm run build` succeeds.

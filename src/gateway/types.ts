@@ -71,6 +71,34 @@ export type TopicMessageSearchResult = {
   truncated: boolean;
 };
 
+export type ConsumerGroupMember = {
+  id: string;
+  clientId: string;
+  clientHost: string;
+  instanceId?: string;
+};
+
+export type ConsumerGroupPartition = {
+  topic: string;
+  partition: number;
+  committedOffset: string | null;
+  startOffset: string | null;
+  endOffset: string | null;
+  lag: string | null;
+  status: "ok" | "no_commit" | "out_of_range" | "unavailable";
+  error?: string;
+};
+
+export type ConsumerGroup = {
+  id: string;
+  protocol: "classic" | "consumer";
+  state: string;
+  members: ConsumerGroupMember[];
+  topics: string[];
+  partitions: ConsumerGroupPartition[];
+  error?: string;
+};
+
 export type GatewayErrorKind = "gateway-unreachable" | "cluster-unreachable" | "other";
 
 // RFC 9457 problem body sent by the gateway on errors (only the fields the UI uses).
