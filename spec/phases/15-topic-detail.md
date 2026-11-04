@@ -22,7 +22,7 @@
   - Files: `internal/httpapi/register_get_topic_detail.go` (new), `internal/httpapi/register_get_topic_detail_test.go` (new), `internal/httpapi/new_topic_not_found.go` (new), `cmd/gateway/main.go`
   - Do: Register `GET /api/v1/topics/{topic}`; map the missing-topic sentinel to 404 `not_found` and all Kafka failures to 503 `cluster_unreachable`; wire the action and route in the composition root.
   - Done when: `go test ./internal/httpapi/...` passes checks for the detail JSON, missing-topic 404, and Kafka-error 503; `go test ./...` passes.
-- [ ] **T15.4 UI topic-detail data access** — Covers: F4-AC1
+- [x] **T15.4 UI topic-detail data access** — Covers: F4-AC1
   - Files: `src/gateway/types.ts`, `src/gateway/getTopicDetail.ts` (new), `src/gateway/getTopicDetail.test.ts` (new), `src/hooks/useTopicDetail.ts` (new), `src/hooks/useTopicDetail.test.tsx` (new)
   - Do: Add the typed detail request using an encoded topic path and a query keyed by gateway ID and topic name; disable automatic retries so the page's Retry action remains explicit.
   - Done when: `npm test -- getTopicDetail useTopicDetail` passes URL encoding, response, error, and query behavior tests.

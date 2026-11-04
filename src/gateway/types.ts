@@ -25,6 +25,27 @@ export type Topic = {
   approxMessages: number;
 };
 
+export type TopicDetail = {
+  name: string;
+  partitions: TopicPartition[];
+  config: TopicConfig[];
+};
+
+export type TopicPartition = {
+  id: number;
+  leader: number;
+  replicas: number[];
+  isr: number[];
+  startOffset: number;
+  endOffset: number;
+};
+
+export type TopicConfig = {
+  name: string;
+  value: string;
+  sensitive: boolean;
+};
+
 export type GatewayErrorKind = "gateway-unreachable" | "cluster-unreachable" | "other";
 
 // RFC 9457 problem body sent by the gateway on errors (only the fields the UI uses).
