@@ -112,6 +112,8 @@ Tests live next to the file they test (`*_test.go`, `*.test.ts(x)`).
 - `GET /api/v1/health/live` → 200 while the process is up
 - `GET /api/v1/cluster` → `{clusterId, controllerId, brokers:[{id, host, port, rack}]}`; 503 `cluster_unreachable` when Kafka is unreachable
 - `GET /api/v1/topics` → `[{name, partitions, replicationFactor, internal, approxMessages}]`; 503 `cluster_unreachable`
+- `GET /api/v1/topics/{topic}` → `{name, partitions:[{id, leader, replicas, isr, startOffset, endOffset}], config:[{name, value, sensitive}]}`; sensitive config values are not sent, 404 `not_found` when the topic is absent, 503 `cluster_unreachable` for Kafka failures
+- `GET /api/v1/topics/{topic}/messages` → at most 50 `{partition, offset, timestamp, key, value, headers:[{key, value}]}` records across the topic, newest first by default; Kafka byte fields are base64 strings. Optional `partition` plus exactly one of `offset` or `timestamp` reads from that position in offset order (`timestamp` is Unix milliseconds); invalid positions return 400 `invalid_position`, a missing topic returns 404 `not_found`, and Kafka failures return 503 `cluster_unreachable`
 - Errors: RFC 9457 problem JSON with `code`
 - OpenAPI document served at `/openapi.json`
 - UI timeout per gateway call: 5 s; status polling every 15 s; gateway Kafka timeout 3 s (must stay below the UI timeout)

@@ -59,13 +59,44 @@ A cluster's topics with their size, filterable by name.
 **External dependencies:** same as F1
 
 ### F4 — Topic detail
-Partitions (leader, replicas, ISR, offsets) and config of one topic · *detailed when M2 starts*
+Open a topic to inspect its partitions, offsets, and configuration.
+
+**Behaviors**
+- **F4-B1** User opens a topic from the topic list → system shows its partitions, leaders, replicas, ISR, start/end offsets, and configuration entries
+- **F4-B2** Topic no longer exists or the gateway cannot reach Kafka → system shows a clear not-found or cluster-unavailable state with Retry where retry can help
+
+**Acceptance criteria**
+- **F4-AC1** (B1) Given a topic with multiple partitions and configuration entries, when the user opens it → partitions appear in ID order with leader, replicas, ISR, start/end offsets, and the configuration entries; sensitive values are not exposed
+- **F4-AC2** (B2) Given the topic was deleted or Kafka is unreachable, when the user opens it → the UI distinguishes not-found from cluster-unreachable and offers Retry for the latter
+
+**External dependencies:** Gateway HTTP API and Kafka metadata/config APIs; UI tests fake the gateway with MSW, gateway unit tests fake Kafka ports, integration tests use the existing testcontainers Kafka setup
 
 ### F5 — Read latest messages
-Latest messages of a topic with key, value, headers, timestamp; value as text, JSON or base64 · *detailed when M2 starts*
+Read a bounded batch of a topic's latest messages and view their values as text, JSON, or base64.
+
+**Behaviors**
+- **F5-B1** User opens a topic's Messages view → system returns at most 50 latest messages across its partitions, newest first, with partition, offset, timestamp, key, value, and headers
+- **F5-B2** User chooses a value representation → system displays the value as text, formatted JSON, or base64; invalid JSON is identified without hiding the original value
+
+**Acceptance criteria**
+- **F5-AC1** (B1) Given messages in multiple partitions, when the Messages view opens → no more than 50 records are shown newest first, with each record's partition, offset, timestamp, key, value, and headers
+- **F5-AC2** (B2) Given a message with UTF-8 JSON content, when the user selects text, JSON, or base64 → the value is rendered in that representation; selecting JSON for invalid JSON shows a clear invalid-JSON indication and keeps the value inspectable
+
+**External dependencies:** Gateway HTTP API and Kafka record-fetch APIs; UI tests fake the gateway with MSW, gateway unit tests fake Kafka ports, integration tests use the existing testcontainers Kafka setup
 
 ### F6 — Read from a position
-Start reading from a chosen partition, offset or timestamp · *detailed when M2 starts*
+Read a bounded batch from a chosen partition and offset or timestamp.
+
+**Behaviors**
+- **F6-B1** User chooses a partition and starting offset or timestamp → system reads at most 50 messages beginning at that position
+- **F6-B2** User supplies an invalid partition or position → system reports a clear validation error without starting a read
+
+**Acceptance criteria**
+- **F6-AC1** (B1) Given a valid partition and offset, when the user starts reading → at most 50 messages from that offset onward are shown in offset order
+- **F6-AC2** (B1) Given a valid partition and timestamp, when the user starts reading → at most 50 messages beginning at the first available record at or after that timestamp are shown in offset order
+- **F6-AC3** (B2) Given an invalid partition, offset, or timestamp, when the user starts reading → the gateway returns a client error and the UI presents the validation detail
+
+**External dependencies:** Gateway HTTP API and Kafka record-fetch/offset APIs; UI tests fake the gateway with MSW, gateway unit tests fake Kafka ports, integration tests use the existing testcontainers Kafka setup
 
 ### F7 — Search messages
 Bounded scan for messages whose key or value contains some text · *detailed when M3 starts*
