@@ -50,14 +50,14 @@ export type TopicMessage = {
   partition: number;
   offset: number;
   timestamp: string;
-  key: string;
-  value: string;
+  key: string | null;
+  value: string | null;
   headers: TopicMessageHeader[];
 };
 
 export type TopicMessageHeader = {
   key: string;
-  value: string;
+  value: string | null;
 };
 
 export type TopicMessagePosition =

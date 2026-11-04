@@ -5,6 +5,7 @@ import type { GetCluster } from "./gateway/getCluster";
 import type { GetTopicDetail } from "./gateway/getTopicDetail";
 import type { ListLatestTopicMessages } from "./gateway/listLatestTopicMessages";
 import type { ListTopics } from "./gateway/listTopics";
+import type { SearchTopicMessages } from "./gateway/searchTopicMessages";
 import { ClusterPage } from "./pages/ClusterPage";
 import { ClustersPage } from "./pages/ClustersPage";
 import { TopicPage } from "./pages/TopicPage";
@@ -16,6 +17,7 @@ type AppProps = {
   listTopics: ListTopics;
   getTopicDetail: GetTopicDetail;
   listLatestTopicMessages: ListLatestTopicMessages;
+  searchTopicMessages: SearchTopicMessages;
   statusRefreshMs: number;
 };
 
@@ -26,6 +28,7 @@ export function App({
   listTopics,
   getTopicDetail,
   listLatestTopicMessages,
+  searchTopicMessages,
   statusRefreshMs,
 }: AppProps) {
   return (
@@ -77,6 +80,7 @@ export function App({
               loadGatewayConfig={loadGatewayConfig}
               getTopicDetail={getTopicDetail}
               listLatestTopicMessages={listLatestTopicMessages}
+              searchTopicMessages={searchTopicMessages}
             />
           }
         />
@@ -87,6 +91,7 @@ export function App({
               loadGatewayConfig={loadGatewayConfig}
               getTopicDetail={getTopicDetail}
               listLatestTopicMessages={listLatestTopicMessages}
+              searchTopicMessages={searchTopicMessages}
               view="messages"
             />
           }

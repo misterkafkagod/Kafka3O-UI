@@ -25,9 +25,9 @@
   - Files: `src/gateway/searchTopicMessages.ts` (new), `src/gateway/searchTopicMessages.test.ts` (new), `src/gateway/types.ts`, `src/hooks/useSearchTopicMessages.ts` (new), `src/hooks/useSearchTopicMessages.test.tsx` (new)
   - Do: Add the search client and query independently by gateway, topic and search text.
   - Done when: focused client/hook tests and `npm test` pass; `npm run build` succeeds.
-- [ ] **T19.5 Show search results** — Covers: F7-AC3
-  - Files: `src/main.tsx`, `src/App.tsx`, `src/pages/TopicPage.tsx`, `src/pages/TopicMessagesPage.tsx`, `src/components/SearchTopicMessages.tsx` (new), `src/components/SearchTopicMessages.test.tsx` (new), related page tests
-  - Do: Wire the search client and add a search form, limit/exclusion explanation, matching records, empty state and retry; keep latest and positioned reads available.
+- [x] **T19.5 Show search results** — Covers: F7-AC3
+  - Files: `src/main.tsx`, `src/App.tsx`, `src/pages/TopicPage.tsx`, `src/pages/TopicMessagesPage.tsx`, `src/components/SearchTopicMessages.tsx` (new), `src/components/SearchTopicMessages.test.tsx` (new), `src/components/MessageTable.tsx`, `src/components/MessageTable.test.tsx`, `src/gateway/types.ts`, related page tests
+  - Do: Wire the search client and add a search form, limit/exclusion explanation, matching records, empty state and retry; keep latest and positioned reads available. Preserve Kafka nulls, including tombstone values, when rendering search matches.
   - Done when: focused UI tests cover success, no matches, exclusion, invalid input and failure/retry; `npm test` and `npm run build` pass.
 
 ## Review

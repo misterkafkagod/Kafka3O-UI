@@ -9,6 +9,7 @@ import { getCluster } from "./gateway/getCluster";
 import { getTopicDetail } from "./gateway/getTopicDetail";
 import { listLatestTopicMessages } from "./gateway/listLatestTopicMessages";
 import { listTopics } from "./gateway/listTopics";
+import { searchTopicMessages } from "./gateway/searchTopicMessages";
 
 const gatewayTimeoutMs = 5000;
 const statusRefreshMs = 15_000;
@@ -27,6 +28,7 @@ createRoot(document.getElementById("root")!).render(
         listLatestTopicMessages={(gatewayUrl, topicName, position) =>
           listLatestTopicMessages(boundFetchJson, gatewayUrl, topicName, position)
         }
+        searchTopicMessages={(gatewayUrl, topicName, query) => searchTopicMessages(boundFetchJson, gatewayUrl, topicName, query)}
         statusRefreshMs={statusRefreshMs}
       />
     </BrowserRouter>

@@ -56,4 +56,15 @@ describe("MessageTable", () => {
     await user.selectOptions(screen.getByRole("combobox", { name: "Value format" }), "base64");
     expect(screen.getByText("bm90IGpzb24=")).toBeDefined();
   });
+
+  it("preserves null keys, tombstone values, and null header values", async () => {
+    const user = userEvent.setup();
+    render(<MessageTable messages={[{ ...messages[0], key: null, value: null, headers: [{ key: "source", value: null }] }]} />);
+
+    expect(screen.getAllByText("(null)")).toHaveLength(2);
+    expect(screen.getByText("source: (null)")).toBeDefined();
+    await user.selectOptions(screen.getByRole("combobox", { name: "Value format" }), "json");
+    expect(screen.queryByRole("status")).toBeNull();
+    expect(screen.getAllByText("(null)")).toHaveLength(2);
+  });
 });

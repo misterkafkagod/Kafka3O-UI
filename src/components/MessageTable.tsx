@@ -40,7 +40,7 @@ export function MessageTable({ messages }: MessageTableProps) {
         </thead>
         <tbody>
           {messages.map((message) => {
-            const formattedValue = formatMessageValue(message.value, valueFormat);
+            const formattedValue = message.value === null ? null : formatMessageValue(message.value, valueFormat);
             return (
               <tr key={`${message.partition}-${message.offset}`}>
                 <td>{message.partition}</td>
@@ -48,10 +48,10 @@ export function MessageTable({ messages }: MessageTableProps) {
                 <td>
                   <time dateTime={message.timestamp}>{new Date(message.timestamp).toLocaleString()}</time>
                 </td>
-                <td>{message.key || "(empty)"}</td>
+                <td>{message.key === null ? "(null)" : message.key || "(empty)"}</td>
                 <td>
-                  {formattedValue.invalidJson ? <p role="status">Invalid JSON</p> : null}
-                  <pre>{formattedValue.value || "(empty)"}</pre>
+                  {formattedValue?.invalidJson ? <p role="status">Invalid JSON</p> : null}
+                  <pre>{formattedValue === null ? "(null)" : formattedValue.value || "(empty)"}</pre>
                 </td>
                 <td>
                   {message.headers.length === 0 ? (
@@ -60,7 +60,7 @@ export function MessageTable({ messages }: MessageTableProps) {
                     <ul>
                       {message.headers.map((header, index) => (
                         <li key={`${header.key}-${index}`}>
-                          {header.key}: {header.value || "(empty)"}
+                          {header.key}: {header.value === null ? "(null)" : header.value || "(empty)"}
                         </li>
                       ))}
                     </ul>

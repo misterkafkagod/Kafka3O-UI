@@ -4,6 +4,7 @@ import { findGatewayById } from "../config/findGatewayById";
 import type { LoadGatewayConfig } from "../config/loadGatewayConfig";
 import type { GetTopicDetail } from "../gateway/getTopicDetail";
 import type { ListLatestTopicMessages } from "../gateway/listLatestTopicMessages";
+import type { SearchTopicMessages } from "../gateway/searchTopicMessages";
 import { useGatewayConfig } from "../hooks/useGatewayConfig";
 import { TopicDetailPage } from "./TopicDetailPage";
 import { TopicMessagesPage } from "./TopicMessagesPage";
@@ -12,10 +13,11 @@ type TopicPageProps = {
   loadGatewayConfig: LoadGatewayConfig;
   getTopicDetail: GetTopicDetail;
   listLatestTopicMessages: ListLatestTopicMessages;
+  searchTopicMessages: SearchTopicMessages;
   view?: "details" | "messages";
 };
 
-export function TopicPage({ loadGatewayConfig, getTopicDetail, listLatestTopicMessages, view = "details" }: TopicPageProps) {
+export function TopicPage({ loadGatewayConfig, getTopicDetail, listLatestTopicMessages, searchTopicMessages, view = "details" }: TopicPageProps) {
   const { gatewayId, topicName } = useParams();
   const { data: gateways } = useGatewayConfig(loadGatewayConfig);
 
@@ -35,7 +37,7 @@ export function TopicPage({ loadGatewayConfig, getTopicDetail, listLatestTopicMe
     );
   }
   if (view === "messages") {
-    return <TopicMessagesPage gateway={gateway} topicName={topicName} listLatestTopicMessages={listLatestTopicMessages} />;
+    return <TopicMessagesPage gateway={gateway} topicName={topicName} listLatestTopicMessages={listLatestTopicMessages} searchTopicMessages={searchTopicMessages} />;
   }
   return <TopicDetailPage gateway={gateway} topicName={topicName} getTopicDetail={getTopicDetail} />;
 }

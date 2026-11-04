@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from "vitest";
 import type { LoadGatewayConfig } from "../config/loadGatewayConfig";
 import type { GetTopicDetail } from "../gateway/getTopicDetail";
 import type { ListLatestTopicMessages } from "../gateway/listLatestTopicMessages";
+import type { SearchTopicMessages } from "../gateway/searchTopicMessages";
 import type { GatewayEntry, TopicMessage, TopicMessagePosition } from "../gateway/types";
 import { HttpError } from "../gateway/HttpError";
 import { renderWithQuery } from "../test/renderWithQuery";
@@ -17,16 +18,17 @@ function renderTopicPage(
   getTopicDetail: GetTopicDetail,
   listLatestTopicMessages: ListLatestTopicMessages = async () => [],
   view: "details" | "messages" = "details",
+  searchTopicMessages: SearchTopicMessages = async () => ({ messages: [], scanned: 0, truncated: false }),
 ) {
   return renderWithQuery(
     <Routes>
       <Route
         path="/clusters/:gatewayId/topics/:topicName"
-        element={<TopicPage {...{ loadGatewayConfig, getTopicDetail, listLatestTopicMessages, view }} />}
+        element={<TopicPage {...{ loadGatewayConfig, getTopicDetail, listLatestTopicMessages, searchTopicMessages, view }} />}
       />
       <Route
         path="/clusters/:gatewayId/topics/:topicName/messages"
-        element={<TopicPage {...{ loadGatewayConfig, getTopicDetail, listLatestTopicMessages, view }} />}
+        element={<TopicPage {...{ loadGatewayConfig, getTopicDetail, listLatestTopicMessages, searchTopicMessages, view }} />}
       />
     </Routes>,
     `/clusters/dev/topics/orders${view === "messages" ? "/messages" : ""}`,
@@ -34,6 +36,20 @@ function renderTopicPage(
 }
 
 describe("TopicPage", () => {
+  it("opens message search and forwards the selected gateway and topic", async () => {
+    const search = vi.fn<SearchTopicMessages>(async () => ({ messages: [], scanned: 0, truncated: false }));
+    const user = userEvent.setup();
+    renderTopicPage(async () => [gateway], async () => ({ name: "orders", partitions: [], config: [] }), async () => [], "messages", search);
+
+    await user.click(await screen.findByRole("button", { name: "Search messages" }));
+    await user.type(screen.getByRole("searchbox", { name: "Search key or value" }), "needle");
+    await user.click(screen.getByRole("button", { name: "Search" }));
+
+    expect(await screen.findByText("No matching messages.")).toBeDefined();
+    expect(search).toHaveBeenCalledWith(gateway.url, "orders", "needle");
+    await user.click(screen.getByRole("button", { name: "Back to message reads" }));
+    expect(screen.getByRole("button", { name: "Read messages" })).toBeDefined();
+  });
   it("shows Cluster not found without fetching topic detail when the gateway is unknown", async () => {
     const getTopicDetail = vi.fn(async () => ({ name: "orders", partitions: [], config: [] }));
     renderTopicPage(async () => [], getTopicDetail);

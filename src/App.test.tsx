@@ -9,6 +9,7 @@ const pendingGetCluster = () => new Promise<never>(() => {});
 const pendingListTopics = () => new Promise<never>(() => {});
 const pendingGetTopicDetail = () => new Promise<never>(() => {});
 const pendingListLatestTopicMessages = () => new Promise<never>(() => {});
+const pendingSearchTopicMessages = () => new Promise<never>(() => {});
 
 function renderApp() {
   return render(
@@ -20,6 +21,7 @@ function renderApp() {
         listTopics={pendingListTopics}
         getTopicDetail={pendingGetTopicDetail}
         listLatestTopicMessages={pendingListLatestTopicMessages}
+        searchTopicMessages={pendingSearchTopicMessages}
         statusRefreshMs={60_000}
       />
     </MemoryRouter>,
@@ -50,6 +52,7 @@ describe("App", () => {
           listTopics={async () => [{ name: "orders", partitions: 6, replicationFactor: 1, internal: false, approxMessages: 10 }]}
           getTopicDetail={pendingGetTopicDetail}
           listLatestTopicMessages={pendingListLatestTopicMessages}
+          searchTopicMessages={pendingSearchTopicMessages}
           statusRefreshMs={60_000}
         />
       </MemoryRouter>,
@@ -72,6 +75,7 @@ describe("App", () => {
           listTopics={async () => [{ name: "orders", partitions: 6, replicationFactor: 1, internal: false, approxMessages: 10 }]}
           getTopicDetail={pendingGetTopicDetail}
           listLatestTopicMessages={pendingListLatestTopicMessages}
+          searchTopicMessages={pendingSearchTopicMessages}
           statusRefreshMs={60_000}
         />
       </MemoryRouter>,
@@ -98,6 +102,7 @@ describe("App", () => {
             config: [],
           })}
           listLatestTopicMessages={async () => []}
+          searchTopicMessages={pendingSearchTopicMessages}
           statusRefreshMs={60_000}
         />
       </MemoryRouter>,
