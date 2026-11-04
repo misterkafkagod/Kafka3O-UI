@@ -80,7 +80,7 @@ Kafka3O is a multi-cluster Kafka console for developers and operators: one web U
 - **Status:** Active
 - **Features:** F7, F8, F9
 - **Phases:**
-  - **P19** F7-B1 + F7-B2 · Bounded topic message search — Covers: F7-AC1, F7-AC2, F7-AC3 · Discovery: — · Status: Review
+  - **P19** F7-B1 + F7-B2 · Bounded topic message search — Covers: F7-AC1, F7-AC2, F7-AC3 · Discovery: — · Status: Done
     - Demo: search a topic with records across partitions and see matches, examined count, the 500-position limit, and whether any positions were excluded.
   - **P20** F8-B1 + F8-B2 · Search topic names across gateways — Covers: F8-AC1, F8-AC2 · Discovery: — · Status: Planned
     - Demo: find `orders` across two clusters, then stop one gateway and verify the other result remains visible.
@@ -102,6 +102,7 @@ Kafka3O is a multi-cluster Kafka console for developers and operators: one web U
 - **Technical debt:** Upgrade the Gateway Go toolchain and build image to a release fixing GO-2026-6809; the 2026-11-04 scan reports CISA CVSS 6.8 medium in Go 1.27.2.
 
 ## Learnings
+- 2026-11-04 (M3 / P19): Search allocates a single 500-offset window fairly across partitions; timestamps do not establish which offsets are globally newest.
 - 2026-11-04 (M1 / P14): Live metadata requests replace cached health and topic-list metadata; stopped-broker integration and demo remain unverified without Docker.
 - 2026-11-04 (M2 / F6): The UI composition root dropped positioned-read arguments; a regression test now covers the production wiring for offset and timestamp requests.
 - 2026-10-24 (M1 / P10): On Kafka 4.3, describing an unknown consumer group fails and creates nothing; to create `__consumer_offsets` without creating a normal topic, run a console consumer with `--include '.*' --group <g>`.
