@@ -13,7 +13,7 @@
   - Files: `internal/groups/consumer_group.go` (new), `internal/groups/fetch_consumer_groups.go` (new), `internal/groups/list_consumer_groups.go` (new), `internal/groups/list_consumer_groups_test.go` (new), `internal/groups/calculate_consumer_partition_lag.go` (new), `internal/groups/calculate_consumer_partition_lag_test.go` (new), comparator files and tests (new)
   - Do: Define injectable snapshots and a timeout-bound action; calculate lag only for valid commits within available offsets, preserve explicit unavailable errors, and sort groups, topics, members and partitions.
   - Done when: `go test ./internal/groups/...` covers exact lag, missing and out-of-range commits, unavailable offsets, group errors, timeout and sorting; `go test ./...` passes.
-- [ ] **T22.2 Fetch group and offset snapshots** — Covers: F10-AC1, F10-AC2, F10-AC3
+- [x] **T22.2 Fetch group and offset snapshots** — Covers: F10-AC1, F10-AC2, F10-AC3
   - Files: `internal/kafka/fetch_consumer_groups.go` (new), supporting mapping helpers/tests (new), `test/integration/consumer_groups_test.go` (new)
   - Do: Read classic and next-generation consumer descriptions, explicit subscriptions, assignments and committed offsets; retrieve log bounds, preserve per-group/partition errors, and propagate request failures.
   - Done when: Kafka adapter tests cover both group protocols and error cases; `go test ./...` passes and the real-broker test compiles or runs with Docker.
