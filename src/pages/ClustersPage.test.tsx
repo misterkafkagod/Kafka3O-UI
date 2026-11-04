@@ -12,6 +12,7 @@ const realFetchJson = (url: string) => fetchJson(fetch, url, 1000);
 const load = () => loadGatewayConfig(realFetchJson);
 const realGetCluster = (url: string) => getCluster(realFetchJson, url);
 const pendingGetCluster = () => new Promise<never>(() => {});
+const pendingListTopics = () => new Promise<never>(() => {});
 
 const dev = { id: "dev", name: "Dev", url: "http://localhost:8081" };
 const prod = { id: "prod", name: "Prod", url: "http://localhost:8082" };
@@ -20,7 +21,7 @@ describe("ClustersPage", () => {
   it("shows one card per configured gateway (F1-AC1)", async () => {
     server.use(http.get("/config.json", () => HttpResponse.json({ gateways: [dev, prod] })));
 
-    renderWithQuery(<ClustersPage statusRefreshMs={60_000} loadGatewayConfig={load} getCluster={pendingGetCluster} />);
+    renderWithQuery(<ClustersPage statusRefreshMs={60_000} loadGatewayConfig={load} getCluster={pendingGetCluster} listTopics={pendingListTopics} />);
 
     expect(await screen.findByRole("article", { name: "Dev" })).toBeDefined();
     expect(screen.getByRole("article", { name: "Prod" })).toBeDefined();
@@ -43,7 +44,7 @@ describe("ClustersPage", () => {
       ),
     );
 
-    renderWithQuery(<ClustersPage statusRefreshMs={60_000} loadGatewayConfig={load} getCluster={realGetCluster} />);
+    renderWithQuery(<ClustersPage statusRefreshMs={60_000} loadGatewayConfig={load} getCluster={realGetCluster} listTopics={pendingListTopics} />);
 
     const card = await screen.findByRole("article", { name: "Dev" });
     expect(await within(card).findByText("Healthy")).toBeDefined();
@@ -60,7 +61,7 @@ describe("ClustersPage", () => {
       http.get("http://localhost:8082/api/v1/cluster", () => HttpResponse.error()),
     );
 
-    renderWithQuery(<ClustersPage statusRefreshMs={60_000} loadGatewayConfig={load} getCluster={realGetCluster} />);
+    renderWithQuery(<ClustersPage statusRefreshMs={60_000} loadGatewayConfig={load} getCluster={realGetCluster} listTopics={pendingListTopics} />);
 
     const prodCard = await screen.findByRole("article", { name: "Prod" });
     expect(await within(prodCard).findByText("Gateway unreachable")).toBeDefined();
@@ -82,6 +83,7 @@ describe("ClustersPage", () => {
       <ClustersPage statusRefreshMs={60_000}
         loadGatewayConfig={() => loadGatewayConfig(fastFetchJson)}
         getCluster={(url) => getCluster(fastFetchJson, url)}
+        listTopics={pendingListTopics}
       />,
     );
 
@@ -105,7 +107,7 @@ describe("ClustersPage", () => {
       ),
     );
 
-    renderWithQuery(<ClustersPage statusRefreshMs={60_000} loadGatewayConfig={load} getCluster={realGetCluster} />);
+    renderWithQuery(<ClustersPage statusRefreshMs={60_000} loadGatewayConfig={load} getCluster={realGetCluster} listTopics={pendingListTopics} />);
 
     const prodCard = await screen.findByRole("article", { name: "Prod" });
     expect(await within(prodCard).findByText("Cluster unreachable")).toBeDefined();
@@ -122,7 +124,7 @@ describe("ClustersPage", () => {
       ),
     );
 
-    renderWithQuery(<ClustersPage statusRefreshMs={50} loadGatewayConfig={load} getCluster={realGetCluster} />);
+    renderWithQuery(<ClustersPage statusRefreshMs={50} loadGatewayConfig={load} getCluster={realGetCluster} listTopics={pendingListTopics} />);
 
     const prodCard = await screen.findByRole("article", { name: "Prod" });
     expect(await within(prodCard).findByText("Healthy")).toBeDefined();
@@ -136,7 +138,7 @@ describe("ClustersPage", () => {
   it("shows No gateways configured when config.json is missing (F1-AC6)", async () => {
     server.use(http.get("/config.json", () => new HttpResponse(null, { status: 404 })));
 
-    renderWithQuery(<ClustersPage statusRefreshMs={60_000} loadGatewayConfig={load} getCluster={pendingGetCluster} />);
+    renderWithQuery(<ClustersPage statusRefreshMs={60_000} loadGatewayConfig={load} getCluster={pendingGetCluster} listTopics={pendingListTopics} />);
 
     expect(await screen.findByRole("heading", { name: "No gateways configured" })).toBeDefined();
   });
@@ -144,7 +146,7 @@ describe("ClustersPage", () => {
   it("shows No gateways configured when the list is empty (F1-AC6)", async () => {
     server.use(http.get("/config.json", () => HttpResponse.json({ gateways: [] })));
 
-    renderWithQuery(<ClustersPage statusRefreshMs={60_000} loadGatewayConfig={load} getCluster={pendingGetCluster} />);
+    renderWithQuery(<ClustersPage statusRefreshMs={60_000} loadGatewayConfig={load} getCluster={pendingGetCluster} listTopics={pendingListTopics} />);
 
     expect(await screen.findByRole("heading", { name: "No gateways configured" })).toBeDefined();
   });

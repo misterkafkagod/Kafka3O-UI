@@ -45,6 +45,7 @@ export function App({
             <ClustersPage
               loadGatewayConfig={loadGatewayConfig}
               getCluster={getCluster}
+              listTopics={listTopics}
               statusRefreshMs={statusRefreshMs}
             />
           }

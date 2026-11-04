@@ -115,6 +115,28 @@ describe("App", () => {
     expect(await screen.findByText("No messages found.")).toBeDefined();
   });
 
+  it("opens a topic found across clusters", async () => {
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter>
+        <App
+          queryClient={new QueryClient()}
+          loadGatewayConfig={async () => [{ id: "dev", name: "Dev", url: "http://localhost:8081" }]}
+          getCluster={pendingGetCluster}
+          listTopics={async () => [{ name: "orders", partitions: 1, replicationFactor: 1, internal: false, approxMessages: 1 }]}
+          getTopicDetail={async () => ({ name: "orders", partitions: [], config: [] })}
+          listLatestTopicMessages={pendingListLatestTopicMessages}
+          searchTopicMessages={pendingSearchTopicMessages}
+          statusRefreshMs={60_000}
+        />
+      </MemoryRouter>,
+    );
+
+    await user.type(await screen.findByRole("searchbox", { name: "Topic name" }), "ORD");
+    await user.click(await screen.findByRole("link", { name: "orders" }));
+    expect(await screen.findByRole("heading", { name: "orders" })).toBeDefined();
+  });
+
   it("renders the clusters page with the injected config loader", async () => {
     renderApp();
 
