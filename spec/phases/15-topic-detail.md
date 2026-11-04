@@ -18,7 +18,7 @@
   - Files: `internal/kafka/describe_topic.go` (new), `test/integration/get_topic_detail_test.go` (new)
   - Do: Adapt Kafka metadata, per-partition start/end offsets, and topic configs into the DTO; sort partitions and configs; never include sensitive config values. Verify the adapter through `GetTopicDetail` against a real broker.
   - Done when: When Docker is available, `CGO_ENABLED=0 go test -tags integration ./test/integration/...` passes `TestGetTopicDetail_ReturnsPartitionsOffsetsAndConfig`; without Docker, `go test -run '^$' -tags integration ./test/integration/...` compiles the integration package and `go test ./...` passes. Record an unavailable Docker runtime as not run in Review.
-- [ ] **T15.3 Topic detail HTTP route** — Covers: F4-AC2
+- [x] **T15.3 Topic detail HTTP route** — Covers: F4-AC2
   - Files: `internal/httpapi/register_get_topic_detail.go` (new), `internal/httpapi/register_get_topic_detail_test.go` (new), `internal/httpapi/new_topic_not_found.go` (new), `cmd/gateway/main.go`
   - Do: Register `GET /api/v1/topics/{topic}`; map the missing-topic sentinel to 404 `not_found` and all Kafka failures to 503 `cluster_unreachable`; wire the action and route in the composition root.
   - Done when: `go test ./internal/httpapi/...` passes checks for the detail JSON, missing-topic 404, and Kafka-error 503; `go test ./...` passes.
