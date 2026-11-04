@@ -17,8 +17,8 @@
   - Files: `internal/kafka/fetch_recent_topic_messages.go` (new), `internal/kafka/allocate_recent_topic_offsets.go` (new), `internal/kafka/allocate_recent_topic_offsets_test.go` (new), `test/integration/search_topic_messages_test.go` (new)
   - Do: Fetch offsets and select a deterministic fair window across partitions with at most 500 offset positions total; reuse the existing reader, propagate errors, and report excluded positions.
   - Done when: `go test ./internal/kafka/...` covers empty, uneven, large, sparse and more-than-500-partition windows with exact bounds; `go test ./...` passes and the integration test compiles or runs with Docker.
-- [ ] **T19.3 Expose the search API** — Covers: F7-AC1, F7-AC2
-  - Files: `internal/httpapi/register_search_topic_messages.go` (new), `internal/httpapi/register_search_topic_messages_test.go` (new), `cmd/gateway/main.go`
+- [x] **T19.3 Expose the search API** — Covers: F7-AC1, F7-AC2
+  - Files: `internal/httpapi/register_search_topic_messages.go` (new), `internal/httpapi/register_search_topic_messages_test.go` (new), `internal/httpapi/new_invalid_search.go` (new), `cmd/gateway/main.go`
   - Do: Register and wire the search route; return the result shape and explicit invalid-query, not-found, and unavailable errors.
   - Done when: `go test ./internal/httpapi/...` checks success and all error paths; `go test ./...` passes.
 - [ ] **T19.4 Add the UI search client and hook** — Covers: F7-AC3
