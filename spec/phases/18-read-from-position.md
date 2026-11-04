@@ -22,7 +22,7 @@
   - Files: `internal/httpapi/register_list_latest_topic_messages.go`, `internal/httpapi/register_list_latest_topic_messages_test.go`, `internal/httpapi/new_invalid_position.go` (new), `internal/httpapi/parse_topic_message_position.go` (new), `internal/httpapi/optional_query_parameter.go` (new), `cmd/gateway/main.go`
   - Do: Extend the message endpoint with optional `partition`, `offset`, and Unix-millisecond `timestamp` query parameters; require a partition and exactly one starting position; return 400 `invalid_position` for invalid requests.
   - Done when: `go test ./internal/httpapi/...` passes valid offset/timestamp, incompatible/missing parameters, negative values, missing-topic 404, and Kafka-error 503 checks; `go test ./...` passes.
-- [ ] **T18.4 UI position request** — Covers: F6-AC1, F6-AC2
+- [x] **T18.4 UI position request** — Covers: F6-AC1, F6-AC2
   - Files: `src/gateway/listLatestTopicMessages.ts` (from T16.4), `src/gateway/listLatestTopicMessages.test.ts` (from T16.4), `src/hooks/useLatestTopicMessages.ts` (from T16.4), `src/hooks/useLatestTopicMessages.test.tsx` (from T16.4)
   - Do: Extend the message request and query key with the selected partition/position, encoding the query parameters and keeping the latest-message query distinct.
   - Done when: `npm test -- listLatestTopicMessages useLatestTopicMessages` passes exact offset/timestamp URLs, distinct query keys, errors, and latest-mode behavior.

@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 import type { ListLatestTopicMessages } from "../gateway/listLatestTopicMessages";
 import type { TopicMessage } from "../gateway/types";
+import type { TopicMessagePosition } from "../gateway/types";
 import { useLatestTopicMessages } from "./useLatestTopicMessages";
 
 const gateway = { id: "dev", name: "Dev", url: "http://localhost:8081" };
@@ -43,5 +44,28 @@ describe("useLatestTopicMessages", () => {
 
     await waitFor(() => expect(result.current.isError).toBe(true));
     expect(listLatestTopicMessages).toHaveBeenCalledTimes(1);
+  });
+
+  it("keeps latest and positioned reads in distinct query cache entries", async () => {
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    const listLatestTopicMessages = vi.fn<ListLatestTopicMessages>(async (_url, _topic, position) =>
+      position === undefined ? messages : [{ ...messages[0], offset: position.partition }],
+    );
+    const position: TopicMessagePosition = { partition: 2, offset: 10 };
+
+    const latest = renderHook(() => useLatestTopicMessages(gateway, "orders", listLatestTopicMessages), {
+      wrapper: wrapperFor(client),
+    });
+    await waitFor(() => expect(latest.result.current.data).toEqual(messages));
+    latest.unmount();
+
+    const positioned = renderHook(() => useLatestTopicMessages(gateway, "orders", listLatestTopicMessages, position), {
+      wrapper: wrapperFor(client),
+    });
+    await waitFor(() => expect(positioned.result.current.data).toEqual([{ ...messages[0], offset: 2 }]));
+    expect(client.getQueryData(["gateway", "dev", "topic", "orders", "messages"])).toEqual(messages);
+    expect(
+      client.getQueryData(["gateway", "dev", "topic", "orders", "messages", "position", position]),
+    ).toEqual([{ ...messages[0], offset: 2 }]);
   });
 });

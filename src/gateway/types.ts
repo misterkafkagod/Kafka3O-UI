@@ -60,6 +60,10 @@ export type TopicMessageHeader = {
   value: string;
 };
 
+export type TopicMessagePosition =
+  | { partition: number; offset: number }
+  | { partition: number; timestamp: number };
+
 export type GatewayErrorKind = "gateway-unreachable" | "cluster-unreachable" | "other";
 
 // RFC 9457 problem body sent by the gateway on errors (only the fields the UI uses).

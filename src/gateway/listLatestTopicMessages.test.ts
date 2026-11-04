@@ -36,6 +36,27 @@ describe("listLatestTopicMessages", () => {
     await expect(listLatestTopicMessages(realFetchJson, "http://localhost:8081/", "orders")).resolves.toEqual(messages);
   });
 
+  it("encodes offset and timestamp position queries", async () => {
+    const urls: string[] = [];
+    server.use(
+      http.get("http://localhost:8081/api/v1/topics/orders/messages", ({ request }) => {
+        urls.push(request.url);
+        return HttpResponse.json(messages);
+      }),
+    );
+
+    await listLatestTopicMessages(realFetchJson, "http://localhost:8081", "orders", { partition: 2, offset: 17 });
+    await listLatestTopicMessages(realFetchJson, "http://localhost:8081", "orders", {
+      partition: 1,
+      timestamp: 1700000000123,
+    });
+
+    expect(urls).toEqual([
+      "http://localhost:8081/api/v1/topics/orders/messages?partition=2&offset=17",
+      "http://localhost:8081/api/v1/topics/orders/messages?partition=1&timestamp=1700000000123",
+    ]);
+  });
+
   it("rejects with HttpError when the topic is missing", async () => {
     server.use(
       http.get("http://localhost:8081/api/v1/topics/orders/messages", () => new HttpResponse(null, { status: 404 })),
