@@ -3,6 +3,7 @@ import { Link, Route, Routes } from "react-router";
 import type { LoadGatewayConfig } from "./config/loadGatewayConfig";
 import type { GetCluster } from "./gateway/getCluster";
 import type { GetTopicDetail } from "./gateway/getTopicDetail";
+import type { ListLatestTopicMessages } from "./gateway/listLatestTopicMessages";
 import type { ListTopics } from "./gateway/listTopics";
 import { ClusterPage } from "./pages/ClusterPage";
 import { ClustersPage } from "./pages/ClustersPage";
@@ -14,10 +15,19 @@ type AppProps = {
   getCluster: GetCluster;
   listTopics: ListTopics;
   getTopicDetail: GetTopicDetail;
+  listLatestTopicMessages: ListLatestTopicMessages;
   statusRefreshMs: number;
 };
 
-export function App({ queryClient, loadGatewayConfig, getCluster, listTopics, getTopicDetail, statusRefreshMs }: AppProps) {
+export function App({
+  queryClient,
+  loadGatewayConfig,
+  getCluster,
+  listTopics,
+  getTopicDetail,
+  listLatestTopicMessages,
+  statusRefreshMs,
+}: AppProps) {
   return (
     <QueryClientProvider client={queryClient}>
       <header>
@@ -62,7 +72,24 @@ export function App({ queryClient, loadGatewayConfig, getCluster, listTopics, ge
         />
         <Route
           path="/clusters/:gatewayId/topics/:topicName"
-          element={<TopicPage loadGatewayConfig={loadGatewayConfig} getTopicDetail={getTopicDetail} />}
+          element={
+            <TopicPage
+              loadGatewayConfig={loadGatewayConfig}
+              getTopicDetail={getTopicDetail}
+              listLatestTopicMessages={listLatestTopicMessages}
+            />
+          }
+        />
+        <Route
+          path="/clusters/:gatewayId/topics/:topicName/messages"
+          element={
+            <TopicPage
+              loadGatewayConfig={loadGatewayConfig}
+              getTopicDetail={getTopicDetail}
+              listLatestTopicMessages={listLatestTopicMessages}
+              view="messages"
+            />
+          }
         />
       </Routes>
     </QueryClientProvider>

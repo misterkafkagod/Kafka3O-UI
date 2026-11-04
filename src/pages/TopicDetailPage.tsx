@@ -1,5 +1,6 @@
 import { Link } from "react-router";
 import { ErrorWithRetry } from "../components/ErrorWithRetry";
+import { TopicTabs } from "../components/TopicTabs";
 import type { GetTopicDetail } from "../gateway/getTopicDetail";
 import { HttpError } from "../gateway/HttpError";
 import type { GatewayEntry } from "../gateway/types";
@@ -32,6 +33,7 @@ export function TopicDetailPage({ gateway, topicName, getTopicDetail }: TopicDet
   return (
     <main>
       <Link to={`/clusters/${gateway.id}/topics`}>Back to topics</Link>
+      <TopicTabs gateway={gateway} topicName={topicName} />
       <h2>{detail.name}</h2>
       <h3>Partitions</h3>
       <table aria-label="Topic partitions">

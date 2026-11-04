@@ -7,6 +7,7 @@ import { loadGatewayConfig } from "./config/loadGatewayConfig";
 import { fetchJson } from "./gateway/fetchJson";
 import { getCluster } from "./gateway/getCluster";
 import { getTopicDetail } from "./gateway/getTopicDetail";
+import { listLatestTopicMessages } from "./gateway/listLatestTopicMessages";
 import { listTopics } from "./gateway/listTopics";
 
 const gatewayTimeoutMs = 5000;
@@ -23,6 +24,9 @@ createRoot(document.getElementById("root")!).render(
         getCluster={(gatewayUrl) => getCluster(boundFetchJson, gatewayUrl)}
         listTopics={(gatewayUrl) => listTopics(boundFetchJson, gatewayUrl)}
         getTopicDetail={(gatewayUrl, topicName) => getTopicDetail(boundFetchJson, gatewayUrl, topicName)}
+        listLatestTopicMessages={(gatewayUrl, topicName) =>
+          listLatestTopicMessages(boundFetchJson, gatewayUrl, topicName)
+        }
         statusRefreshMs={statusRefreshMs}
       />
     </BrowserRouter>

@@ -8,6 +8,7 @@ import { App } from "./App";
 const pendingGetCluster = () => new Promise<never>(() => {});
 const pendingListTopics = () => new Promise<never>(() => {});
 const pendingGetTopicDetail = () => new Promise<never>(() => {});
+const pendingListLatestTopicMessages = () => new Promise<never>(() => {});
 
 function renderApp() {
   return render(
@@ -18,6 +19,7 @@ function renderApp() {
         getCluster={pendingGetCluster}
         listTopics={pendingListTopics}
         getTopicDetail={pendingGetTopicDetail}
+        listLatestTopicMessages={pendingListLatestTopicMessages}
         statusRefreshMs={60_000}
       />
     </MemoryRouter>,
@@ -47,6 +49,7 @@ describe("App", () => {
           getCluster={async () => ({ clusterId: "abc", controllerId: 1, brokers: [{ id: 1, host: "kafka-dev", port: 9092 }] })}
           listTopics={async () => [{ name: "orders", partitions: 6, replicationFactor: 1, internal: false, approxMessages: 10 }]}
           getTopicDetail={pendingGetTopicDetail}
+          listLatestTopicMessages={pendingListLatestTopicMessages}
           statusRefreshMs={60_000}
         />
       </MemoryRouter>,
@@ -68,6 +71,7 @@ describe("App", () => {
           getCluster={pendingGetCluster}
           listTopics={async () => [{ name: "orders", partitions: 6, replicationFactor: 1, internal: false, approxMessages: 10 }]}
           getTopicDetail={pendingGetTopicDetail}
+          listLatestTopicMessages={pendingListLatestTopicMessages}
           statusRefreshMs={60_000}
         />
       </MemoryRouter>,
@@ -93,6 +97,7 @@ describe("App", () => {
             partitions: [{ id: 0, leader: 1, replicas: [1], isr: [1], startOffset: 0, endOffset: 1 }],
             config: [],
           })}
+          listLatestTopicMessages={async () => []}
           statusRefreshMs={60_000}
         />
       </MemoryRouter>,
@@ -101,6 +106,8 @@ describe("App", () => {
     await user.click(await screen.findByRole("link", { name: "orders" }));
 
     expect(await screen.findByRole("table", { name: "Topic partitions" })).toBeDefined();
+    await user.click(screen.getByRole("link", { name: "Messages" }));
+    expect(await screen.findByText("No messages found.")).toBeDefined();
   });
 
   it("renders the clusters page with the injected config loader", async () => {

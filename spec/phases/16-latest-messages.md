@@ -2,7 +2,7 @@
 - **Milestone:** M2
 - **Covers:** F5-AC1
 - **Discovery:** —
-- **Status:** Building        <!-- Planned | Building | Review | Done -->
+- **Status:** Done        <!-- Planned | Building | Review | Done -->
 
 ## Demo
 1. Produce records to at least two `orders` partitions in the dev stack.
@@ -25,9 +25,12 @@
   - Files: `src/gateway/types.ts`, `src/gateway/listLatestTopicMessages.ts` (new), `src/gateway/listLatestTopicMessages.test.ts` (new), `src/hooks/useLatestTopicMessages.ts` (new), `src/hooks/useLatestTopicMessages.test.tsx` (new)
   - Do: Add the typed request and gateway/topic-keyed query for latest messages; disable automatic retries so the explicit Retry control handles errors.
   - Done when: `npm test -- listLatestTopicMessages useLatestTopicMessages` passes URL encoding, response, error, and query behavior tests.
-- [ ] **T16.5 Topic Messages view** — Covers: F5-AC1
-  - Files: `src/components/MessageTable.tsx` (new), `src/components/MessageTable.test.tsx` (new), `src/pages/TopicPage.tsx` (from P15), `src/pages/TopicPage.test.tsx` (from P15), `src/App.tsx` (from P15), `src/App.test.tsx` (from P15), `src/main.tsx` (from P15)
+- [x] **T16.5 Topic Messages view** — Covers: F5-AC1
+  - Files: `src/components/MessageTable.tsx` (new), `src/components/MessageTable.test.tsx` (new), `src/components/TopicTabs.tsx` (new), `src/pages/TopicMessagesPage.tsx` (new), `src/pages/TopicPage.tsx`, `src/pages/TopicPage.test.tsx`, `src/pages/TopicDetailPage.tsx`, `src/App.tsx`, `src/App.test.tsx`, `src/main.tsx`
   - Do: Add a Messages route/tab to the topic page and render partition, offset, timestamp, key, value, and headers. Reuse loading and Retry patterns and show an explicit empty state.
   - Done when: `npm test -- TopicPage MessageTable App` passes message rendering, navigation, loading, empty, and error/Retry cases; `npm test` and `npm run build` exit 0.
 
 ## Review
+- `go test ./...` passed in Gateway. Integration-tagged tests compiled with `go test -run '^$' -tags integration ./test/integration/...`; the real Kafka test was not run because Docker is unavailable.
+- Focused UI tests passed (11 tests), the full suite passed (121 tests), and `npm run build` passed.
+- `git diff --check` passed in both repositories. The pre-existing untracked `configs/dev.yaml` was left unchanged.
