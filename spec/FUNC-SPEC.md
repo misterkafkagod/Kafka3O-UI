@@ -99,13 +99,44 @@ Read a bounded batch from a chosen partition and offset or timestamp.
 **External dependencies:** Gateway HTTP API and Kafka record-fetch/offset APIs; UI tests fake the gateway with MSW, gateway unit tests fake Kafka ports, integration tests use the existing testcontainers Kafka setup
 
 ### F7 — Search messages
-Bounded scan for messages whose key or value contains some text · *detailed when M3 starts*
+Search recent records in a topic without scanning the whole log.
+
+**Behaviors**
+- **F7-B1** User submits non-empty text in a topic's Messages view → the gateway searches key and value bytes for that case-sensitive UTF-8 text within at most 500 recent offset positions across the whole topic, allocating the window fairly among partitions
+- **F7-B2** The UI shows matching records, the number of records examined, the 500-position limit, and whether older positions or partitions were excluded; errors are shown with Retry
+
+**Acceptance criteria**
+- **F7-AC1** (B1) Given multiple partitions with more than 500 available positions, when a non-empty search runs → the total selected offset window is at most 500, matching keys or values are returned, and excluded positions are reported
+- **F7-AC2** (B1) Given an empty query, missing topic, or Kafka failure → the gateway returns an explicit client, not-found, or unavailable error, respectively
+- **F7-AC3** (B2) Given a search result → the Messages view displays its matches, scan count, limit, and exclusion status; a failed search offers Retry without showing stale success
+
+**External dependencies:** Gateway HTTP API and Kafka offsets/record fetch; unit tests use fakes and integration tests use the existing Kafka testcontainer.
 
 ### F8 — Cross-cluster topic search
-Find a topic by name across all configured clusters · *detailed when M3 starts*
+Find topics by name across all configured gateways.
+
+**Behaviors**
+- **F8-B1** User searches by topic name → each configured gateway is queried independently; case-insensitive substring matches, including internal topics, link to that gateway's topic
+- **F8-B2** One gateway fails → its error and Retry are shown without hiding matches from other gateways
+
+**Acceptance criteria**
+- **F8-AC1** (B1) Given matching topics in multiple clusters, searching `ORD` lists each matching topic with its cluster and a working topic link
+- **F8-AC2** (B2) Given one unreachable gateway and one successful gateway, the successful results remain visible and the failed gateway offers Retry
+
+**External dependencies:** Existing gateway topic-list API; UI tests fake each gateway independently.
 
 ### F9 — Message deep link
-Copyable link that opens directly to one message · *detailed when M3 starts*
+Copy a link to a specific message in a configured cluster and topic.
+
+**Behaviors**
+- **F9-B1** User copies a message link → it identifies the configured gateway, topic, partition, and offset
+- **F9-B2** Opening the link reads that position and displays only the exact record; invalid, deleted, compacted, or expired positions are identified instead of displaying a different record
+
+**Acceptance criteria**
+- **F9-AC1** (B1) Given a displayed message, copying its link produces a URL containing its gateway, topic, partition, and offset; clipboard failures are visible
+- **F9-AC2** (B2) Given a link to an existing record, opening it shows exactly that partition and offset; an invalid or unavailable record shows an explicit error or not-found state
+
+**External dependencies:** Browser clipboard and the existing positioned-read gateway API.
 
 ### F10 — Consumer groups
 Consumer groups with state, members and per-partition lag · *detailed when M4 starts*
