@@ -23,10 +23,10 @@ Covers both repositories: **Kafka3O-Gateway** (one per Kafka cluster) and **Kafk
 
 ### UI (Kafka3O-UI)
 - Runtime: Node 24.21.0 LTS; CVE status: pending scan
-- Language/framework: TypeScript 7.0.2, React 19.3.1, Vite 8.3.4; CVE status: `npm audit` 2026-10-18: 0 findings
-- Routing: React Router 8.4.0; CVE status: `npm audit` 2026-10-24: 0 findings
-- Type definitions (dev): @types/react 19.3.0, @types/react-dom 19.3.0; CVE status: `npm audit` 2026-10-18: 0 findings
-- Data fetching: TanStack Query 5.104.4 — one independent query per gateway with its own polling, timeout, error state and retry, so one slow gateway never blocks another; CVE status: `npm audit` 2026-10-18: 0 findings
+- Language/framework: TypeScript 7.0.2, React 19.3.1, Vite 8.3.4; CVE status: `npm audit` 2026-11-04: 0 findings
+- Routing: React Router 8.4.0; CVE status: `npm audit` 2026-11-04: 0 findings
+- Type definitions (dev): @types/react 19.3.0, @types/react-dom 19.3.0; CVE status: `npm audit` 2026-11-04: 0 findings
+- Data fetching: TanStack Query 5.104.4 — one independent query per gateway with its own polling, timeout, error state and retry, so one slow gateway never blocks another; CVE status: `npm audit` 2026-11-04: 0 findings
 - Styling: plain CSS modules
 - Rejected: Next.js — a static SPA suffices; no server needed
 - Rejected: MUI / Tailwind — unnecessary weight for M1
@@ -98,7 +98,7 @@ Tests live next to the file they test (`*_test.go`, `*.test.ts(x)`).
 - Run: `go test ./...` (unit) · `CGO_ENABLED=0 go test -tags integration ./test/integration/...` (integration; cgo off avoids linking macOS frameworks, which fails with mismatched Command Line Tools)
 
 ### UI
-- Framework: Vitest 5.0.5, Testing Library (react 16.3.3, user-event 14.6.8, dom 10.4.2), jsdom 30.1.3 · Fakes: MSW 3.0.3, one handler set per fake gateway (`onUnhandledFrame: "error"`) · CVE status: `npm audit` 2026-10-18: 0 findings
+- Framework: Vitest 5.0.5, Testing Library (react 16.3.3, user-event 14.6.8, dom 10.4.2), jsdom 30.1.3 · Fakes: MSW 3.0.3, one handler set per fake gateway (`onUnhandledFrame: "error"`) · CVE status: `npm audit` 2026-11-04: 0 findings
 - Run: `npm test`
 
 ## Integrations

@@ -2,7 +2,7 @@
 - **Milestone:** M3
 - **Covers:** F9-AC1, F9-AC2
 - **Discovery:** —
-- **Status:** Review
+- **Status:** Done
 
 ## Demo
 1. Copy a message link and open it in a new tab.
@@ -23,3 +23,7 @@
   - Done when: focused UI tests cover existing, skipped, expired, malformed, large-offset and unreachable records; `npm test` and `npm run build` pass.
 
 ## Review
+- **Tests:** Gateway `go test ./...` passed and integration tests compiled; UI `npm test` passed 183 tests and `npm run build` passed. Tests include copy-to-open navigation, exact int64 offsets, missing/expired positions, and clipboard failures.
+- **Demo:** Both real-Kafka steps **not run** because Docker/Kafka is unavailable.
+- **Vulnerability scan:** `npm audit` 2026-11-04: 0 findings. `govulncheck` 2026-11-04: GO-2026-6809 / CVE-2026-111943 is called in Go 1.27.2 (CISA CVSS 6.8 medium; upgrade to 1.27.3 pending); GO-2026-5932 is present at module level but not called.
+- **Notes:** Kafka offsets exceed JavaScript's exact integer range; the additive `offsetExact` field preserves precision. Older gateways without it can only provide verifiable links for safe numeric offsets.
