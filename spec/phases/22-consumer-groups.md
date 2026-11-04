@@ -2,7 +2,7 @@
 - **Milestone:** M4
 - **Covers:** F10-AC1, F10-AC2, F10-AC3
 - **Discovery:** —
-- **Status:** Review
+- **Status:** Done
 
 ## Demo
 1. Produce and consume records in a consumer group, then open the cluster's Consumer groups tab.
@@ -31,3 +31,7 @@
   - Done when: focused UI tests cover populated, empty, missing/out-of-range/unavailable and failure/retry cases; `npm test` and `npm run build` pass.
 
 ## Review
+- **Tests (2026-11-04):** Gateway `go test ./...` passed; the integration package compiled without running tests. UI `npm test` passed 197 tests and `npm run build` passed.
+- **Demo:** both real-Kafka steps not run; Docker is unavailable.
+- **Vulnerability scan:** not required for this phase (no dependency changes); the milestone scan is scheduled after P23.
+- **Notes:** Group and partition failures remain visible; offsets use nullable string DTOs so OpenAPI agrees with the exact JSON representation. Node v22.21.0 is below the declared UI runtime, although tests and build passed.
