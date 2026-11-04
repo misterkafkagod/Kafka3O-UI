@@ -2,20 +2,24 @@
 - **Milestone:** M3
 - **Covers:** F9-AC1, F9-AC2
 - **Discovery:** —
-- **Status:** Planned
+- **Status:** Building
 
 ## Demo
 1. Copy a message link and open it in a new tab.
 2. Verify exactly its partition and offset are displayed; a missing offset reports that the record is unavailable.
 
 ## Tasks
-- [ ] **T21.1 Copy links from messages** — Covers: F9-AC1
-  - Files: `src/messages/messageLink.ts` (new), `src/messages/messageLink.test.ts` (new), `src/components/MessageTable.tsx`, `src/components/MessageTable.test.tsx`, `src/pages/TopicMessagesPage.tsx`, composition wiring
-  - Do: Create properly encoded links and expose a copy action with explicit clipboard success/failure.
-  - Done when: focused UI tests check encoded URLs, clipboard success and failure; `npm test` and `npm run build` pass.
-- [ ] **T21.2 Open the exact linked record** — Covers: F9-AC2
-  - Files: `src/pages/TopicMessagesPage.tsx`, `src/messages/topicMessageLinkPosition.ts` (new), `src/messages/topicMessageLinkPosition.test.ts` (new), related page tests
+- [x] **T21.1 Preserve exact Kafka offsets** — Covers: F9-AC1, F9-AC2
+  - Files: `internal/topics/topic_message.go`, `internal/kafka/topic_message_from_record.go`, `internal/kafka/topic_message_from_record_test.go`, message HTTP and integration tests
+  - Do: Add the decimal `offsetExact` string alongside the existing numeric offset so browser links can represent the full Kafka int64 range without rounding.
+  - Done when: `go test ./internal/kafka/... ./internal/httpapi/...` checks exact serialization beyond JavaScript's safe integer range; `go test ./...` passes and integration tests compile or run with Docker.
+- [ ] **T21.2 Copy links from messages** — Covers: F9-AC1
+  - Files: `src/messages/messageLink.ts` (new), `src/messages/messageLink.test.ts` (new), `src/messages/exactMessageOffset.ts` (new), `src/messages/exactMessageOffset.test.ts` (new), `src/components/CopyMessageLink.tsx` (new), `src/components/MessageTable.tsx`, related tests and composition wiring
+  - Do: Create properly encoded links using exact offsets and expose a copy action with explicit clipboard success/failure; older gateways without exact offsets are supported only when the numeric offset is safe.
+  - Done when: focused UI tests check encoded URLs, large offsets, unsafe legacy offsets, clipboard success and failure; `npm test` and `npm run build` pass.
+- [ ] **T21.3 Open the exact linked record** — Covers: F9-AC2
+  - Files: `src/pages/TopicMessagesPage.tsx`, `src/messages/topicMessageLinkPosition.ts` (new), `src/messages/topicMessageLinkPosition.test.ts` (new), `src/hooks/useLatestTopicMessages.ts`, `src/gateway/types.ts`, related page and client tests
   - Do: Validate link position, read from that position, and display only an exact partition/offset match; distinguish unavailable or invalid links.
-  - Done when: focused UI tests cover existing, skipped, expired, malformed and unreachable records; `npm test` and `npm run build` pass.
+  - Done when: focused UI tests cover existing, skipped, expired, malformed, large-offset and unreachable records; `npm test` and `npm run build` pass.
 
 ## Review
