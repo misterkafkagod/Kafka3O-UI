@@ -2,7 +2,7 @@
 - **Milestone:** M2
 - **Covers:** F4-AC1, F4-AC2
 - **Discovery:** —
-- **Status:** Review        <!-- Planned | Building | Review | Done -->
+- **Status:** Done        <!-- Planned | Building | Review | Done -->
 
 ## Demo
 1. Start the `kafka-dev` and `gateway-dev` services from `deploy/compose.dev.yaml`.
@@ -32,3 +32,7 @@
   - Done when: `npm test -- TopicPage TopicDetailPage TopicTable App` passes navigation, details, missing-topic and Retry cases; `npm test` and `npm run build` exit 0.
 
 ## Review
+- **Verification:** `go test ./...` passed; `go test -run '^$' -tags integration ./test/integration/...` compiled the integration package; `npm test` passed (113 tests); `npm run build` exited 0.
+- **Demo:** not run — no Docker runtime is installed, so the Kafka dev stack could not be started.
+- **Vulnerability scan:** not required — no dependency changes; `npm ci` reported 0 vulnerabilities.
+- **Notes:** real-broker integration remains unverified until run with Docker.
