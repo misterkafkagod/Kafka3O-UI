@@ -27,10 +27,10 @@
   - Do: Extend the message request and query key with the selected partition/position, encoding the query parameters and keeping the latest-message query distinct.
   - Done when: `npm test -- listLatestTopicMessages useLatestTopicMessages` passes exact offset/timestamp URLs, distinct query keys, errors, and latest-mode behavior.
 - [x] **T18.5 UI position form** — Covers: F6-AC1, F6-AC2, F6-AC3
-  - Files: `src/components/ReadTopicMessagesForm.tsx` (new), `src/components/ReadTopicMessagesForm.test.tsx` (new), `src/pages/TopicMessagesPage.tsx`, `src/pages/TopicPage.test.tsx`, `src/gateway/describeGatewayError.ts`, `src/gateway/describeGatewayError.test.ts`
+  - Files: `src/components/ReadTopicMessagesForm.tsx` (new), `src/components/ReadTopicMessagesForm.test.tsx` (new), `src/messages/topicMessagePositionFromForm.ts` (new), `src/messages/topicMessagePositionFromForm.test.ts` (new), `src/pages/TopicMessagesPage.tsx`, `src/pages/TopicPage.test.tsx`, `src/gateway/describeGatewayError.ts`, `src/gateway/describeGatewayError.test.ts`
   - Do: Add a form for partition plus offset or timestamp (Unix milliseconds); submit the selected position, display returned records in offset order, and surface gateway validation details.
   - Done when: `npm test -- ReadTopicMessagesForm TopicPage` passes offset, timestamp, and validation-error cases; `npm test` and `npm run build` exit 0.
 
 ## Review
 - `go test ./...` passed. `CGO_ENABLED=0 go test -run '^$' -tags integration ./test/integration/...` compiled the integration package; Docker is unavailable, so live Kafka integration tests and the demo were not run.
-- The focused position UI tests passed (10 tests), the full suite passed (136 tests), `npm run build` passed, and `git diff --check` passed in both repositories.
+- The focused position UI tests passed (10 tests), the full suite passed (138 tests), `npm run build` passed, and `git diff --check` passed in both repositories.

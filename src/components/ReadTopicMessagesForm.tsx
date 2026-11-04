@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
 import type { TopicMessagePosition } from "../gateway/types";
+import { topicMessagePositionFromForm, type MessagePositionMode } from "../messages/topicMessagePositionFromForm";
 
 type ReadTopicMessagesFormProps = {
   onRead: (position: TopicMessagePosition) => void;
@@ -9,18 +10,13 @@ type ReadTopicMessagesFormProps = {
 
 export function ReadTopicMessagesForm({ onRead, onReadLatest }: ReadTopicMessagesFormProps) {
   const [partition, setPartition] = useState("0");
-  const [mode, setMode] = useState<"offset" | "timestamp">("offset");
+  const [mode, setMode] = useState<MessagePositionMode>("offset");
   const [offset, setOffset] = useState("0");
   const [timestamp, setTimestamp] = useState("0");
 
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const partitionNumber = Number(partition);
-    if (mode === "offset") {
-      onRead({ partition: partitionNumber, offset: Number(offset) });
-    } else {
-      onRead({ partition: partitionNumber, timestamp: Number(timestamp) });
-    }
+    onRead(topicMessagePositionFromForm(mode, partition, offset, timestamp));
   }
 
   return (
