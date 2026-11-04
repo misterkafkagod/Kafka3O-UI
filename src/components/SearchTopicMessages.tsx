@@ -1,7 +1,8 @@
-import { useState, type FormEvent } from "react";
+import { useState } from "react";
 import type { SearchTopicMessages as SearchTopicMessagesAction } from "../gateway/searchTopicMessages";
 import type { GatewayEntry } from "../gateway/types";
 import { useSearchTopicMessages } from "../hooks/useSearchTopicMessages";
+import { messageSearchSubmission } from "../messages/messageSearchSubmission";
 import { ErrorWithRetry } from "./ErrorWithRetry";
 import { MessageTable } from "./MessageTable";
 
@@ -17,24 +18,19 @@ export function SearchTopicMessages({ gateway, topicName, searchTopicMessages }:
   const [validationError, setValidationError] = useState(false);
   const { data, isError, error, isFetching, refetch } = useSearchTopicMessages(gateway, topicName, searchTopicMessages, query);
 
-  function submit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (text.length === 0) {
-      setValidationError(true);
-      setQuery(undefined);
-      return;
-    }
-    setValidationError(false);
-    if (query === text) {
-      void refetch();
-    } else {
-      setQuery(text);
-    }
-  }
-
   return (
     <section aria-label="Message search">
-      <form onSubmit={submit}>
+      <form
+        onSubmit={(event) => {
+          event.preventDefault();
+          const submission = messageSearchSubmission(text, query);
+          setValidationError(submission.invalid);
+          setQuery(submission.query);
+          if (submission.repeat) {
+            void refetch();
+          }
+        }}
+      >
         <label>
           Search key or value
           <input type="search" value={text} onChange={(event) => setText(event.target.value)} />

@@ -2,7 +2,7 @@
 - **Milestone:** M3
 - **Covers:** F7-AC1, F7-AC2, F7-AC3
 - **Discovery:** —
-- **Status:** Building
+- **Status:** Review
 
 ## Demo
 1. Produce matching and nonmatching records to multiple partitions.
@@ -29,5 +29,9 @@
   - Files: `src/main.tsx`, `src/App.tsx`, `src/pages/TopicPage.tsx`, `src/pages/TopicMessagesPage.tsx`, `src/components/SearchTopicMessages.tsx` (new), `src/components/SearchTopicMessages.test.tsx` (new), `src/components/MessageTable.tsx`, `src/components/MessageTable.test.tsx`, `src/gateway/types.ts`, related page tests
   - Do: Wire the search client and add a search form, limit/exclusion explanation, matching records, empty state and retry; keep latest and positioned reads available. Preserve Kafka nulls, including tombstone values, when rendering search matches.
   - Done when: focused UI tests cover success, no matches, exclusion, invalid input and failure/retry; `npm test` and `npm run build` pass.
+- [x] **T19.6 Fix: extract search submission logic** — Covers: TECH-SPEC conventions
+  - Files: `src/messages/messageSearchSubmission.ts` (new), `src/messages/messageSearchSubmission.test.ts` (new), `src/components/SearchTopicMessages.tsx`
+  - Do: Move the named search-submission decision out of the component into a separately tested pure function, leaving event binding in the component.
+  - Done when: focused submission and component tests pass for empty, new and repeated searches; `npm test` and `npm run build` pass.
 
 ## Review
