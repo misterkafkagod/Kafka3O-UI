@@ -56,11 +56,12 @@ Kafka3O is a multi-cluster Kafka console for developers and operators: one web U
     - Demo: typing "ORD" leaves only `orders`.
   - **P12** F3-B5 · Topic list error with Retry — Covers: F3-AC5 · Discovery: — · Status: Done
     - Demo: with `kafka-dev` stopped, the Topics tab shows an error and Retry.
-  - **P14** F1-B4 (correction) · Status reflects a cluster that goes down after a healthy check — Covers: F1-AC8 · Discovery: — · Status: Defined
+  - **P14** F1-B4 (correction) · Status reflects a cluster that goes down after a healthy check — Covers: F1-AC8 · Discovery: — · Status: Planned
     - Demo: with both cards Healthy, `docker compose stop kafka-prod` (gateway keeps running) → within 15 s "Prod" shows "Cluster unreachable".
     - Scope: the cluster adapter (and the topic metadata adapter from P09) send a direct `kmsg.MetadataRequest` via `kgo.Client.Request` instead of kadm's cached `BrokerMetadata` / `ListTopicsWithInternal`; integration test stops Kafka after a successful call.
   - **P13** F1-B7 · Gateway connects to TLS/SASL-secured clusters — Covers: F1-AC7 · Discovery: kafka-tls-scram-dev · Status: Defined
     - Demo: a gateway pointed at a TLS + SCRAM-SHA-512 cluster shows its card as Healthy.
+    - Blocked: secured-broker discovery has not been run, and no isolated Kafka test environment is available.
 
 ### M2 — Look inside a topic and read its messages
 - **Status:** Done
@@ -93,6 +94,7 @@ Kafka3O is a multi-cluster Kafka console for developers and operators: one web U
 - **F17** User can add or remove gateways from the UI instead of a config file
 
 ## Learnings
+- 2026-11-04 (M2 / F6): The UI composition root dropped positioned-read arguments; a regression test now covers the production wiring for offset and timestamp requests.
 - 2026-10-24 (M1 / P10): On Kafka 4.3, describing an unknown consumer group fails and creates nothing; to create `__consumer_offsets` without creating a normal topic, run a console consumer with `--include '.*' --group <g>`.
 - 2026-10-24 (M1 / P07): A dropped 8081/8082 SSH forward looks exactly like a stopped gateway; demo runs check the forward before stopping containers.
 - 2026-10-24 (M1 / P06): Cluster page and card share the cluster-status query key, so the page renders from cache after a card click. Demos can be driven by Claude with Playwright headless Chromium (installed in the session scratchpad) and screenshots shown to the user.

@@ -14,7 +14,7 @@ Covers both repositories: **Kafka3O-Gateway** (one per Kafka cluster) and **Kafk
 - Config: koanf v2.3.8 with providers/file v1.2.1, providers/env/v2 v2.0.2, parsers/yaml v1.1.1 (YAML file + `KAFKA3O_*` env overrides, `__` separates nested keys; secrets only from env) — v2.4.1 released 2026-10-18, not adopted yet; CVE status: `govulncheck` v1.9.0 2026-10-20: 0 affecting
 - Container images: `golang:1.27.2` (build), `gcr.io/distroless/static-debian12:nonroot` (runtime), `apache/kafka:4.3.1` (dev/test); CVE status: gateway image `kafka3o-gateway:dev` Trivy 0.75.0 2026-10-20: 0 critical/high (1 UNKNOWN: tzdata DLA-4792-1, fixed in a newer distroless base); `golang` and `apache/kafka` not scanned (build/dev only)
 - Logging: stdlib `log/slog` (JSON)
-- Kafka security supported from M1: PLAINTEXT, TLS, SASL PLAIN, SCRAM-SHA-256/512
+- Kafka security currently supports PLAINTEXT; TLS and SASL PLAIN/SCRAM remain planned in P13, pending secured-broker discovery
 - CORS: allowed origins from config (`http.cors.allowedOrigins`)
 - Rejected: Java/Spring — heavier runtime than a per-cluster sidecar needs
 - Rejected: confluent-kafka-go — cgo/librdkafka complicates builds
@@ -105,7 +105,7 @@ Tests live next to the file they test (`*_test.go`, `*.test.ts(x)`).
 ### Kafka (behind each gateway)
 - Source: known territory, no discovery needed
 - Admin API via franz-go/kadm: metadata (brokers, controller, cluster ID, topics, internal flag), ListStartOffsets / ListEndOffsets for approximate message counts
-- Security: PLAINTEXT, TLS, SASL PLAIN, SCRAM-SHA-256/512 from gateway config
+- Security: PLAINTEXT today; TLS and SASL PLAIN/SCRAM configuration are pending P13 discovery
 
 ### Gateway HTTP API v1 (consumed by the UI)
 - Base URL: per gateway, from the UI's `/config.json`; no auth until F12 (M5) — trusted network assumed
