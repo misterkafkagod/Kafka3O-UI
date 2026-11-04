@@ -63,7 +63,7 @@ Kafka3O is a multi-cluster Kafka console for developers and operators: one web U
     - Demo: a gateway pointed at a TLS + SCRAM-SHA-512 cluster shows its card as Healthy.
 
 ### M2 — Look inside a topic and read its messages
-- **Status:** Active
+- **Status:** Done
 - **Features:** F4, F5, F6
 - **Phases:**
   - **P15** F4-B1 + F4-B2 · Topic partitions and configuration — Covers: F4-AC1, F4-AC2 · Discovery: — · Status: Done
@@ -72,7 +72,7 @@ Kafka3O is a multi-cluster Kafka console for developers and operators: one web U
     - Demo: produce records to multiple partitions, open Messages, and verify at most 50 records appear newest first with their metadata and headers.
   - **P17** F5-B2 · Choose message value representation — Covers: F5-AC2 · Discovery: — · Status: Done
     - Demo: switch a JSON message between text, formatted JSON, and base64; switch to an invalid JSON message and verify it remains inspectable.
-  - **P18** F6-B1 + F6-B2 · Read from a partition position — Covers: F6-AC1, F6-AC2, F6-AC3 · Discovery: — · Status: Building
+  - **P18** F6-B1 + F6-B2 · Read from a partition position — Covers: F6-AC1, F6-AC2, F6-AC3 · Discovery: — · Status: Done
     - Demo: read `orders` from a chosen partition by offset and timestamp, then submit an invalid position and verify the validation error.
 
 ### M3 — Find what I'm looking for, even across clusters

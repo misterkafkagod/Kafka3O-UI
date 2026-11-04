@@ -19,4 +19,16 @@ describe("describeGatewayError", () => {
       detail: "GET failed with 500",
     });
   });
+
+  it("shows a validation problem detail for an invalid position", () => {
+    const error = new HttpError(400, "GET failed with 400", {
+      code: "invalid_position",
+      detail: "partition 9 does not exist",
+    });
+
+    expect(describeGatewayError(error)).toEqual({
+      title: "Something went wrong",
+      detail: "partition 9 does not exist",
+    });
+  });
 });

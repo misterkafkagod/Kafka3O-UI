@@ -14,5 +14,8 @@ export function describeGatewayError(error: unknown): GatewayErrorDescription {
   if (kind === "cluster-unreachable") {
     return { title: "Cluster unreachable", detail: error instanceof HttpError ? error.problem?.detail : undefined };
   }
-  return { title: "Something went wrong", detail: error instanceof Error ? error.message : undefined };
+  return {
+    title: "Something went wrong",
+    detail: error instanceof HttpError ? (error.problem?.detail ?? error.message) : error instanceof Error ? error.message : undefined,
+  };
 }

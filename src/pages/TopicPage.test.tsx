@@ -5,7 +5,8 @@ import { describe, expect, it, vi } from "vitest";
 import type { LoadGatewayConfig } from "../config/loadGatewayConfig";
 import type { GetTopicDetail } from "../gateway/getTopicDetail";
 import type { ListLatestTopicMessages } from "../gateway/listLatestTopicMessages";
-import type { GatewayEntry } from "../gateway/types";
+import type { GatewayEntry, TopicMessage, TopicMessagePosition } from "../gateway/types";
+import { HttpError } from "../gateway/HttpError";
 import { renderWithQuery } from "../test/renderWithQuery";
 import { TopicPage } from "./TopicPage";
 
@@ -82,5 +83,77 @@ describe("TopicPage", () => {
     await userEvent.click(within(alert).getByRole("button", { name: "Retry" }));
     expect(await screen.findByRole("table", { name: "Topic messages" })).toBeDefined();
     expect(listLatestTopicMessages).toHaveBeenCalledTimes(2);
+  });
+
+  it("reads messages from an offset and displays the returned records", async () => {
+    const listLatestTopicMessages = vi.fn(
+      async (_url: string, _topic: string, position?: TopicMessagePosition): Promise<TopicMessage[]> =>
+        position === undefined
+          ? []
+          : [
+              {
+                partition: position.partition,
+                offset: "offset" in position ? position.offset : 0,
+                timestamp: "2026-01-02T03:04:05Z",
+                key: "",
+                value: "dmFsdWU=",
+                headers: [],
+              },
+            ],
+    );
+    const user = userEvent.setup();
+    renderTopicPage(async () => [gateway], async () => ({ name: "orders", partitions: [], config: [] }), listLatestTopicMessages, "messages");
+
+    await user.clear(await screen.findByRole("spinbutton", { name: "Partition" }));
+    await user.type(screen.getByRole("spinbutton", { name: "Partition" }), "2");
+    await user.clear(screen.getByRole("spinbutton", { name: "Offset" }));
+    await user.type(screen.getByRole("spinbutton", { name: "Offset" }), "11");
+    await user.click(screen.getByRole("button", { name: "Read messages" }));
+
+    expect(await screen.findByRole("table", { name: "Topic messages" })).toBeDefined();
+    expect(screen.getByText("value")).toBeDefined();
+    expect(listLatestTopicMessages).toHaveBeenLastCalledWith(gateway.url, "orders", { partition: 2, offset: 11 });
+  });
+
+  it("reads messages from a timestamp", async () => {
+    const listLatestTopicMessages = vi.fn(
+      async (_url: string, _topic: string, position?: TopicMessagePosition): Promise<TopicMessage[]> =>
+        position === undefined
+          ? []
+          : [{ partition: position.partition, offset: 12, timestamp: "2026-01-02T03:04:05Z", key: "", value: "", headers: [] }],
+    );
+    const user = userEvent.setup();
+    renderTopicPage(async () => [gateway], async () => ({ name: "orders", partitions: [], config: [] }), listLatestTopicMessages, "messages");
+
+    await user.click(await screen.findByRole("radio", { name: "Timestamp" }));
+    await user.clear(screen.getByRole("spinbutton", { name: "Partition" }));
+    await user.type(screen.getByRole("spinbutton", { name: "Partition" }), "1");
+    await user.clear(screen.getByRole("spinbutton", { name: "Timestamp (Unix milliseconds)" }));
+    await user.type(screen.getByRole("spinbutton", { name: "Timestamp (Unix milliseconds)" }), "1700000000123");
+    await user.click(screen.getByRole("button", { name: "Read messages" }));
+
+    expect(await screen.findByRole("table", { name: "Topic messages" })).toBeDefined();
+    expect(listLatestTopicMessages).toHaveBeenLastCalledWith(gateway.url, "orders", {
+      partition: 1,
+      timestamp: 1700000000123,
+    });
+  });
+
+  it("shows the validation detail returned for an invalid position", async () => {
+    const listLatestTopicMessages = vi.fn(async (_url: string, _topic: string, position?: TopicMessagePosition) => {
+      if (position === undefined) {
+        return [];
+      }
+      throw new HttpError(400, "Invalid position", { code: "invalid_position", detail: "partition 9 does not exist" });
+    });
+    const user = userEvent.setup();
+    renderTopicPage(async () => [gateway], async () => ({ name: "orders", partitions: [], config: [] }), listLatestTopicMessages, "messages");
+
+    await user.clear(await screen.findByRole("spinbutton", { name: "Partition" }));
+    await user.type(screen.getByRole("spinbutton", { name: "Partition" }), "9");
+    await user.click(screen.getByRole("button", { name: "Read messages" }));
+
+    const alert = await screen.findByRole("alert");
+    expect(within(alert).getByText("partition 9 does not exist")).toBeDefined();
   });
 });
