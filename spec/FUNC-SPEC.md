@@ -139,10 +139,32 @@ Copy a link to a specific message in a configured cluster and topic.
 **External dependencies:** Browser clipboard and the existing positioned-read gateway API.
 
 ### F10 — Consumer groups
-Consumer groups with state, members and per-partition lag · *detailed when M4 starts*
+Inspect consumer group state, members, and committed-offset lag.
+
+**Behaviors**
+- **F10-B1** User opens a cluster's Consumer groups tab → system lists classic and next-generation consumer groups with state and members, plus per-topic/partition committed offset, log start/end, and lag
+- **F10-B2** A partition has no committed offset, an out-of-range commit, or unavailable offsets → its lag is explicitly unknown or unavailable, never silently reported as zero; group-specific errors are shown without inventing results
+- **F10-B3** The gateway cannot obtain group data → the tab shows an error with Retry
+
+**Acceptance criteria**
+- **F10-AC1** (B1) Given consumer groups and committed offsets, the tab shows each group's name, state, members, and per-partition lag (`end - committed`) sorted deterministically
+- **F10-AC2** (B2) A missing commit, commit outside the current log range, or unavailable partition offsets is labelled explicitly and does not display a fabricated lag
+- **F10-AC3** (B3) Given a gateway or Kafka failure, the tab displays an error and Retry; a failed individual group is identified
+
+**External dependencies:** Kafka group list/describe and offset APIs (Kafka 3.8+ group-type filtering); UI and action tests use fakes, integration tests use the Kafka testcontainer.
 
 ### F11 — Topic consumers
-Which consumer groups read a topic and how far behind they are · *detailed when M4 starts*
+See consumer groups associated with a topic and their lag for that topic.
+
+**Behaviors**
+- **F11-B1** User opens a topic's Consumers tab → groups with a current subscription, assignment, or committed offset for the topic appear with their topic-specific partition lag and status
+- **F11-B2** No group is associated with the topic → an explicit empty state is shown; group-data failures remain visible
+
+**Acceptance criteria**
+- **F11-AC1** (B1) Given groups associated with several topics, the Consumers tab shows only groups associated with this topic and only this topic's partition rows
+- **F11-AC2** (B2) An empty result and gateway or individual-group errors are distinguishable; retry is available for gateway failures
+
+**External dependencies:** The F10 group API and configured gateway.
 
 ### F12 — Gateway authentication
 Gateways accept only authenticated requests · *detailed when M5 starts*
