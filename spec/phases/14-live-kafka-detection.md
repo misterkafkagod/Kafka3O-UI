@@ -2,7 +2,7 @@
 - **Milestone:** M1
 - **Covers:** F1-AC8
 - **Discovery:** —
-- **Status:** Building        <!-- Planned | Building | Review | Done -->
+- **Status:** Done        <!-- Planned | Building | Review | Done -->
 
 ## Demo
 1. Start the dev stack and confirm the Dev cluster is Healthy.
@@ -23,3 +23,7 @@
   - Done when: With Docker, `go test -tags integration ./test/integration/...` passes the stopped-broker test; otherwise `go test -run '^$' -tags integration ./test/integration/...` compiles it, with the live test and demo recorded as not run.
 
 ## Review
+- **Tests:** `go test ./...` passed; `go test -run '^$' -tags integration ./test/integration/...` compiled the integration tests. The stopped-broker test was **not run** because Docker is unavailable.
+- **Demo:** Both steps **not run** because Docker/Kafka is unavailable.
+- **Vulnerability scan:** `govulncheck` 2026-11-04 reported one called standard-library finding, GO-2026-6809 / CVE-2026-111943 (CISA CVSS 6.8 medium, fixed in Go 1.27.3), and one uncalled module finding, GO-2026-5932. The called finding does not exceed the critical/high policy threshold; the Go patch upgrade remains follow-up work.
+- **Notes:** Kafka metadata must be requested live for both health and topic listing; a successful earlier call is not evidence that the broker is still reachable.

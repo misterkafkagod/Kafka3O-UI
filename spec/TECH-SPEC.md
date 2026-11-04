@@ -7,7 +7,7 @@ Covers both repositories: **Kafka3O-Gateway** (one per Kafka cluster) and **Kafk
 
 ## Stack
 ### Gateway (Kafka3O-Gateway)
-- Runtime: Go 1.27.2 — small static binary, strong concurrency, continuity with the earlier attempt; CVE status: `govulncheck` v1.9.0 2026-10-20: 0 affecting (stdlib included)
+- Runtime: Go 1.27.2 — small static binary, strong concurrency, continuity with the earlier attempt; CVE status: `govulncheck` v1.9.0 2026-11-04: GO-2026-6809 / CVE-2026-111943 affects `crypto/x509` (CISA CVSS 6.8 medium); fixed in Go 1.27.3, upgrade pending
 - Kafka client: franz-go v1.22.2 + kadm v1.19.0 — pure Go, complete admin API (metadata, start/end offsets); CVE status: `govulncheck` v1.9.0 2026-10-20: 0 affecting
 - HTTP: Huma v2.39.1 on the stdlib `net/http` mux — typed handlers, OpenAPI 3.1 generated from code, RFC 9457 problem errors; CVE status: `govulncheck` v1.9.0 2026-10-20: 0 affecting
 - Module path: `github.com/misterkafkagod/Kafka3O-Gateway`
@@ -90,7 +90,7 @@ Tests live next to the file they test (`*_test.go`, `*.test.ts(x)`).
 ### Gateway
 - Framework: Go `testing` + go-cmp · Fakes: hand-written interface fakes for Kafka ports
 - Unit: go-cmp v0.7.0; HTTP routes via Huma `humatest`
-- Vulnerability scan: `CGO_ENABLED=0 go run golang.org/x/vuln/cmd/govulncheck@v1.9.0 -test -tags integration ./...` (include tests: testcontainers pulls its own dependencies); test-only deps 2026-10-20: 0 affecting, 1 module-level advisory without fix and not called (GO-2026-5932, golang.org/x/crypto)
+- Vulnerability scan: `CGO_ENABLED=0 go run golang.org/x/vuln/cmd/govulncheck@v1.9.0 -test -tags integration ./...` (include tests: testcontainers pulls its own dependencies); 2026-11-04: 1 called standard-library advisory (GO-2026-6809, medium) and 1 uncalled module-level advisory (GO-2026-5932, golang.org/x/crypto)
 - Integration: core testcontainers-go v0.44.0 with `apache/kafka:4.3.1`, started by `test/integration/start_kafka.go` (requires a Docker-compatible runtime)
 - Rejected: testcontainers `modules/kafka` — v0.44.0 only starts Confluent images; `confluent-local` — different distribution than the dev stack; `kfake` — not a real broker
 - Remote Docker (current dev setup: `docker-host`, 192.168.1.194, SSH only): forward the daemon socket with `ssh -nNT -o ExitOnForwardFailure=yes -o StreamLocalBindUnlink=yes -L $HOME/.docker/docker-host.sock:/var/run/docker.sock docker-host`, then `source ~/.docker/docker-host.env` (`DOCKER_HOST=unix://$HOME/.docker/docker-host.sock`, `TESTCONTAINERS_HOST_OVERRIDE=192.168.1.194`, `TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=/var/run/docker.sock`); Ryuk stays enabled. Not `ssh://` contexts — testcontainers-go doesn't reliably support them. Demo ports: `ssh -nNT -L 8081:localhost:8081 -L 8082:localhost:8082 docker-host`
