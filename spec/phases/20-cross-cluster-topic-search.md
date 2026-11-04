@@ -2,7 +2,7 @@
 - **Milestone:** M3
 - **Covers:** F8-AC1, F8-AC2
 - **Discovery:** —
-- **Status:** Review
+- **Status:** Done
 
 ## Demo
 1. Search for `orders` across two configured clusters and open a matching topic.
@@ -15,3 +15,7 @@
   - Done when: focused UI tests cover case-insensitive matches, links, no matches, and one failure alongside successful results; `npm test` and `npm run build` pass.
 
 ## Review
+- **Tests:** `npm test` passed 155 tests; `npm run build` passed. UI tests cover multiple gateways, independent errors/retry, pending gateways, and navigation.
+- **Demo:** Both real-gateway steps **not run** because the Kafka/Docker stack is unavailable.
+- **Vulnerability scan:** Not required for this phase; no dependencies changed.
+- **Notes:** Each gateway retains its own topic query and error state; a slow or failed gateway does not hide another gateway's matches.
