@@ -68,7 +68,7 @@ Kafka3O is a multi-cluster Kafka console for developers and operators: one web U
 - **Phases:**
   - **P15** F4-B1 + F4-B2 · Topic partitions and configuration — Covers: F4-AC1, F4-AC2 · Discovery: — · Status: Done
     - Demo: open `orders` from the Topics tab and inspect its ordered partition metadata and configuration; stop Kafka and verify the unavailable state offers Retry.
-  - **P16** F5-B1 · Read latest messages — Covers: F5-AC1 · Discovery: — · Status: Planned
+  - **P16** F5-B1 · Read latest messages — Covers: F5-AC1 · Discovery: — · Status: Building
     - Demo: produce records to multiple partitions, open Messages, and verify at most 50 records appear newest first with their metadata and headers.
   - **P17** F5-B2 · Choose message value representation — Covers: F5-AC2 · Discovery: — · Status: Planned
     - Demo: switch a JSON message between text, formatted JSON, and base64; switch to an invalid JSON message and verify it remains inspectable.
