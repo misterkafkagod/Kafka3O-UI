@@ -13,7 +13,7 @@
   - Files: `internal/kafka/request_metadata.go` (new), `internal/kafka/request_metadata_test.go` (new), `internal/kafka/describe_cluster.go`, `internal/kafka/describe_cluster_test.go`, `cmd/gateway/main.go`, `test/integration/describe_cluster_test.go`
   - Do: Request broker metadata directly from Kafka for each health check rather than using cached kadm metadata; preserve the cluster response and propagate request and broker errors.
   - Done when: `go test ./internal/kafka/...` covers a successful metadata response followed by a failed live request, response mapping, and timeout/error propagation; `go test ./...` passes.
-- [ ] **T14.2 Request live topic metadata** — Covers: F1-AC8
+- [x] **T14.2 Request live topic metadata** — Covers: F1-AC8
   - Files: `internal/kafka/list_topic_metadata.go`, `internal/kafka/list_topic_metadata_test.go` (new), `cmd/gateway/main.go`, `test/integration/list_topics_test.go`
   - Do: Use the same live metadata request for topic lists, preserving internal-topic, partition, and replication-factor behavior and returning Kafka errors explicitly.
   - Done when: `go test ./internal/kafka/...` covers topic mapping, empty results, authorization errors, and a successful response followed by a failed request; `go test ./...` passes.
