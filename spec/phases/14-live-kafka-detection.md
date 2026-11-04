@@ -2,14 +2,14 @@
 - **Milestone:** M1
 - **Covers:** F1-AC8
 - **Discovery:** —
-- **Status:** Planned        <!-- Planned | Building | Review | Done -->
+- **Status:** Building        <!-- Planned | Building | Review | Done -->
 
 ## Demo
 1. Start the dev stack and confirm the Dev cluster is Healthy.
 2. Stop only the dev Kafka broker; within 15 seconds the Dev card shows Cluster unreachable while the gateway remains running.
 
 ## Tasks
-- [ ] **T14.1 Request live cluster metadata** — Covers: F1-AC8
+- [x] **T14.1 Request live cluster metadata** — Covers: F1-AC8
   - Files: `internal/kafka/request_metadata.go` (new), `internal/kafka/request_metadata_test.go` (new), `internal/kafka/describe_cluster.go`, `internal/kafka/describe_cluster_test.go`, `cmd/gateway/main.go`, `test/integration/describe_cluster_test.go`
   - Do: Request broker metadata directly from Kafka for each health check rather than using cached kadm metadata; preserve the cluster response and propagate request and broker errors.
   - Done when: `go test ./internal/kafka/...` covers a successful metadata response followed by a failed live request, response mapping, and timeout/error propagation; `go test ./...` passes.
