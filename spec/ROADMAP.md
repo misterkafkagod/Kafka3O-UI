@@ -88,12 +88,12 @@ Kafka3O is a multi-cluster Kafka console for developers and operators: one web U
     - Demo: copy a message link, open it in a new tab, and verify only its exact partition and offset are shown.
 
 ### M4 — See whether consumers are keeping up
-- **Status:** Active
+- **Status:** Done
 - **Features:** F10, F11
 - **Phases:**
   - **P22** F10-B1 + F10-B2 + F10-B3 · Consumer groups and partition lag — Covers: F10-AC1, F10-AC2, F10-AC3 · Discovery: — · Status: Done
     - Demo: open Consumer groups after producing and consuming records, inspect members and per-partition lag, and verify missing commits are not shown as zero.
-  - **P23** F11-B1 + F11-B2 · Topic consumer groups — Covers: F11-AC1, F11-AC2 · Discovery: — · Status: Review
+  - **P23** F11-B1 + F11-B2 · Topic consumer groups — Covers: F11-AC1, F11-AC2 · Discovery: — · Status: Done
     - Demo: open a topic's Consumers tab and see only groups and lag rows associated with that topic.
 
 ### M5 — Safe write access for debugging
@@ -107,6 +107,7 @@ Kafka3O is a multi-cluster Kafka console for developers and operators: one web U
 - **Technical debt:** Upgrade the Gateway Go toolchain and build image to a release fixing GO-2026-6809; the 2026-11-04 scan reports CISA CVSS 6.8 medium in Go 1.27.2.
 
 ## Learnings
+- 2026-11-04 (M4 retro): Shared group snapshots keep cluster and topic views consistent; explicit unknown association and lag states avoid false empty or zero results; nullable decimal strings preserve Kafka offsets in JSON and OpenAPI; real-broker integration and demos remain outstanding without Docker.
 - 2026-11-04 (M4 / P22): Consumer group offsets are nullable decimal strings in both JSON and OpenAPI; Docker-backed group tests and demo remain unrun without Docker.
 - 2026-11-04 (M3 retro): Independent gateway queries keep partial search results usable; the topic-wide search bound must describe offset windows rather than global timestamp order; exact decimal offsets prevent incorrect message links; real-broker demos and integration runs remain outstanding without Docker.
 - 2026-11-04 (M3 / P19): Search allocates a single 500-offset window fairly across partitions; timestamps do not establish which offsets are globally newest.
