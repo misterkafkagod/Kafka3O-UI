@@ -17,9 +17,9 @@
   - Files: `internal/kafka/fetch_consumer_groups.go` (new), supporting mapping helpers/tests (new), `test/integration/consumer_groups_test.go` (new)
   - Do: Read classic and next-generation consumer descriptions, explicit subscriptions, assignments and committed offsets; retrieve log bounds, preserve per-group/partition errors, and propagate request failures.
   - Done when: Kafka adapter tests cover both group protocols and error cases; `go test ./...` passes and the real-broker test compiles or runs with Docker.
-- [ ] **T22.3 Expose the group API** — Covers: F10-AC1, F10-AC2, F10-AC3
-  - Files: `internal/httpapi/register_list_consumer_groups.go` (new), `internal/httpapi/register_list_consumer_groups_test.go` (new), `cmd/gateway/main.go`
-  - Do: Wire a group-list endpoint with decimal-string offsets and explicit failure responses.
+- [x] **T22.3 Expose the group API** — Covers: F10-AC1, F10-AC2, F10-AC3
+  - Files: `internal/httpapi/register_list_consumer_groups.go` (new), `internal/httpapi/register_list_consumer_groups_test.go` (new), `cmd/gateway/main.go`, group DTO/lag conversion and related tests (amended)
+  - Do: Wire a group-list endpoint with decimal-string offsets and explicit failure responses; use nullable string DTO fields so the generated OpenAPI schema matches the JSON wire format.
   - Done when: HTTP tests cover response shape, empty list, group errors and unavailable Kafka; `go test ./...` passes.
 - [ ] **T22.4 Add the group client and hook** — Covers: F10-AC1, F10-AC3
   - Files: `src/gateway/listConsumerGroups.ts` (new), client tests (new), `src/gateway/types.ts`, `src/hooks/useConsumerGroups.ts` (new), hook tests (new)
