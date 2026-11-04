@@ -2,7 +2,7 @@
 - **Milestone:** M2
 - **Covers:** F4-AC1, F4-AC2
 - **Discovery:** —
-- **Status:** Planned        <!-- Planned | Building | Review | Done -->
+- **Status:** Building        <!-- Planned | Building | Review | Done -->
 
 ## Demo
 1. Start the `kafka-dev` and `gateway-dev` services from `deploy/compose.dev.yaml`.
@@ -10,7 +10,7 @@
 3. Stop `kafka-dev`; click Retry and verify the topic page shows the cluster-unavailable message.
 
 ## Tasks
-- [ ] **T15.1 Gateway topic detail action** — Covers: F4-AC1, F4-AC2
+- [x] **T15.1 Gateway topic detail action** — Covers: F4-AC1, F4-AC2
   - Files: `internal/topics/topic_detail.go` (new), `internal/topics/describe_topic.go` (new), `internal/topics/get_topic_detail.go` (new), `internal/topics/get_topic_detail_test.go` (new)
   - Do: Define topic detail, partition, and config DTOs; add the Kafka port and a timeout-bounded `GetTopicDetail` action. Return the port error unchanged and distinguish a missing topic with a stable sentinel error.
   - Done when: `go test ./internal/topics/...` passes tests for returned detail, missing-topic/error propagation, and the configured deadline.
