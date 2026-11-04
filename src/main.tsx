@@ -24,8 +24,8 @@ createRoot(document.getElementById("root")!).render(
         getCluster={(gatewayUrl) => getCluster(boundFetchJson, gatewayUrl)}
         listTopics={(gatewayUrl) => listTopics(boundFetchJson, gatewayUrl)}
         getTopicDetail={(gatewayUrl, topicName) => getTopicDetail(boundFetchJson, gatewayUrl, topicName)}
-        listLatestTopicMessages={(gatewayUrl, topicName) =>
-          listLatestTopicMessages(boundFetchJson, gatewayUrl, topicName)
+        listLatestTopicMessages={(gatewayUrl, topicName, position) =>
+          listLatestTopicMessages(boundFetchJson, gatewayUrl, topicName, position)
         }
         statusRefreshMs={statusRefreshMs}
       />
