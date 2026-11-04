@@ -2,14 +2,14 @@
 - **Milestone:** M3
 - **Covers:** F7-AC1, F7-AC2, F7-AC3
 - **Discovery:** —
-- **Status:** Planned
+- **Status:** Building
 
 ## Demo
 1. Produce matching and nonmatching records to multiple partitions.
 2. Search from the Messages view and inspect matches, examined count, 500-position limit, and exclusion status.
 
 ## Tasks
-- [ ] **T19.1 Add message-search action** — Covers: F7-AC1, F7-AC2
+- [x] **T19.1 Add message-search action** — Covers: F7-AC1, F7-AC2
   - Files: `internal/topics/search_topic_messages.go` (new), `internal/topics/search_topic_messages_test.go` (new), `internal/topics/fetch_recent_topic_messages.go` (new), `internal/topics/topic_message_search_result.go` (new)
   - Do: Add a timeout-bound action over an injected bounded-window port; validate non-empty search text, match key/value bytes, return count/exclusion status, and sort matches consistently.
   - Done when: `go test ./internal/topics/...` covers key/value matching, empty input, errors, count, sorting, and excluded windows; `go test ./...` passes.
