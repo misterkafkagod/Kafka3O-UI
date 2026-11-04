@@ -19,19 +19,22 @@ function renderTopicPage(
   listLatestTopicMessages: ListLatestTopicMessages = async () => [],
   view: "details" | "messages" = "details",
   searchTopicMessages: SearchTopicMessages = async () => ({ messages: [], scanned: 0, truncated: false }),
+  route = `/clusters/dev/topics/orders${view === "messages" ? "/messages" : ""}`,
 ) {
+  const linkOrigin = "https://console.example";
+  const copyMessageLink = async () => {};
   return renderWithQuery(
     <Routes>
       <Route
         path="/clusters/:gatewayId/topics/:topicName"
-        element={<TopicPage {...{ loadGatewayConfig, getTopicDetail, listLatestTopicMessages, searchTopicMessages, view }} />}
+        element={<TopicPage {...{ loadGatewayConfig, getTopicDetail, listLatestTopicMessages, searchTopicMessages, linkOrigin, copyMessageLink, view }} />}
       />
       <Route
         path="/clusters/:gatewayId/topics/:topicName/messages"
-        element={<TopicPage {...{ loadGatewayConfig, getTopicDetail, listLatestTopicMessages, searchTopicMessages, view }} />}
+        element={<TopicPage {...{ loadGatewayConfig, getTopicDetail, listLatestTopicMessages, searchTopicMessages, linkOrigin, copyMessageLink, view }} />}
       />
     </Routes>,
-    `/clusters/dev/topics/orders${view === "messages" ? "/messages" : ""}`,
+    route,
   );
 }
 
@@ -50,6 +53,81 @@ describe("TopicPage", () => {
     await user.click(screen.getByRole("button", { name: "Back to message reads" }));
     expect(screen.getByRole("button", { name: "Read messages" })).toBeDefined();
   });
+
+  it("offers message links for search matches", async () => {
+    const search = vi.fn<SearchTopicMessages>(async () => ({
+      messages: [{ partition: 1, offset: 4, timestamp: "2026-01-02T03:04:05Z", key: null, value: null, headers: [] }],
+      scanned: 1,
+      truncated: false,
+    }));
+    const user = userEvent.setup();
+    renderTopicPage(async () => [gateway], async () => ({ name: "orders", partitions: [], config: [] }), async () => [], "messages", search);
+    await user.click(await screen.findByRole("button", { name: "Search messages" }));
+    await user.type(screen.getByRole("searchbox", { name: "Search key or value" }), "needle");
+    await user.click(screen.getByRole("button", { name: "Search" }));
+
+    expect(await screen.findByRole("button", { name: "Copy link for partition 1 offset 4" })).toBeDefined();
+  });
+
+  it("opens a linked large offset and displays only the exact record", async () => {
+    const offset = "9007199254740993";
+    const list = vi.fn<ListLatestTopicMessages>(async () => [
+      { partition: 2, offset: Number(offset), offsetExact: offset, timestamp: "2026-01-02T03:04:05Z", key: null, value: "ZXhhY3Q=", headers: [] },
+      { partition: 2, offset: Number("9007199254740994"), offsetExact: "9007199254740994", timestamp: "2026-01-02T03:04:06Z", key: null, value: "bGF0ZXI=", headers: [] },
+    ]);
+    renderTopicPage(async () => [gateway], async () => ({ name: "orders", partitions: [], config: [] }), list, "messages", undefined, `/clusters/dev/topics/orders/messages?partition=2&offset=${offset}`);
+
+    expect(await screen.findByText("exact")).toBeDefined();
+    expect(screen.queryByText("later")).toBeNull();
+    expect(list).toHaveBeenCalledWith(gateway.url, "orders", { partition: 2, offset });
+    expect(screen.getByRole("link", { name: "Back to message reads" }).getAttribute("href")).toBe("/clusters/dev/topics/orders/messages");
+  });
+
+  it("does not display the next record when the linked offset is absent", async () => {
+    const list = vi.fn<ListLatestTopicMessages>(async () => [
+      { partition: 0, offset: 10, timestamp: "2026-01-02T03:04:05Z", key: null, value: "bGF0ZXI=", headers: [] },
+    ]);
+    renderTopicPage(async () => [gateway], async () => ({ name: "orders", partitions: [], config: [] }), list, "messages", undefined, "/clusters/dev/topics/orders/messages?partition=0&offset=9");
+
+    expect((await screen.findByRole("alert")).textContent).toContain("No message is available");
+    expect(screen.queryByText("later")).toBeNull();
+  });
+
+  it("rejects malformed links without fetching messages", async () => {
+    const list = vi.fn<ListLatestTopicMessages>(async () => []);
+    renderTopicPage(async () => [gateway], async () => ({ name: "orders", partitions: [], config: [] }), list, "messages", undefined, "/clusters/dev/topics/orders/messages?partition=0&offset=not-a-number");
+
+    expect((await screen.findByRole("alert")).textContent).toContain("Invalid message link");
+    expect(list).not.toHaveBeenCalled();
+  });
+
+  it("marks expired positions unavailable and reports unverifiable legacy offsets", async () => {
+    const list = vi.fn<ListLatestTopicMessages>(async () => {
+      throw new HttpError(400, "Invalid position", { code: "invalid_position" });
+    });
+    const first = renderTopicPage(async () => [gateway], async () => ({ name: "orders", partitions: [], config: [] }), list, "messages", undefined, "/clusters/dev/topics/orders/messages?partition=0&offset=9");
+    expect((await screen.findByRole("alert")).textContent).toContain("No message is available");
+    first.unmount();
+
+    const legacy = vi.fn<ListLatestTopicMessages>(async () => [
+      { partition: 0, offset: Number("9007199254740993"), timestamp: "2026-01-02T03:04:05Z", key: null, value: null, headers: [] },
+    ]);
+    renderTopicPage(async () => [gateway], async () => ({ name: "orders", partitions: [], config: [] }), legacy, "messages", undefined, "/clusters/dev/topics/orders/messages?partition=0&offset=9007199254740993");
+    expect((await screen.findByRole("alert")).textContent).toContain("cannot be verified");
+  });
+
+  it("offers retry when a linked read fails because the gateway is unavailable", async () => {
+    const list = vi
+      .fn<ListLatestTopicMessages>()
+      .mockRejectedValueOnce(new Error("offline"))
+      .mockResolvedValueOnce([{ partition: 0, offset: 9, timestamp: "2026-01-02T03:04:05Z", key: null, value: "ZXhhY3Q=", headers: [] }]);
+    renderTopicPage(async () => [gateway], async () => ({ name: "orders", partitions: [], config: [] }), list, "messages", undefined, "/clusters/dev/topics/orders/messages?partition=0&offset=9");
+
+    const alert = await screen.findByRole("alert");
+    await userEvent.click(within(alert).getByRole("button", { name: "Retry" }));
+    expect(await screen.findByText("exact")).toBeDefined();
+  });
+
   it("shows Cluster not found without fetching topic detail when the gateway is unknown", async () => {
     const getTopicDetail = vi.fn(async () => ({ name: "orders", partitions: [], config: [] }));
     renderTopicPage(async () => [], getTopicDetail);
@@ -109,7 +187,7 @@ describe("TopicPage", () => {
           : [
               {
                 partition: position.partition,
-                offset: "offset" in position ? position.offset : 0,
+                offset: "offset" in position ? Number(position.offset) : 0,
                 timestamp: "2026-01-02T03:04:05Z",
                 key: "",
                 value: "dmFsdWU=",

@@ -18,6 +18,8 @@ type AppProps = {
   getTopicDetail: GetTopicDetail;
   listLatestTopicMessages: ListLatestTopicMessages;
   searchTopicMessages: SearchTopicMessages;
+  linkOrigin: string;
+  copyMessageLink: (text: string) => Promise<void>;
   statusRefreshMs: number;
 };
 
@@ -29,6 +31,8 @@ export function App({
   getTopicDetail,
   listLatestTopicMessages,
   searchTopicMessages,
+  linkOrigin,
+  copyMessageLink,
   statusRefreshMs,
 }: AppProps) {
   return (
@@ -82,6 +86,8 @@ export function App({
               getTopicDetail={getTopicDetail}
               listLatestTopicMessages={listLatestTopicMessages}
               searchTopicMessages={searchTopicMessages}
+              linkOrigin={linkOrigin}
+              copyMessageLink={copyMessageLink}
             />
           }
         />
@@ -93,6 +99,8 @@ export function App({
               getTopicDetail={getTopicDetail}
               listLatestTopicMessages={listLatestTopicMessages}
               searchTopicMessages={searchTopicMessages}
+              linkOrigin={linkOrigin}
+              copyMessageLink={copyMessageLink}
               view="messages"
             />
           }

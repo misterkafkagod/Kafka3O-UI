@@ -57,6 +57,19 @@ describe("listLatestTopicMessages", () => {
     ]);
   });
 
+  it("preserves an exact large offset in the query string", async () => {
+    server.use(
+      http.get("http://localhost:8081/api/v1/topics/orders/messages", ({ request }) => {
+        expect(new URL(request.url).searchParams.get("offset")).toBe("9007199254740993");
+        return HttpResponse.json(messages);
+      }),
+    );
+    await listLatestTopicMessages(realFetchJson, "http://localhost:8081", "orders", {
+      partition: 2,
+      offset: "9007199254740993",
+    });
+  });
+
   it("rejects with HttpError when the topic is missing", async () => {
     server.use(
       http.get("http://localhost:8081/api/v1/topics/orders/messages", () => new HttpResponse(null, { status: 404 })),

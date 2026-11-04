@@ -29,6 +29,8 @@ createRoot(document.getElementById("root")!).render(
           listLatestTopicMessages(boundFetchJson, gatewayUrl, topicName, position)
         }
         searchTopicMessages={(gatewayUrl, topicName, query) => searchTopicMessages(boundFetchJson, gatewayUrl, topicName, query)}
+        linkOrigin={window.location.origin}
+        copyMessageLink={(text) => navigator.clipboard.writeText(text)}
         statusRefreshMs={statusRefreshMs}
       />
     </BrowserRouter>

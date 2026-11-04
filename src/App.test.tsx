@@ -2,7 +2,7 @@ import { QueryClient } from "@tanstack/react-query";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { App } from "./App";
 
 const pendingGetCluster = () => new Promise<never>(() => {});
@@ -10,6 +10,8 @@ const pendingListTopics = () => new Promise<never>(() => {});
 const pendingGetTopicDetail = () => new Promise<never>(() => {});
 const pendingListLatestTopicMessages = () => new Promise<never>(() => {});
 const pendingSearchTopicMessages = () => new Promise<never>(() => {});
+const linkOrigin = "https://console.example";
+const copyMessageLink = async () => {};
 
 function renderApp() {
   return render(
@@ -22,6 +24,8 @@ function renderApp() {
         getTopicDetail={pendingGetTopicDetail}
         listLatestTopicMessages={pendingListLatestTopicMessages}
         searchTopicMessages={pendingSearchTopicMessages}
+        linkOrigin={linkOrigin}
+        copyMessageLink={copyMessageLink}
         statusRefreshMs={60_000}
       />
     </MemoryRouter>,
@@ -53,6 +57,8 @@ describe("App", () => {
           getTopicDetail={pendingGetTopicDetail}
           listLatestTopicMessages={pendingListLatestTopicMessages}
           searchTopicMessages={pendingSearchTopicMessages}
+          linkOrigin={linkOrigin}
+          copyMessageLink={copyMessageLink}
           statusRefreshMs={60_000}
         />
       </MemoryRouter>,
@@ -76,6 +82,8 @@ describe("App", () => {
           getTopicDetail={pendingGetTopicDetail}
           listLatestTopicMessages={pendingListLatestTopicMessages}
           searchTopicMessages={pendingSearchTopicMessages}
+          linkOrigin={linkOrigin}
+          copyMessageLink={copyMessageLink}
           statusRefreshMs={60_000}
         />
       </MemoryRouter>,
@@ -103,6 +111,8 @@ describe("App", () => {
           })}
           listLatestTopicMessages={async () => []}
           searchTopicMessages={pendingSearchTopicMessages}
+          linkOrigin={linkOrigin}
+          copyMessageLink={copyMessageLink}
           statusRefreshMs={60_000}
         />
       </MemoryRouter>,
@@ -127,6 +137,8 @@ describe("App", () => {
           getTopicDetail={async () => ({ name: "orders", partitions: [], config: [] })}
           listLatestTopicMessages={pendingListLatestTopicMessages}
           searchTopicMessages={pendingSearchTopicMessages}
+          linkOrigin={linkOrigin}
+          copyMessageLink={copyMessageLink}
           statusRefreshMs={60_000}
         />
       </MemoryRouter>,
@@ -135,6 +147,40 @@ describe("App", () => {
     await user.type(await screen.findByRole("searchbox", { name: "Topic name" }), "ORD");
     await user.click(await screen.findByRole("link", { name: "orders" }));
     expect(await screen.findByRole("heading", { name: "orders" })).toBeDefined();
+  });
+
+  it("copies and opens an exact message link with encoded names", async () => {
+    const user = userEvent.setup();
+    const copy = vi.fn(async (_text: string) => {});
+    const list = vi.fn(async () => [
+      { partition: 2, offset: Number("9007199254740993"), offsetExact: "9007199254740993", timestamp: "2026-01-02T03:04:05Z", key: null, value: "ZXhhY3Q=", headers: [] },
+    ]);
+    const app = () => (
+      <App
+        queryClient={new QueryClient()}
+        loadGatewayConfig={async () => [{ id: "dev & west", name: "Dev", url: "http://localhost:8081" }]}
+        getCluster={pendingGetCluster}
+        listTopics={pendingListTopics}
+        getTopicDetail={pendingGetTopicDetail}
+        listLatestTopicMessages={list}
+        searchTopicMessages={pendingSearchTopicMessages}
+        linkOrigin="https://console.example"
+        copyMessageLink={copy}
+        statusRefreshMs={60_000}
+      />
+    );
+    const first = render(<MemoryRouter initialEntries={["/clusters/dev%20%26%20west/topics/orders%20%26%20audit/messages"]}>{app()}</MemoryRouter>);
+    await user.click(await screen.findByRole("button", { name: "Copy link for partition 2 offset 9007199254740993" }));
+    const copied = copy.mock.calls[0][0];
+    first.unmount();
+
+    const url = new URL(copied);
+    render(<MemoryRouter initialEntries={[url.pathname + url.search]}>{app()}</MemoryRouter>);
+    expect(await screen.findByText("exact")).toBeDefined();
+    expect(list).toHaveBeenLastCalledWith("http://localhost:8081", "orders & audit", {
+      partition: 2,
+      offset: "9007199254740993",
+    });
   });
 
   it("renders the clusters page with the injected config loader", async () => {

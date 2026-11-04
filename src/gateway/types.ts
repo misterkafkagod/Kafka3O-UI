@@ -62,7 +62,7 @@ export type TopicMessageHeader = {
 };
 
 export type TopicMessagePosition =
-  | { partition: number; offset: number }
+  | { partition: number; offset: number | string }
   | { partition: number; timestamp: number };
 
 export type TopicMessageSearchResult = {

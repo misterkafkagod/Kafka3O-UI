@@ -14,10 +14,12 @@ type TopicPageProps = {
   getTopicDetail: GetTopicDetail;
   listLatestTopicMessages: ListLatestTopicMessages;
   searchTopicMessages: SearchTopicMessages;
+  linkOrigin: string;
+  copyMessageLink: (text: string) => Promise<void>;
   view?: "details" | "messages";
 };
 
-export function TopicPage({ loadGatewayConfig, getTopicDetail, listLatestTopicMessages, searchTopicMessages, view = "details" }: TopicPageProps) {
+export function TopicPage({ loadGatewayConfig, getTopicDetail, listLatestTopicMessages, searchTopicMessages, linkOrigin, copyMessageLink, view = "details" }: TopicPageProps) {
   const { gatewayId, topicName } = useParams();
   const { data: gateways } = useGatewayConfig(loadGatewayConfig);
 
@@ -37,7 +39,7 @@ export function TopicPage({ loadGatewayConfig, getTopicDetail, listLatestTopicMe
     );
   }
   if (view === "messages") {
-    return <TopicMessagesPage gateway={gateway} topicName={topicName} listLatestTopicMessages={listLatestTopicMessages} searchTopicMessages={searchTopicMessages} />;
+    return <TopicMessagesPage gateway={gateway} topicName={topicName} listLatestTopicMessages={listLatestTopicMessages} searchTopicMessages={searchTopicMessages} messageLinks={{ origin: linkOrigin, gatewayId: gateway.id, topicName, copyText: copyMessageLink }} />;
   }
   return <TopicDetailPage gateway={gateway} topicName={topicName} getTopicDetail={getTopicDetail} />;
 }

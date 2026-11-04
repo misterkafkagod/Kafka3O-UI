@@ -84,7 +84,7 @@ Kafka3O is a multi-cluster Kafka console for developers and operators: one web U
     - Demo: search a topic with records across partitions and see matches, examined count, the 500-position limit, and whether any positions were excluded.
   - **P20** F8-B1 + F8-B2 · Search topic names across gateways — Covers: F8-AC1, F8-AC2 · Discovery: — · Status: Done
     - Demo: find `orders` across two clusters, then stop one gateway and verify the other result remains visible.
-  - **P21** F9-B1 + F9-B2 · Copy and open a message link — Covers: F9-AC1, F9-AC2 · Discovery: — · Status: Building
+  - **P21** F9-B1 + F9-B2 · Copy and open a message link — Covers: F9-AC1, F9-AC2 · Discovery: — · Status: Review
     - Demo: copy a message link, open it in a new tab, and verify only its exact partition and offset are shown.
 
 ### M4 — See whether consumers are keeping up
