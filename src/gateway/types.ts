@@ -46,6 +46,20 @@ export type TopicConfig = {
   sensitive: boolean;
 };
 
+export type TopicMessage = {
+  partition: number;
+  offset: number;
+  timestamp: string;
+  key: string;
+  value: string;
+  headers: TopicMessageHeader[];
+};
+
+export type TopicMessageHeader = {
+  key: string;
+  value: string;
+};
+
 export type GatewayErrorKind = "gateway-unreachable" | "cluster-unreachable" | "other";
 
 // RFC 9457 problem body sent by the gateway on errors (only the fields the UI uses).

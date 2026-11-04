@@ -21,7 +21,7 @@
   - Files: `internal/httpapi/register_list_latest_topic_messages.go` (new), `internal/httpapi/register_list_latest_topic_messages_test.go` (new), `cmd/gateway/main.go`
   - Do: Register `GET /api/v1/topics/{topic}/messages`; return a JSON array, map a missing topic to 404 `not_found`, and map Kafka failures to 503 `cluster_unreachable`; wire the action and route in the composition root.
   - Done when: `go test ./internal/httpapi/...` passes response-shape, empty-array, 404, and 503 checks; `go test ./...` passes.
-- [ ] **T16.4 UI latest-message data access** — Covers: F5-AC1
+- [x] **T16.4 UI latest-message data access** — Covers: F5-AC1
   - Files: `src/gateway/types.ts`, `src/gateway/listLatestTopicMessages.ts` (new), `src/gateway/listLatestTopicMessages.test.ts` (new), `src/hooks/useLatestTopicMessages.ts` (new), `src/hooks/useLatestTopicMessages.test.tsx` (new)
   - Do: Add the typed request and gateway/topic-keyed query for latest messages; disable automatic retries so the explicit Retry control handles errors.
   - Done when: `npm test -- listLatestTopicMessages useLatestTopicMessages` passes URL encoding, response, error, and query behavior tests.
