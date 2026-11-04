@@ -13,7 +13,7 @@
   - Files: `internal/topics/search_topic_messages.go` (new), `internal/topics/search_topic_messages_test.go` (new), `internal/topics/fetch_recent_topic_messages.go` (new), `internal/topics/topic_message_search_result.go` (new)
   - Do: Add a timeout-bound action over an injected bounded-window port; validate non-empty search text, match key/value bytes, return count/exclusion status, and sort matches consistently.
   - Done when: `go test ./internal/topics/...` covers key/value matching, empty input, errors, count, sorting, and excluded windows; `go test ./...` passes.
-- [ ] **T19.2 Read a bounded partition window** — Covers: F7-AC1, F7-AC2
+- [x] **T19.2 Read a bounded partition window** — Covers: F7-AC1, F7-AC2
   - Files: `internal/kafka/fetch_recent_topic_messages.go` (new), `internal/kafka/allocate_recent_topic_offsets.go` (new), `internal/kafka/allocate_recent_topic_offsets_test.go` (new), `test/integration/search_topic_messages_test.go` (new)
   - Do: Fetch offsets and select a deterministic fair window across partitions with at most 500 offset positions total; reuse the existing reader, propagate errors, and report excluded positions.
   - Done when: `go test ./internal/kafka/...` covers empty, uneven, large, sparse and more-than-500-partition windows with exact bounds; `go test ./...` passes and the integration test compiles or runs with Docker.
