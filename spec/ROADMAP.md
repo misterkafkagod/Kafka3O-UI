@@ -91,7 +91,7 @@ Kafka3O is a multi-cluster Kafka console for developers and operators: one web U
 - **Status:** Active
 - **Features:** F10, F11
 - **Phases:**
-  - **P22** F10-B1 + F10-B2 + F10-B3 · Consumer groups and partition lag — Covers: F10-AC1, F10-AC2, F10-AC3 · Discovery: — · Status: Planned
+  - **P22** F10-B1 + F10-B2 + F10-B3 · Consumer groups and partition lag — Covers: F10-AC1, F10-AC2, F10-AC3 · Discovery: — · Status: Building
     - Demo: open Consumer groups after producing and consuming records, inspect members and per-partition lag, and verify missing commits are not shown as zero.
   - **P23** F11-B1 + F11-B2 · Topic consumer groups — Covers: F11-AC1, F11-AC2 · Discovery: — · Status: Planned
     - Demo: open a topic's Consumers tab and see only groups and lag rows associated with that topic.

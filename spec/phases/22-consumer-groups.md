@@ -2,15 +2,15 @@
 - **Milestone:** M4
 - **Covers:** F10-AC1, F10-AC2, F10-AC3
 - **Discovery:** —
-- **Status:** Planned
+- **Status:** Building
 
 ## Demo
 1. Produce and consume records in a consumer group, then open the cluster's Consumer groups tab.
 2. Verify the group state, members, committed offsets and per-partition lag; inspect a partition without a commit.
 
 ## Tasks
-- [ ] **T22.1 Model consumer group lag** — Covers: F10-AC1, F10-AC2
-  - Files: `internal/groups/consumer_group.go` (new), `internal/groups/fetch_consumer_groups.go` (new), `internal/groups/list_consumer_groups.go` (new), `internal/groups/list_consumer_groups_test.go` (new), lag calculation helper/tests (new)
+- [x] **T22.1 Model consumer group lag** — Covers: F10-AC1, F10-AC2
+  - Files: `internal/groups/consumer_group.go` (new), `internal/groups/fetch_consumer_groups.go` (new), `internal/groups/list_consumer_groups.go` (new), `internal/groups/list_consumer_groups_test.go` (new), `internal/groups/calculate_consumer_partition_lag.go` (new), `internal/groups/calculate_consumer_partition_lag_test.go` (new), comparator files and tests (new)
   - Do: Define injectable snapshots and a timeout-bound action; calculate lag only for valid commits within available offsets, preserve explicit unavailable errors, and sort groups, topics, members and partitions.
   - Done when: `go test ./internal/groups/...` covers exact lag, missing and out-of-range commits, unavailable offsets, group errors, timeout and sorting; `go test ./...` passes.
 - [ ] **T22.2 Fetch group and offset snapshots** — Covers: F10-AC1, F10-AC2, F10-AC3
