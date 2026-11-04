@@ -2,7 +2,7 @@
 - **Milestone:** M2
 - **Covers:** F4-AC1, F4-AC2
 - **Discovery:** —
-- **Status:** Building        <!-- Planned | Building | Review | Done -->
+- **Status:** Review        <!-- Planned | Building | Review | Done -->
 
 ## Demo
 1. Start the `kafka-dev` and `gateway-dev` services from `deploy/compose.dev.yaml`.
@@ -26,9 +26,9 @@
   - Files: `src/gateway/types.ts`, `src/gateway/getTopicDetail.ts` (new), `src/gateway/getTopicDetail.test.ts` (new), `src/hooks/useTopicDetail.ts` (new), `src/hooks/useTopicDetail.test.tsx` (new)
   - Do: Add the typed detail request using an encoded topic path and a query keyed by gateway ID and topic name; disable automatic retries so the page's Retry action remains explicit.
   - Done when: `npm test -- getTopicDetail useTopicDetail` passes URL encoding, response, error, and query behavior tests.
-- [ ] **T15.5 Topic detail page** — Covers: F4-AC1, F4-AC2
-  - Files: `src/components/TopicTable.tsx`, `src/components/TopicTable.test.tsx`, `src/pages/TopicPage.tsx` (new), `src/pages/TopicPage.test.tsx` (new), `src/App.tsx`, `src/App.test.tsx`, `src/main.tsx`
-  - Do: Link topic names to `/clusters/:gatewayId/topics/:topicName`; render the ordered partition/config detail, a back link to Topics, loading and not-found states, and `ErrorWithRetry` for retryable failures.
-  - Done when: `npm test -- TopicPage TopicTable App` passes navigation, details, missing-topic and Retry cases; `npm test` and `npm run build` exit 0.
+- [x] **T15.5 Topic detail page** — Covers: F4-AC1, F4-AC2
+  - Files: `src/components/TopicTable.tsx`, `src/components/TopicTable.test.tsx`, `src/pages/TopicPage.tsx` (new), `src/pages/TopicPage.test.tsx` (new), `src/pages/TopicDetailPage.tsx` (new), `src/pages/TopicDetailPage.test.tsx` (new), `src/App.tsx`, `src/App.test.tsx`, `src/main.tsx`
+  - Do: Link topic names to `/clusters/:gatewayId/topics/:topicName`; resolve the gateway in `TopicPage` and render the fetched details in `TopicDetailPage`, with ordered partition/config tables, a back link to Topics, loading and not-found states, and `ErrorWithRetry` for retryable failures.
+  - Done when: `npm test -- TopicPage TopicDetailPage TopicTable App` passes navigation, details, missing-topic and Retry cases; `npm test` and `npm run build` exit 0.
 
 ## Review

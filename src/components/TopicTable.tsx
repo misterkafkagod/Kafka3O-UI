@@ -1,6 +1,7 @@
+import { Link } from "react-router";
 import type { Topic } from "../gateway/types";
 
-export function TopicTable({ topics }: { topics: Topic[] }) {
+export function TopicTable({ gatewayId, topics }: { gatewayId: string; topics: Topic[] }) {
   return (
     <table aria-label="Topics">
       <thead>
@@ -14,7 +15,9 @@ export function TopicTable({ topics }: { topics: Topic[] }) {
       <tbody>
         {topics.map((topic) => (
           <tr key={topic.name}>
-            <td>{topic.name}</td>
+            <td>
+              <Link to={`/clusters/${gatewayId}/topics/${encodeURIComponent(topic.name)}`}>{topic.name}</Link>
+            </td>
             <td>{topic.partitions}</td>
             <td>{topic.replicationFactor}</td>
             <td>~{topic.approxMessages}</td>

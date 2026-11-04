@@ -7,6 +7,7 @@ import { App } from "./App";
 
 const pendingGetCluster = () => new Promise<never>(() => {});
 const pendingListTopics = () => new Promise<never>(() => {});
+const pendingGetTopicDetail = () => new Promise<never>(() => {});
 
 function renderApp() {
   return render(
@@ -16,6 +17,7 @@ function renderApp() {
         loadGatewayConfig={async () => []}
         getCluster={pendingGetCluster}
         listTopics={pendingListTopics}
+        getTopicDetail={pendingGetTopicDetail}
         statusRefreshMs={60_000}
       />
     </MemoryRouter>,
@@ -44,6 +46,7 @@ describe("App", () => {
           loadGatewayConfig={async () => [{ id: "dev", name: "Dev", url: "http://localhost:8081" }]}
           getCluster={async () => ({ clusterId: "abc", controllerId: 1, brokers: [{ id: 1, host: "kafka-dev", port: 9092 }] })}
           listTopics={async () => [{ name: "orders", partitions: 6, replicationFactor: 1, internal: false, approxMessages: 10 }]}
+          getTopicDetail={pendingGetTopicDetail}
           statusRefreshMs={60_000}
         />
       </MemoryRouter>,
@@ -64,6 +67,7 @@ describe("App", () => {
           loadGatewayConfig={async () => [{ id: "dev", name: "Dev", url: "http://localhost:8081" }]}
           getCluster={pendingGetCluster}
           listTopics={async () => [{ name: "orders", partitions: 6, replicationFactor: 1, internal: false, approxMessages: 10 }]}
+          getTopicDetail={pendingGetTopicDetail}
           statusRefreshMs={60_000}
         />
       </MemoryRouter>,
@@ -73,6 +77,30 @@ describe("App", () => {
 
     expect(await screen.findByRole("table", { name: "Topics" })).toBeDefined();
     expect(screen.getByText("orders")).toBeDefined();
+  });
+
+  it("clicking a topic opens its detail page", async () => {
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter initialEntries={["/clusters/dev/topics"]}>
+        <App
+          queryClient={new QueryClient()}
+          loadGatewayConfig={async () => [{ id: "dev", name: "Dev", url: "http://localhost:8081" }]}
+          getCluster={pendingGetCluster}
+          listTopics={async () => [{ name: "orders", partitions: 1, replicationFactor: 1, internal: false, approxMessages: 1 }]}
+          getTopicDetail={async () => ({
+            name: "orders",
+            partitions: [{ id: 0, leader: 1, replicas: [1], isr: [1], startOffset: 0, endOffset: 1 }],
+            config: [],
+          })}
+          statusRefreshMs={60_000}
+        />
+      </MemoryRouter>,
+    );
+
+    await user.click(await screen.findByRole("link", { name: "orders" }));
+
+    expect(await screen.findByRole("table", { name: "Topic partitions" })).toBeDefined();
   });
 
   it("renders the clusters page with the injected config loader", async () => {

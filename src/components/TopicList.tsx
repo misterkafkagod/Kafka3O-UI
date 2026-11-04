@@ -41,7 +41,7 @@ export function TopicList({ gateway, listTopics }: TopicListProps) {
       ) : visible.length === 0 ? (
         <p>No topics match "{text}"</p>
       ) : (
-        <TopicTable topics={visible} />
+        <TopicTable gatewayId={gateway.id} topics={visible} />
       )}
     </>
   );

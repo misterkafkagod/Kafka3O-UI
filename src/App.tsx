@@ -2,19 +2,22 @@ import { type QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Link, Route, Routes } from "react-router";
 import type { LoadGatewayConfig } from "./config/loadGatewayConfig";
 import type { GetCluster } from "./gateway/getCluster";
+import type { GetTopicDetail } from "./gateway/getTopicDetail";
 import type { ListTopics } from "./gateway/listTopics";
 import { ClusterPage } from "./pages/ClusterPage";
 import { ClustersPage } from "./pages/ClustersPage";
+import { TopicPage } from "./pages/TopicPage";
 
 type AppProps = {
   queryClient: QueryClient;
   loadGatewayConfig: LoadGatewayConfig;
   getCluster: GetCluster;
   listTopics: ListTopics;
+  getTopicDetail: GetTopicDetail;
   statusRefreshMs: number;
 };
 
-export function App({ queryClient, loadGatewayConfig, getCluster, listTopics, statusRefreshMs }: AppProps) {
+export function App({ queryClient, loadGatewayConfig, getCluster, listTopics, getTopicDetail, statusRefreshMs }: AppProps) {
   return (
     <QueryClientProvider client={queryClient}>
       <header>
@@ -56,6 +59,10 @@ export function App({ queryClient, loadGatewayConfig, getCluster, listTopics, st
               view="topics"
             />
           }
+        />
+        <Route
+          path="/clusters/:gatewayId/topics/:topicName"
+          element={<TopicPage loadGatewayConfig={loadGatewayConfig} getTopicDetail={getTopicDetail} />}
         />
       </Routes>
     </QueryClientProvider>
