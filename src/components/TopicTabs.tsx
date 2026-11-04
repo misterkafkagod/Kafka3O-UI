@@ -7,7 +7,7 @@ type TopicTabsProps = {
 };
 
 export function TopicTabs({ gateway, topicName }: TopicTabsProps) {
-  const topicPath = `/clusters/${gateway.id}/topics/${encodeURIComponent(topicName)}`;
+  const topicPath = `/clusters/${encodeURIComponent(gateway.id)}/topics/${encodeURIComponent(topicName)}`;
 
   return (
     <nav aria-label="Topic views">
@@ -16,6 +16,8 @@ export function TopicTabs({ gateway, topicName }: TopicTabsProps) {
       </NavLink>
       {" | "}
       <NavLink to={`${topicPath}/messages`}>Messages</NavLink>
+      {" | "}
+      <NavLink to={`${topicPath}/consumers`}>Consumers</NavLink>
     </nav>
   );
 }

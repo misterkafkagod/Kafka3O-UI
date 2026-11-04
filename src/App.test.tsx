@@ -157,6 +157,34 @@ describe("App", () => {
     expect(await screen.findByText("No messages found.")).toBeDefined();
   });
 
+  it("opens Consumers for an encoded topic and its configured gateway", async () => {
+    const user = userEvent.setup();
+    const listGroups = vi.fn(async () => [{
+      id: "reader", protocol: "consumer" as const, state: "Stable", members: [], topics: ["orders & audit"], partitions: [],
+    }]);
+    render(
+      <MemoryRouter initialEntries={["/clusters/dev%20%26%20west/topics/orders%20%26%20audit"]}>
+        <App
+          queryClient={new QueryClient()}
+          loadGatewayConfig={async () => [{ id: "dev & west", name: "Dev", url: "http://localhost:8081" }]}
+          getCluster={pendingGetCluster}
+          listTopics={pendingListTopics}
+          listConsumerGroups={listGroups}
+          getTopicDetail={async () => ({ name: "orders & audit", partitions: [], config: [] })}
+          listLatestTopicMessages={pendingListLatestTopicMessages}
+          searchTopicMessages={pendingSearchTopicMessages}
+          linkOrigin={linkOrigin}
+          copyMessageLink={copyMessageLink}
+          statusRefreshMs={60_000}
+        />
+      </MemoryRouter>,
+    );
+    await user.click(await screen.findByRole("link", { name: "Consumers" }));
+    expect(await screen.findByRole("heading", { name: "reader" })).toBeDefined();
+    expect(screen.getByRole("link", { name: "Consumers" }).getAttribute("aria-current")).toBe("page");
+    expect(listGroups).toHaveBeenCalledWith("http://localhost:8081");
+  });
+
   it("opens a topic found across clusters", async () => {
     const user = userEvent.setup();
     render(

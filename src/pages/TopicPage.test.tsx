@@ -23,15 +23,16 @@ function renderTopicPage(
 ) {
   const linkOrigin = "https://console.example";
   const copyMessageLink = async () => {};
+  const listConsumerGroups = async () => [];
   return renderWithQuery(
     <Routes>
       <Route
         path="/clusters/:gatewayId/topics/:topicName"
-        element={<TopicPage {...{ loadGatewayConfig, getTopicDetail, listLatestTopicMessages, searchTopicMessages, linkOrigin, copyMessageLink, view }} />}
+        element={<TopicPage {...{ loadGatewayConfig, getTopicDetail, listConsumerGroups, listLatestTopicMessages, searchTopicMessages, linkOrigin, copyMessageLink, view }} />}
       />
       <Route
         path="/clusters/:gatewayId/topics/:topicName/messages"
-        element={<TopicPage {...{ loadGatewayConfig, getTopicDetail, listLatestTopicMessages, searchTopicMessages, linkOrigin, copyMessageLink, view }} />}
+        element={<TopicPage {...{ loadGatewayConfig, getTopicDetail, listConsumerGroups, listLatestTopicMessages, searchTopicMessages, linkOrigin, copyMessageLink, view }} />}
       />
     </Routes>,
     route,

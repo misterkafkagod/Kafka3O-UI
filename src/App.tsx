@@ -102,6 +102,7 @@ export function App({
             <TopicPage
               loadGatewayConfig={loadGatewayConfig}
               getTopicDetail={getTopicDetail}
+              listConsumerGroups={listConsumerGroups}
               listLatestTopicMessages={listLatestTopicMessages}
               searchTopicMessages={searchTopicMessages}
               linkOrigin={linkOrigin}
@@ -115,11 +116,27 @@ export function App({
             <TopicPage
               loadGatewayConfig={loadGatewayConfig}
               getTopicDetail={getTopicDetail}
+              listConsumerGroups={listConsumerGroups}
               listLatestTopicMessages={listLatestTopicMessages}
               searchTopicMessages={searchTopicMessages}
               linkOrigin={linkOrigin}
               copyMessageLink={copyMessageLink}
               view="messages"
+            />
+          }
+        />
+        <Route
+          path="/clusters/:gatewayId/topics/:topicName/consumers"
+          element={
+            <TopicPage
+              loadGatewayConfig={loadGatewayConfig}
+              getTopicDetail={getTopicDetail}
+              listConsumerGroups={listConsumerGroups}
+              listLatestTopicMessages={listLatestTopicMessages}
+              searchTopicMessages={searchTopicMessages}
+              linkOrigin={linkOrigin}
+              copyMessageLink={copyMessageLink}
+              view="consumers"
             />
           }
         />

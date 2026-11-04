@@ -1,8 +1,10 @@
 import { Link, useParams } from "react-router";
 import { ClusterNotFound } from "../components/ClusterNotFound";
+import { TopicConsumerGroups } from "../components/TopicConsumerGroups";
 import { findGatewayById } from "../config/findGatewayById";
 import type { LoadGatewayConfig } from "../config/loadGatewayConfig";
 import type { GetTopicDetail } from "../gateway/getTopicDetail";
+import type { ListConsumerGroups } from "../gateway/listConsumerGroups";
 import type { ListLatestTopicMessages } from "../gateway/listLatestTopicMessages";
 import type { SearchTopicMessages } from "../gateway/searchTopicMessages";
 import { useGatewayConfig } from "../hooks/useGatewayConfig";
@@ -12,14 +14,15 @@ import { TopicMessagesPage } from "./TopicMessagesPage";
 type TopicPageProps = {
   loadGatewayConfig: LoadGatewayConfig;
   getTopicDetail: GetTopicDetail;
+  listConsumerGroups: ListConsumerGroups;
   listLatestTopicMessages: ListLatestTopicMessages;
   searchTopicMessages: SearchTopicMessages;
   linkOrigin: string;
   copyMessageLink: (text: string) => Promise<void>;
-  view?: "details" | "messages";
+  view?: "details" | "messages" | "consumers";
 };
 
-export function TopicPage({ loadGatewayConfig, getTopicDetail, listLatestTopicMessages, searchTopicMessages, linkOrigin, copyMessageLink, view = "details" }: TopicPageProps) {
+export function TopicPage({ loadGatewayConfig, getTopicDetail, listConsumerGroups, listLatestTopicMessages, searchTopicMessages, linkOrigin, copyMessageLink, view = "details" }: TopicPageProps) {
   const { gatewayId, topicName } = useParams();
   const { data: gateways } = useGatewayConfig(loadGatewayConfig);
 
@@ -40,6 +43,9 @@ export function TopicPage({ loadGatewayConfig, getTopicDetail, listLatestTopicMe
   }
   if (view === "messages") {
     return <TopicMessagesPage gateway={gateway} topicName={topicName} listLatestTopicMessages={listLatestTopicMessages} searchTopicMessages={searchTopicMessages} messageLinks={{ origin: linkOrigin, gatewayId: gateway.id, topicName, copyText: copyMessageLink }} />;
+  }
+  if (view === "consumers") {
+    return <TopicConsumerGroups gateway={gateway} topicName={topicName} listConsumerGroups={listConsumerGroups} />;
   }
   return <TopicDetailPage gateway={gateway} topicName={topicName} getTopicDetail={getTopicDetail} />;
 }
