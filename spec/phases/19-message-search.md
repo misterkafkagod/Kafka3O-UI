@@ -21,7 +21,7 @@
   - Files: `internal/httpapi/register_search_topic_messages.go` (new), `internal/httpapi/register_search_topic_messages_test.go` (new), `internal/httpapi/new_invalid_search.go` (new), `cmd/gateway/main.go`
   - Do: Register and wire the search route; return the result shape and explicit invalid-query, not-found, and unavailable errors.
   - Done when: `go test ./internal/httpapi/...` checks success and all error paths; `go test ./...` passes.
-- [ ] **T19.4 Add the UI search client and hook** — Covers: F7-AC3
+- [x] **T19.4 Add the UI search client and hook** — Covers: F7-AC3
   - Files: `src/gateway/searchTopicMessages.ts` (new), `src/gateway/searchTopicMessages.test.ts` (new), `src/gateway/types.ts`, `src/hooks/useSearchTopicMessages.ts` (new), `src/hooks/useSearchTopicMessages.test.tsx` (new)
   - Do: Add the search client and query independently by gateway, topic and search text.
   - Done when: focused client/hook tests and `npm test` pass; `npm run build` succeeds.
