@@ -18,8 +18,8 @@
   - Files: `internal/kafka/list_latest_topic_messages.go`, `internal/kafka/read_topic_messages.go` (new), `internal/kafka/read_topic_messages_from_offsets.go` (new), `test/integration/read_topic_messages_test.go` (new)
   - Do: Read from the requested partition and offset, or resolve the timestamp with Kafka's offset lookup and read from the resulting offset. Preserve offset order and return an empty array when the requested point is at or beyond the end.
   - Done when: When Docker is available, `CGO_ENABLED=0 go test -tags integration ./test/integration/...` passes `TestReadTopicMessages_FromOffsetAndTimestamp`; without Docker, `go test -run '^$' -tags integration ./test/integration/...` compiles the integration package and `go test ./...` passes. Record an unavailable Docker runtime as not run in Review.
-- [ ] **T18.3 Position query validation and HTTP responses** — Covers: F6-AC3
-  - Files: `internal/httpapi/register_list_latest_topic_messages.go` (from T16.3), `internal/httpapi/register_list_latest_topic_messages_test.go` (from T16.3), `internal/httpapi/new_invalid_position.go` (new)
+- [x] **T18.3 Position query validation and HTTP responses** — Covers: F6-AC3
+  - Files: `internal/httpapi/register_list_latest_topic_messages.go`, `internal/httpapi/register_list_latest_topic_messages_test.go`, `internal/httpapi/new_invalid_position.go` (new), `internal/httpapi/parse_topic_message_position.go` (new), `internal/httpapi/optional_query_parameter.go` (new), `cmd/gateway/main.go`
   - Do: Extend the message endpoint with optional `partition`, `offset`, and Unix-millisecond `timestamp` query parameters; require a partition and exactly one starting position; return 400 `invalid_position` for invalid requests.
   - Done when: `go test ./internal/httpapi/...` passes valid offset/timestamp, incompatible/missing parameters, negative values, missing-topic 404, and Kafka-error 503 checks; `go test ./...` passes.
 - [ ] **T18.4 UI position request** — Covers: F6-AC1, F6-AC2
