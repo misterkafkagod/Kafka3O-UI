@@ -2,7 +2,7 @@
 - **Milestone:** M2
 - **Covers:** F6-AC1, F6-AC2, F6-AC3
 - **Discovery:** —
-- **Status:** Planned        <!-- Planned | Building | Review | Done -->
+- **Status:** Building        <!-- Planned | Building | Review | Done -->
 
 ## Demo
 1. Open `orders` → Messages; choose a partition and read from a known offset, verifying records start at that offset and are in offset order.
@@ -10,8 +10,8 @@
 3. Submit an unknown partition or negative offset and verify a validation error is shown.
 
 ## Tasks
-- [ ] **T18.1 Position-read action and validation** — Covers: F6-AC1, F6-AC2, F6-AC3
-  - Files: `internal/topics/read_topic_messages.go` (new), `internal/topics/read_topic_messages_test.go` (new), `internal/topics/topic_message.go` (from T16.1), `internal/topics/fetch_topic_messages.go` (from T16.1)
+- [x] **T18.1 Position-read action and validation** — Covers: F6-AC1, F6-AC2, F6-AC3
+  - Files: `internal/topics/read_topic_messages.go` (new), `internal/topics/read_topic_messages_test.go` (new), `internal/topics/topic_message_position.go` (new), `internal/topics/fetch_topic_messages_from_position.go` (new), `internal/topics/invalid_topic_message_position.go` (new), `internal/topics/compare_topic_messages_by_offset.go` (new), `internal/topics/compare_topic_messages_by_offset_test.go` (new)
   - Do: Add a read request with a partition and exactly one of offset or timestamp; validate non-negative inputs and reject invalid combinations; apply the configured timeout and cap results at 50. Keep the existing latest-message behavior when no position is supplied.
   - Done when: `go test ./internal/topics/...` passes checks for offset and timestamp requests, invalid combinations/negative positions, result cap, empty results, errors, and deadline propagation.
 - [ ] **T18.2 Kafka position reader** — Covers: F6-AC1, F6-AC2
