@@ -49,6 +49,7 @@ export type TopicConfig = {
 export type TopicMessage = {
   partition: number;
   offset: number;
+  offsetExact?: string;
   timestamp: string;
   key: string | null;
   value: string | null;

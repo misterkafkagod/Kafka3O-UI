@@ -1,12 +1,16 @@
 import { useState } from "react";
 import type { TopicMessage } from "../gateway/types";
+import { exactMessageOffset } from "../messages/exactMessageOffset";
 import { formatMessageValue, type MessageValueFormat } from "../messages/formatMessageValue";
+import type { MessageLinkContext } from "../messages/messageLink";
+import { CopyMessageLink } from "./CopyMessageLink";
 
 type MessageTableProps = {
   messages: TopicMessage[];
+  messageLinks?: MessageLinkContext;
 };
 
-export function MessageTable({ messages }: MessageTableProps) {
+export function MessageTable({ messages, messageLinks }: MessageTableProps) {
   const [valueFormat, setValueFormat] = useState<MessageValueFormat>("text");
 
   return (
@@ -36,15 +40,16 @@ export function MessageTable({ messages }: MessageTableProps) {
             <th scope="col">Key (base64)</th>
             <th scope="col">Value</th>
             <th scope="col">Headers</th>
+            {messageLinks === undefined ? null : <th scope="col">Link</th>}
           </tr>
         </thead>
         <tbody>
           {messages.map((message) => {
             const formattedValue = message.value === null ? null : formatMessageValue(message.value, valueFormat);
             return (
-              <tr key={`${message.partition}-${message.offset}`}>
+              <tr key={`${message.partition}-${exactMessageOffset(message) ?? message.offset}`}>
                 <td>{message.partition}</td>
-                <td>{message.offset}</td>
+                <td>{exactMessageOffset(message) ?? "Exact offset unavailable"}</td>
                 <td>
                   <time dateTime={message.timestamp}>{new Date(message.timestamp).toLocaleString()}</time>
                 </td>
@@ -66,6 +71,9 @@ export function MessageTable({ messages }: MessageTableProps) {
                     </ul>
                   )}
                 </td>
+                {messageLinks === undefined ? null : (
+                  <td><CopyMessageLink context={messageLinks} message={message} /></td>
+                )}
               </tr>
             );
           })}

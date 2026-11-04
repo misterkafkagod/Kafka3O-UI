@@ -1,6 +1,6 @@
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import type { TopicMessage } from "../gateway/types";
 import { MessageTable } from "./MessageTable";
 
@@ -66,5 +66,50 @@ describe("MessageTable", () => {
     await user.selectOptions(screen.getByRole("combobox", { name: "Value format" }), "json");
     expect(screen.queryByRole("status")).toBeNull();
     expect(screen.getAllByText("(null)")).toHaveLength(2);
+  });
+
+  it("copies a precise message link and reports clipboard success", async () => {
+    const user = userEvent.setup();
+    const copyText = vi.fn(async () => {});
+    render(
+      <MessageTable
+        messages={[{ ...messages[0], offset: Number("9007199254740993"), offsetExact: "9007199254740993" }]}
+        messageLinks={{ origin: "https://console.example", gatewayId: "dev", topicName: "orders & audit", copyText }}
+      />,
+    );
+
+    expect(screen.getByText("9007199254740993")).toBeDefined();
+    const expected = "https://console.example/clusters/dev/topics/orders%20%26%20audit/messages?partition=2&offset=9007199254740993";
+    expect(screen.getByRole("link", { name: "Message link" }).getAttribute("href")).toBe(expected);
+    await user.click(screen.getByRole("button", { name: "Copy link for partition 2 offset 9007199254740993" }));
+    expect(copyText).toHaveBeenCalledWith(expected);
+    expect(screen.getByRole("status").textContent).toBe("Message link copied.");
+  });
+
+  it("reports clipboard failure and preserves a usable link", async () => {
+    const user = userEvent.setup();
+    render(
+      <MessageTable
+        messages={[messages[0]]}
+        messageLinks={{ origin: "https://console.example", gatewayId: "dev", topicName: "orders", copyText: async () => { throw new Error("denied"); } }}
+      />,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Copy link for partition 2 offset 8" }));
+    expect(screen.getByRole("alert").textContent).toContain("Copy failed");
+    expect(screen.getByRole("link", { name: "Message link" })).toBeDefined();
+  });
+
+  it("does not create a misleading link for an unsafe legacy offset", () => {
+    render(
+      <MessageTable
+        messages={[{ ...messages[0], offset: Number("9007199254740993") }]}
+        messageLinks={{ origin: "https://console.example", gatewayId: "dev", topicName: "orders", copyText: async () => {} }}
+      />,
+    );
+
+    expect(screen.getByText("Exact offset unavailable")).toBeDefined();
+    expect(screen.getByRole("alert").textContent).toContain("exact message position is unavailable");
+    expect(screen.queryByRole("link", { name: "Message link" })).toBeNull();
   });
 });

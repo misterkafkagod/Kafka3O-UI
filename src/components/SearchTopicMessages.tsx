@@ -3,6 +3,7 @@ import type { SearchTopicMessages as SearchTopicMessagesAction } from "../gatewa
 import type { GatewayEntry } from "../gateway/types";
 import { useSearchTopicMessages } from "../hooks/useSearchTopicMessages";
 import { messageSearchSubmission } from "../messages/messageSearchSubmission";
+import type { MessageLinkContext } from "../messages/messageLink";
 import { ErrorWithRetry } from "./ErrorWithRetry";
 import { MessageTable } from "./MessageTable";
 
@@ -10,9 +11,10 @@ type SearchTopicMessagesProps = {
   gateway: GatewayEntry;
   topicName: string;
   searchTopicMessages: SearchTopicMessagesAction;
+  messageLinks?: MessageLinkContext;
 };
 
-export function SearchTopicMessages({ gateway, topicName, searchTopicMessages }: SearchTopicMessagesProps) {
+export function SearchTopicMessages({ gateway, topicName, searchTopicMessages, messageLinks }: SearchTopicMessagesProps) {
   const [text, setText] = useState("");
   const [query, setQuery] = useState<string>();
   const [validationError, setValidationError] = useState(false);
@@ -54,7 +56,7 @@ export function SearchTopicMessages({ gateway, topicName, searchTopicMessages }:
               ? "Older offsets or partitions were excluded from this search."
               : "No available offsets were excluded from this search."}
           </p>
-          {data.messages.length === 0 ? <p>No matching messages.</p> : <MessageTable messages={data.messages} />}
+          {data.messages.length === 0 ? <p>No matching messages.</p> : <MessageTable messages={data.messages} messageLinks={messageLinks} />}
         </>
       )}
     </section>
