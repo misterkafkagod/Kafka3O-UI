@@ -2,13 +2,13 @@
 - **Milestone:** M5
 - **Covers:** F14-AC2
 - **Discovery:** —
-- **Status:** Planned
+- **Status:** Building
 
 ## Demo
 1. Cancel a topic deletion, then confirm it and observe the accepted request.
 
 ## Tasks
-- [ ] **T27.1 Delete topics through the gateway** — Covers: F14-AC2
+- [x] **T27.1 Delete topics through the gateway** — Covers: F14-AC2
   - Files: Gateway delete-topic action/port/tests, Kafka adapter/tests, HTTP route/tests, composition root, integration test
   - Do: Request deletion and distinguish missing topics from broker failures.
   - Done when: focused action, Kafka mapping and HTTP tests pass; `go test ./...` passes and the integration test compiles or runs with Docker.
