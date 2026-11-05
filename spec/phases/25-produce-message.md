@@ -2,13 +2,13 @@
 - **Milestone:** M5
 - **Covers:** F13-AC1, F13-AC2
 - **Discovery:** —
-- **Status:** Planned
+- **Status:** Building
 
 ## Demo
 1. Produce a UTF-8 message with key and headers; use the returned partition and offset to read it back.
 
 ## Tasks
-- [ ] **T25.1 Produce through the gateway** — Covers: F13-AC1, F13-AC2
+- [x] **T25.1 Produce through the gateway** — Covers: F13-AC1, F13-AC2
   - Files: Gateway message write types/action/port/tests, Kafka producer adapter/tests, HTTP route/tests, composition root, integration test
   - Do: Validate the request, produce a single message with optional key and headers, return partition and exact offset, and report unconfirmed delivery without retrying.
   - Done when: focused tests cover bytes, missing/empty key, headers, validation, exact offsets and failures; `go test ./...` passes and the integration test compiles or runs with Docker.
