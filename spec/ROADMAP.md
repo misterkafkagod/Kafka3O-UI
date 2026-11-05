@@ -100,7 +100,7 @@ Kafka3O is a multi-cluster Kafka console for developers and operators: one web U
 - **Status:** Active
 - **Features:** F12, F13, F14
 - **Phases:**
-  - **P24** F12-B1 + F12-B2 + F12-B3 · Authenticate gateway requests over TLS — Covers: F12-AC1, F12-AC2, F12-AC3 · Discovery: — · Status: Review
+  - **P24** F12-B1 + F12-B2 + F12-B3 · Authenticate gateway requests over TLS — Covers: F12-AC1, F12-AC2, F12-AC3 · Discovery: — · Status: Done
     - Demo: start a gateway with a certificate and token, verify anonymous liveness and rejected unauthenticated API calls, then enter the token and load the cluster.
   - **P25** F13-B1 + F13-B2 · Produce a test message — Covers: F13-AC1, F13-AC2 · Discovery: — · Status: Planned
     - Demo: produce a message with key and headers and read it back by its returned partition and offset.
@@ -116,6 +116,7 @@ Kafka3O is a multi-cluster Kafka console for developers and operators: one web U
 - **Technical debt:** Upgrade the Gateway Go toolchain and build image to a release fixing GO-2026-6809; the 2026-11-04 scan reports CISA CVSS 6.8 medium in Go 1.27.2.
 
 ## Learnings
+- 2026-11-04 (M5 / P24): Gateway authentication requires trusted TLS and a random per-gateway token; credential changes reset gateway caches. A real-broker authentication demo remains outstanding without Docker.
 - 2026-11-04 (M4 retro): Shared group snapshots keep cluster and topic views consistent; explicit unknown association and lag states avoid false empty or zero results; nullable decimal strings preserve Kafka offsets in JSON and OpenAPI; real-broker integration and demos remain outstanding without Docker.
 - 2026-11-04 (M4 / P22): Consumer group offsets are nullable decimal strings in both JSON and OpenAPI; Docker-backed group tests and demo remain unrun without Docker.
 - 2026-11-04 (M3 retro): Independent gateway queries keep partial search results usable; the topic-wide search bound must describe offset windows rather than global timestamp order; exact decimal offsets prevent incorrect message links; real-broker demos and integration runs remain outstanding without Docker.
