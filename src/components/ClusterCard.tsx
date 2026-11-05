@@ -23,9 +23,15 @@ export function ClusterCard({ gateway, getCluster, statusRefreshMs }: ClusterCar
       </h2>
       <p>{gateway.url}</p>
       {errorKind === "authentication-required" ? (
-        <p>Authentication required</p>
+        <>
+          <p>Authentication required</p>
+          <p>Enter a token under Gateway credentials.</p>
+        </>
       ) : errorKind === "gateway-unreachable" ? (
-        <p>Gateway unreachable</p>
+        <>
+          <p>Gateway unreachable</p>
+          <p>Check the connection and that the gateway's HTTPS certificate is trusted.</p>
+        </>
       ) : errorKind === "cluster-unreachable" ? (
         <>
           <p>Cluster unreachable</p>

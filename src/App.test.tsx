@@ -4,6 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
 import { describe, expect, it, vi } from "vitest";
 import { App } from "./App";
+import { HttpError } from "./gateway/HttpError";
 
 const pendingGetCluster = () => new Promise<never>(() => {});
 const pendingListTopics = () => new Promise<never>(() => {});
@@ -13,12 +14,14 @@ const pendingListLatestTopicMessages = () => new Promise<never>(() => {});
 const pendingSearchTopicMessages = () => new Promise<never>(() => {});
 const linkOrigin = "https://console.example";
 const copyMessageLink = async () => {};
+const gatewayCredentials = { read: () => null, save: () => {}, clear: () => {} };
 
 function renderApp() {
   return render(
     <MemoryRouter>
       <App
         queryClient={new QueryClient()}
+        gatewayCredentials={gatewayCredentials}
         loadGatewayConfig={async () => []}
         getCluster={pendingGetCluster}
         listTopics={pendingListTopics}
@@ -53,6 +56,7 @@ describe("App", () => {
       <MemoryRouter>
         <App
           queryClient={new QueryClient()}
+          gatewayCredentials={gatewayCredentials}
           loadGatewayConfig={async () => [{ id: "dev", name: "Dev", url: "http://localhost:8081" }]}
           getCluster={async () => ({ clusterId: "abc", controllerId: 1, brokers: [{ id: 1, host: "kafka-dev", port: 9092 }] })}
           listTopics={async () => [{ name: "orders", partitions: 6, replicationFactor: 1, internal: false, approxMessages: 10 }]}
@@ -79,6 +83,7 @@ describe("App", () => {
       <MemoryRouter initialEntries={["/clusters/dev"]}>
         <App
           queryClient={new QueryClient()}
+          gatewayCredentials={gatewayCredentials}
           loadGatewayConfig={async () => [{ id: "dev", name: "Dev", url: "http://localhost:8081" }]}
           getCluster={pendingGetCluster}
           listTopics={async () => [{ name: "orders", partitions: 6, replicationFactor: 1, internal: false, approxMessages: 10 }]}
@@ -108,6 +113,7 @@ describe("App", () => {
       <MemoryRouter initialEntries={["/clusters/dev"]}>
         <App
           queryClient={new QueryClient()}
+          gatewayCredentials={gatewayCredentials}
           loadGatewayConfig={async () => [{ id: "dev", name: "Dev", url: "http://localhost:8081" }]}
           getCluster={pendingGetCluster}
           listTopics={pendingListTopics}
@@ -132,6 +138,7 @@ describe("App", () => {
       <MemoryRouter initialEntries={["/clusters/dev/topics"]}>
         <App
           queryClient={new QueryClient()}
+          gatewayCredentials={gatewayCredentials}
           loadGatewayConfig={async () => [{ id: "dev", name: "Dev", url: "http://localhost:8081" }]}
           getCluster={pendingGetCluster}
           listTopics={async () => [{ name: "orders", partitions: 1, replicationFactor: 1, internal: false, approxMessages: 1 }]}
@@ -166,6 +173,7 @@ describe("App", () => {
       <MemoryRouter initialEntries={["/clusters/dev%20%26%20west/topics/orders%20%26%20audit"]}>
         <App
           queryClient={new QueryClient()}
+          gatewayCredentials={gatewayCredentials}
           loadGatewayConfig={async () => [{ id: "dev & west", name: "Dev", url: "http://localhost:8081" }]}
           getCluster={pendingGetCluster}
           listTopics={pendingListTopics}
@@ -191,6 +199,7 @@ describe("App", () => {
       <MemoryRouter>
         <App
           queryClient={new QueryClient()}
+          gatewayCredentials={gatewayCredentials}
           loadGatewayConfig={async () => [{ id: "dev", name: "Dev", url: "http://localhost:8081" }]}
           getCluster={pendingGetCluster}
           listTopics={async () => [{ name: "orders", partitions: 1, replicationFactor: 1, internal: false, approxMessages: 1 }]}
@@ -219,6 +228,7 @@ describe("App", () => {
     const app = () => (
       <App
         queryClient={new QueryClient()}
+        gatewayCredentials={gatewayCredentials}
         loadGatewayConfig={async () => [{ id: "dev & west", name: "Dev", url: "http://localhost:8081" }]}
         getCluster={pendingGetCluster}
         listTopics={pendingListTopics}
@@ -243,6 +253,46 @@ describe("App", () => {
       partition: 2,
       offset: "9007199254740993",
     });
+  });
+
+  it("allows authentication and removal from a direct topic link", async () => {
+    const user = userEvent.setup();
+    const tokens = new Map<string, string>();
+    const credentials = {
+      read: (url: string) => tokens.get(url) ?? null,
+      save: (url: string, token: string) => { tokens.set(url, token); },
+      clear: (url: string) => { tokens.delete(url); },
+    };
+    const url = "https://gateway.example";
+    render(
+      <MemoryRouter initialEntries={["/clusters/dev/topics/orders"]}>
+        <App
+          queryClient={new QueryClient({ defaultOptions: { queries: { retry: false } } })}
+          gatewayCredentials={credentials}
+          loadGatewayConfig={async () => [{ id: "dev", name: "Dev", url }]}
+          getCluster={pendingGetCluster}
+          listTopics={pendingListTopics}
+          listConsumerGroups={pendingListConsumerGroups}
+          getTopicDetail={async () => {
+            if (!tokens.has(url)) throw new HttpError(401, "unauthorized");
+            return { name: "orders", partitions: [], config: [] };
+          }}
+          listLatestTopicMessages={pendingListLatestTopicMessages}
+          searchTopicMessages={pendingSearchTopicMessages}
+          linkOrigin={linkOrigin}
+          copyMessageLink={copyMessageLink}
+          statusRefreshMs={60_000}
+        />
+      </MemoryRouter>,
+    );
+    expect(await screen.findByText("Authentication required")).toBeDefined();
+    await user.click(screen.getByText("Gateway credentials"));
+    await user.type(screen.getByLabelText("Token for Dev"), "a".repeat(32));
+    await user.click(screen.getByRole("button", { name: "Use token" }));
+    expect(await screen.findByRole("table", { name: "Topic partitions" })).toBeDefined();
+    await user.click(screen.getByRole("button", { name: "Remove token" }));
+    expect(await screen.findByText("Authentication required")).toBeDefined();
+    expect(screen.queryByRole("table", { name: "Topic partitions" })).toBeNull();
   });
 
   it("renders the clusters page with the injected config loader", async () => {

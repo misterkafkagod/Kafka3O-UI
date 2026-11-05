@@ -1,6 +1,6 @@
 # Technical Spec
 
-Covers both repositories: **Kafka3O-Gateway** (one per Kafka cluster) and **Kafka3O-UI** (one UI talking to all gateways). The browser calls each gateway directly over HTTP with CORS.
+Covers both repositories: **Kafka3O-Gateway** (one per Kafka cluster) and **Kafka3O-UI** (one UI talking to all gateways). The browser calls each gateway directly over HTTPS with CORS.
 
 ## Policies
 - Project type: Open source (Apache-2.0) · CVE policy: zero unpatched critical/high in shipped dependencies
@@ -48,7 +48,7 @@ Covers both repositories: **Kafka3O-Gateway** (one per Kafka cluster) and **Kafk
 - Rules (Gateway): errors are problem JSON with a stable `code` (`cluster_unreachable`, `not_found`, …), built as `httpapi.Problem` (embeds `huma.ErrorModel`, adds `code`)
 - Rules (Gateway): no state survives a restart
 - Rules (UI): components never call `fetch`; all I/O goes through the injected `FetchJson` (`src/gateway/fetchJson.ts`)
-- Rules (UI): every query key starts with the gateway ID
+- Rules (UI): gateway query keys start with `["gateway", gatewayId]`
 - Rules (UI): the gateway list comes only from runtime `/config.json`, never build-time env, so one build serves any deployment
 - Rules (UI): the static host serves `index.html` for client routes (`/clusters/*`); Vite dev already does
 - Rules (M5): tokens are stored in browser session storage for the configured HTTPS gateway only, never in URLs or runtime config; the UI must run in a secure context, authenticated redirects are rejected, and credential changes clear gateway query caches
@@ -70,7 +70,7 @@ Kafka3O-Gateway/
 └── spec/README.md                   # points to Kafka3O-UI/spec/
 
 Kafka3O-UI/
-├── public/config.json               # {"gateways":[{"id":"dev","name":"Dev","url":"http://localhost:8081"}]}
+├── public/config.json               # {"gateways":[{"id":"dev","name":"Dev","url":"https://localhost:8081"}]}
 ├── src/
 │   ├── main.tsx                     # composition root
 │   ├── config/loadGatewayConfig.ts
@@ -96,7 +96,7 @@ Tests live next to the file they test (`*_test.go`, `*.test.ts(x)`).
 - Integration: core testcontainers-go v0.44.0 with `apache/kafka:4.3.1`, started by `test/integration/start_kafka.go` (requires a Docker-compatible runtime)
 - Rejected: testcontainers `modules/kafka` — v0.44.0 only starts Confluent images; `confluent-local` — different distribution than the dev stack; `kfake` — not a real broker
 - Remote Docker (current dev setup: `docker-host`, 192.168.1.194, SSH only): forward the daemon socket with `ssh -nNT -o ExitOnForwardFailure=yes -o StreamLocalBindUnlink=yes -L $HOME/.docker/docker-host.sock:/var/run/docker.sock docker-host`, then `source ~/.docker/docker-host.env` (`DOCKER_HOST=unix://$HOME/.docker/docker-host.sock`, `TESTCONTAINERS_HOST_OVERRIDE=192.168.1.194`, `TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=/var/run/docker.sock`); Ryuk stays enabled. Not `ssh://` contexts — testcontainers-go doesn't reliably support them. Demo ports: `ssh -nNT -L 8081:localhost:8081 -L 8082:localhost:8082 docker-host`
-- Compose must not bind-mount local files (they would resolve on the remote host); configure services via environment variables
+- Compose uses read-only certificate/key bind mounts that resolve on the Docker host, including when it is remote. Provision them there with nonroot-readable permissions; all other service settings use environment variables. See `Kafka3O-Gateway/deploy/README.md`.
 - Run: `go test ./...` (unit) · `CGO_ENABLED=0 go test -tags integration ./test/integration/...` (integration; cgo off avoids linking macOS frameworks, which fails with mismatched Command Line Tools)
 
 ### UI

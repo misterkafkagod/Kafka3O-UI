@@ -1,8 +1,10 @@
 import { type QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Link, Route, Routes } from "react-router";
+import { GatewayCredentialsPanel } from "./components/GatewayCredentialsPanel";
 import type { LoadGatewayConfig } from "./config/loadGatewayConfig";
 import type { GetCluster } from "./gateway/getCluster";
 import type { GetTopicDetail } from "./gateway/getTopicDetail";
+import type { GatewayCredentials } from "./gateway/GatewayCredentials";
 import type { ListConsumerGroups } from "./gateway/listConsumerGroups";
 import type { ListLatestTopicMessages } from "./gateway/listLatestTopicMessages";
 import type { ListTopics } from "./gateway/listTopics";
@@ -14,6 +16,7 @@ import { TopicPage } from "./pages/TopicPage";
 type AppProps = {
   queryClient: QueryClient;
   loadGatewayConfig: LoadGatewayConfig;
+  gatewayCredentials: GatewayCredentials;
   getCluster: GetCluster;
   listTopics: ListTopics;
   listConsumerGroups: ListConsumerGroups;
@@ -28,6 +31,7 @@ type AppProps = {
 export function App({
   queryClient,
   loadGatewayConfig,
+  gatewayCredentials,
   getCluster,
   listTopics,
   listConsumerGroups,
@@ -44,6 +48,7 @@ export function App({
         <h1>
           <Link to="/">Kafka3O</Link>
         </h1>
+        <GatewayCredentialsPanel loadGatewayConfig={loadGatewayConfig} credentials={gatewayCredentials} />
       </header>
       <Routes>
         <Route

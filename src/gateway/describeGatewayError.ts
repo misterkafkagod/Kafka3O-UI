@@ -12,7 +12,7 @@ export function describeGatewayError(error: unknown): GatewayErrorDescription {
     return { title: "Authentication required", detail: "Enter or update this gateway's token." };
   }
   if (kind === "gateway-unreachable") {
-    return { title: "Gateway unreachable" };
+    return { title: "Gateway unreachable", detail: "Check the connection and that the gateway's HTTPS certificate is trusted." };
   }
   if (kind === "cluster-unreachable") {
     return { title: "Cluster unreachable", detail: error instanceof HttpError ? error.problem?.detail : undefined };

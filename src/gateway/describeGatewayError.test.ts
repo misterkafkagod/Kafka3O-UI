@@ -10,7 +10,10 @@ describe("describeGatewayError", () => {
     });
   });
   it("describes a network failure as Gateway unreachable", () => {
-    expect(describeGatewayError(new TypeError("Failed to fetch"))).toEqual({ title: "Gateway unreachable" });
+    expect(describeGatewayError(new TypeError("Failed to fetch"))).toEqual({
+      title: "Gateway unreachable",
+      detail: "Check the connection and that the gateway's HTTPS certificate is trusted.",
+    });
   });
 
   it("describes a cluster_unreachable problem with its detail", () => {
