@@ -106,7 +106,7 @@ Kafka3O is a multi-cluster Kafka console for developers and operators: one web U
     - Demo: produce a message with key and headers and read it back by its returned partition and offset.
   - **P26** F14-B1 + F14-B3 · Create a topic — Covers: F14-AC1, F14-AC3 · Discovery: — · Status: Done
     - Demo: create a topic with explicit partition and replication counts and see it in the topic list.
-  - **P27** F14-B2 · Delete a topic — Covers: F14-AC2 · Discovery: — · Status: Building
+  - **P27** F14-B2 · Delete a topic — Covers: F14-AC2 · Discovery: — · Status: Review
     - Demo: cancel deletion, then confirm it and observe the accepted deletion request.
 
 ## Backlog

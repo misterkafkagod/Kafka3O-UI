@@ -14,6 +14,8 @@ const pendingListLatestTopicMessages = () => new Promise<never>(() => {});
 const pendingSearchTopicMessages = () => new Promise<never>(() => {});
 const produceTopicMessage = async () => ({ partition: 0, offset: "0" });
 const createTopic = async () => {};
+const deleteTopic = async () => {};
+const confirmTopicDeletion = () => false;
 const linkOrigin = "https://console.example";
 const copyMessageLink = async () => {};
 const gatewayCredentials = { read: () => null, save: () => {}, clear: () => {} };
@@ -26,6 +28,8 @@ function renderApp() {
         gatewayCredentials={gatewayCredentials}
         produceTopicMessage={produceTopicMessage}
         createTopic={createTopic}
+        deleteTopic={deleteTopic}
+        confirmTopicDeletion={confirmTopicDeletion}
         loadGatewayConfig={async () => []}
         getCluster={pendingGetCluster}
         listTopics={pendingListTopics}
@@ -63,6 +67,8 @@ describe("App", () => {
           gatewayCredentials={gatewayCredentials}
           produceTopicMessage={produceTopicMessage}
           createTopic={createTopic}
+          deleteTopic={deleteTopic}
+          confirmTopicDeletion={confirmTopicDeletion}
           loadGatewayConfig={async () => [{ id: "dev", name: "Dev", url: "http://localhost:8081" }]}
           getCluster={async () => ({ clusterId: "abc", controllerId: 1, brokers: [{ id: 1, host: "kafka-dev", port: 9092 }] })}
           listTopics={async () => [{ name: "orders", partitions: 6, replicationFactor: 1, internal: false, approxMessages: 10 }]}
@@ -92,6 +98,8 @@ describe("App", () => {
           gatewayCredentials={gatewayCredentials}
           produceTopicMessage={produceTopicMessage}
           createTopic={createTopic}
+          deleteTopic={deleteTopic}
+          confirmTopicDeletion={confirmTopicDeletion}
           loadGatewayConfig={async () => [{ id: "dev", name: "Dev", url: "http://localhost:8081" }]}
           getCluster={pendingGetCluster}
           listTopics={async () => [{ name: "orders", partitions: 6, replicationFactor: 1, internal: false, approxMessages: 10 }]}
@@ -124,6 +132,8 @@ describe("App", () => {
           gatewayCredentials={gatewayCredentials}
           produceTopicMessage={produceTopicMessage}
           createTopic={createTopic}
+          deleteTopic={deleteTopic}
+          confirmTopicDeletion={confirmTopicDeletion}
           loadGatewayConfig={async () => [{ id: "dev", name: "Dev", url: "http://localhost:8081" }]}
           getCluster={pendingGetCluster}
           listTopics={pendingListTopics}
@@ -151,6 +161,8 @@ describe("App", () => {
           gatewayCredentials={gatewayCredentials}
           produceTopicMessage={produceTopicMessage}
           createTopic={createTopic}
+          deleteTopic={deleteTopic}
+          confirmTopicDeletion={confirmTopicDeletion}
           loadGatewayConfig={async () => [{ id: "dev", name: "Dev", url: "http://localhost:8081" }]}
           getCluster={pendingGetCluster}
           listTopics={async () => [{ name: "orders", partitions: 1, replicationFactor: 1, internal: false, approxMessages: 1 }]}
@@ -188,6 +200,8 @@ describe("App", () => {
           gatewayCredentials={gatewayCredentials}
           produceTopicMessage={produceTopicMessage}
           createTopic={createTopic}
+          deleteTopic={deleteTopic}
+          confirmTopicDeletion={confirmTopicDeletion}
           loadGatewayConfig={async () => [{ id: "dev & west", name: "Dev", url: "http://localhost:8081" }]}
           getCluster={pendingGetCluster}
           listTopics={pendingListTopics}
@@ -216,6 +230,8 @@ describe("App", () => {
           gatewayCredentials={gatewayCredentials}
           produceTopicMessage={produceTopicMessage}
           createTopic={createTopic}
+          deleteTopic={deleteTopic}
+          confirmTopicDeletion={confirmTopicDeletion}
           loadGatewayConfig={async () => [{ id: "dev", name: "Dev", url: "http://localhost:8081" }]}
           getCluster={pendingGetCluster}
           listTopics={async () => [{ name: "orders", partitions: 1, replicationFactor: 1, internal: false, approxMessages: 1 }]}
@@ -247,6 +263,8 @@ describe("App", () => {
         gatewayCredentials={gatewayCredentials}
         produceTopicMessage={produceTopicMessage}
         createTopic={createTopic}
+        deleteTopic={deleteTopic}
+        confirmTopicDeletion={confirmTopicDeletion}
         loadGatewayConfig={async () => [{ id: "dev & west", name: "Dev", url: "http://localhost:8081" }]}
         getCluster={pendingGetCluster}
         listTopics={pendingListTopics}
@@ -289,6 +307,8 @@ describe("App", () => {
           gatewayCredentials={credentials}
           produceTopicMessage={produceTopicMessage}
           createTopic={createTopic}
+          deleteTopic={deleteTopic}
+          confirmTopicDeletion={confirmTopicDeletion}
           loadGatewayConfig={async () => [{ id: "dev", name: "Dev", url }]}
           getCluster={pendingGetCluster}
           listTopics={pendingListTopics}
@@ -313,6 +333,40 @@ describe("App", () => {
     await user.click(screen.getByRole("button", { name: "Remove token" }));
     expect(await screen.findByText("Authentication required")).toBeDefined();
     expect(screen.queryByRole("table", { name: "Topic partitions" })).toBeNull();
+  });
+
+  it("requires confirmation and displays accepted deletion on the topic route", async () => {
+    const user = userEvent.setup();
+    const confirm = vi.fn().mockReturnValueOnce(false).mockReturnValueOnce(true);
+    const remove = vi.fn(async () => {});
+    render(
+      <MemoryRouter initialEntries={["/clusters/dev/topics/orders"]}>
+        <App
+          queryClient={new QueryClient({ defaultOptions: { queries: { retry: false } } })}
+          gatewayCredentials={gatewayCredentials}
+          produceTopicMessage={produceTopicMessage}
+          createTopic={createTopic}
+          deleteTopic={remove}
+          confirmTopicDeletion={confirm}
+          loadGatewayConfig={async () => [{ id: "dev", name: "Dev", url: "https://gateway" }]}
+          getCluster={pendingGetCluster}
+          listTopics={pendingListTopics}
+          listConsumerGroups={pendingListConsumerGroups}
+          getTopicDetail={async () => ({ name: "orders", partitions: [], config: [] })}
+          listLatestTopicMessages={pendingListLatestTopicMessages}
+          searchTopicMessages={pendingSearchTopicMessages}
+          linkOrigin={linkOrigin}
+          copyMessageLink={copyMessageLink}
+          statusRefreshMs={60_000}
+        />
+      </MemoryRouter>,
+    );
+    await user.click(await screen.findByRole("button", { name: "Delete topic" }));
+    expect(remove).not.toHaveBeenCalled();
+    await user.click(screen.getByRole("button", { name: "Delete topic" }));
+    expect(await screen.findByText(/Deletion was accepted/)).toBeDefined();
+    expect(remove).toHaveBeenCalledOnce();
+    expect(remove).toHaveBeenCalledWith("https://gateway", "orders");
   });
 
   it("renders the clusters page with the injected config loader", async () => {

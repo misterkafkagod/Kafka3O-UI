@@ -25,15 +25,17 @@ function renderTopicPage(
   const copyMessageLink = async () => {};
   const listConsumerGroups = async () => [];
   const produceTopicMessage = async () => ({ partition: 0, offset: "0" });
+  const deleteTopic = async () => {};
+  const confirmTopicDeletion = () => false;
   return renderWithQuery(
     <Routes>
       <Route
         path="/clusters/:gatewayId/topics/:topicName"
-        element={<TopicPage {...{ loadGatewayConfig, getTopicDetail, listConsumerGroups, listLatestTopicMessages, searchTopicMessages, produceTopicMessage, linkOrigin, copyMessageLink, view }} />}
+        element={<TopicPage {...{ loadGatewayConfig, getTopicDetail, listConsumerGroups, listLatestTopicMessages, searchTopicMessages, produceTopicMessage, deleteTopic, confirmTopicDeletion, linkOrigin, copyMessageLink, view }} />}
       />
       <Route
         path="/clusters/:gatewayId/topics/:topicName/messages"
-        element={<TopicPage {...{ loadGatewayConfig, getTopicDetail, listConsumerGroups, listLatestTopicMessages, searchTopicMessages, produceTopicMessage, linkOrigin, copyMessageLink, view }} />}
+        element={<TopicPage {...{ loadGatewayConfig, getTopicDetail, listConsumerGroups, listLatestTopicMessages, searchTopicMessages, produceTopicMessage, deleteTopic, confirmTopicDeletion, linkOrigin, copyMessageLink, view }} />}
       />
     </Routes>,
     route,

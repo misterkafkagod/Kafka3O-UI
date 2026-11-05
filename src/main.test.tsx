@@ -4,6 +4,7 @@ import type { LoadGatewayConfig } from "./config/loadGatewayConfig";
 import type { GatewayCredentials } from "./gateway/GatewayCredentials";
 import type { GetCluster } from "./gateway/getCluster";
 import type { CreateTopic } from "./gateway/createTopic";
+import type { ConfirmTopicDeletion, DeleteTopic } from "./gateway/deleteTopic";
 import type { ListConsumerGroups } from "./gateway/listConsumerGroups";
 import type { ListLatestTopicMessages } from "./gateway/listLatestTopicMessages";
 import type { ProduceTopicMessage } from "./gateway/produceTopicMessage";
@@ -43,6 +44,8 @@ type AppTree = ReactElement<{
       gatewayCredentials: GatewayCredentials;
       produceTopicMessage: ProduceTopicMessage;
       createTopic: CreateTopic;
+      deleteTopic: DeleteTopic;
+      confirmTopicDeletion: ConfirmTopicDeletion;
       linkOrigin: string;
       copyMessageLink: (text: string) => Promise<void>;
     }>;
@@ -87,6 +90,7 @@ describe("main composition", () => {
         return Response.json(JSON.parse(String(init.body)), { status: 201 });
       }
       if (init?.method === "POST") return Response.json({ partition: 1, offset: "9007199254740993" });
+      if (init?.method === "DELETE") return Response.json({ name: "orders", status: "accepted" }, { status: 202 });
       return Response.json({ clusterId: "abc", controllerId: 1, brokers: [] });
     });
     vi.stubGlobal("fetch", fetchFn);
@@ -112,6 +116,13 @@ describe("main composition", () => {
     await props.createTopic("https://gateway", { name: "orders", partitions: 1, replicationFactor: 1 });
     expect(fetchFn.mock.calls[5][1]?.method).toBe("POST");
     expect(new Headers(fetchFn.mock.calls[5][1]?.headers).get("Authorization")).toBe(`Bearer ${token}`);
+    const confirm = vi.fn(() => false);
+    vi.stubGlobal("confirm", confirm);
+    expect(props.confirmTopicDeletion("orders")).toBe(false);
+    expect(confirm).toHaveBeenCalledWith(expect.stringContaining("permanently deleted"));
+    await props.deleteTopic("https://gateway", "orders");
+    expect(fetchFn.mock.calls[6][1]?.method).toBe("DELETE");
+    expect(new Headers(fetchFn.mock.calls[6][1]?.headers).get("Authorization")).toBe(`Bearer ${token}`);
     props.gatewayCredentials.clear("https://gateway");
     expect(props.gatewayCredentials.read("https://gateway")).toBeNull();
   });

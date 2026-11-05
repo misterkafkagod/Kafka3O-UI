@@ -5,6 +5,7 @@ import type { LoadGatewayConfig } from "./config/loadGatewayConfig";
 import type { GetCluster } from "./gateway/getCluster";
 import type { GetTopicDetail } from "./gateway/getTopicDetail";
 import type { CreateTopic } from "./gateway/createTopic";
+import type { ConfirmTopicDeletion, DeleteTopic } from "./gateway/deleteTopic";
 import type { GatewayCredentials } from "./gateway/GatewayCredentials";
 import type { ListConsumerGroups } from "./gateway/listConsumerGroups";
 import type { ListLatestTopicMessages } from "./gateway/listLatestTopicMessages";
@@ -27,6 +28,8 @@ type AppProps = {
   searchTopicMessages: SearchTopicMessages;
   produceTopicMessage: ProduceTopicMessage;
   createTopic: CreateTopic;
+  deleteTopic: DeleteTopic;
+  confirmTopicDeletion: ConfirmTopicDeletion;
   linkOrigin: string;
   copyMessageLink: (text: string) => Promise<void>;
   statusRefreshMs: number;
@@ -44,6 +47,8 @@ export function App({
   searchTopicMessages,
   produceTopicMessage,
   createTopic,
+  deleteTopic,
+  confirmTopicDeletion,
   linkOrigin,
   copyMessageLink,
   statusRefreshMs,
@@ -120,6 +125,8 @@ export function App({
               listLatestTopicMessages={listLatestTopicMessages}
               searchTopicMessages={searchTopicMessages}
               produceTopicMessage={produceTopicMessage}
+              deleteTopic={deleteTopic}
+              confirmTopicDeletion={confirmTopicDeletion}
               linkOrigin={linkOrigin}
               copyMessageLink={copyMessageLink}
             />
@@ -135,6 +142,8 @@ export function App({
               listLatestTopicMessages={listLatestTopicMessages}
               searchTopicMessages={searchTopicMessages}
               produceTopicMessage={produceTopicMessage}
+              deleteTopic={deleteTopic}
+              confirmTopicDeletion={confirmTopicDeletion}
               linkOrigin={linkOrigin}
               copyMessageLink={copyMessageLink}
               view="messages"
@@ -151,6 +160,8 @@ export function App({
               listLatestTopicMessages={listLatestTopicMessages}
               searchTopicMessages={searchTopicMessages}
               produceTopicMessage={produceTopicMessage}
+              deleteTopic={deleteTopic}
+              confirmTopicDeletion={confirmTopicDeletion}
               linkOrigin={linkOrigin}
               copyMessageLink={copyMessageLink}
               view="consumers"

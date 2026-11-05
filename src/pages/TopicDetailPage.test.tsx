@@ -7,6 +7,8 @@ import { renderWithQuery } from "../test/renderWithQuery";
 import { TopicDetailPage } from "./TopicDetailPage";
 
 const gateway = { id: "dev", name: "Dev", url: "http://localhost:8081" };
+const deleteTopic = async () => {};
+const confirmTopicDeletion = () => false;
 const detail: TopicDetail = {
   name: "orders",
   partitions: [
@@ -21,7 +23,7 @@ const detail: TopicDetail = {
 
 describe("TopicDetailPage", () => {
   it("shows partition metadata and topic config without exposing sensitive values", async () => {
-    renderWithQuery(<TopicDetailPage gateway={gateway} topicName="orders" getTopicDetail={async () => detail} />);
+    renderWithQuery(<TopicDetailPage gateway={gateway} topicName="orders" getTopicDetail={async () => detail} deleteTopic={deleteTopic} confirmTopicDeletion={confirmTopicDeletion} />);
 
     expect(await screen.findByRole("heading", { name: "orders" })).toBeDefined();
     const partitions = within(screen.getByRole("table", { name: "Topic partitions" }));
@@ -42,6 +44,8 @@ describe("TopicDetailPage", () => {
       <TopicDetailPage
         gateway={gateway}
         topicName="orders"
+        deleteTopic={deleteTopic}
+        confirmTopicDeletion={confirmTopicDeletion}
         getTopicDetail={async () => {
           throw new HttpError(404, "Not found", { code: "not_found" });
         }}
@@ -58,6 +62,8 @@ describe("TopicDetailPage", () => {
       <TopicDetailPage
         gateway={gateway}
         topicName="orders"
+        deleteTopic={deleteTopic}
+        confirmTopicDeletion={confirmTopicDeletion}
         getTopicDetail={async () => {
           if (!failed) {
             failed = true;

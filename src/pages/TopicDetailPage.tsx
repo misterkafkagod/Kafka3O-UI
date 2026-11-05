@@ -1,7 +1,9 @@
 import { Link } from "react-router";
 import { ErrorWithRetry } from "../components/ErrorWithRetry";
+import { DeleteTopic } from "../components/DeleteTopic";
 import { TopicTabs } from "../components/TopicTabs";
 import type { GetTopicDetail } from "../gateway/getTopicDetail";
+import type { ConfirmTopicDeletion, DeleteTopic as DeleteAction } from "../gateway/deleteTopic";
 import { HttpError } from "../gateway/HttpError";
 import type { GatewayEntry } from "../gateway/types";
 import { useTopicDetail } from "../hooks/useTopicDetail";
@@ -10,9 +12,11 @@ type TopicDetailPageProps = {
   gateway: GatewayEntry;
   topicName: string;
   getTopicDetail: GetTopicDetail;
+  deleteTopic: DeleteAction;
+  confirmTopicDeletion: ConfirmTopicDeletion;
 };
 
-export function TopicDetailPage({ gateway, topicName, getTopicDetail }: TopicDetailPageProps) {
+export function TopicDetailPage({ gateway, topicName, getTopicDetail, deleteTopic, confirmTopicDeletion }: TopicDetailPageProps) {
   const { data: detail, isError, error, refetch } = useTopicDetail(gateway, topicName, getTopicDetail);
 
   if (isError) {
@@ -35,6 +39,7 @@ export function TopicDetailPage({ gateway, topicName, getTopicDetail }: TopicDet
       <Link to={`/clusters/${gateway.id}/topics`}>Back to topics</Link>
       <TopicTabs gateway={gateway} topicName={topicName} />
       <h2>{detail.name}</h2>
+      <DeleteTopic key={JSON.stringify([gateway.id, topicName])} gateway={gateway} topicName={topicName} deleteTopic={deleteTopic} confirmTopicDeletion={confirmTopicDeletion} />
       <h3>Partitions</h3>
       <table aria-label="Topic partitions">
         <thead>

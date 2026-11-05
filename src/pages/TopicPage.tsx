@@ -4,6 +4,7 @@ import { TopicConsumerGroups } from "../components/TopicConsumerGroups";
 import { findGatewayById } from "../config/findGatewayById";
 import type { LoadGatewayConfig } from "../config/loadGatewayConfig";
 import type { GetTopicDetail } from "../gateway/getTopicDetail";
+import type { ConfirmTopicDeletion, DeleteTopic } from "../gateway/deleteTopic";
 import type { ListConsumerGroups } from "../gateway/listConsumerGroups";
 import type { ListLatestTopicMessages } from "../gateway/listLatestTopicMessages";
 import type { ProduceTopicMessage } from "../gateway/produceTopicMessage";
@@ -19,12 +20,14 @@ type TopicPageProps = {
   listLatestTopicMessages: ListLatestTopicMessages;
   searchTopicMessages: SearchTopicMessages;
   produceTopicMessage: ProduceTopicMessage;
+  deleteTopic: DeleteTopic;
+  confirmTopicDeletion: ConfirmTopicDeletion;
   linkOrigin: string;
   copyMessageLink: (text: string) => Promise<void>;
   view?: "details" | "messages" | "consumers";
 };
 
-export function TopicPage({ loadGatewayConfig, getTopicDetail, listConsumerGroups, listLatestTopicMessages, searchTopicMessages, produceTopicMessage, linkOrigin, copyMessageLink, view = "details" }: TopicPageProps) {
+export function TopicPage({ loadGatewayConfig, getTopicDetail, listConsumerGroups, listLatestTopicMessages, searchTopicMessages, produceTopicMessage, deleteTopic, confirmTopicDeletion, linkOrigin, copyMessageLink, view = "details" }: TopicPageProps) {
   const { gatewayId, topicName } = useParams();
   const { data: gateways } = useGatewayConfig(loadGatewayConfig);
 
@@ -49,5 +52,5 @@ export function TopicPage({ loadGatewayConfig, getTopicDetail, listConsumerGroup
   if (view === "consumers") {
     return <TopicConsumerGroups gateway={gateway} topicName={topicName} listConsumerGroups={listConsumerGroups} />;
   }
-  return <TopicDetailPage gateway={gateway} topicName={topicName} getTopicDetail={getTopicDetail} />;
+  return <TopicDetailPage gateway={gateway} topicName={topicName} getTopicDetail={getTopicDetail} deleteTopic={deleteTopic} confirmTopicDeletion={confirmTopicDeletion} />;
 }

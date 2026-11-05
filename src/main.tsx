@@ -6,6 +6,7 @@ import { App } from "./App";
 import { loadGatewayConfig } from "./config/loadGatewayConfig";
 import { clearGatewayToken } from "./gateway/clearGatewayToken";
 import { createTopic } from "./gateway/createTopic";
+import { deleteTopic } from "./gateway/deleteTopic";
 import { fetchGatewayJson } from "./gateway/fetchGatewayJson";
 import { fetchJson } from "./gateway/fetchJson";
 import { getGatewayToken } from "./gateway/getGatewayToken";
@@ -50,6 +51,8 @@ createRoot(document.getElementById("root")!).render(
         searchTopicMessages={(gatewayUrl, topicName, query) => searchTopicMessages(gatewayFetchJson(gatewayUrl), gatewayUrl, topicName, query)}
         produceTopicMessage={(gatewayUrl, topicName, message) => produceTopicMessage(gatewayFetchWrite(gatewayUrl), gatewayUrl, topicName, message)}
         createTopic={(gatewayUrl, input) => createTopic(gatewayFetchWrite(gatewayUrl), gatewayUrl, input)}
+        deleteTopic={(gatewayUrl, topicName) => deleteTopic(gatewayFetchWrite(gatewayUrl), gatewayUrl, topicName)}
+        confirmTopicDeletion={(topicName) => window.confirm(`Delete topic "${topicName}"? Its messages may be permanently deleted.`)}
         linkOrigin={window.location.origin}
         copyMessageLink={(text) => navigator.clipboard.writeText(text)}
         statusRefreshMs={statusRefreshMs}
