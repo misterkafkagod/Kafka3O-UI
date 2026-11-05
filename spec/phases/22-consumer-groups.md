@@ -32,6 +32,7 @@
 
 ## Review
 - **Tests (2026-11-04):** Gateway `go test ./...` passed; the integration package compiled without running tests. UI `npm test` passed 197 tests and `npm run build` passed.
-- **Demo:** both real-Kafka steps not run; Docker is unavailable.
+- **Demo (initial review):** both real-Kafka steps were not run; Docker was unavailable.
+- **Follow-up (2026-11-05):** `TestConsumerGroups_ClassicAndModernLag` passed against a disposable Kafka broker, including missing commits; the real-browser consumer-group demo remains unrun.
 - **Vulnerability scan:** not required for this phase (no dependency changes); the milestone scan is scheduled after P23.
 - **Notes:** Group and partition failures remain visible; offsets use nullable string DTOs so OpenAPI agrees with the exact JSON representation. Node v22.21.0 is below the declared UI runtime, although tests and build passed.

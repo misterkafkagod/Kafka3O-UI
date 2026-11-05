@@ -35,7 +35,8 @@
   - Done when: focused submission and component tests pass for empty, new and repeated searches; `npm test` and `npm run build` pass.
 
 ## Review
-- **Tests:** Gateway `go test ./...` passed; the integration test compiled with `go test -run '^$' -tags integration ./test/integration/...` but was **not run** without Docker. UI `npm test` passed 151 tests and `npm run build` passed.
-- **Demo:** Both real-Kafka steps **not run** because Docker/Kafka is unavailable.
+- **Tests (initial review):** Gateway `go test ./...` passed; the integration test compiled with `go test -run '^$' -tags integration ./test/integration/...` but was **not run** without Docker. UI `npm test` passed 151 tests and `npm run build` passed.
+- **Follow-up (2026-11-05):** `TestSearchTopicMessages_ScansAtMost500OffsetsAcrossPartitions` passed against a disposable Kafka broker; the real-browser search demo remains unrun.
+- **Demo (initial review):** Both real-Kafka steps were **not run** because Docker/Kafka was unavailable.
 - **Vulnerability scan:** Not required for this phase; no dependencies changed. The previously recorded Go advisory remains open.
 - **Notes:** The 500 limit covers offset positions across the whole topic, not 500 per partition or necessarily the newest 500 timestamps; null Kafka values remain distinguishable from empty values.

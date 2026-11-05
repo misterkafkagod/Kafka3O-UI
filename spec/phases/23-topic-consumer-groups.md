@@ -16,6 +16,7 @@
 
 ## Review
 - **Tests (2026-11-04):** Gateway `go test ./...` passed; the integration package compiled without running tests. UI `npm test` passed 203 tests and `npm run build` passed.
-- **Demo:** real-Kafka steps not run because Docker is unavailable. A browser check with mocked gateway responses passed for exact offsets, topic-only rows, and unresolved-group warnings; it is not a real-Kafka demo.
+- **Demo (initial review):** real-Kafka steps were not run because Docker was unavailable. A browser check with mocked gateway responses passed for exact offsets, topic-only rows, and unresolved-group warnings; it is not a real-Kafka demo.
+- **Follow-up (2026-11-05):** The shared consumer-group adapter passed a classic/modern group integration test against a disposable Kafka broker; the topic-specific browser demo remains unrun.
 - **Vulnerability scan:** `npm audit` reported 0 findings. `govulncheck -test -tags integration ./...` reported the previously recorded called GO-2026-6809 (medium; fixed in Go 1.27.3) and one uncalled module advisory.
 - **Notes:** Groups whose association is unknown appear as warnings rather than being misidentified as consumers or hidden. Node v22.21.0 remains below the declared UI runtime.

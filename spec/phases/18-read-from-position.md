@@ -32,5 +32,6 @@
   - Done when: `npm test -- ReadTopicMessagesForm TopicPage` passes offset, timestamp, and validation-error cases; `npm test` and `npm run build` exit 0.
 
 ## Review
-- `go test ./...` passed. `CGO_ENABLED=0 go test -run '^$' -tags integration ./test/integration/...` compiled the integration package; Docker is unavailable, so live Kafka integration tests and the demo were not run.
+- At the initial review, `go test ./...` passed. `CGO_ENABLED=0 go test -run '^$' -tags integration ./test/integration/...` compiled the integration package; Docker was unavailable, so live Kafka integration tests and the demo were not run.
+- **Follow-up (2026-11-05):** The offset and timestamp integration test passed against a disposable Kafka broker. A browser smoke test opened a produced message at its returned partition and offset; the full position-form demo remains unrun.
 - The focused position UI tests passed (10 tests), the full suite passed (138 tests), `npm run build` passed, and `git diff --check` passed in both repositories.

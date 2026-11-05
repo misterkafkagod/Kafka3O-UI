@@ -33,6 +33,6 @@
 
 ## Review
 - **Verification:** `go test ./...` passed; `go test -run '^$' -tags integration ./test/integration/...` compiled the integration package; `npm test` passed (113 tests); `npm run build` exited 0.
-- **Demo:** not run — no Docker runtime is installed, so the Kafka dev stack could not be started.
+- **Demo (initial review):** not run — no Docker runtime was installed, so the Kafka dev stack could not be started.
 - **Vulnerability scan:** not required — no dependency changes; `npm ci` reported 0 vulnerabilities.
-- **Notes:** real-broker integration remains unverified until run with Docker.
+- **Follow-up (2026-11-05):** `TestGetTopicDetail_ReturnsPartitionsOffsetsAndConfig` passed against a disposable Kafka broker; topic details were also viewed in the browser. The stopped-broker Retry demo remains unrun.

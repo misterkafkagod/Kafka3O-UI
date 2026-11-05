@@ -18,6 +18,6 @@
   - Done when: focused UI tests, `npm test`, and `npm run build` pass.
 
 ## Review
-- **Demo:** Producer submission passed in isolated Chrome against a mocked gateway. Producing and reading back against a real broker was **not run** because no Docker or reachable test broker was available. The integration test compiled; unit/UI tests cover UTF-8 bytes, empty versus absent keys, headers, exact offsets, duplicate submission prevention, and uncertain delivery.
+- **Demo:** A browser smoke test produced a synthetic value to a disposable Kafka broker and read it at the returned partition and offset. The authenticated HTTPS integration test also verified UTF-8 bytes, an empty key, and a header. The full key/header browser demo remains unrun; unit/UI tests cover duplicate submissions and uncertain delivery.
 - **Vulnerability scan:** not required for this phase (no dependency changes); see P27 for the milestone scan.
 - **Notes:** Producer requests and UI submissions are not automatically retried; an unconfirmed response may have already been written.

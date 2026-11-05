@@ -61,7 +61,7 @@ Kafka3O is a multi-cluster Kafka console for developers and operators: one web U
     - Scope: the cluster adapter (and the topic metadata adapter from P09) send a direct `kmsg.MetadataRequest` via `kgo.Client.Request` instead of kadm's cached `BrokerMetadata` / `ListTopicsWithInternal`; integration test stops Kafka after a successful call.
   - **P13** F1-B7 · Gateway connects to TLS/SASL-secured clusters — Covers: F1-AC7 · Discovery: kafka-tls-scram-dev · Status: Defined
     - Demo: a gateway pointed at a TLS + SCRAM-SHA-512 cluster shows its card as Healthy.
-    - Blocked: secured-broker discovery has not been run, and no isolated Kafka test environment is available.
+    - Blocked: secured-broker discovery has not been run; the disposable broker used for verification was plaintext.
 
 ### M2 — Look inside a topic and read its messages
 - **Status:** Done
@@ -98,7 +98,7 @@ Kafka3O is a multi-cluster Kafka console for developers and operators: one web U
 
 ### M5 — Safe write access for debugging
 - **Status:** Done
-- **Verification:** Automated suites and mocked-browser workflows pass; real-Kafka integration tests and demos remain outstanding without an isolated Docker-compatible broker.
+- **Verification:** Automated suites, real-Kafka integration tests, and an authenticated browser smoke test pass. The browser test used a certificate-error override; trusted-certificate deployment and the full key/header browser demo remain to be verified.
 - **Features:** F12, F13, F14
 - **Phases:**
   - **P24** F12-B1 + F12-B2 + F12-B3 · Authenticate gateway requests over TLS — Covers: F12-AC1, F12-AC2, F12-AC3 · Discovery: — · Status: Done
@@ -114,23 +114,25 @@ Kafka3O is a multi-cluster Kafka console for developers and operators: one web U
 - **F15** User can reset a consumer group's offsets to earliest, latest or a timestamp
 - **F16** User can decode Avro/Protobuf values via a Schema Registry
 - **F17** User can add or remove gateways from the UI instead of a config file
-- **Verification debt:** Run the M5 real-Kafka integration suite and P24–P27 demos against an isolated Docker-compatible broker; this environment could not start a Docker provider.
+- **Verification debt:** Run the Docker-only stopped-broker test and P14 demo, complete P13 secured-broker discovery, and verify the remaining cross-cluster and consumer-group browser demos.
+- **Verification debt:** Repeat the P24–P27 browser smoke test with a trusted deployment certificate and complete the producer key/header browser demo.
 - **Verification debt:** Build and scan the current gateway container image when a Docker-compatible runtime is available.
 - **Verification debt:** Repeat UI tests and build using the declared Node 24.21.0 or newer; this environment only had Node 22.21.0.
 - **Technical debt:** Upgrade the Gateway Go toolchain and build image to a release fixing GO-2026-6809; the 2026-11-04 scan reports CISA CVSS 6.8 medium in Go 1.27.2.
 
 ## Learnings
+- 2026-11-05 (M2–M5 verification): A disposable EKS-D Kafka broker exercised the existing broker tests, empty and mixed partitions, transaction markers, real log compaction, and authenticated write lifecycle. A browser smoke test covered topic creation, empty and mixed reads, produce/read at the returned position, cancelled/confirmed deletion, and credential removal; TLS certificate errors were overridden for this test.
 - 2026-11-04 (M5 retro): Mandatory gateway TLS and per-gateway credentials provide a consistent boundary for reads and writes.
 - 2026-11-04 (M5 retro): Exact decimal offsets and explicit uncertain outcomes avoid misleading success or failure claims.
 - 2026-11-04 (M5 retro): Automated and mocked-browser flows exercise wiring and confirmation, but cannot prove real Kafka behavior.
-- 2026-11-04 (M5 retro): Next, run broker-backed demos and integration tests in an isolated runtime and validate the UI on its supported Node version.
+- 2026-11-04 (M5 retro): Broker-backed demos and integration tests and supported-Node UI validation were outstanding at review time.
 - 2026-11-04 (M5 / P27): A confirmed delete is an accepted asynchronous request, not proof of completed removal; cancel sends nothing and stale topic caches are invalidated.
 - 2026-11-04 (M5 / P26): Validate Kafka topic-name and numeric bounds before writes; refresh topic-list caches for gateway aliases and report unconfirmed creation honestly.
-- 2026-11-04 (M5 / P25): Exact offsets are returned as decimal strings; failed produces are treated as potentially delivered and are not automatically retried. Real-broker verification remains outstanding.
-- 2026-11-04 (M5 / P24): Gateway authentication requires trusted TLS and a random per-gateway token; credential changes reset gateway caches. A real-broker authentication demo remains outstanding without Docker.
-- 2026-11-04 (M4 retro): Shared group snapshots keep cluster and topic views consistent; explicit unknown association and lag states avoid false empty or zero results; nullable decimal strings preserve Kafka offsets in JSON and OpenAPI; real-broker integration and demos remain outstanding without Docker.
-- 2026-11-04 (M4 / P22): Consumer group offsets are nullable decimal strings in both JSON and OpenAPI; Docker-backed group tests and demo remain unrun without Docker.
-- 2026-11-04 (M3 retro): Independent gateway queries keep partial search results usable; the topic-wide search bound must describe offset windows rather than global timestamp order; exact decimal offsets prevent incorrect message links; real-broker demos and integration runs remain outstanding without Docker.
+- 2026-11-04 (M5 / P25): Exact offsets are returned as decimal strings; failed produces are treated as potentially delivered and are not automatically retried. Real-broker verification was outstanding at review time.
+- 2026-11-04 (M5 / P24): Gateway authentication requires trusted TLS and a random per-gateway token; credential changes reset gateway caches. A real-broker authentication demo was outstanding at review time.
+- 2026-11-04 (M4 retro): Shared group snapshots keep cluster and topic views consistent; explicit unknown association and lag states avoid false empty or zero results; nullable decimal strings preserve Kafka offsets in JSON and OpenAPI. Real-broker verification was outstanding at review time.
+- 2026-11-04 (M4 / P22): Consumer group offsets are nullable decimal strings in both JSON and OpenAPI; the broker-backed group test and demo were outstanding at review time.
+- 2026-11-04 (M3 retro): Independent gateway queries keep partial search results usable; the topic-wide search bound must describe offset windows rather than global timestamp order; exact decimal offsets prevent incorrect message links. Real-broker verification was outstanding at review time.
 - 2026-11-04 (M3 / P19): Search allocates a single 500-offset window fairly across partitions; timestamps do not establish which offsets are globally newest.
 - 2026-11-04 (M1 / P14): Live metadata requests replace cached health and topic-list metadata; stopped-broker integration and demo remain unverified without Docker.
 - 2026-11-04 (M2 / F6): The UI composition root dropped positioned-read arguments; a regression test now covers the production wiring for offset and timestamp requests.

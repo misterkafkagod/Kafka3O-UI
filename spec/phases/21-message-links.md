@@ -24,6 +24,7 @@
 
 ## Review
 - **Tests:** Gateway `go test ./...` passed and integration tests compiled; UI `npm test` passed 183 tests and `npm run build` passed. Tests include copy-to-open navigation, exact int64 offsets, missing/expired positions, and clipboard failures.
-- **Demo:** Both real-Kafka steps **not run** because Docker/Kafka is unavailable.
+- **Demo (initial review):** Both real-Kafka steps were **not run** because Docker/Kafka was unavailable.
+- **Follow-up (2026-11-05):** The browser opened a produced message using its exact partition and offset against a disposable Kafka broker. Copying that link into a new tab was not exercised in this smoke test.
 - **Vulnerability scan:** `npm audit` 2026-11-04: 0 findings. `govulncheck` 2026-11-04: GO-2026-6809 / CVE-2026-111943 is called in Go 1.27.2 (CISA CVSS 6.8 medium; upgrade to 1.27.3 pending); GO-2026-5932 is present at module level but not called.
 - **Notes:** Kafka offsets exceed JavaScript's exact integer range; the additive `offsetExact` field preserves precision. Older gateways without it can only provide verifiable links for safe numeric offsets.

@@ -31,6 +31,7 @@
   - Done when: `npm test -- TopicPage MessageTable App` passes message rendering, navigation, loading, empty, and error/Retry cases; `npm test` and `npm run build` exit 0.
 
 ## Review
-- `go test ./...` passed in Gateway. Integration-tagged tests compiled with `go test -run '^$' -tags integration ./test/integration/...`; the real Kafka test was not run because Docker is unavailable.
+- At the initial review, `go test ./...` passed in Gateway. Integration-tagged tests compiled with `go test -run '^$' -tags integration ./test/integration/...`; the real Kafka test was not run because Docker was unavailable.
+- **Follow-up (2026-11-05):** The newest-across-partitions and empty/mixed-partition integration tests passed against a disposable Kafka broker, including transaction markers. Direct bounded reads also matched a log compacted from 74 to fewer than 10 records. The browser showed the empty state and then the produced record with other partitions empty.
 - Focused UI tests passed (11 tests), the full suite passed (121 tests), and `npm run build` passed.
 - `git diff --check` passed in both repositories. The pre-existing untracked `configs/dev.yaml` was left unchanged.
