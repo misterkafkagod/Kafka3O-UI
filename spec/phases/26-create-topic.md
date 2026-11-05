@@ -2,7 +2,7 @@
 - **Milestone:** M5
 - **Covers:** F14-AC1, F14-AC3
 - **Discovery:** —
-- **Status:** Review
+- **Status:** Done
 
 ## Demo
 1. Create a topic with explicit partition and replication counts and verify it appears in the topic list.
@@ -18,3 +18,6 @@
   - Done when: focused UI tests, `npm test`, and `npm run build` pass.
 
 ## Review
+- **Demo:** Real-broker creation and list visibility were **not run** because no Docker or reachable test broker was available. The integration test compiled; unit/UI tests cover Kafka name/count boundaries, conflicts, uncertain outcomes, duplicate submission prevention, and topic-list refresh.
+- **Vulnerability scan:** not required for this phase (no dependency changes); the milestone scan remains due.
+- **Notes:** Kafka administrative writes use the no-retry client; all cached gateway topic lists are invalidated after creation so aliases refresh too.
