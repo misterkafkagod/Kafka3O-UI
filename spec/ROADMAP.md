@@ -97,7 +97,8 @@ Kafka3O is a multi-cluster Kafka console for developers and operators: one web U
     - Demo: open a topic's Consumers tab and see only groups and lag rows associated with that topic.
 
 ### M5 — Safe write access for debugging
-- **Status:** Active
+- **Status:** Done
+- **Verification:** Automated suites and mocked-browser workflows pass; real-Kafka integration tests and demos remain outstanding without an isolated Docker-compatible broker.
 - **Features:** F12, F13, F14
 - **Phases:**
   - **P24** F12-B1 + F12-B2 + F12-B3 · Authenticate gateway requests over TLS — Covers: F12-AC1, F12-AC2, F12-AC3 · Discovery: — · Status: Done
@@ -113,9 +114,16 @@ Kafka3O is a multi-cluster Kafka console for developers and operators: one web U
 - **F15** User can reset a consumer group's offsets to earliest, latest or a timestamp
 - **F16** User can decode Avro/Protobuf values via a Schema Registry
 - **F17** User can add or remove gateways from the UI instead of a config file
+- **Verification debt:** Run the M5 real-Kafka integration suite and P24–P27 demos against an isolated Docker-compatible broker; this environment could not start a Docker provider.
+- **Verification debt:** Build and scan the current gateway container image when a Docker-compatible runtime is available.
+- **Verification debt:** Repeat UI tests and build using the declared Node 24.21.0 or newer; this environment only had Node 22.21.0.
 - **Technical debt:** Upgrade the Gateway Go toolchain and build image to a release fixing GO-2026-6809; the 2026-11-04 scan reports CISA CVSS 6.8 medium in Go 1.27.2.
 
 ## Learnings
+- 2026-11-04 (M5 retro): Mandatory gateway TLS and per-gateway credentials provide a consistent boundary for reads and writes.
+- 2026-11-04 (M5 retro): Exact decimal offsets and explicit uncertain outcomes avoid misleading success or failure claims.
+- 2026-11-04 (M5 retro): Automated and mocked-browser flows exercise wiring and confirmation, but cannot prove real Kafka behavior.
+- 2026-11-04 (M5 retro): Next, run broker-backed demos and integration tests in an isolated runtime and validate the UI on its supported Node version.
 - 2026-11-04 (M5 / P27): A confirmed delete is an accepted asynchronous request, not proof of completed removal; cancel sends nothing and stale topic caches are invalidated.
 - 2026-11-04 (M5 / P26): Validate Kafka topic-name and numeric bounds before writes; refresh topic-list caches for gateway aliases and report unconfirmed creation honestly.
 - 2026-11-04 (M5 / P25): Exact offsets are returned as decimal strings; failed produces are treated as potentially delivered and are not automatically retried. Real-broker verification remains outstanding.

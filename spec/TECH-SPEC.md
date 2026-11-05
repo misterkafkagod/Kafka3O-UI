@@ -12,7 +12,7 @@ Covers both repositories: **Kafka3O-Gateway** (one per Kafka cluster) and **Kafk
 - HTTP: Huma v2.39.1 on the stdlib `net/http` mux — typed handlers, OpenAPI 3.1 generated from code, RFC 9457 problem errors; CVE status: `govulncheck` v1.9.0 2026-10-20: 0 affecting
 - Module path: `github.com/misterkafkagod/Kafka3O-Gateway`
 - Config: koanf v2.3.8 with providers/file v1.2.1, providers/env/v2 v2.0.2, parsers/yaml v1.1.1 (YAML file + `KAFKA3O_*` env overrides, `__` separates nested keys; secrets only from env) — v2.4.1 released 2026-10-18, not adopted yet; CVE status: `govulncheck` v1.9.0 2026-10-20: 0 affecting
-- Container images: `golang:1.27.2` (build), `gcr.io/distroless/static-debian12:nonroot` (runtime), `apache/kafka:4.3.1` (dev/test); CVE status: gateway image `kafka3o-gateway:dev` Trivy 0.75.0 2026-10-20: 0 critical/high (1 UNKNOWN: tzdata DLA-4792-1, fixed in a newer distroless base); `golang` and `apache/kafka` not scanned (build/dev only)
+- Container images: `golang:1.27.2` (build), `gcr.io/distroless/static-debian12:nonroot` (runtime), `apache/kafka:4.3.1` (dev/test); CVE status: gateway image `kafka3o-gateway:dev` Trivy 0.75.0 2026-10-20: 0 critical/high (1 UNKNOWN: tzdata DLA-4792-1, fixed in a newer distroless base); the M5 image was not scanned without Docker; `golang` and `apache/kafka` not scanned (build/dev only)
 - Logging: stdlib `log/slog` (JSON)
 - Kafka security currently supports PLAINTEXT; TLS and SASL PLAIN/SCRAM remain planned in P13, pending secured-broker discovery
 - Gateway HTTP security (M5): the gateway itself terminates TLS using deployment-supplied certificate/key files and requires a strong per-gateway bearer token from the environment; anonymous liveness and allowed-origin CORS preflight are the only exceptions. A token grants all API permissions, with no user identity or roles.
@@ -92,16 +92,18 @@ Tests live next to the file they test (`*_test.go`, `*.test.ts(x)`).
 ### Gateway
 - Framework: Go `testing` + go-cmp · Fakes: hand-written interface fakes for Kafka ports
 - Unit: go-cmp v0.7.0; HTTP routes via Huma `humatest`
-- Vulnerability scan: `CGO_ENABLED=0 go run golang.org/x/vuln/cmd/govulncheck@v1.9.0 -test -tags integration ./...` (include tests: testcontainers pulls its own dependencies); 2026-11-04: 1 called standard-library advisory (GO-2026-6809, medium) and 1 uncalled module-level advisory (GO-2026-5932, golang.org/x/crypto)
+- Vulnerability scan: `CGO_ENABLED=0 go run golang.org/x/vuln/cmd/govulncheck@v1.9.0 -test -tags integration ./...` (include tests: testcontainers pulls its own dependencies); 2026-11-04: 1 called standard-library advisory (GO-2026-6809, medium) and 1 uncalled module-level advisory (GO-2026-5932, golang.org/x/crypto/openpgp; the module is required only by integration test tooling, not the gateway binary)
 - Integration: core testcontainers-go v0.44.0 with `apache/kafka:4.3.1`, started by `test/integration/start_kafka.go` (requires a Docker-compatible runtime)
 - Rejected: testcontainers `modules/kafka` — v0.44.0 only starts Confluent images; `confluent-local` — different distribution than the dev stack; `kfake` — not a real broker
 - Remote Docker (current dev setup: `docker-host`, 192.168.1.194, SSH only): forward the daemon socket with `ssh -nNT -o ExitOnForwardFailure=yes -o StreamLocalBindUnlink=yes -L $HOME/.docker/docker-host.sock:/var/run/docker.sock docker-host`, then `source ~/.docker/docker-host.env` (`DOCKER_HOST=unix://$HOME/.docker/docker-host.sock`, `TESTCONTAINERS_HOST_OVERRIDE=192.168.1.194`, `TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=/var/run/docker.sock`); Ryuk stays enabled. Not `ssh://` contexts — testcontainers-go doesn't reliably support them. Demo ports: `ssh -nNT -L 8081:localhost:8081 -L 8082:localhost:8082 docker-host`
 - Compose uses read-only certificate/key bind mounts that resolve on the Docker host, including when it is remote. Provision them there with nonroot-readable permissions; all other service settings use environment variables. See `Kafka3O-Gateway/deploy/README.md`.
 - Run: `go test ./...` (unit) · `CGO_ENABLED=0 go test -tags integration ./test/integration/...` (integration; cgo off avoids linking macOS frameworks, which fails with mismatched Command Line Tools)
+- M5 verification on 2026-11-04: unit tests and integration compilation passed; an integration execution failed before starting Kafka because no Docker provider was available.
 
 ### UI
 - Framework: Vitest 5.0.5, Testing Library (react 16.3.3, user-event 14.6.8, dom 10.4.2), jsdom 30.1.3 · Fakes: MSW 3.0.3, one handler set per fake gateway (`onUnhandledFrame: "error"`) · CVE status: `npm audit` 2026-11-04: 0 findings
 - Run: `npm test`
+- M5 verification on 2026-11-04: tests, build and `npm audit` passed. The available Node 22.21.0 is below the declared Node 24.21.0 minimum, so repeat validation on the supported runtime.
 
 ## Integrations
 ### Kafka (behind each gateway)

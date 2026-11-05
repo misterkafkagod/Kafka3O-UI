@@ -18,6 +18,6 @@
   - Done when: focused UI tests, `npm test`, and `npm run build` pass.
 
 ## Review
-- **Demo:** Real-broker creation and list visibility were **not run** because no Docker or reachable test broker was available. The integration test compiled; unit/UI tests cover Kafka name/count boundaries, conflicts, uncertain outcomes, duplicate submission prevention, and topic-list refresh.
-- **Vulnerability scan:** not required for this phase (no dependency changes); the milestone scan remains due.
+- **Demo:** Topic creation passed in isolated Chrome against a mocked gateway. Real-broker creation and list visibility were **not run** because no Docker or reachable test broker was available. The integration test compiled; unit/UI tests cover Kafka name/count boundaries, conflicts, uncertain outcomes, duplicate submission prevention, and topic-list refresh.
+- **Vulnerability scan:** not required for this phase (no dependency changes); see P27 for the milestone scan.
 - **Notes:** Kafka administrative writes use the no-retry client; all cached gateway topic lists are invalidated after creation so aliases refresh too.

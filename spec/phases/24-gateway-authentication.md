@@ -27,6 +27,6 @@
   - Done when: Gateway and UI suites and UI build pass; tests verify real production wiring, cache reset, preflight, 401 recovery, and TLS startup failures.
 
 ## Review
-- **Demo:** TLS, anonymous liveness, unauthorized requests, authorized requests and preflight passed in an HTTPS server test. Credential entry/removal, direct-topic recovery and cache reset passed in UI tests. Loading a real Kafka cluster was **not run**: no Docker or reachable test broker was available; the integrated browser also could not connect.
-- **Vulnerability scan:** not required for this phase (no dependency changes); the milestone scan remains due.
+- **Demo:** TLS, anonymous liveness, unauthorized requests, authorized requests and preflight passed in an HTTPS server test. Credential entry/removal passed in isolated Chrome against a mocked gateway; direct-topic recovery and cache reset passed in UI tests. Loading a real Kafka cluster was **not run**: no Docker or reachable test broker was available.
+- **Vulnerability scan:** not required for this phase (no dependency changes); see P27 for the milestone scan.
 - **Notes:** Deployment-supplied certificate/key files and the random token are mandatory; session storage is readable by UI-origin scripts.

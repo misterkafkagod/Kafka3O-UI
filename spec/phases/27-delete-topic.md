@@ -18,6 +18,7 @@
   - Done when: focused UI tests, `npm test`, and `npm run build` pass.
 
 ## Review
-- **Demo:** Cancel then confirm passed in isolated Chrome against a mocked gateway: cancel sent no request, confirm sent one, and asynchronous acceptance was displayed. Actual Kafka deletion was **not run**: the integration test could not start a Docker provider on this host.
+- **Demo:** Cancel then confirm passed in isolated Chrome against a mocked gateway: cancel sent no request and confirm sent one. UI tests verify asynchronous acceptance is displayed. Actual Kafka deletion was **not run**: the integration test could not start a Docker provider on this host.
+- **Checks:** `go test ./...` passed and integration tests compiled; UI `npm test` passed 268 tests and `npm run build` passed.
 - **Vulnerability scan:** `npm audit --audit-level=low`: 0 findings. `govulncheck -test -tags integration`: one called standard-library finding, GO-2026-6809 / CVE-2026-111943 (medium, fixed in Go 1.27.3), and one uncalled module-only finding, GO-2026-5932 (`golang.org/x/crypto/openpgp`, not imported by the shipped gateway). Container image scan was **not run** without Docker.
-- **Notes:** Confirmation is a browser dialog; accepted deletion may complete asynchronously. The no-retry administrative client distinguishes a missing topic from an unconfirmed broker result.
+- **Notes:** Confirmation is a browser dialog; accepted deletion may complete asynchronously. The no-retry administrative client distinguishes a missing topic from an unconfirmed broker result. No new dependency or configuration was needed.

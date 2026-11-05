@@ -18,6 +18,6 @@
   - Done when: focused UI tests, `npm test`, and `npm run build` pass.
 
 ## Review
-- **Demo:** Producing and reading back against a real broker was **not run** because no Docker or reachable test broker was available. The integration test compiled; unit/UI tests cover UTF-8 bytes, empty versus absent keys, headers, exact offsets, duplicate submission prevention, and uncertain delivery.
-- **Vulnerability scan:** not required for this phase (no dependency changes); the milestone scan remains due.
+- **Demo:** Producer submission passed in isolated Chrome against a mocked gateway. Producing and reading back against a real broker was **not run** because no Docker or reachable test broker was available. The integration test compiled; unit/UI tests cover UTF-8 bytes, empty versus absent keys, headers, exact offsets, duplicate submission prevention, and uncertain delivery.
+- **Vulnerability scan:** not required for this phase (no dependency changes); see P27 for the milestone scan.
 - **Notes:** Producer requests and UI submissions are not automatically retried; an unconfirmed response may have already been written.
