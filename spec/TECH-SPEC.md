@@ -7,14 +7,14 @@ Covers both repositories: **Kafka3O-Gateway** (one per Kafka cluster) and **Kafk
 
 ## Stack
 ### Gateway (Kafka3O-Gateway)
-- Runtime: Go 1.27.2 — small static binary, strong concurrency, continuity with the earlier attempt; CVE status: `govulncheck` v1.9.0 2026-11-04: GO-2026-6809 / CVE-2026-111943 affects `crypto/x509` (CISA CVSS 6.8 medium); fixed in Go 1.27.3, upgrade pending
+- Runtime: Go 1.27.3 — small static binary, strong concurrency, continuity with the earlier attempt; CVE status: `govulncheck` v1.9.0 2026-11-05: 0 called vulnerabilities. This version fixes GO-2026-6809 / CVE-2026-111943 in `crypto/x509`.
 - Kafka client: franz-go v1.22.2 + kadm v1.19.0 — pure Go, complete admin API (metadata, start/end offsets); CVE status: `govulncheck` v1.9.0 2026-10-20: 0 affecting
 - HTTP: Huma v2.39.1 on the stdlib `net/http` mux — typed handlers, OpenAPI 3.1 generated from code, RFC 9457 problem errors; CVE status: `govulncheck` v1.9.0 2026-10-20: 0 affecting
 - Module path: `github.com/misterkafkagod/Kafka3O-Gateway`
 - Config: koanf v2.3.8 with providers/file v1.2.1, providers/env/v2 v2.0.2, parsers/yaml v1.1.1 (YAML file + `KAFKA3O_*` env overrides, `__` separates nested keys; secrets only from env) — v2.4.1 released 2026-10-18, not adopted yet; CVE status: `govulncheck` v1.9.0 2026-10-20: 0 affecting
-- Container images: `golang:1.27.2` (build), `gcr.io/distroless/static-debian12:nonroot` (runtime), `apache/kafka:4.3.1` (dev/test); CVE status: gateway image `kafka3o-gateway:dev` Trivy 0.75.0 2026-10-20: 0 critical/high (1 UNKNOWN: tzdata DLA-4792-1, fixed in a newer distroless base); the M5 image was not scanned without Docker; `golang` and `apache/kafka` not scanned (build/dev only)
+- Container images: `golang:1.27.3` (build), `gcr.io/distroless/static-debian12:nonroot` (runtime), `apache/kafka:4.3.1` (dev/test); CVE status: the current gateway image was built on EKS-D with Kaniko and scanned with Trivy 0.75.0 on 2026-11-05: 0 critical/high in the Debian packages and Go binary. Lower/unknown severities were not included. The image was not pushed or started as a container. The `golang` and `apache/kafka` images have not been scanned (build/dev only).
 - Logging: stdlib `log/slog` (JSON)
-- Kafka security currently supports PLAINTEXT; TLS and SASL PLAIN/SCRAM remain planned in P13, pending secured-broker discovery
+- Kafka security: plaintext by default; optional verified TLS 1.2+ and SASL PLAIN, SCRAM-SHA-256 or SCRAM-SHA-512. A configured PEM CA bundle replaces system roots; SASL passwords come only from the environment. Mutual TLS client certificates are not supported.
 - Gateway HTTP security (M5): the gateway itself terminates TLS using deployment-supplied certificate/key files and requires a strong per-gateway bearer token from the environment; anonymous liveness and allowed-origin CORS preflight are the only exceptions. A token grants all API permissions, with no user identity or roles.
 - CORS: allowed origins from config (`http.cors.allowedOrigins`)
 - Rejected: Java/Spring — heavier runtime than a per-cluster sidecar needs
@@ -24,10 +24,10 @@ Covers both repositories: **Kafka3O-Gateway** (one per Kafka cluster) and **Kafk
 
 ### UI (Kafka3O-UI)
 - Runtime: Node 24.21.0 LTS; CVE status: pending scan
-- Language/framework: TypeScript 7.0.2, React 19.3.1, Vite 8.3.4; CVE status: `npm audit` 2026-11-04: 0 findings
-- Routing: React Router 8.4.0; CVE status: `npm audit` 2026-11-04: 0 findings
-- Type definitions (dev): @types/react 19.3.0, @types/react-dom 19.3.0; CVE status: `npm audit` 2026-11-04: 0 findings
-- Data fetching: TanStack Query 5.104.4 — one independent query per gateway with its own polling, timeout, error state and retry, so one slow gateway never blocks another; CVE status: `npm audit` 2026-11-04: 0 findings
+- Language/framework: TypeScript 7.0.2, React 19.3.1, Vite 8.3.4; CVE status: `npm audit` 2026-11-05: 0 findings
+- Routing: React Router 8.4.0; CVE status: `npm audit` 2026-11-05: 0 findings
+- Type definitions (dev): @types/react 19.3.0, @types/react-dom 19.3.0; CVE status: `npm audit` 2026-11-05: 0 findings
+- Data fetching: TanStack Query 5.104.4 — one independent query per gateway with its own polling, timeout, error state and retry, so one slow gateway never blocks another; CVE status: `npm audit` 2026-11-05: 0 findings
 - Styling: plain CSS modules
 - Rejected: Next.js — a static SPA suffices; no server needed
 - Rejected: MUI / Tailwind — unnecessary weight for M1
@@ -92,24 +92,24 @@ Tests live next to the file they test (`*_test.go`, `*.test.ts(x)`).
 ### Gateway
 - Framework: Go `testing` + go-cmp · Fakes: hand-written interface fakes for Kafka ports
 - Unit: go-cmp v0.7.0; HTTP routes via Huma `humatest`
-- Vulnerability scan: `CGO_ENABLED=0 go run golang.org/x/vuln/cmd/govulncheck@v1.9.0 -test -tags integration ./...` (include tests: testcontainers pulls its own dependencies); 2026-11-04: 1 called standard-library advisory (GO-2026-6809, medium) and 1 uncalled module-level advisory (GO-2026-5932, golang.org/x/crypto/openpgp; the module is required only by integration test tooling, not the gateway binary)
+- Vulnerability scan: `CGO_ENABLED=0 go run golang.org/x/vuln/cmd/govulncheck@v1.9.0 -test -tags integration ./...` (include tests: testcontainers pulls its own dependencies); 2026-11-05 with Go 1.27.3: 0 called vulnerabilities and 1 uncalled module-level advisory (GO-2026-5932, golang.org/x/crypto/openpgp; the module is required only by integration test tooling, not the gateway binary)
 - Integration: core testcontainers-go v0.44.0 with `apache/kafka:4.3.1`, started by `test/integration/start_kafka.go`. The default fixture requires a Docker-compatible runtime; a guarded external mode also supports a disposable loopback-forwarded broker, with one integration test per process and a fresh broker per test. See `Kafka3O-Gateway/test/integration/README.md`.
 - Rejected: testcontainers `modules/kafka` — v0.44.0 only starts Confluent images; `confluent-local` — different distribution than the dev stack; `kfake` — not a real broker
 - Remote Docker (current dev setup: `docker-host`, 192.168.1.194, SSH only): forward the daemon socket with `ssh -nNT -o ExitOnForwardFailure=yes -o StreamLocalBindUnlink=yes -L $HOME/.docker/docker-host.sock:/var/run/docker.sock docker-host`, then `source ~/.docker/docker-host.env` (`DOCKER_HOST=unix://$HOME/.docker/docker-host.sock`, `TESTCONTAINERS_HOST_OVERRIDE=192.168.1.194`, `TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=/var/run/docker.sock`); Ryuk stays enabled. Not `ssh://` contexts — testcontainers-go doesn't reliably support them. Demo ports: `ssh -nNT -L 8081:localhost:8081 -L 8082:localhost:8082 docker-host`
 - Compose uses read-only certificate/key bind mounts that resolve on the Docker host, including when it is remote. Provision them there with nonroot-readable permissions; all other service settings use environment variables. See `Kafka3O-Gateway/deploy/README.md`.
 - Run: `go test ./...` (unit) · `CGO_ENABLED=0 go test -tags integration ./test/integration/... ./cmd/gateway ./internal/kafka` (Docker-backed integration; cgo off avoids linking macOS frameworks, which fails with mismatched Command Line Tools)
-- Verification on 2026-11-05: existing broker tests, authenticated HTTPS write lifecycle, empty/mixed partitions, transaction markers, and bounded snapshot fetches over genuinely compacted offsets passed against a disposable EKS-D Kafka pod. The Docker-only stopped-broker test and P13 TLS/SASL discovery remain unrun.
+- Verification on 2026-11-05: existing broker tests, authenticated HTTPS write lifecycle, empty/mixed partitions, transaction markers, bounded snapshot fetches over genuinely compacted offsets, and TLS/SASL security modes passed against disposable EKS-D Kafka pods. The production gateway binary also returned secured cluster metadata over trusted HTTPS inside a pod. The gateway image was built and scanned, but not started as a container. The original Docker-only stopped-broker test remains unrun.
 
 ### UI
-- Framework: Vitest 5.0.5, Testing Library (react 16.3.3, user-event 14.6.8, dom 10.4.2), jsdom 30.1.3 · Fakes: MSW 3.0.3, one handler set per fake gateway (`onUnhandledFrame: "error"`) · CVE status: `npm audit` 2026-11-04: 0 findings
+- Framework: Vitest 5.0.5, Testing Library (react 16.3.3, user-event 14.6.8, dom 10.4.2), jsdom 30.1.3 · Fakes: MSW 3.0.3, one handler set per fake gateway (`onUnhandledFrame: "error"`) · CVE status: `npm audit` 2026-11-05: 0 findings
 - Run: `npm test`
-- M5 verification on 2026-11-04: tests, build and `npm audit` passed. The available Node 22.21.0 is below the declared Node 24.21.0 minimum, so repeat validation on the supported runtime.
+- M5 verification: tests, build and `npm audit` passed on 2026-11-04. On 2026-11-05, all 268 tests and the build also passed in a disposable EKS-D pod running the declared Node 24.21.0; these UI tests use mocked gateway responses.
 
 ## Integrations
 ### Kafka (behind each gateway)
-- Source: known territory, no discovery needed
+- Source: known Kafka admin API; secured broker setup was verified in [P13 discovery](./discovery/kafka-tls-scram-dev.md).
 - Admin API via franz-go/kadm: metadata (brokers, controller, cluster ID, topics, internal flag), ListStartOffsets / ListEndOffsets for approximate message counts
-- Security: PLAINTEXT today; TLS and SASL PLAIN/SCRAM configuration are pending P13 discovery
+- Security: verified TLS and/or SASL PLAIN/SCRAM; see `Kafka3O-Gateway/deploy/README.md` for CA, username and environment-only password configuration.
 
 ### Gateway HTTP API v1 (consumed by the UI)
 - Base URL: per gateway, from the UI's `/config.json`; M5 requires HTTPS and an `Authorization: Bearer` token for all requests except anonymous liveness and allowed-origin CORS preflight

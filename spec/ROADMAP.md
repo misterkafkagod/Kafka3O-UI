@@ -29,7 +29,7 @@ Kafka3O is a multi-cluster Kafka console for developers and operators: one web U
 
 ## Milestones
 ### M1 — See all my clusters and what topics they hold, from one screen
-- **Status:** Active
+- **Status:** Done
 - **Features:** F1, F2, F3
 - **Phases:**
   - **P01** F1-B1 + F1-B6 · Cluster cards from config, and the "no gateways" case — Covers: F1-AC1, F1-AC6 · Discovery: — · Status: Done
@@ -59,9 +59,8 @@ Kafka3O is a multi-cluster Kafka console for developers and operators: one web U
   - **P14** F1-B4 (correction) · Status reflects a cluster that goes down after a healthy check — Covers: F1-AC8 · Discovery: — · Status: Done
     - Demo: with both cards Healthy, `docker compose stop kafka-prod` (gateway keeps running) → within 15 s "Prod" shows "Cluster unreachable".
     - Scope: the cluster adapter (and the topic metadata adapter from P09) send a direct `kmsg.MetadataRequest` via `kgo.Client.Request` instead of kadm's cached `BrokerMetadata` / `ListTopicsWithInternal`; integration test stops Kafka after a successful call.
-  - **P13** F1-B7 · Gateway connects to TLS/SASL-secured clusters — Covers: F1-AC7 · Discovery: kafka-tls-scram-dev · Status: Defined
+  - **P13** F1-B7 · Gateway connects to TLS/SASL-secured clusters — Covers: F1-AC7 · Discovery: kafka-tls-scram-dev · Status: Done
     - Demo: a gateway pointed at a TLS + SCRAM-SHA-512 cluster shows its card as Healthy.
-    - Blocked: secured-broker discovery has not been run; the disposable broker used for verification was plaintext.
 
 ### M2 — Look inside a topic and read its messages
 - **Status:** Done
@@ -114,13 +113,15 @@ Kafka3O is a multi-cluster Kafka console for developers and operators: one web U
 - **F15** User can reset a consumer group's offsets to earliest, latest or a timestamp
 - **F16** User can decode Avro/Protobuf values via a Schema Registry
 - **F17** User can add or remove gateways from the UI instead of a config file
-- **Verification debt:** Run the Docker-only stopped-broker test and P14 demo, complete P13 secured-broker discovery, and verify the remaining cross-cluster and consumer-group browser demos.
+- **Verification debt:** Run the Docker-only stopped-broker test and P14 browser demo, and verify the remaining cross-cluster and consumer-group browser demos.
 - **Verification debt:** Repeat the P24–P27 browser smoke test with a trusted deployment certificate and complete the producer key/header browser demo.
-- **Verification debt:** Build and scan the current gateway container image when a Docker-compatible runtime is available.
-- **Verification debt:** Repeat UI tests and build using the declared Node 24.21.0 or newer; this environment only had Node 22.21.0.
-- **Technical debt:** Upgrade the Gateway Go toolchain and build image to a release fixing GO-2026-6809; the 2026-11-04 scan reports CISA CVSS 6.8 medium in Go 1.27.2.
+- **Verification debt:** Run the built gateway container in a deployment; the image was built and scanned on EKS-D but was not started as a container.
 
 ## Learnings
+- 2026-11-05 (M1 retro): Real secured Kafka testing uncovered the separate per-read clients; sharing the main client's options keeps message reads authenticated and encrypted.
+- 2026-11-05 (M1 retro): The UI card and, separately, the production gateway binary reached a TLS/SCRAM-SHA-512 broker on EKS-D. Browser trust of the gateway certificate remains unverified because the demo used a test-only override.
+- 2026-11-05 (M1 retro): Go 1.27.3 fixes the certificate-verification advisory; scans found no called Go vulnerabilities and no npm audit findings. The gateway image was built and had no high/critical Trivy findings; the Docker-only lifecycle test remains unrun.
+- 2026-11-05 (EKS-D retest): Fifteen real-Kafka scenarios passed, including a stopped-broker case adapted to delete its disposable pod. The original Docker-only test was not run. UI tests (268) and the build passed in a Node 24.21.0 pod using mocked gateway responses.
 - 2026-11-05 (M2–M5 verification): A disposable EKS-D Kafka broker exercised the existing broker tests, empty and mixed partitions, transaction markers, real log compaction, and authenticated write lifecycle. A browser smoke test covered topic creation, empty and mixed reads, produce/read at the returned position, cancelled/confirmed deletion, and credential removal; TLS certificate errors were overridden for this test.
 - 2026-11-04 (M5 retro): Mandatory gateway TLS and per-gateway credentials provide a consistent boundary for reads and writes.
 - 2026-11-04 (M5 retro): Exact decimal offsets and explicit uncertain outcomes avoid misleading success or failure claims.
