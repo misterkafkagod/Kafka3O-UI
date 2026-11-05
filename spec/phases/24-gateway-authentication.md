@@ -13,7 +13,7 @@
   - Files: Gateway config types/load tests, secure-configuration validation and tests (new)
   - Do: Read certificate/key file paths and an environment-only bearer token; validate token syntax and minimum length, and load the TLS key pair without exposing the token. Document that token entropy must come from a secure random generator.
   - Done when: focused config tests cover valid and missing/invalid token and certificate cases and `go test ./...` passes.
-- [ ] **T24.2 Implement gateway authentication** — Covers: F12-AC1, F12-AC3
+- [x] **T24.2 Implement gateway authentication** — Covers: F12-AC1, F12-AC3
   - Files: Gateway HTTP authentication middleware/tests (new), CORS handler/tests
   - Do: Implement constant-time bearer-token verification, anonymous liveness, safe 401 problem responses, and allowed-origin preflight with the Authorization header.
   - Done when: HTTP tests cover valid/invalid tokens, protected endpoints, anonymous liveness, preflight, and non-disclosure; `go test ./...` passes.
