@@ -2,7 +2,7 @@
 - **Milestone:** M5
 - **Covers:** F13-AC1, F13-AC2
 - **Discovery:** —
-- **Status:** Review
+- **Status:** Done
 
 ## Demo
 1. Produce a UTF-8 message with key and headers; use the returned partition and offset to read it back.
@@ -18,3 +18,6 @@
   - Done when: focused UI tests, `npm test`, and `npm run build` pass.
 
 ## Review
+- **Demo:** Producing and reading back against a real broker was **not run** because no Docker or reachable test broker was available. The integration test compiled; unit/UI tests cover UTF-8 bytes, empty versus absent keys, headers, exact offsets, duplicate submission prevention, and uncertain delivery.
+- **Vulnerability scan:** not required for this phase (no dependency changes); the milestone scan remains due.
+- **Notes:** Producer requests and UI submissions are not automatically retried; an unconfirmed response may have already been written.
