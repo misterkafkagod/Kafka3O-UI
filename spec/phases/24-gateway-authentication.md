@@ -2,16 +2,16 @@
 - **Milestone:** M5
 - **Covers:** F12-AC1, F12-AC2, F12-AC3
 - **Discovery:** —
-- **Status:** Planned
+- **Status:** Building
 
 ## Demo
 1. Start a gateway using a trusted TLS certificate/key and a strong environment-provided token; verify anonymous liveness succeeds and an unauthenticated API call receives 401.
 2. Enter the token in the UI and verify the corresponding cluster loads; remove it and verify access is denied again.
 
 ## Tasks
-- [ ] **T24.1 Define secure gateway configuration** — Covers: F12-AC1
+- [x] **T24.1 Define secure gateway configuration** — Covers: F12-AC1
   - Files: Gateway config types/load tests, secure-configuration validation and tests (new)
-  - Do: Read certificate/key file paths and an environment-only bearer token; validate token syntax/strength and load the TLS key pair without exposing the token.
+  - Do: Read certificate/key file paths and an environment-only bearer token; validate token syntax and minimum length, and load the TLS key pair without exposing the token. Document that token entropy must come from a secure random generator.
   - Done when: focused config tests cover valid and missing/invalid token and certificate cases and `go test ./...` passes.
 - [ ] **T24.2 Implement gateway authentication** — Covers: F12-AC1, F12-AC3
   - Files: Gateway HTTP authentication middleware/tests (new), CORS handler/tests

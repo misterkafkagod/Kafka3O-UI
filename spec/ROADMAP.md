@@ -100,7 +100,7 @@ Kafka3O is a multi-cluster Kafka console for developers and operators: one web U
 - **Status:** Active
 - **Features:** F12, F13, F14
 - **Phases:**
-  - **P24** F12-B1 + F12-B2 + F12-B3 · Authenticate gateway requests over TLS — Covers: F12-AC1, F12-AC2, F12-AC3 · Discovery: — · Status: Planned
+  - **P24** F12-B1 + F12-B2 + F12-B3 · Authenticate gateway requests over TLS — Covers: F12-AC1, F12-AC2, F12-AC3 · Discovery: — · Status: Building
     - Demo: start a gateway with a certificate and token, verify anonymous liveness and rejected unauthenticated API calls, then enter the token and load the cluster.
   - **P25** F13-B1 + F13-B2 · Produce a test message — Covers: F13-AC1, F13-AC2 · Discovery: — · Status: Planned
     - Demo: produce a message with key and headers and read it back by its returned partition and offset.
