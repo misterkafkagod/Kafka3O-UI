@@ -2,13 +2,13 @@
 - **Milestone:** M5
 - **Covers:** F14-AC1, F14-AC3
 - **Discovery:** —
-- **Status:** Planned
+- **Status:** Building
 
 ## Demo
 1. Create a topic with explicit partition and replication counts and verify it appears in the topic list.
 
 ## Tasks
-- [ ] **T26.1 Create topics through the gateway** — Covers: F14-AC1, F14-AC3
+- [x] **T26.1 Create topics through the gateway** — Covers: F14-AC1, F14-AC3
   - Files: Gateway create-topic action/port/tests, Kafka adapter/tests, HTTP route/tests, composition root, integration test
   - Do: Validate names and counts, map duplicate-topic and broker errors, and request creation.
   - Done when: focused validation, Kafka mapping and HTTP tests pass; `go test ./...` passes and the integration test compiles or runs with Docker.

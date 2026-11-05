@@ -104,7 +104,7 @@ Kafka3O is a multi-cluster Kafka console for developers and operators: one web U
     - Demo: start a gateway with a certificate and token, verify anonymous liveness and rejected unauthenticated API calls, then enter the token and load the cluster.
   - **P25** F13-B1 + F13-B2 · Produce a test message — Covers: F13-AC1, F13-AC2 · Discovery: — · Status: Done
     - Demo: produce a message with key and headers and read it back by its returned partition and offset.
-  - **P26** F14-B1 + F14-B3 · Create a topic — Covers: F14-AC1, F14-AC3 · Discovery: — · Status: Planned
+  - **P26** F14-B1 + F14-B3 · Create a topic — Covers: F14-AC1, F14-AC3 · Discovery: — · Status: Building
     - Demo: create a topic with explicit partition and replication counts and see it in the topic list.
   - **P27** F14-B2 · Delete a topic — Covers: F14-AC2 · Discovery: — · Status: Planned
     - Demo: cancel deletion, then confirm it and observe the accepted deletion request.
