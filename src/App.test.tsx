@@ -12,6 +12,7 @@ const pendingListConsumerGroups = () => new Promise<never>(() => {});
 const pendingGetTopicDetail = () => new Promise<never>(() => {});
 const pendingListLatestTopicMessages = () => new Promise<never>(() => {});
 const pendingSearchTopicMessages = () => new Promise<never>(() => {});
+const produceTopicMessage = async () => ({ partition: 0, offset: "0" });
 const linkOrigin = "https://console.example";
 const copyMessageLink = async () => {};
 const gatewayCredentials = { read: () => null, save: () => {}, clear: () => {} };
@@ -22,6 +23,7 @@ function renderApp() {
       <App
         queryClient={new QueryClient()}
         gatewayCredentials={gatewayCredentials}
+        produceTopicMessage={produceTopicMessage}
         loadGatewayConfig={async () => []}
         getCluster={pendingGetCluster}
         listTopics={pendingListTopics}
@@ -57,6 +59,7 @@ describe("App", () => {
         <App
           queryClient={new QueryClient()}
           gatewayCredentials={gatewayCredentials}
+          produceTopicMessage={produceTopicMessage}
           loadGatewayConfig={async () => [{ id: "dev", name: "Dev", url: "http://localhost:8081" }]}
           getCluster={async () => ({ clusterId: "abc", controllerId: 1, brokers: [{ id: 1, host: "kafka-dev", port: 9092 }] })}
           listTopics={async () => [{ name: "orders", partitions: 6, replicationFactor: 1, internal: false, approxMessages: 10 }]}
@@ -84,6 +87,7 @@ describe("App", () => {
         <App
           queryClient={new QueryClient()}
           gatewayCredentials={gatewayCredentials}
+          produceTopicMessage={produceTopicMessage}
           loadGatewayConfig={async () => [{ id: "dev", name: "Dev", url: "http://localhost:8081" }]}
           getCluster={pendingGetCluster}
           listTopics={async () => [{ name: "orders", partitions: 6, replicationFactor: 1, internal: false, approxMessages: 10 }]}
@@ -114,6 +118,7 @@ describe("App", () => {
         <App
           queryClient={new QueryClient()}
           gatewayCredentials={gatewayCredentials}
+          produceTopicMessage={produceTopicMessage}
           loadGatewayConfig={async () => [{ id: "dev", name: "Dev", url: "http://localhost:8081" }]}
           getCluster={pendingGetCluster}
           listTopics={pendingListTopics}
@@ -139,6 +144,7 @@ describe("App", () => {
         <App
           queryClient={new QueryClient()}
           gatewayCredentials={gatewayCredentials}
+          produceTopicMessage={produceTopicMessage}
           loadGatewayConfig={async () => [{ id: "dev", name: "Dev", url: "http://localhost:8081" }]}
           getCluster={pendingGetCluster}
           listTopics={async () => [{ name: "orders", partitions: 1, replicationFactor: 1, internal: false, approxMessages: 1 }]}
@@ -174,6 +180,7 @@ describe("App", () => {
         <App
           queryClient={new QueryClient()}
           gatewayCredentials={gatewayCredentials}
+          produceTopicMessage={produceTopicMessage}
           loadGatewayConfig={async () => [{ id: "dev & west", name: "Dev", url: "http://localhost:8081" }]}
           getCluster={pendingGetCluster}
           listTopics={pendingListTopics}
@@ -200,6 +207,7 @@ describe("App", () => {
         <App
           queryClient={new QueryClient()}
           gatewayCredentials={gatewayCredentials}
+          produceTopicMessage={produceTopicMessage}
           loadGatewayConfig={async () => [{ id: "dev", name: "Dev", url: "http://localhost:8081" }]}
           getCluster={pendingGetCluster}
           listTopics={async () => [{ name: "orders", partitions: 1, replicationFactor: 1, internal: false, approxMessages: 1 }]}
@@ -229,6 +237,7 @@ describe("App", () => {
       <App
         queryClient={new QueryClient()}
         gatewayCredentials={gatewayCredentials}
+        produceTopicMessage={produceTopicMessage}
         loadGatewayConfig={async () => [{ id: "dev & west", name: "Dev", url: "http://localhost:8081" }]}
         getCluster={pendingGetCluster}
         listTopics={pendingListTopics}
@@ -269,6 +278,7 @@ describe("App", () => {
         <App
           queryClient={new QueryClient({ defaultOptions: { queries: { retry: false } } })}
           gatewayCredentials={credentials}
+          produceTopicMessage={produceTopicMessage}
           loadGatewayConfig={async () => [{ id: "dev", name: "Dev", url }]}
           getCluster={pendingGetCluster}
           listTopics={pendingListTopics}

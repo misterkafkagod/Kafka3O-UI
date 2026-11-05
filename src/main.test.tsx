@@ -5,6 +5,7 @@ import type { GatewayCredentials } from "./gateway/GatewayCredentials";
 import type { GetCluster } from "./gateway/getCluster";
 import type { ListConsumerGroups } from "./gateway/listConsumerGroups";
 import type { ListLatestTopicMessages } from "./gateway/listLatestTopicMessages";
+import type { ProduceTopicMessage } from "./gateway/produceTopicMessage";
 import type { SearchTopicMessages } from "./gateway/searchTopicMessages";
 
 const { renderApp, listMessages, searchMessages, listGroups } = vi.hoisted(() => ({
@@ -39,6 +40,7 @@ type AppTree = ReactElement<{
       getCluster: GetCluster;
       loadGatewayConfig: LoadGatewayConfig;
       gatewayCredentials: GatewayCredentials;
+      produceTopicMessage: ProduceTopicMessage;
       linkOrigin: string;
       copyMessageLink: (text: string) => Promise<void>;
     }>;
@@ -77,8 +79,9 @@ describe("main composition", () => {
     expect(writeText).toHaveBeenCalledWith("https://console.example/message");
 
     vi.stubGlobal("isSecureContext", true);
-    const fetchFn = vi.fn<typeof fetch>(async (url) => {
+    const fetchFn = vi.fn<typeof fetch>(async (url, init) => {
       if (url === "/config.json") return Response.json({ gateways: [{ id: "dev", name: "Dev", url: "https://gateway" }] });
+      if (init?.method === "POST") return Response.json({ partition: 1, offset: "9007199254740993" });
       return Response.json({ clusterId: "abc", controllerId: 1, brokers: [] });
     });
     vi.stubGlobal("fetch", fetchFn);
@@ -97,6 +100,10 @@ describe("main composition", () => {
     await messageFetch("https://gateway/api/v1/topics/orders/messages");
     expect(new Headers(fetchFn.mock.calls[3][1]?.headers).get("Authorization")).toBe(`Bearer ${token}`);
     await expect(messageFetch("https://another-gateway/api/v1/topics")).rejects.toThrow(/outside/);
+    await expect(props.produceTopicMessage("https://gateway", "orders", { value: "", headers: [] }))
+      .resolves.toEqual({ partition: 1, offset: "9007199254740993" });
+    expect(fetchFn.mock.calls[4][1]?.method).toBe("POST");
+    expect(new Headers(fetchFn.mock.calls[4][1]?.headers).get("Authorization")).toBe(`Bearer ${token}`);
     props.gatewayCredentials.clear("https://gateway");
     expect(props.gatewayCredentials.read("https://gateway")).toBeNull();
   });

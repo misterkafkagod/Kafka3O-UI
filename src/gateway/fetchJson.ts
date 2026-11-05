@@ -22,7 +22,7 @@ export async function fetchJson(fetchFn: typeof fetch, url: string, timeoutMs: n
     } catch {
       problem = undefined;
     }
-    throw new HttpError(response.status, `GET ${url} failed with ${response.status}`, problem);
+    throw new HttpError(response.status, `${init.method ?? "GET"} ${url} failed with ${response.status}`, problem);
   }
   return response.json();
 }

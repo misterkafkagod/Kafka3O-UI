@@ -8,6 +8,7 @@ import type { GatewayCredentials } from "./gateway/GatewayCredentials";
 import type { ListConsumerGroups } from "./gateway/listConsumerGroups";
 import type { ListLatestTopicMessages } from "./gateway/listLatestTopicMessages";
 import type { ListTopics } from "./gateway/listTopics";
+import type { ProduceTopicMessage } from "./gateway/produceTopicMessage";
 import type { SearchTopicMessages } from "./gateway/searchTopicMessages";
 import { ClusterPage } from "./pages/ClusterPage";
 import { ClustersPage } from "./pages/ClustersPage";
@@ -23,6 +24,7 @@ type AppProps = {
   getTopicDetail: GetTopicDetail;
   listLatestTopicMessages: ListLatestTopicMessages;
   searchTopicMessages: SearchTopicMessages;
+  produceTopicMessage: ProduceTopicMessage;
   linkOrigin: string;
   copyMessageLink: (text: string) => Promise<void>;
   statusRefreshMs: number;
@@ -38,6 +40,7 @@ export function App({
   getTopicDetail,
   listLatestTopicMessages,
   searchTopicMessages,
+  produceTopicMessage,
   linkOrigin,
   copyMessageLink,
   statusRefreshMs,
@@ -110,6 +113,7 @@ export function App({
               listConsumerGroups={listConsumerGroups}
               listLatestTopicMessages={listLatestTopicMessages}
               searchTopicMessages={searchTopicMessages}
+              produceTopicMessage={produceTopicMessage}
               linkOrigin={linkOrigin}
               copyMessageLink={copyMessageLink}
             />
@@ -124,6 +128,7 @@ export function App({
               listConsumerGroups={listConsumerGroups}
               listLatestTopicMessages={listLatestTopicMessages}
               searchTopicMessages={searchTopicMessages}
+              produceTopicMessage={produceTopicMessage}
               linkOrigin={linkOrigin}
               copyMessageLink={copyMessageLink}
               view="messages"
@@ -139,6 +144,7 @@ export function App({
               listConsumerGroups={listConsumerGroups}
               listLatestTopicMessages={listLatestTopicMessages}
               searchTopicMessages={searchTopicMessages}
+              produceTopicMessage={produceTopicMessage}
               linkOrigin={linkOrigin}
               copyMessageLink={copyMessageLink}
               view="consumers"

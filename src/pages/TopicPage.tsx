@@ -6,6 +6,7 @@ import type { LoadGatewayConfig } from "../config/loadGatewayConfig";
 import type { GetTopicDetail } from "../gateway/getTopicDetail";
 import type { ListConsumerGroups } from "../gateway/listConsumerGroups";
 import type { ListLatestTopicMessages } from "../gateway/listLatestTopicMessages";
+import type { ProduceTopicMessage } from "../gateway/produceTopicMessage";
 import type { SearchTopicMessages } from "../gateway/searchTopicMessages";
 import { useGatewayConfig } from "../hooks/useGatewayConfig";
 import { TopicDetailPage } from "./TopicDetailPage";
@@ -17,12 +18,13 @@ type TopicPageProps = {
   listConsumerGroups: ListConsumerGroups;
   listLatestTopicMessages: ListLatestTopicMessages;
   searchTopicMessages: SearchTopicMessages;
+  produceTopicMessage: ProduceTopicMessage;
   linkOrigin: string;
   copyMessageLink: (text: string) => Promise<void>;
   view?: "details" | "messages" | "consumers";
 };
 
-export function TopicPage({ loadGatewayConfig, getTopicDetail, listConsumerGroups, listLatestTopicMessages, searchTopicMessages, linkOrigin, copyMessageLink, view = "details" }: TopicPageProps) {
+export function TopicPage({ loadGatewayConfig, getTopicDetail, listConsumerGroups, listLatestTopicMessages, searchTopicMessages, produceTopicMessage, linkOrigin, copyMessageLink, view = "details" }: TopicPageProps) {
   const { gatewayId, topicName } = useParams();
   const { data: gateways } = useGatewayConfig(loadGatewayConfig);
 
@@ -42,7 +44,7 @@ export function TopicPage({ loadGatewayConfig, getTopicDetail, listConsumerGroup
     );
   }
   if (view === "messages") {
-    return <TopicMessagesPage gateway={gateway} topicName={topicName} listLatestTopicMessages={listLatestTopicMessages} searchTopicMessages={searchTopicMessages} messageLinks={{ origin: linkOrigin, gatewayId: gateway.id, topicName, copyText: copyMessageLink }} />;
+    return <TopicMessagesPage gateway={gateway} topicName={topicName} listLatestTopicMessages={listLatestTopicMessages} searchTopicMessages={searchTopicMessages} produceTopicMessage={produceTopicMessage} messageLinks={{ origin: linkOrigin, gatewayId: gateway.id, topicName, copyText: copyMessageLink }} />;
   }
   if (view === "consumers") {
     return <TopicConsumerGroups gateway={gateway} topicName={topicName} listConsumerGroups={listConsumerGroups} />;

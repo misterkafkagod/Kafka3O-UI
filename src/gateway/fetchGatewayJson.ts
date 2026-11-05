@@ -1,4 +1,5 @@
 import { fetchJson } from "./fetchJson";
+import type { GatewayWriteRequest } from "./GatewayWriteRequest";
 import { isValidGatewayToken } from "./isValidGatewayToken";
 import { secureGatewayUrl } from "./secureGatewayUrl";
 
@@ -9,6 +10,7 @@ export async function fetchGatewayJson(
   timeoutMs: number,
   readToken: (gatewayUrl: string) => string | null,
   secureContext: boolean,
+  request?: GatewayWriteRequest,
 ): Promise<unknown> {
   if (!secureContext) {
     throw new Error("The UI must use HTTPS or a trusted loopback origin before accessing a gateway.");
@@ -28,7 +30,11 @@ export async function fetchGatewayJson(
   if (token !== null) {
     headers.set("Authorization", `Bearer ${token}`);
   }
+  if (request?.body !== undefined) {
+    headers.set("Content-Type", "application/json");
+  }
   return fetchJson(fetchFn, target.href, timeoutMs, {
+    method: request?.method, body: request?.body,
     headers, redirect: "error", cache: "no-store", credentials: "omit", referrerPolicy: "no-referrer",
   });
 }

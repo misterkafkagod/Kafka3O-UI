@@ -3,10 +3,12 @@ import { Link, useSearchParams } from "react-router";
 import { ErrorWithRetry } from "../components/ErrorWithRetry";
 import { MessageTable } from "../components/MessageTable";
 import { LinkedTopicMessage } from "../components/LinkedTopicMessage";
+import { ProduceTopicMessage } from "../components/ProduceTopicMessage";
 import { ReadTopicMessagesForm } from "../components/ReadTopicMessagesForm";
 import { SearchTopicMessages } from "../components/SearchTopicMessages";
 import { TopicTabs } from "../components/TopicTabs";
 import type { ListLatestTopicMessages } from "../gateway/listLatestTopicMessages";
+import type { ProduceTopicMessage as ProduceAction } from "../gateway/produceTopicMessage";
 import type { SearchTopicMessages as SearchTopicMessagesAction } from "../gateway/searchTopicMessages";
 import type { GatewayEntry, TopicMessagePosition } from "../gateway/types";
 import { useLatestTopicMessages } from "../hooks/useLatestTopicMessages";
@@ -18,10 +20,11 @@ type TopicMessagesPageProps = {
   topicName: string;
   listLatestTopicMessages: ListLatestTopicMessages;
   searchTopicMessages: SearchTopicMessagesAction;
+  produceTopicMessage: ProduceAction;
   messageLinks: MessageLinkContext;
 };
 
-export function TopicMessagesPage({ gateway, topicName, listLatestTopicMessages, searchTopicMessages, messageLinks }: TopicMessagesPageProps) {
+export function TopicMessagesPage({ gateway, topicName, listLatestTopicMessages, searchTopicMessages, produceTopicMessage, messageLinks }: TopicMessagesPageProps) {
   const [position, setPosition] = useState<TopicMessagePosition>();
   const [searching, setSearching] = useState(false);
   const [params] = useSearchParams();
@@ -40,6 +43,10 @@ export function TopicMessagesPage({ gateway, topicName, listLatestTopicMessages,
       <TopicTabs gateway={gateway} topicName={topicName} />
       <h2>{topicName}</h2>
       <h3>Messages</h3>
+      <details>
+        <summary>Produce message</summary>
+        <ProduceTopicMessage key={JSON.stringify([gateway.id, topicName])} gateway={gateway} topicName={topicName} produceTopicMessage={produceTopicMessage} />
+      </details>
       {linkPosition.kind !== "none" ? (
         <>
           <Link to={`/clusters/${encodeURIComponent(gateway.id)}/topics/${encodeURIComponent(topicName)}/messages`}>Back to message reads</Link>

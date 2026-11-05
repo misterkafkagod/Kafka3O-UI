@@ -53,4 +53,19 @@ describe("fetchGatewayJson", () => {
       .rejects.toThrow();
     expect(redirected).not.toHaveBeenCalled();
   });
+
+  it("sends authenticated writes with the same HTTPS and redirect restrictions", async () => {
+    const fetchFn = vi.fn<typeof fetch>(async () => Response.json({ partition: 0, offset: "0" }));
+    await fetchGatewayJson(fetchFn, "https://gateway.example", "https://gateway.example/api/v1/topics/orders/messages",
+      1000, () => "a".repeat(32), true, { method: "POST", body: '{"value":""}' });
+    const init = fetchFn.mock.calls[0][1]!;
+    expect(init.method).toBe("POST");
+    expect(init.body).toBe('{"value":""}');
+    expect(new Headers(init.headers).get("Content-Type")).toBe("application/json");
+    expect(new Headers(init.headers).get("Authorization")).toBe(`Bearer ${"a".repeat(32)}`);
+    expect(init.redirect).toBe("error");
+    await expect(fetchGatewayJson(fetchFn, "https://gateway.example", "https://other.example/messages",
+      1000, () => "a".repeat(32), true, { method: "POST", body: "{}" })).rejects.toThrow(/outside/);
+    expect(fetchFn).toHaveBeenCalledTimes(1);
+  });
 });

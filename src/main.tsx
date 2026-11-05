@@ -13,6 +13,8 @@ import { getTopicDetail } from "./gateway/getTopicDetail";
 import { listConsumerGroups } from "./gateway/listConsumerGroups";
 import { listLatestTopicMessages } from "./gateway/listLatestTopicMessages";
 import { listTopics } from "./gateway/listTopics";
+import { produceTopicMessage } from "./gateway/produceTopicMessage";
+import type { GatewayWriteRequest } from "./gateway/GatewayWriteRequest";
 import { searchTopicMessages } from "./gateway/searchTopicMessages";
 import { setGatewayToken } from "./gateway/setGatewayToken";
 
@@ -26,6 +28,8 @@ const gatewayCredentials = {
 };
 const gatewayFetchJson = (gatewayUrl: string) => (url: string) =>
   fetchGatewayJson(window.fetch.bind(window), gatewayUrl, url, gatewayTimeoutMs, gatewayCredentials.read, window.isSecureContext);
+const gatewayFetchWrite = (gatewayUrl: string) => (url: string, request: GatewayWriteRequest) =>
+  fetchGatewayJson(window.fetch.bind(window), gatewayUrl, url, gatewayTimeoutMs, gatewayCredentials.read, window.isSecureContext, request);
 const queryClient = new QueryClient();
 
 createRoot(document.getElementById("root")!).render(
@@ -43,6 +47,7 @@ createRoot(document.getElementById("root")!).render(
           listLatestTopicMessages(gatewayFetchJson(gatewayUrl), gatewayUrl, topicName, position)
         }
         searchTopicMessages={(gatewayUrl, topicName, query) => searchTopicMessages(gatewayFetchJson(gatewayUrl), gatewayUrl, topicName, query)}
+        produceTopicMessage={(gatewayUrl, topicName, message) => produceTopicMessage(gatewayFetchWrite(gatewayUrl), gatewayUrl, topicName, message)}
         linkOrigin={window.location.origin}
         copyMessageLink={(text) => navigator.clipboard.writeText(text)}
         statusRefreshMs={statusRefreshMs}
