@@ -106,7 +106,7 @@ Kafka3O is a multi-cluster Kafka console for developers and operators: one web U
     - Demo: produce a message with key and headers and read it back by its returned partition and offset.
   - **P26** F14-B1 + F14-B3 · Create a topic — Covers: F14-AC1, F14-AC3 · Discovery: — · Status: Done
     - Demo: create a topic with explicit partition and replication counts and see it in the topic list.
-  - **P27** F14-B2 · Delete a topic — Covers: F14-AC2 · Discovery: — · Status: Review
+  - **P27** F14-B2 · Delete a topic — Covers: F14-AC2 · Discovery: — · Status: Done
     - Demo: cancel deletion, then confirm it and observe the accepted deletion request.
 
 ## Backlog
@@ -116,6 +116,7 @@ Kafka3O is a multi-cluster Kafka console for developers and operators: one web U
 - **Technical debt:** Upgrade the Gateway Go toolchain and build image to a release fixing GO-2026-6809; the 2026-11-04 scan reports CISA CVSS 6.8 medium in Go 1.27.2.
 
 ## Learnings
+- 2026-11-04 (M5 / P27): A confirmed delete is an accepted asynchronous request, not proof of completed removal; cancel sends nothing and stale topic caches are invalidated.
 - 2026-11-04 (M5 / P26): Validate Kafka topic-name and numeric bounds before writes; refresh topic-list caches for gateway aliases and report unconfirmed creation honestly.
 - 2026-11-04 (M5 / P25): Exact offsets are returned as decimal strings; failed produces are treated as potentially delivered and are not automatically retried. Real-broker verification remains outstanding.
 - 2026-11-04 (M5 / P24): Gateway authentication requires trusted TLS and a random per-gateway token; credential changes reset gateway caches. A real-broker authentication demo remains outstanding without Docker.
