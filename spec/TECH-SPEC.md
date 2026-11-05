@@ -15,6 +15,7 @@ Covers both repositories: **Kafka3O-Gateway** (one per Kafka cluster) and **Kafk
 - Container images: `golang:1.27.2` (build), `gcr.io/distroless/static-debian12:nonroot` (runtime), `apache/kafka:4.3.1` (dev/test); CVE status: gateway image `kafka3o-gateway:dev` Trivy 0.75.0 2026-10-20: 0 critical/high (1 UNKNOWN: tzdata DLA-4792-1, fixed in a newer distroless base); `golang` and `apache/kafka` not scanned (build/dev only)
 - Logging: stdlib `log/slog` (JSON)
 - Kafka security currently supports PLAINTEXT; TLS and SASL PLAIN/SCRAM remain planned in P13, pending secured-broker discovery
+- Gateway HTTP security (M5): the gateway itself terminates TLS using deployment-supplied certificate/key files and requires a strong per-gateway bearer token from the environment; anonymous liveness and allowed-origin CORS preflight are the only exceptions. A token grants all API permissions, with no user identity or roles.
 - CORS: allowed origins from config (`http.cors.allowedOrigins`)
 - Rejected: Java/Spring — heavier runtime than a per-cluster sidecar needs
 - Rejected: confluent-kafka-go — cgo/librdkafka complicates builds
@@ -50,6 +51,7 @@ Covers both repositories: **Kafka3O-Gateway** (one per Kafka cluster) and **Kafk
 - Rules (UI): every query key starts with the gateway ID
 - Rules (UI): the gateway list comes only from runtime `/config.json`, never build-time env, so one build serves any deployment
 - Rules (UI): the static host serves `index.html` for client routes (`/clusters/*`); Vite dev already does
+- Rules (M5): tokens are stored in browser session storage for the configured HTTPS gateway only, never in URLs or runtime config; the UI must run in a secure context, authenticated redirects are rejected, and credential changes clear gateway query caches
 
 ## Structure
 ```
@@ -108,7 +110,7 @@ Tests live next to the file they test (`*_test.go`, `*.test.ts(x)`).
 - Security: PLAINTEXT today; TLS and SASL PLAIN/SCRAM configuration are pending P13 discovery
 
 ### Gateway HTTP API v1 (consumed by the UI)
-- Base URL: per gateway, from the UI's `/config.json`; no auth until F12 (M5) — trusted network assumed
+- Base URL: per gateway, from the UI's `/config.json`; M5 requires HTTPS and an `Authorization: Bearer` token for all requests except anonymous liveness and allowed-origin CORS preflight
 - `GET /api/v1/health/live` → 200 while the process is up
 - `GET /api/v1/cluster` → `{clusterId, controllerId, brokers:[{id, host, port, rack}]}`; 503 `cluster_unreachable` when Kafka is unreachable
 - `GET /api/v1/topics` → `[{name, partitions, replicationFactor, internal, approxMessages}]`; 503 `cluster_unreachable`
@@ -116,6 +118,7 @@ Tests live next to the file they test (`*_test.go`, `*.test.ts(x)`).
 - `GET /api/v1/topics/{topic}/messages` → at most 50 `{partition, offset, offsetExact, timestamp, key, value, headers:[{key, value}]}` records across the topic, newest first by default; `offsetExact` is the decimal string for the existing numeric `offset`, preserving int64 precision in browsers, and Kafka byte fields are base64 strings or `null` for Kafka nulls. Optional `partition` plus exactly one of `offset` or `timestamp` reads from that position in offset order (`timestamp` is Unix milliseconds); invalid positions return 400 `invalid_position`, a missing topic returns 404 `not_found`, and Kafka failures return 503 `cluster_unreachable`
 - `GET /api/v1/topics/{topic}/messages/search?query=<text>` → `{messages, scanned, truncated}`; searches case-sensitive UTF-8 query bytes in keys and values over at most 500 recent offset positions across the topic. `scanned` is the number of records examined, and `truncated` indicates positions or partitions outside the bounded window. Offset order and timestamps are not globally correlated; the window is not a claim of the newest 500 by timestamp. Empty or invalid UTF-8 search returns 400 `invalid_search`; missing topics return 404 `not_found` and Kafka failures 503 `cluster_unreachable`.
 - `GET /api/v1/consumer-groups` → consumer groups with `id`, `protocol`, `state`, `members`, `topics`, and per-topic/partition offsets and lag. Offsets and lag are decimal strings or `null` to preserve int64 precision. Partition status is `ok`, `no_commit`, `out_of_range`, or `unavailable`; an unavailable partition or group includes an explicit error. Topic membership is based on explicit subscription, current assignment, or committed offset. List/describe classic and next-generation consumer groups using Kafka 3.8+ group-type filtering.
+- M5 write endpoints will accept UTF-8 message fields and explicit topic-creation parameters; successful produce returns a partition and exact decimal-string offset. Delete success means the broker accepted the request, not that deletion has completed.
 - Errors: RFC 9457 problem JSON with `code`
 - OpenAPI document served at `/openapi.json`
 - UI timeout per gateway call: 5 s; status polling every 15 s; gateway Kafka timeout 3 s (must stay below the UI timeout)

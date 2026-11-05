@@ -167,10 +167,44 @@ See consumer groups associated with a topic and their lag for that topic.
 **External dependencies:** The F10 group API and configured gateway.
 
 ### F12 — Gateway authentication
-Gateways accept only authenticated requests · *detailed when M5 starts*
+Protect each gateway and its Kafka operations with a per-gateway shared bearer token and TLS.
+
+**Behaviors**
+- **F12-B1** A gateway starts only with a configured token and usable TLS certificate and key; all requests except liveness and permitted CORS preflights require the token
+- **F12-B2** A user enters or removes a gateway token in the UI → it is stored only in that tab's session storage, used only for that HTTPS gateway, and discarded when the session ends
+- **F12-B3** A token is missing or rejected, TLS is unavailable, or a request fails → the UI reports the error and allows the user to correct credentials or retry without exposing the token
+
+**Acceptance criteria**
+- **F12-AC1** (B1) Missing or invalid tokens receive 401; valid tokens reach the API; anonymous liveness and allowed-origin preflight still work; gateway startup fails without a valid token or TLS configuration
+- **F12-AC2** (B2) Token entry, replacement, removal, session storage, HTTPS-only requests, per-gateway isolation, and query-cache reset work without putting tokens in URLs or config files
+- **F12-AC3** (B3) Authentication, TLS, and gateway failures are visible; authenticated redirects are not followed; the gateway does not log or return the token
+
+**External dependencies:** TLS certificate and private key supplied by the deployment; a strong token supplied through the gateway environment. The shared token grants the same read/write access to everyone who holds it; there are no per-user roles.
 
 ### F13 — Produce message
-Produce a test message (key, value, headers) to a topic · *detailed when M5 starts*
+Produce a UTF-8 test message to an existing topic.
+
+**Behaviors**
+- **F13-B1** User enters a value, optionally includes a key, adds zero or more headers, and submits → the gateway produces one message and reports its partition and exact offset
+- **F13-B2** Validation or delivery fails → the UI reports the failure and does not automatically retry; an unconfirmed delivery may already have succeeded
+
+**Acceptance criteria**
+- **F13-AC1** (B1) A valid authenticated submission produces the specified UTF-8 bytes, including empty values and an optional empty key, and displays the returned partition and decimal offset
+- **F13-AC2** (B2) Invalid input is rejected, repeated submission is disabled while pending, and failures explicitly warn when delivery cannot be confirmed
+
+**External dependencies:** An authenticated gateway and a writable Kafka topic. Producing null values/tombstones is outside this feature.
 
 ### F14 — Create or delete topic
-Create or delete a topic · *detailed when M5 starts*
+Create topics and request deletion after confirmation.
+
+**Behaviors**
+- **F14-B1** User supplies a topic name, partition count, and replication factor → the gateway requests topic creation and reports the result
+- **F14-B2** User confirms deletion in a dialog → the gateway requests deletion; canceling the dialog sends no request
+- **F14-B3** Validation, conflicts, missing topics, or broker failures are displayed without automatic retries or claims that an unconfirmed operation failed definitively
+
+**Acceptance criteria**
+- **F14-AC1** (B1) Valid authenticated input requests topic creation with the requested partition count and replication factor; invalid or duplicate names are reported
+- **F14-AC2** (B2) Deletion requires confirmation; canceling is a no-op; successful requests clearly indicate deletion may be asynchronous
+- **F14-AC3** (B3) Failures are visible, duplicate submissions are prevented while pending, and cached topic lists are refreshed after successful writes
+
+**External dependencies:** An authenticated gateway and Kafka permissions to create or delete topics. Deletion behavior depends on broker configuration.
