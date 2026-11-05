@@ -3,9 +3,12 @@ import type { Problem } from "./types";
 
 export type FetchJson = (url: string) => Promise<unknown>;
 
-export async function fetchJson(fetchFn: typeof fetch, url: string, timeoutMs: number): Promise<unknown> {
+export async function fetchJson(fetchFn: typeof fetch, url: string, timeoutMs: number, init: RequestInit = {}): Promise<unknown> {
+  const headers = new Headers(init.headers);
+  headers.set("Accept", "application/json");
   const response = await fetchFn(url, {
-    headers: { Accept: "application/json" },
+    ...init,
+    headers,
     signal: AbortSignal.timeout(timeoutMs),
   });
   if (!response.ok) {

@@ -22,7 +22,9 @@ export function ClusterCard({ gateway, getCluster, statusRefreshMs }: ClusterCar
         <Link to={`/clusters/${gateway.id}`}>{gateway.name}</Link>
       </h2>
       <p>{gateway.url}</p>
-      {errorKind === "gateway-unreachable" ? (
+      {errorKind === "authentication-required" ? (
+        <p>Authentication required</p>
+      ) : errorKind === "gateway-unreachable" ? (
         <p>Gateway unreachable</p>
       ) : errorKind === "cluster-unreachable" ? (
         <>
@@ -30,7 +32,10 @@ export function ClusterCard({ gateway, getCluster, statusRefreshMs }: ClusterCar
           <p>{error instanceof HttpError ? error.problem?.detail : undefined}</p>
         </>
       ) : errorKind === "other" ? (
-        <p>Status unavailable</p>
+        <>
+          <p>Status unavailable</p>
+          {error instanceof Error ? <p>{error.message}</p> : null}
+        </>
       ) : cluster ? (
         <>
           <p>Healthy</p>

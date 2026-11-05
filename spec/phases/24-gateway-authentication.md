@@ -17,7 +17,7 @@
   - Files: Gateway HTTP authentication middleware/tests (new), CORS handler/tests
   - Do: Implement constant-time bearer-token verification, anonymous liveness, safe 401 problem responses, and allowed-origin preflight with the Authorization header.
   - Done when: HTTP tests cover valid/invalid tokens, protected endpoints, anonymous liveness, preflight, and non-disclosure; `go test ./...` passes.
-- [ ] **T24.3 Implement session credentials and secure requests** — Covers: F12-AC2, F12-AC3
+- [x] **T24.3 Implement session credentials and secure requests** — Covers: F12-AC2, F12-AC3
   - Files: UI session credential store and tests (new), authenticated request action/tests (new), gateway error classification/tests
   - Do: Store tokens per gateway in session storage, require a secure UI context and HTTPS gateway URLs, prevent redirect forwarding, and surface authentication errors.
   - Done when: focused UI tests cover storage failures, gateway isolation, token removal, HTTPS and redirect policy, and 401 handling; `npm test` and `npm run build` pass.

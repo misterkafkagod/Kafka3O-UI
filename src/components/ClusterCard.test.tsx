@@ -61,6 +61,15 @@ describe("ClusterCard", () => {
     expect(await screen.findByText("Gateway unreachable")).toBeDefined();
   });
 
+  it("shows when authentication is required", async () => {
+    renderWithQuery(
+      <ClusterCard gateway={gateway} statusRefreshMs={60_000} getCluster={async () => {
+        throw new HttpError(401, "unauthorized");
+      }} />,
+    );
+    expect(await screen.findByText("Authentication required")).toBeDefined();
+  });
+
   it("shows Cluster unreachable with the gateway's message", async () => {
     renderWithQuery(
       <ClusterCard

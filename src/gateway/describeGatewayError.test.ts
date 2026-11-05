@@ -3,6 +3,12 @@ import { describeGatewayError } from "./describeGatewayError";
 import { HttpError } from "./HttpError";
 
 describe("describeGatewayError", () => {
+  it("describes rejected gateway credentials", () => {
+    expect(describeGatewayError(new HttpError(401, "unauthorized"))).toEqual({
+      title: "Authentication required",
+      detail: "Enter or update this gateway's token.",
+    });
+  });
   it("describes a network failure as Gateway unreachable", () => {
     expect(describeGatewayError(new TypeError("Failed to fetch"))).toEqual({ title: "Gateway unreachable" });
   });

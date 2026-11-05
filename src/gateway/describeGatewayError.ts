@@ -8,6 +8,9 @@ export type GatewayErrorDescription = {
 
 export function describeGatewayError(error: unknown): GatewayErrorDescription {
   const kind = classifyGatewayError(error);
+  if (kind === "authentication-required") {
+    return { title: "Authentication required", detail: "Enter or update this gateway's token." };
+  }
   if (kind === "gateway-unreachable") {
     return { title: "Gateway unreachable" };
   }

@@ -99,7 +99,7 @@ export type ConsumerGroup = {
   error?: string;
 };
 
-export type GatewayErrorKind = "gateway-unreachable" | "cluster-unreachable" | "other";
+export type GatewayErrorKind = "authentication-required" | "gateway-unreachable" | "cluster-unreachable" | "other";
 
 // RFC 9457 problem body sent by the gateway on errors (only the fields the UI uses).
 export type Problem = {

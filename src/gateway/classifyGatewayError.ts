@@ -5,6 +5,9 @@ const unreachableNames = new Set(["TimeoutError", "AbortError"]);
 
 // Matches by name, not instanceof: fetch's DOMException may come from a different realm than the global one.
 export function classifyGatewayError(error: unknown): GatewayErrorKind {
+  if (error instanceof HttpError && error.status === 401) {
+    return "authentication-required";
+  }
   if (error instanceof HttpError && error.problem?.code === "cluster_unreachable") {
     return "cluster-unreachable";
   }

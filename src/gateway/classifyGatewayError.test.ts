@@ -3,6 +3,9 @@ import { classifyGatewayError } from "./classifyGatewayError";
 import { HttpError } from "./HttpError";
 
 describe("classifyGatewayError", () => {
+  it("identifies a 401 as authentication required", () => {
+    expect(classifyGatewayError(new HttpError(401, "unauthorized"))).toBe("authentication-required");
+  });
   it("treats a fetch network failure (TypeError) as gateway-unreachable", () => {
     expect(classifyGatewayError(new TypeError("Failed to fetch"))).toBe("gateway-unreachable");
   });
