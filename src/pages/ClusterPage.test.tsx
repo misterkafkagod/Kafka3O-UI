@@ -20,22 +20,39 @@ const pageProps = {
   getCluster: (url: string) => getCluster(realFetchJson, url),
   listTopics: (url: string) => listTopics(realFetchJson, url),
   listConsumerGroups: (url: string) => listConsumerGroups(realFetchJson, url),
+  createTopic: async () => {},
   statusRefreshMs: 60_000,
 };
 
-function renderClusterPage(route: string) {
+function renderClusterPage(route: string, props = pageProps) {
   return renderWithQuery(
     <Routes>
       <Route path="/" element={<p>Overview</p>} />
-      <Route path="/clusters/:gatewayId" element={<ClusterPage {...pageProps} view="brokers" />} />
-      <Route path="/clusters/:gatewayId/topics" element={<ClusterPage {...pageProps} view="topics" />} />
-      <Route path="/clusters/:gatewayId/consumer-groups" element={<ClusterPage {...pageProps} view="consumer-groups" />} />
+      <Route path="/clusters/:gatewayId" element={<ClusterPage {...props} view="brokers" />} />
+      <Route path="/clusters/:gatewayId/topics" element={<ClusterPage {...props} view="topics" />} />
+      <Route path="/clusters/:gatewayId/consumer-groups" element={<ClusterPage {...props} view="consumer-groups" />} />
     </Routes>,
     route,
   );
 }
 
 describe("ClusterPage", () => {
+  it("refreshes the topic list after creation", async () => {
+    const user = userEvent.setup();
+    let created = false;
+    server.use(
+      http.get("/config.json", () => HttpResponse.json({ gateways: [dev] })),
+      http.get("http://localhost:8081/api/v1/topics", () => HttpResponse.json(
+        created ? [{ name: "orders", partitions: 1, replicationFactor: 1, internal: false, approxMessages: 0 }] : [],
+      )),
+    );
+    renderClusterPage("/clusters/dev/topics", { ...pageProps, createTopic: async () => { created = true; } });
+    expect(await screen.findByText("No topics")).toBeDefined();
+    await user.click(screen.getByText("Create topic", { selector: "summary" }));
+    await user.type(screen.getByLabelText("Topic name"), "orders");
+    await user.click(screen.getByRole("button", { name: "Create topic" }));
+    expect(await screen.findByRole("link", { name: "orders" })).toBeDefined();
+  });
   it("opens consumer groups through the cluster tab", async () => {
     server.use(
       http.get("/config.json", () => HttpResponse.json({ gateways: [dev] })),

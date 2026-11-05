@@ -4,6 +4,7 @@ import { GatewayCredentialsPanel } from "./components/GatewayCredentialsPanel";
 import type { LoadGatewayConfig } from "./config/loadGatewayConfig";
 import type { GetCluster } from "./gateway/getCluster";
 import type { GetTopicDetail } from "./gateway/getTopicDetail";
+import type { CreateTopic } from "./gateway/createTopic";
 import type { GatewayCredentials } from "./gateway/GatewayCredentials";
 import type { ListConsumerGroups } from "./gateway/listConsumerGroups";
 import type { ListLatestTopicMessages } from "./gateway/listLatestTopicMessages";
@@ -25,6 +26,7 @@ type AppProps = {
   listLatestTopicMessages: ListLatestTopicMessages;
   searchTopicMessages: SearchTopicMessages;
   produceTopicMessage: ProduceTopicMessage;
+  createTopic: CreateTopic;
   linkOrigin: string;
   copyMessageLink: (text: string) => Promise<void>;
   statusRefreshMs: number;
@@ -41,6 +43,7 @@ export function App({
   listLatestTopicMessages,
   searchTopicMessages,
   produceTopicMessage,
+  createTopic,
   linkOrigin,
   copyMessageLink,
   statusRefreshMs,
@@ -73,6 +76,7 @@ export function App({
               getCluster={getCluster}
               listTopics={listTopics}
               listConsumerGroups={listConsumerGroups}
+              createTopic={createTopic}
               statusRefreshMs={statusRefreshMs}
               view="brokers"
             />
@@ -86,6 +90,7 @@ export function App({
               getCluster={getCluster}
               listTopics={listTopics}
               listConsumerGroups={listConsumerGroups}
+              createTopic={createTopic}
               statusRefreshMs={statusRefreshMs}
               view="topics"
             />
@@ -99,6 +104,7 @@ export function App({
               getCluster={getCluster}
               listTopics={listTopics}
               listConsumerGroups={listConsumerGroups}
+              createTopic={createTopic}
               statusRefreshMs={statusRefreshMs}
               view="consumer-groups"
             />

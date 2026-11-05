@@ -5,6 +5,7 @@ import { describeProduceError } from "../gateway/describeProduceError";
 import type { ProduceMessageResult, ProduceTopicMessage as ProduceAction } from "../gateway/produceTopicMessage";
 import type { GatewayEntry } from "../gateway/types";
 import { produceMessageFromForm, type ProduceHeaderField } from "../messages/produceMessageFromForm";
+import { isGatewayTopicListQuery } from "../topics/isGatewayTopicListQuery";
 
 type ProduceTopicMessageProps = {
   gateway: GatewayEntry;
@@ -35,7 +36,7 @@ export function ProduceTopicMessage({ gateway, topicName, produceTopicMessage }:
       const produced = await produceTopicMessage(gateway.url, topicName, produceMessageFromForm(value, includeKey, key, headers));
       setResult(produced);
       void queryClient.invalidateQueries({ queryKey: ["gateway", gateway.id, "topic", topicName, "messages"] });
-      void queryClient.invalidateQueries({ queryKey: ["gateway", gateway.id, "topics"] });
+      void queryClient.invalidateQueries({ queryKey: ["gateway"], predicate: isGatewayTopicListQuery });
     } catch (failure) {
       setError(describeProduceError(failure));
     } finally {

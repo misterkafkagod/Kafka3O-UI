@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import type { LoadGatewayConfig } from "./config/loadGatewayConfig";
 import type { GatewayCredentials } from "./gateway/GatewayCredentials";
 import type { GetCluster } from "./gateway/getCluster";
+import type { CreateTopic } from "./gateway/createTopic";
 import type { ListConsumerGroups } from "./gateway/listConsumerGroups";
 import type { ListLatestTopicMessages } from "./gateway/listLatestTopicMessages";
 import type { ProduceTopicMessage } from "./gateway/produceTopicMessage";
@@ -41,6 +42,7 @@ type AppTree = ReactElement<{
       loadGatewayConfig: LoadGatewayConfig;
       gatewayCredentials: GatewayCredentials;
       produceTopicMessage: ProduceTopicMessage;
+      createTopic: CreateTopic;
       linkOrigin: string;
       copyMessageLink: (text: string) => Promise<void>;
     }>;
@@ -81,6 +83,9 @@ describe("main composition", () => {
     vi.stubGlobal("isSecureContext", true);
     const fetchFn = vi.fn<typeof fetch>(async (url, init) => {
       if (url === "/config.json") return Response.json({ gateways: [{ id: "dev", name: "Dev", url: "https://gateway" }] });
+      if (init?.method === "POST" && typeof url === "string" && url.endsWith("/api/v1/topics")) {
+        return Response.json(JSON.parse(String(init.body)), { status: 201 });
+      }
       if (init?.method === "POST") return Response.json({ partition: 1, offset: "9007199254740993" });
       return Response.json({ clusterId: "abc", controllerId: 1, brokers: [] });
     });
@@ -104,6 +109,9 @@ describe("main composition", () => {
       .resolves.toEqual({ partition: 1, offset: "9007199254740993" });
     expect(fetchFn.mock.calls[4][1]?.method).toBe("POST");
     expect(new Headers(fetchFn.mock.calls[4][1]?.headers).get("Authorization")).toBe(`Bearer ${token}`);
+    await props.createTopic("https://gateway", { name: "orders", partitions: 1, replicationFactor: 1 });
+    expect(fetchFn.mock.calls[5][1]?.method).toBe("POST");
+    expect(new Headers(fetchFn.mock.calls[5][1]?.headers).get("Authorization")).toBe(`Bearer ${token}`);
     props.gatewayCredentials.clear("https://gateway");
     expect(props.gatewayCredentials.read("https://gateway")).toBeNull();
   });
