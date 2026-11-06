@@ -2,7 +2,7 @@
 - **Milestone:** M6
 - **Covers:** F19-AC2
 - **Discovery:** —
-- **Status:** Review
+- **Status:** Done
 
 ## Demo
 1. On the updated manual-test UI, check 320, 768 and 1440 CSS-pixel viewport widths and a separate 200% zoom check; confirm there is no page-wide horizontal overflow and wide tables scroll in labeled regions.
@@ -23,3 +23,8 @@
   - Done when: `npm test -- src/App.test.tsx` and `npm run build` pass; browser checks confirm no page-wide overflow at all specified widths and zoom, keyboard operation and reduced-motion behavior.
 
 ## Review
+- **Demo:** With synthetic GET fixtures, the overview, brokers, topic list, topic details, messages and consumer groups had no page-wide horizontal overflow at 320, 768 or 1440 CSS pixels, including expanded forms and long values. The empty-configuration example also fit at 320 pixels. A separate browser zoom check reached 200% (`devicePixelRatio` 2) and all six pages fit the resulting viewport.
+- **Keyboard and motion:** The first Tab exposed the skip link; Enter focused the content target and the next Tab reached its first control. A focused message-table region scrolled horizontally by keyboard, with a visible 3px outline. Reduced-motion emulation reduced a 2s animation and transition to 0.01ms.
+- **Validation:** All 272 UI tests and the production build passed. The P31 build is served by the EKS-D manual UI; both Gateways passed pinned-certificate HTTPS, authentication, Kafka metadata and CORS checks. Kafka A and B remained Ready (1/1), with no Kafka writes.
+- **Vulnerability scan:** Not run; P31 adds no dependencies and is not the final M6 phase.
+- **Notes:** The manual pod replacement rotated its in-memory credentials and certificates; the localhost tunnel was restored. The previous P30 ConfigMap remains available for rollback. Live browser Gateway access still requires manual acceptance of the new self-signed certificates.

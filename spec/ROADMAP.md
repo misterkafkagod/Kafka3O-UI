@@ -130,7 +130,7 @@ The console should be comfortable for dense technical data, easy to navigate, an
     - Demo: open an encoded-topic exact-message URL directly, then use Back and Forward and verify the topic and exact message position.
   - **P30** F19-B1 · Apply a shared visual language and system theme — Covers: F19-AC1 · Discovery: — · Status: Done
     - Demo: check representative pages in light and dark themes; verify contrast, accessible control names and text-based statuses.
-  - **P31** F19-B2 · Keep pages usable across viewports and input modes — Covers: F19-AC2 · Discovery: — · Status: Review
+  - **P31** F19-B2 · Keep pages usable across viewports and input modes — Covers: F19-AC2 · Discovery: — · Status: Done
     - Demo: check 320, 768 and 1440 CSS-pixel widths and 200% zoom; navigate by keyboard and verify skip navigation, focus, contained table overflow and reduced motion.
   - **P32** F19-B3 · Show truthful loading, empty, error and partial-result states — Covers: F19-AC3 · Discovery: — · Status: Planned
     - Demo: with two gateway fixtures, exercise loading, empty, no-match and failure states plus one healthy and one failed gateway; verify no false zero or healthy status.
