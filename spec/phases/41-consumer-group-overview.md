@@ -2,7 +2,7 @@
 - **Milestone:** M8
 - **Covers:** F23-AC1
 - **Discovery:** —
-- **Status:** Review
+- **Status:** Done
 
 ## Demo
 1. Open a cluster with multiple groups and navigate by keyboard from the summary to a group's member and partition-lag details.
@@ -15,3 +15,7 @@
   - Done when: `npm test -- src/components/ConsumerGroups.test.tsx src/components/ConsumerGroupDetails.test.tsx src/pages/ClusterPage.test.tsx src/App.test.tsx` and `npm run build` pass.
 
 ## Review
+- **Demo:** Browser fixtures navigated by keyboard from an encoded group summary link to the focused detail, showed exact offsets and distinct lag statuses, and recovered from an incomplete group followed by a gateway failure.
+- **Responsive:** The summary and detail pages had no page-wide overflow at 320, 768 or 1440 CSS pixels; wide tables stayed in their scroll regions.
+- **Validation:** All 320 UI tests and the production build passed on Node 24.21.0. The M8 deployment remains deferred until the milestone's final phase.
+- **Vulnerability scan:** Not run; P41 adds no dependencies and is not the final M8 phase.
