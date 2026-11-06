@@ -442,6 +442,7 @@ describe("App", () => {
     const first = render(<MemoryRouter initialEntries={["/clusters/dev%20%26%20west/topics/orders%20%26%20audit/messages"]}>{app()}</MemoryRouter>);
     await user.click(await screen.findByRole("button", { name: "Copy link for partition 2 offset 9007199254740993" }));
     const copied = copy.mock.calls[0][0];
+    expect(copied).toBe("https://console.example/clusters/dev%20%26%20west/topics/orders%20%26%20audit/messages?partition=2&offset=9007199254740993");
     first.unmount();
 
     const url = new URL(copied);
@@ -452,6 +453,7 @@ describe("App", () => {
       </MemoryRouter>,
     );
     expect(await screen.findByText("exact")).toBeDefined();
+    expect(screen.getByRole("region", { name: "Verified linked message" })).toBeDefined();
     expect(list).toHaveBeenLastCalledWith("http://localhost:8081", "orders & audit", {
       partition: 2,
       offset: "9007199254740993",

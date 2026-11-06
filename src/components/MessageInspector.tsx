@@ -10,16 +10,18 @@ type MessageInspectorProps = {
   id: string;
   message: TopicMessage;
   messageLinks?: MessageLinkContext;
+  verifiedLink?: boolean;
 };
 
-export function MessageInspector({ id, message, messageLinks }: MessageInspectorProps) {
+export function MessageInspector({ id, message, messageLinks, verifiedLink }: MessageInspectorProps) {
   const [valueFormat, setValueFormat] = useState<MessageValueFormat>("text");
   const offset = exactMessageOffset(message);
   const formattedValue = message.value === null ? null : formatMessageValue(message.value, valueFormat);
+  const heading = verifiedLink ? "Verified linked message" : "Selected message";
 
   return (
-    <section id={id} aria-label="Selected message" className={styles.inspector}>
-      <h4>Selected message</h4>
+    <section id={id} aria-label={heading} className={styles.inspector}>
+      <h4>{heading}</h4>
       <dl className={styles.metadata}>
         <div><dt>Partition</dt><dd>{message.partition}</dd></div>
         <div><dt>Offset</dt><dd>{offset ?? "Exact offset unavailable"}</dd></div>

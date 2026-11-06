@@ -8,9 +8,10 @@ import styles from "./MessageWorkspace.module.css";
 type MessageWorkspaceProps = {
   messages: TopicMessage[];
   messageLinks?: MessageLinkContext;
+  verifiedLink?: boolean;
 };
 
-export function MessageWorkspace({ messages, messageLinks }: MessageWorkspaceProps) {
+export function MessageWorkspace({ messages, messageLinks, verifiedLink }: MessageWorkspaceProps) {
   const inspectorId = useId();
   const [selection, setSelection] = useState<{ results: TopicMessage[]; message: TopicMessage | undefined }>({
     results: messages,
@@ -34,7 +35,7 @@ export function MessageWorkspace({ messages, messageLinks }: MessageWorkspacePro
         inspectorId={inspectorId}
         onSelect={(message) => setSelection({ results: messages, message })}
       />
-      <MessageInspector id={inspectorId} message={selected} messageLinks={messageLinks} />
+      <MessageInspector id={inspectorId} message={selected} messageLinks={messageLinks} verifiedLink={verifiedLink} />
     </div>
   );
 }

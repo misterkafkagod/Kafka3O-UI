@@ -100,6 +100,7 @@ describe("TopicPage", () => {
     renderTopicPage(async () => [gateway], async () => ({ name: "orders", partitions: [], config: [] }), list, "messages", undefined, `/clusters/dev/topics/orders/messages?partition=2&offset=${offset}`);
 
     expect(await screen.findByText("exact")).toBeDefined();
+    expect(within(screen.getByRole("region", { name: "Verified linked message" })).getByText(offset)).toBeDefined();
     expect(screen.queryByText("later")).toBeNull();
     expect(list).toHaveBeenCalledWith(gateway.url, "orders", { partition: 2, offset });
     expect(screen.getByRole("link", { name: "Back to message reads" }).getAttribute("href")).toBe("/clusters/dev/topics/orders/messages");
@@ -127,6 +128,8 @@ describe("TopicPage", () => {
 
     expect((await screen.findByRole("alert")).textContent).toContain("No message is available");
     expect(screen.queryByText("later")).toBeNull();
+    expect(screen.queryByRole("region", { name: "Verified linked message" })).toBeNull();
+    expect(screen.queryByRole("link", { name: "Message link" })).toBeNull();
   });
 
   it("rejects malformed links without fetching messages", async () => {
@@ -150,6 +153,8 @@ describe("TopicPage", () => {
     ]);
     renderTopicPage(async () => [gateway], async () => ({ name: "orders", partitions: [], config: [] }), legacy, "messages", undefined, "/clusters/dev/topics/orders/messages?partition=0&offset=9007199254740993");
     expect((await screen.findByRole("alert")).textContent).toContain("cannot be verified");
+    expect(screen.queryByRole("region", { name: "Verified linked message" })).toBeNull();
+    expect(screen.queryByRole("link", { name: "Message link" })).toBeNull();
   });
 
   it("offers retry when a linked read fails because the gateway is unavailable", async () => {

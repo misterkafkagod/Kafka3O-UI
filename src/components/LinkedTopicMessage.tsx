@@ -34,5 +34,5 @@ export function LinkedTopicMessage({ position, gateway, messages, isError, error
   if (result.kind === "not-found") {
     return <p role="alert">No message is available at this partition and offset.</p>;
   }
-  return <MessageWorkspace messages={[result.message]} messageLinks={messageLinks} />;
+  return <MessageWorkspace messages={[result.message]} messageLinks={messageLinks} verifiedLink />;
 }

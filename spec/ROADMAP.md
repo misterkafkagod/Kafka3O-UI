@@ -154,7 +154,7 @@ The console should be comfortable for dense technical data, easy to navigate, an
     - Demo: read several records, select each by keyboard and inspect its position, payload formats and headers.
   - **P39** F22-B2 · Inspect bounded message search results — Covers: F22-AC2 · Discovery: — · Status: Done
     - Demo: search messages, select a match and verify the scanned count, truncation notice and retry behavior.
-  - **P40** F22-B3 · Inspect and share exact message links — Covers: F22-AC3 · Discovery: — · Status: Planned
+  - **P40** F22-B3 · Inspect and share exact message links — Covers: F22-AC3 · Discovery: — · Status: Review
     - Demo: copy an exact message link and reopen it, then check an unavailable or unverifiable position.
 
 ### M8 — Clear operational workflows

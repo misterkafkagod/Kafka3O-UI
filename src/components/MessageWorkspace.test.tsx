@@ -17,6 +17,16 @@ const messages: TopicMessage[] = [
 ];
 
 describe("MessageWorkspace", () => {
+  it("distinguishes a verified linked record from an ordinary selected record", () => {
+    const page = render(<MessageWorkspace messages={[messages[0]]} verifiedLink />);
+
+    expect(screen.getByRole("region", { name: "Verified linked message" })).toBeDefined();
+    expect(screen.queryByRole("region", { name: "Selected message" })).toBeNull();
+    page.rerender(<MessageWorkspace messages={[messages[0]]} />);
+    expect(screen.getByRole("region", { name: "Selected message" })).toBeDefined();
+    expect(screen.queryByRole("region", { name: "Verified linked message" })).toBeNull();
+  });
+
   it("initially inspects only the first record and lets the keyboard select another", async () => {
     const user = userEvent.setup();
     render(<MessageWorkspace messages={messages} />);
