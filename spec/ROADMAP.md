@@ -140,10 +140,22 @@ The console should be comfortable for dense technical data, easy to navigate, an
     - Demo: submit invalid credentials, recover from 401, then simulate a network/TLS failure; verify no token exposure or certificate bypass and keep the other gateway usable.
 
 ### M7 — Efficient investigation of clusters, topics and messages
-- **Status:** Planned
+- **Status:** Active
 - **Features:** F21, F22
 - **Goal:** Organize the read workflows into dense, readable overview/detail pages and a message workspace with a compact result list and selected-record inspector.
-- **Phases:** To be defined by `skill-phase-breakdown`.
+- **Phases:**
+  - **P35** F21-B1 · Review clusters and cross-cluster topic results — Covers: F21-AC1 · Discovery: — · Status: Planned
+    - Demo: open the overview with two gateways, search topics and verify one failure does not hide the other gateway's result.
+  - **P36** F21-B2 · Inspect cluster and broker context — Covers: F21-AC2 · Discovery: — · Status: Planned
+    - Demo: open a healthy cluster and a failed cluster; compare the factual summary, broker table and recoverable error.
+  - **P37** F21-B3 · Browse topics, partitions and configuration — Covers: F21-AC3 · Discovery: — · Status: Planned
+    - Demo: filter topics, open an encoded topic name and inspect its partitions and hidden sensitive configuration.
+  - **P38** F22-B1 · Select and inspect message read results — Covers: F22-AC1 · Discovery: — · Status: Planned
+    - Demo: read several records, select each by keyboard and inspect its position, payload formats and headers.
+  - **P39** F22-B2 · Inspect bounded message search results — Covers: F22-AC2 · Discovery: — · Status: Planned
+    - Demo: search messages, select a match and verify the scanned count, truncation notice and retry behavior.
+  - **P40** F22-B3 · Inspect and share exact message links — Covers: F22-AC3 · Discovery: — · Status: Planned
+    - Demo: copy an exact message link and reopen it, then check an unavailable or unverifiable position.
 
 ### M8 — Clear operational workflows
 - **Status:** Planned

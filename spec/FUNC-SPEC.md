@@ -257,8 +257,32 @@ Manage gateway connections in a dedicated, keyboard-accessible panel rather than
 ### F21 — Investigation overview and detail pages
 Explore clusters, brokers, topics and configuration through organized, dense overview/detail pages, retaining topic filtering and cross-cluster search.
 
+**Behaviors**
+- **F21-B1** User opens the cluster overview or searches across gateways → each gateway has a readable, independently updated status and matching topics remain available when another gateway fails
+- **F21-B2** User opens a cluster's brokers → the page groups its gateway and cluster identity, controller and broker information without presenting unavailable data as a metric
+- **F21-B3** User browses topics or a topic's details → filtering, partition information and configuration are organized for scanning while existing topic actions and links remain available
+
+**Acceptance criteria**
+- **F21-AC1** (B1) Given multiple gateways, the responsive overview identifies each gateway and its actual loading, health or error state; available cluster metadata and broker counts are shown only on success. Cross-cluster topic search retains independent results and recovery when another gateway fails.
+- **F21-AC2** (B2) Given a healthy cluster, the broker page shows its gateway, cluster ID, controller and broker count with the sorted, accessible broker table. Loading or failure does not display stale success or a fabricated count.
+- **F21-AC3** (B3) Given topics and a selected topic, the topic list retains case-insensitive filtering, internal-topic visibility, sorted and encoded links, and approximate counts. The detail page keeps partition offsets, replicas and configuration readable, hides sensitive configuration values, and preserves existing create/delete actions and failure states.
+
+**External dependencies:** Existing gateway cluster and topic APIs, runtime gateway configuration and navigation routes. No new gateway endpoint is required.
+
 ### F22 — Message investigation workspace
 Read and search messages in a compact result list with a selected-record inspector for payload formats, headers and exact position, retaining positioned reads, bounded scans and message links.
+
+**Behaviors**
+- **F22-B1** User reads recent or positioned messages → a compact, keyboard-operable result list selects a record for inspection without expanding every payload
+- **F22-B2** User searches recent messages → matching records use the same inspector and retain the bounded-scan explanation and failure recovery
+- **F22-B3** User opens or copies an exact message link → the inspector shows only the verified record and preserves its partition and decimal offset
+
+**Acceptance criteria**
+- **F22-AC1** (B1) Given message results, each record is represented in result order and the first is selected initially; selecting another by mouse or keyboard updates a responsive inspector without another read. The inspector shows timestamp, partition, exact offset or its unavailability, key, value and headers, including null and empty values, with the existing text, JSON and base64 formats. A changed result set cannot leave a stale or wrongly identified record selected.
+- **F22-AC2** (B2) Given a search, the existing case-sensitive, bounded scan, examined count, truncation status, empty and retry states remain accurate; matching records use the same selectable inspector and no additional search is triggered by selection.
+- **F22-AC3** (B3) Given a direct link, only a message verified at its exact partition and decimal offset is inspected; unavailable or unverifiable positions remain explicit. Copying a selected record's link preserves encoded gateway/topic names and exact offsets, and an unavailable exact position cannot produce a misleading link.
+
+**External dependencies:** Existing message read/search APIs and browser clipboard and navigation facilities. Kafka records and offsets are not modified by inspection.
 
 ### F23 — Consumer investigation
 Inspect consumer groups and partition lag through summary-to-detail navigation, preserving explicit unknown, unavailable and missing-commit states.
