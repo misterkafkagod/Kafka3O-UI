@@ -13,6 +13,14 @@ describe("parseConsoleSession", () => {
     expect(parseConsoleSession({ ...session, passwordHash: "must-not-escape" })).toEqual(session);
   });
 
+  it("accepts the additive authentication source without changing the preview contract", () => {
+    expect(parseConsoleSession({ ...session, authSource: "local" })).toEqual(session);
+    expect(parseConsoleSession({ ...session, username: "cognito-user", authSource: "cognito" })).toEqual({
+      ...session,
+      username: "cognito-user",
+    });
+  });
+
   it("rejects malformed or unnormalized server results", () => {
     for (const value of [
       null, [], {}, { ...session, accountId: "" }, { ...session, accountId: " id" },

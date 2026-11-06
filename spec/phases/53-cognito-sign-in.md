@@ -100,6 +100,26 @@ is linked to a local account by email.
   - Done when: protection tests cover key separation, limits, tampering,
     substitution and concurrency; exchange tests reject malformed refresh
     tokens; focused Cognito tests and `go test ./...` pass.
+- [x] **T53.3d Create audited Cognito sessions** — Covers: foundation of F27-AC2, F27-AC4
+  - Files: Gateway `internal/console/cognito/`, `session/`, `storage/` and
+    session API actions/tests, Gateway `internal/console/README.md`,
+    `spec/TECH-SPEC.md`, `spec/ROADMAP.md`.
+  - Do: Use a provider-bound, non-forgeable exchange proof and durable
+    one-use reservation to atomically create or find an enabled `(issuer,
+    sub)` identity and audited opaque session with separately encrypted
+    refresh-token storage. Create no grants or email links. Preserve local
+    session behavior, distinguish authentication sources, require an enabled
+    matching provider/protector, deny stale or disabled sessions, and let
+    local administrators list/revoke Cognito sessions. Permit CSRF-checked
+    local logout of unavailable sessions and delete retained provider
+    credentials on revocation; retention cleanup remains a predeployment task.
+  - Done when: synthetic tests cover encrypted persistence/restart,
+    no direct grants or local linking, expiry, disabled identities,
+    source and configuration isolation, audit/commit failure, single-use
+    concurrency, unavailable-session logout and administrator revocation;
+    migration preserves existing state and
+    focused Cognito tests plus `go test ./...` pass. Provider refresh and
+    browser integration remain separate unfinished work.
 - [ ] **T53.3 Issue and refresh Cognito application sessions** — Covers: F27-AC2, F27-AC4
   - Files: Gateway `internal/console/cognito/` (new exchange/refresh
     actions/tests), `internal/console/session/` and
