@@ -140,7 +140,7 @@ The console should be comfortable for dense technical data, easy to navigate, an
     - Demo: submit invalid credentials, recover from 401, then simulate a network/TLS failure; verify no token exposure or certificate bypass and keep the other gateway usable.
 
 ### M7 — Efficient investigation of clusters, topics and messages
-- **Status:** Active
+- **Status:** Done
 - **Features:** F21, F22
 - **Goal:** Organize the read workflows into dense, readable overview/detail pages and a message workspace with a compact result list and selected-record inspector.
 - **Phases:**
@@ -154,7 +154,7 @@ The console should be comfortable for dense technical data, easy to navigate, an
     - Demo: read several records, select each by keyboard and inspect its position, payload formats and headers.
   - **P39** F22-B2 · Inspect bounded message search results — Covers: F22-AC2 · Discovery: — · Status: Done
     - Demo: search messages, select a match and verify the scanned count, truncation notice and retry behavior.
-  - **P40** F22-B3 · Inspect and share exact message links — Covers: F22-AC3 · Discovery: — · Status: Review
+  - **P40** F22-B3 · Inspect and share exact message links — Covers: F22-AC3 · Discovery: — · Status: Done
     - Demo: copy an exact message link and reopen it, then check an unavailable or unverifiable position.
 
 ### M8 — Clear operational workflows
@@ -174,6 +174,11 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
 - **Verification debt:** Run the built gateway container in a deployment; the image was built and scanned on EKS-D but was not started as a container.
 
 ## Learnings
+- 2026-11-06 (M7 retro): P35–P40 cover F21–F22 while preserving independent Gateway failures, bounded searches and exact message positions.
+- 2026-11-06 (M7 retro): A shared selectable inspector avoids repeated payload expansion and keeps selection local to the current result set.
+- 2026-11-06 (M7 retro): Browser fixtures exercised large offsets, unavailable records and recovery; the persistent clusters had no sampled records for a real exact-position demo, so that check remains unrun.
+- 2026-11-06 (M7 retro): The EKS-D UI rollout preserved Kafka data and the prior ConfigMap, but rotated the test certificates and tokens and required restoring the tunnel.
+- 2026-11-06 (M7 retro): Both npm audits had zero findings; Node itself remains pending a runtime vulnerability scan.
 - 2026-11-06 (P35): A configured-gateway count is factual even while individual gateways load or fail; gateway IDs need URL encoding in overview links as well as breadcrumbs.
 - 2026-11-06 (M6 retro): P28–P34 cover all F18–F20 acceptance criteria; shared navigation, accessible states and contextual recovery preserve existing routes and write safeguards.
 - 2026-11-06 (M6 retro): Browser fixtures made focus, failure and gateway-isolation behavior reproducible, while the EKS-D checks confirmed the actual static assets and secured Kafka connections.
