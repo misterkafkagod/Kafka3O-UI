@@ -28,7 +28,7 @@ Covers both repositories: **Kafka3O-Gateway** (one per Kafka cluster) and **Kafk
 - Routing: React Router 8.4.0; CVE status: `npm audit` 2026-11-05: 0 findings
 - Type definitions (dev): @types/react 19.3.0, @types/react-dom 19.3.0; CVE status: `npm audit` 2026-11-05: 0 findings
 - Data fetching: TanStack Query 5.104.4 — one independent query per gateway with its own polling, timeout, error state and retry, so one slow gateway never blocks another; CVE status: `npm audit` 2026-11-05: 0 findings
-- Styling: plain CSS modules
+- Styling: CSS Modules for component styles, with minimal global styles for typography, theme tokens and baseline normalization; no new styling dependency
 - Rejected: Next.js — a static SPA suffices; no server needed
 - Rejected: MUI / Tailwind — unnecessary weight for M1
 - Rejected: BFF aggregating gateways — adds a stateful hop; direct browser → gateway with CORS is simpler
@@ -88,6 +88,19 @@ Kafka3O-UI/
 ```
 Tests live next to the file they test (`*_test.go`, `*.test.ts(x)`).
 
+## UI experience (M6–M8)
+- Direction: a restrained operator console for developers and operators, with neutral surfaces, blue primary actions, compact readable tables, consistent spacing and a clear typographic hierarchy. Status labels include text and never rely on color alone.
+- Themes and motion: follow `prefers-color-scheme` for light/dark presentation and `prefers-reduced-motion` for optional motion. No separate theme-persistence mechanism is required.
+- Scope: M6 supplies the shell, shared visual baseline and connection panel across all current routes; M7 reorganizes cluster/topic/message investigation; M8 reorganizes consumer and write workflows. Completed F1–F14 behavior remains the baseline throughout.
+- Components: extract only elements with actual reuse, such as navigation, breadcrumbs, page headers, controls and state feedback. Keep styles next to their components in the existing source structure; do not introduce a general-purpose component framework or speculative abstractions.
+- Semantics: use native links, buttons, form labels, headings, landmarks and tables. Dialogs must provide accessible naming, initial/contained focus, Escape/close behavior and focus restoration; prefer native browser facilities where suitable.
+- Connection management: move credential entry out of the permanently expanded global header into a dedicated dialog/panel available from the shell and contextual authentication prompts. Preserve the existing per-gateway session-storage lifecycle and cache resets.
+- States: distinguish loading, missing configuration, empty data, no matches, authentication errors and gateway/cluster failures. Preserve partial cross-cluster results and error-before-stale-data checks; never fabricate zero values or healthy status.
+- Transport guidance: browsers may not distinguish certificate failures from other transport errors. Provide network/TLS troubleshooting without asserting an unavailable diagnosis or adding a certificate bypass.
+- Contracts: preserve current routes and message links, runtime configuration, API shapes, exact decimal offsets, the 50-record read bound, the 500-position search bound, polling and timeout behavior, and all existing write-confirmation/no-automatic-retry safeguards.
+- Dependencies and conventions: retain the exact existing stack and all existing SOLID, injection, file naming and one-action-per-file rules. No dependency or backend change is approved for the redesign; no new vulnerability-scan result is claimed by this planning update.
+- Delivery: verify each completed UX milestone on the updated EKS-D manual deployment, not just against a local build. Preserve the two persistent Kafka clusters, broker volumes and existing access endpoints; writes used for verification must use explicitly scoped synthetic test data.
+
 ## Testing
 ### Gateway
 - Framework: Go `testing` + go-cmp · Fakes: hand-written interface fakes for Kafka ports
@@ -104,6 +117,10 @@ Tests live next to the file they test (`*_test.go`, `*.test.ts(x)`).
 - Framework: Vitest 5.0.5, Testing Library (react 16.3.3, user-event 14.6.8, dom 10.4.2), jsdom 30.1.3 · Fakes: MSW 3.0.3, one handler set per fake gateway (`onUnhandledFrame: "error"`) · CVE status: `npm audit` 2026-11-05: 0 findings
 - Run: `npm test`
 - M5 verification: tests, build and `npm audit` passed on 2026-11-04. On 2026-11-05, all 268 tests and the build also passed in a disposable EKS-D pod running the declared Node 24.21.0; these UI tests use mocked gateway responses.
+- M6–M8 validation: run focused component tests for changed behavior first, then `npm test` and `npm run build` on the declared Node runtime. Continue using the existing Testing Library/MSW stack; no new test dependency is approved.
+- Browser acceptance: inspect the affected pages at 320, 768 and 1440 CSS pixels, in system light/dark themes and at 200% zoom. Verify table overflow containment, keyboard order, visible focus, dialog focus restoration, reduced-motion behavior and the stated contrast thresholds; record measurements rather than inferring accessibility from a screenshot.
+- Regression acceptance: retain direct routes and exact-message links, per-gateway isolation, partial results, session-only credentials, explicit unknown states and write protections. Exercise real gateway read flows on EKS-D; any write demo uses scoped synthetic data and preserves existing broker data.
+- Completion evidence: confirm the updated build is served at the EKS-D manual-test URL and record browser/demo outcomes in each phase review. Checks not executed remain `not run`; screenshot review alone does not establish keyboard, accessibility or Kafka behavior.
 
 ## Integrations
 ### Kafka (behind each gateway)

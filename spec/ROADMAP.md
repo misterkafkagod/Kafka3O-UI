@@ -3,6 +3,8 @@
 ## Vision
 Kafka3O is a multi-cluster Kafka console for developers and operators: one web UI (Kafka3O-UI) shows every cluster side by side — health, topics, messages, consumer lag. Each cluster is fronted by its own small, stateless gateway (Kafka3O-Gateway) that owns the broker connection and credentials close to that cluster; the browser never talks to Kafka directly.
 
+The console should be comfortable for dense technical data, easy to navigate, and explicit about connection problems and write outcomes. M6–M8 turn the existing functional pages into a consistent, accessible operator interface without changing the gateway API or the completed M1–M5 behavior.
+
 ## Out of Scope
 - A gateway serving more than one cluster
 - The UI connecting to Kafka directly
@@ -10,6 +12,7 @@ Kafka3O is a multi-cluster Kafka console for developers and operators: one web U
 - Kafka Connect, ksqlDB, or Schema Registry administration
 - Replaying, copying, or transforming messages between topics
 - Persistence in the gateway (no database; stateless)
+- UI redesign introducing new Kafka capabilities, live streaming, invented metrics, roles, or a backend/API redesign
 
 ## Features
 - **F1** User can see every configured cluster on one page with its health (gateway reachable, cluster reachable, broker count)
@@ -26,6 +29,13 @@ Kafka3O is a multi-cluster Kafka console for developers and operators: one web U
 - **F12** User can only reach a gateway when authenticated
 - **F13** User can produce a test message (key, value, headers) to a topic
 - **F14** User can create or delete a topic
+- **F18** User can navigate every page through a consistent application shell, active cluster, breadcrumbs and contextual tabs
+- **F19** User can read and operate every existing page with consistent styling, accessible controls, responsive layouts and clear states
+- **F20** User can manage per-gateway connections in a dedicated panel instead of permanent header forms
+- **F21** User can explore clusters, brokers, topics and configuration through organized overview and detail pages
+- **F22** User can read and search messages in a compact list with a selected-record inspector for payload, headers and exact position
+- **F23** User can inspect consumer groups and partition lag through summary-to-detail navigation
+- **F24** User can produce messages and create or delete topics through contextual forms with explicit pending, confirmed and uncertain outcomes
 
 ## Milestones
 ### M1 — See all my clusters and what topics they hold, from one screen
@@ -109,6 +119,40 @@ Kafka3O is a multi-cluster Kafka console for developers and operators: one web U
   - **P27** F14-B2 · Delete a topic — Covers: F14-AC2 · Discovery: — · Status: Done
     - Demo: cancel deletion, then confirm it and observe the accepted deletion request.
 
+### M6 — A consistent, accessible console foundation
+- **Status:** Active
+- **Features:** F18, F19, F20
+- **Goal:** Replace the browser-default presentation and permanent credential forms with a coherent shell, shared visual baseline and accessible connection panel across the existing pages.
+- **Phases:**
+  - **P28** F18-B1 · Navigate with consistent shell and page context — Covers: F18-AC1 · Discovery: — · Status: Planned
+    - Demo: visit the overview, cluster sections and topic views; verify the active navigation and breadcrumb destinations match each page.
+  - **P29** F18-B2 · Restore direct routes and browser history — Covers: F18-AC2 · Discovery: — · Status: Planned
+    - Demo: open an encoded-topic exact-message URL directly, then use Back and Forward and verify the topic and exact message position.
+  - **P30** F19-B1 · Apply a shared visual language and system theme — Covers: F19-AC1 · Discovery: — · Status: Planned
+    - Demo: check representative pages in light and dark themes; verify contrast, accessible control names and text-based statuses.
+  - **P31** F19-B2 · Keep pages usable across viewports and input modes — Covers: F19-AC2 · Discovery: — · Status: Planned
+    - Demo: check 320, 768 and 1440 CSS-pixel widths and 200% zoom; navigate by keyboard and verify skip navigation, focus, contained table overflow and reduced motion.
+  - **P32** F19-B3 · Show truthful loading, empty, error and partial-result states — Covers: F19-AC3 · Discovery: — · Status: Planned
+    - Demo: with two gateway fixtures, exercise loading, empty, no-match and failure states plus one healthy and one failed gateway; verify no false zero or healthy status.
+  - **P33** F20-B1 + F20-B2 · Manage gateway credentials in an accessible connection panel — Covers: F20-AC1, F20-AC2 · Discovery: — · Status: Planned
+    - Demo: open the panel from the shell and an authentication prompt; add or remove one of two tokens and verify focus behavior, session isolation and cache refresh.
+  - **P34** F20-B3 · Recover safely from credential and transport errors — Covers: F20-AC3 · Discovery: — · Status: Planned
+    - Demo: submit invalid credentials, recover from 401, then simulate a network/TLS failure; verify no token exposure or certificate bypass and keep the other gateway usable.
+
+### M7 — Efficient investigation of clusters, topics and messages
+- **Status:** Planned
+- **Features:** F21, F22
+- **Goal:** Organize the read workflows into dense, readable overview/detail pages and a message workspace with a compact result list and selected-record inspector.
+- **Phases:** To be defined by `skill-phase-breakdown`.
+
+### M8 — Clear operational workflows
+- **Status:** Planned
+- **Features:** F23, F24
+- **Goal:** Make consumer lag investigation and existing write operations understandable, contextual and explicit about safety and uncertain outcomes.
+- **Phases:** To be defined by `skill-phase-breakdown`.
+
+M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded reads/searches and write safeguards. Each milestone must be served and verified at the EKS-D manual-test URL before it is marked Done; broker data and existing access endpoints must be preserved.
+
 ## Backlog
 - **F15** User can reset a consumer group's offsets to earliest, latest or a timestamp
 - **F16** User can decode Avro/Protobuf values via a Schema Registry
@@ -118,6 +162,7 @@ Kafka3O is a multi-cluster Kafka console for developers and operators: one web U
 - **Verification debt:** Run the built gateway container in a deployment; the image was built and scanned on EKS-D but was not started as a container.
 
 ## Learnings
+- 2026-11-05 (M6–M8 planning): The live UI and source review showed browser-default styling, no stylesheet files, global inline credentials, payloads expanded inside message rows and inline consumer-group details. Approved an incremental UX redesign: shared console foundation first, investigation pages second, operational workflows third. M1–M5 remain Done; F15–F17 remain in backlog; no new dependencies or gateway capabilities are proposed.
 - 2026-11-05 (M1 retro): Real secured Kafka testing uncovered the separate per-read clients; sharing the main client's options keeps message reads authenticated and encrypted.
 - 2026-11-05 (M1 retro): The UI card and, separately, the production gateway binary reached a TLS/SCRAM-SHA-512 broker on EKS-D. Browser trust of the gateway certificate remains unverified because the demo used a test-only override.
 - 2026-11-05 (M1 retro): Go 1.27.3 fixes the certificate-verification advisory; scans found no called Go vulnerabilities and no npm audit findings. The gateway image was built and had no high/critical Trivy findings; the Docker-only lifecycle test remains unrun.

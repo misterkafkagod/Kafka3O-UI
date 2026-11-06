@@ -208,3 +208,58 @@ Create topics and request deletion after confirmation.
 - **F14-AC3** (B3) Failures are visible, duplicate submissions are prevented while pending, and cached topic lists are refreshed after successful writes
 
 **External dependencies:** An authenticated gateway and Kafka permissions to create or delete topics. Deletion behavior depends on broker configuration.
+
+### F18 — Navigation and context
+Navigate every page through a consistent application shell with current cluster/topic context.
+
+**Behaviors**
+- **F18-B1** User navigates between clusters, topics and consumer groups → the shell shows the current context, accurate breadcrumbs and the active navigation section
+- **F18-B2** User opens an existing URL directly or uses browser Back/Forward → the appropriate page and contextual navigation are restored without changing the existing route contract
+
+**Acceptance criteria**
+- **F18-AC1** (B1) Given any existing page, its shell provides consistent global navigation and identifies the active section; cluster and topic pages show the correct context and breadcrumb destinations
+- **F18-AC2** (B2) Given existing cluster, topic and exact-message links, direct navigation and browser Back/Forward resolve to the correct page, including topic names requiring URL encoding
+
+**External dependencies:** Existing runtime gateway configuration and React Router routes; no new external integration.
+
+### F19 — Readable, accessible pages
+Read and operate every existing page with a consistent visual baseline, responsive layouts and clear states. This milestone supplies shared presentation; F21–F24 later reorganize individual workflows.
+
+**Behaviors**
+- **F19-B1** User opens any existing page → typography, surfaces, tables, forms, actions and status indicators follow the same visual language and system light/dark preference
+- **F19-B2** User operates the console by keyboard, at increased zoom or on a narrow screen → navigation, content and actions remain accessible
+- **F19-B3** Data loads, is absent, fails or only partially succeeds → the interface distinguishes those conditions and offers appropriate recovery without misleading status or metrics
+
+**Acceptance criteria**
+- **F19-AC1** (B1) Given either system theme, normal text contrast is at least 4.5:1, large text at least 3:1, and essential control boundaries/focus indicators at least 3:1 against adjacent colors; controls have accessible names and status indicators include text rather than relying on color alone
+- **F19-AC2** (B2) Given viewport widths of 320, 768 and 1440 CSS pixels and a separate 200% zoom check, content and actions remain available without page-wide horizontal overflow; wide tables may scroll inside labeled regions. Keyboard users can skip navigation, reach and operate controls in a logical order, and see focus; reduced-motion preference is respected
+- **F19-AC3** (B3) Given loading, no configured gateways, empty data, no search matches, authentication failure, gateway failure, cluster failure or partial cross-cluster results, the appropriate state is shown with recovery where applicable; unavailable data is not displayed as zero or healthy, and one failed gateway does not hide another gateway's results
+
+**External dependencies:** Existing query states and gateway errors; browser media queries and semantic HTML. Accessibility checks use component tests and real-browser verification.
+
+### F20 — Gateway connection panel
+Manage gateway connections in a dedicated, keyboard-accessible panel rather than permanent forms in the header.
+
+**Behaviors**
+- **F20-B1** User opens connection management from the shell or an authentication prompt → a dedicated panel shows gateway context, masked token entry and whether a token is stored
+- **F20-B2** User enters, replaces or removes a token → only that gateway's tab-session credentials change and the existing gateway query caches are reset
+- **F20-B3** Credentials are rejected or a transport request fails → the interface provides appropriate correction or troubleshooting guidance without exposing credentials or disabling other gateways
+
+**Acceptance criteria**
+- **F20-AC1** (B1) Given a closed panel, its entry point remains available without exposing the token forms on every page; opening from a gateway prompt identifies that gateway. The dialog has an accessible name, sensible initial focus, contained keyboard focus, Escape/close behavior and focus restoration to its invoker
+- **F20-AC2** (B2) Given separate tokens for two gateways, entering, replacing and removing one preserves the other's credentials; tokens remain masked and confined to the existing tab-session storage for configured HTTPS gateways, never URLs, runtime config or persistent local storage, and credential changes retain the existing cache-reset behavior
+- **F20-AC3** (B3) Given invalid input or a 401 response, the user can correct credentials with an explicit error; given a generic transport failure, network/TLS troubleshooting is offered without claiming to identify its cause reliably. No certificate bypass is introduced, no token is exposed, and another gateway remains usable
+
+**External dependencies:** Existing gateway authentication and browser session storage; browser dialog/focus facilities. Browser-trusted gateway TLS remains a deployment requirement.
+
+### F21 — Investigation overview and detail pages
+Explore clusters, brokers, topics and configuration through organized, dense overview/detail pages, retaining topic filtering and cross-cluster search.
+
+### F22 — Message investigation workspace
+Read and search messages in a compact result list with a selected-record inspector for payload formats, headers and exact position, retaining positioned reads, bounded scans and message links.
+
+### F23 — Consumer investigation
+Inspect consumer groups and partition lag through summary-to-detail navigation, preserving explicit unknown, unavailable and missing-commit states.
+
+### F24 — Contextual write workflows
+Produce messages and create or delete topics through contextual forms with confirmation, pending-state protection and explicit confirmed, asynchronous or uncertain outcomes.
