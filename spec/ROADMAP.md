@@ -144,7 +144,7 @@ The console should be comfortable for dense technical data, easy to navigate, an
 - **Features:** F21, F22
 - **Goal:** Organize the read workflows into dense, readable overview/detail pages and a message workspace with a compact result list and selected-record inspector.
 - **Phases:**
-  - **P35** F21-B1 · Review clusters and cross-cluster topic results — Covers: F21-AC1 · Discovery: — · Status: Review
+  - **P35** F21-B1 · Review clusters and cross-cluster topic results — Covers: F21-AC1 · Discovery: — · Status: Done
     - Demo: open the overview with two gateways, search topics and verify one failure does not hide the other gateway's result.
   - **P36** F21-B2 · Inspect cluster and broker context — Covers: F21-AC2 · Discovery: — · Status: Planned
     - Demo: open a healthy cluster and a failed cluster; compare the factual summary, broker table and recoverable error.
@@ -174,6 +174,7 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
 - **Verification debt:** Run the built gateway container in a deployment; the image was built and scanned on EKS-D but was not started as a container.
 
 ## Learnings
+- 2026-11-06 (P35): A configured-gateway count is factual even while individual gateways load or fail; gateway IDs need URL encoding in overview links as well as breadcrumbs.
 - 2026-11-06 (M6 retro): P28–P34 cover all F18–F20 acceptance criteria; shared navigation, accessible states and contextual recovery preserve existing routes and write safeguards.
 - 2026-11-06 (M6 retro): Browser fixtures made focus, failure and gateway-isolation behavior reproducible, while the EKS-D checks confirmed the actual static assets and secured Kafka connections.
 - 2026-11-06 (M6 retro): Replacing the manual pod rotates its test credentials and certificates; preserve the prior ConfigMap, restore the tunnel and tell testers to trust the new certificates and copy fresh tokens.

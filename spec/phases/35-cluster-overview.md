@@ -2,7 +2,7 @@
 - **Milestone:** M7
 - **Covers:** F21-AC1
 - **Discovery:** —
-- **Status:** Review
+- **Status:** Done
 
 ## Demo
 1. Open an overview with two gateway fixtures at 320, 768 and 1440 CSS pixels; verify independently loading, healthy and failed cards show only available metadata.
@@ -19,3 +19,8 @@
   - Done when: `npm test -- src/components/CrossClusterTopicSearch.test.tsx src/pages/ClustersPage.test.tsx src/App.test.tsx` and `npm run build` pass.
 
 ## Review
+- **Demo:** Browser fixtures showed an independently loading gateway, a healthy gateway and an unreachable gateway without fabricated counts. Search kept the healthy gateway's encoded topic link available alongside the failed gateway's Retry action. An encoded gateway link opened the correct cluster.
+- **Responsive and contrast:** At 320, 768 and 1440 CSS pixels the page had no horizontal overflow; cards stacked at 320 and used two columns at wider sizes. New healthy, failure and muted card text measured at least 5.69:1 in light mode and 7.53:1 in dark mode.
+- **Validation:** All 305 UI tests and the production build passed on Node 24.21.0. The M7 UI deployment remains deferred until the milestone's final phase to avoid repeatedly rotating the manual test credentials.
+- **Vulnerability scan:** Not run; P35 adds no dependencies and is not the final M7 phase.
+- **Notes:** The overview counts configured gateways, not healthy clusters. Existing query and recovery behavior remains independent per gateway.
