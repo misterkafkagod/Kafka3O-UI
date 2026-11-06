@@ -2,7 +2,7 @@
 - **Milestone:** M7
 - **Covers:** F21-AC2
 - **Discovery:** —
-- **Status:** Review
+- **Status:** Done
 
 ## Demo
 1. Open a healthy cluster and inspect its identity, controller, broker count and sorted broker table.
@@ -15,3 +15,8 @@
   - Done when: `npm test -- src/components/ClusterDetails.test.tsx src/components/BrokerTable.test.tsx src/pages/ClusterPage.test.tsx src/App.test.tsx` and `npm run build` pass.
 
 ## Review
+- **Demo:** A browser fixture showed the gateway address, cluster ID, controller, a factual three-broker count and broker IDs sorted 1, 2, 3. After a simulated failed refresh, the summary and table disappeared and a recoverable gateway error appeared.
+- **Responsive:** The broker page had no page-wide horizontal overflow at 320, 768 or 1440 CSS pixels; the existing labeled table scroll region remains available.
+- **Validation:** All 307 UI tests and the production build passed on Node 24.21.0. The M7 deployment remains deferred until the milestone's final phase.
+- **Vulnerability scan:** Not run; P36 adds no dependencies and is not the final M7 phase.
+- **Notes:** Zero brokers is shown only when the successful gateway response actually contains an empty broker list.
