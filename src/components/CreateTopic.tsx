@@ -3,10 +3,10 @@ import { useRef, useState, type FormEvent } from "react";
 import type { CreateTopic as CreateAction } from "../gateway/createTopic";
 import { classifyGatewayError } from "../gateway/classifyGatewayError";
 import { describeCreateTopicError } from "../gateway/describeCreateTopicError";
-import type { GatewayEntry } from "../gateway/types";
+import type { GatewayEntry, GatewayErrorKind } from "../gateway/types";
 import { createTopicFromForm } from "../topics/createTopicFromForm";
 import { isGatewayTopicListQuery } from "../topics/isGatewayTopicListQuery";
-import { GatewayCredentialAction } from "./GatewayCredentialAction";
+import { GatewayErrorRecovery } from "./GatewayErrorRecovery";
 
 type CreateTopicProps = {
   gateway: GatewayEntry;
@@ -20,7 +20,7 @@ export function CreateTopic({ gateway, createTopic }: CreateTopicProps) {
   const [replicationFactor, setReplicationFactor] = useState("1");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
-  const [authenticationRequired, setAuthenticationRequired] = useState(false);
+  const [errorKind, setErrorKind] = useState<GatewayErrorKind>();
   const [created, setCreated] = useState("");
   const submitting = useRef(false);
 
@@ -31,21 +31,21 @@ export function CreateTopic({ gateway, createTopic }: CreateTopicProps) {
     if (parsed.error !== undefined) {
       setCreated("");
       setError(parsed.error);
-      setAuthenticationRequired(false);
+      setErrorKind(undefined);
       return;
     }
     submitting.current = true;
     setPending(true);
     setCreated("");
     setError("");
-    setAuthenticationRequired(false);
+    setErrorKind(undefined);
     try {
       await createTopic(gateway.url, parsed.input);
       setCreated(parsed.input.name);
       void queryClient.invalidateQueries({ queryKey: ["gateway"], predicate: isGatewayTopicListQuery });
     } catch (failure) {
       setError(describeCreateTopicError(failure));
-      setAuthenticationRequired(classifyGatewayError(failure) === "authentication-required");
+      setErrorKind(classifyGatewayError(failure));
     } finally {
       submitting.current = false;
       setPending(false);
@@ -63,7 +63,7 @@ export function CreateTopic({ gateway, createTopic }: CreateTopicProps) {
       {error ? (
         <div role="alert">
           <p>{error}</p>
-          {authenticationRequired ? <GatewayCredentialAction gateway={gateway} /> : null}
+          <GatewayErrorRecovery gateway={gateway} kind={errorKind} />
         </div>
       ) : null}
       {created ? <p>Creation of "{created}" was accepted; it may take a moment to appear.</p> : null}

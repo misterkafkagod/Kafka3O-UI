@@ -10,7 +10,7 @@ type ErrorWithRetryProps = {
 };
 
 export function ErrorWithRetry({ error, gateway, onRetry }: ErrorWithRetryProps) {
-  const { title, detail } = describeGatewayError(error);
+  const { title, detail } = describeGatewayError(error, gateway.url);
 
   return (
     <div role="alert">

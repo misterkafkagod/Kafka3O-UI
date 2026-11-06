@@ -3,10 +3,10 @@ import { useRef, useState } from "react";
 import type { ConfirmTopicDeletion, DeleteTopic as DeleteAction } from "../gateway/deleteTopic";
 import { classifyGatewayError } from "../gateway/classifyGatewayError";
 import { describeDeleteTopicError } from "../gateway/describeDeleteTopicError";
-import type { GatewayEntry } from "../gateway/types";
+import type { GatewayEntry, GatewayErrorKind } from "../gateway/types";
 import { isGatewayTopicListQuery } from "../topics/isGatewayTopicListQuery";
 import { isGatewayTopicQuery } from "../topics/isGatewayTopicQuery";
-import { GatewayCredentialAction } from "./GatewayCredentialAction";
+import { GatewayErrorRecovery } from "./GatewayErrorRecovery";
 
 type DeleteTopicProps = {
   gateway: GatewayEntry;
@@ -20,7 +20,7 @@ export function DeleteTopic({ gateway, topicName, deleteTopic, confirmTopicDelet
   const [pending, setPending] = useState(false);
   const [accepted, setAccepted] = useState(false);
   const [error, setError] = useState("");
-  const [authenticationRequired, setAuthenticationRequired] = useState(false);
+  const [errorKind, setErrorKind] = useState<GatewayErrorKind>();
   const submitting = useRef(false);
   const hasAccepted = useRef(false);
 
@@ -30,13 +30,13 @@ export function DeleteTopic({ gateway, topicName, deleteTopic, confirmTopicDelet
       if (!confirmTopicDeletion(topicName)) return;
     } catch {
       setError("The confirmation dialog is unavailable; no deletion request was sent.");
-      setAuthenticationRequired(false);
+      setErrorKind(undefined);
       return;
     }
     submitting.current = true;
     setPending(true);
     setError("");
-    setAuthenticationRequired(false);
+    setErrorKind(undefined);
     try {
       await deleteTopic(gateway.url, topicName);
       hasAccepted.current = true;
@@ -49,7 +49,7 @@ export function DeleteTopic({ gateway, topicName, deleteTopic, confirmTopicDelet
       });
     } catch (failure) {
       setError(describeDeleteTopicError(failure));
-      setAuthenticationRequired(classifyGatewayError(failure) === "authentication-required");
+      setErrorKind(classifyGatewayError(failure));
     } finally {
       submitting.current = false;
       setPending(false);
@@ -64,7 +64,7 @@ export function DeleteTopic({ gateway, topicName, deleteTopic, confirmTopicDelet
       {error ? (
         <div role="alert">
           <p>{error}</p>
-          {authenticationRequired ? <GatewayCredentialAction gateway={gateway} /> : null}
+          <GatewayErrorRecovery gateway={gateway} kind={errorKind} />
         </div>
       ) : null}
       {accepted ? <p>Deletion was accepted. Removing the topic and its messages may take time.</p> : null}

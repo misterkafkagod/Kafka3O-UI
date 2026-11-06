@@ -12,6 +12,7 @@ describe("ErrorWithRetry", () => {
     render(<ErrorWithRetry gateway={gateway} error={new TypeError("Failed to fetch")} onRetry={() => {}} />);
 
     expect(within(screen.getByRole("alert")).getByText("Gateway unreachable")).toBeDefined();
+    expect(screen.getByText(/browser cannot determine the cause/).textContent).toContain("certificate is trusted");
     expect(screen.queryByRole("button", { name: "Manage credentials for Dev" })).toBeNull();
   });
 

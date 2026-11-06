@@ -80,6 +80,8 @@ describe("CreateTopic", () => {
     await user.type(screen.getByLabelText("Topic name"), "orders");
     await user.click(screen.getByRole("button", { name: "Create topic" }));
     expect((await screen.findByRole("alert")).textContent).toContain("may already exist");
+    expect(screen.getByRole("alert").textContent).toContain("browser cannot determine the cause");
+    expect(screen.getByRole("alert").textContent).toContain("certificate is trusted");
     expect(create).toHaveBeenCalledTimes(1);
   });
 });

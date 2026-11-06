@@ -65,6 +65,8 @@ describe("DeleteTopic", () => {
     expect(remove).toHaveBeenCalledTimes(1);
     await user.click(screen.getByRole("button", { name: "Delete topic" }));
     await waitFor(() => expect(screen.getByRole("alert").textContent).toContain("may already be deleting"));
+    expect(screen.getByRole("alert").textContent).toContain("browser cannot determine the cause");
+    expect(screen.getByRole("alert").textContent).toContain("certificate is trusted");
     expect(remove).toHaveBeenCalledTimes(2);
   });
 

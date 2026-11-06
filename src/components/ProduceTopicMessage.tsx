@@ -4,10 +4,10 @@ import { Link } from "react-router";
 import { classifyGatewayError } from "../gateway/classifyGatewayError";
 import { describeProduceError } from "../gateway/describeProduceError";
 import type { ProduceMessageResult, ProduceTopicMessage as ProduceAction } from "../gateway/produceTopicMessage";
-import type { GatewayEntry } from "../gateway/types";
+import type { GatewayEntry, GatewayErrorKind } from "../gateway/types";
 import { produceMessageFromForm, type ProduceHeaderField } from "../messages/produceMessageFromForm";
 import { isGatewayTopicListQuery } from "../topics/isGatewayTopicListQuery";
-import { GatewayCredentialAction } from "./GatewayCredentialAction";
+import { GatewayErrorRecovery } from "./GatewayErrorRecovery";
 
 type ProduceTopicMessageProps = {
   gateway: GatewayEntry;
@@ -24,7 +24,7 @@ export function ProduceTopicMessage({ gateway, topicName, produceTopicMessage }:
   const [pending, setPending] = useState(false);
   const [result, setResult] = useState<ProduceMessageResult>();
   const [error, setError] = useState("");
-  const [authenticationRequired, setAuthenticationRequired] = useState(false);
+  const [errorKind, setErrorKind] = useState<GatewayErrorKind>();
   const submitting = useRef(false);
   const nextHeader = useRef(0);
 
@@ -34,7 +34,7 @@ export function ProduceTopicMessage({ gateway, topicName, produceTopicMessage }:
     submitting.current = true;
     setPending(true);
     setError("");
-    setAuthenticationRequired(false);
+    setErrorKind(undefined);
     setResult(undefined);
     try {
       const produced = await produceTopicMessage(gateway.url, topicName, produceMessageFromForm(value, includeKey, key, headers));
@@ -43,7 +43,7 @@ export function ProduceTopicMessage({ gateway, topicName, produceTopicMessage }:
       void queryClient.invalidateQueries({ queryKey: ["gateway"], predicate: isGatewayTopicListQuery });
     } catch (failure) {
       setError(describeProduceError(failure));
-      setAuthenticationRequired(classifyGatewayError(failure) === "authentication-required");
+      setErrorKind(classifyGatewayError(failure));
     } finally {
       submitting.current = false;
       setPending(false);
@@ -92,7 +92,7 @@ export function ProduceTopicMessage({ gateway, topicName, produceTopicMessage }:
       {error ? (
         <div role="alert">
           <p>{error}</p>
-          {authenticationRequired ? <GatewayCredentialAction gateway={gateway} /> : null}
+          <GatewayErrorRecovery gateway={gateway} kind={errorKind} />
         </div>
       ) : null}
       {result ? (

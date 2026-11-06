@@ -60,6 +60,17 @@ describe("ClusterCard", () => {
     );
 
     expect(await screen.findByText("Gateway unreachable")).toBeDefined();
+    expect(screen.getByText(/browser cannot determine the cause/).textContent).not.toContain("certificate");
+  });
+
+  it("suggests certificate trust checks for an HTTPS gateway transport failure", async () => {
+    renderWithQuery(
+      <ClusterCard gateway={{ ...gateway, url: "https://gateway.example" }} statusRefreshMs={60_000} getCluster={async () => {
+        throw new TypeError("Failed to fetch");
+      }} />,
+    );
+
+    expect((await screen.findByText(/browser cannot determine the cause/)).textContent).toContain("certificate is trusted");
   });
 
   it("offers a gateway-specific credential action when authentication is required", async () => {

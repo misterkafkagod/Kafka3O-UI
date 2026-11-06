@@ -2,17 +2,17 @@
 - **Milestone:** M6
 - **Covers:** F20-AC3
 - **Discovery:** —
-- **Status:** Planned
+- **Status:** Building
 
 ## Demo
 1. Submit invalid credentials, then replace them after a 401; verify an explicit correction path and no token in visible output or URLs.
 2. Simulate a gateway transport failure; verify the UI offers network/gateway/TLS checks without claiming which one caused the failure, introduces no certificate bypass, and leaves the other gateway usable.
 
 ## Tasks
-- [ ] **T34.1 Give generic transport failures accurate troubleshooting guidance** — Covers: F20-AC3
-  - Files: `src/gateway/describeGatewayError.ts`, `src/gateway/describeGatewayError.test.ts`, `src/components/ClusterCard.tsx`, `src/components/ClusterCard.test.tsx`
-  - Do: Explain network and gateway checks, and suggest verifying certificate trust only for HTTPS; state that a browser transport failure does not reliably identify its cause. Keep authentication and cluster-unreachable errors distinct and do not bypass certificate validation.
-  - Done when: `npm test -- src/gateway/describeGatewayError.test.ts src/components/ClusterCard.test.tsx src/components/ErrorWithRetry.test.tsx` passes assertions for the troubleshooting guidance and distinct error types.
+- [x] **T34.1 Give generic transport failures accurate troubleshooting guidance** — Covers: F20-AC3
+  - Files: `src/gateway/describeGatewayTransportFailure.ts` (new), `src/gateway/describeGatewayError.ts`, `src/components/GatewayErrorRecovery.tsx` (new), `src/components/ErrorWithRetry.tsx`, `src/components/ClusterCard.tsx`, the three write components, and their tests
+  - Do: Explain network, gateway and CORS checks, and suggest verifying certificate trust only for HTTPS; state that a browser transport failure does not reliably identify its cause. Reuse this guidance for unconfirmed writes without obscuring their uncertain outcome. Keep authentication and cluster-unreachable errors distinct and do not bypass certificate validation.
+  - Done when: `npm test -- src/gateway/describeGatewayTransportFailure.test.ts src/gateway/describeGatewayError.test.ts src/components/GatewayErrorRecovery.test.tsx src/components/ClusterCard.test.tsx src/components/ErrorWithRetry.test.tsx src/components/CreateTopic.test.tsx src/components/DeleteTopic.test.tsx src/components/ProduceTopicMessage.test.tsx` and `npm run build` pass.
 - [ ] **T34.2 Verify credential correction and gateway isolation end to end** — Covers: F20-AC3
   - Files: `src/App.test.tsx` (from T28.1), `src/components/GatewayCredentialsPanel.tsx` (from T33.1), `src/components/ClusterCard.tsx` (from T33.2), `src/components/GatewayCredentialForm.test.tsx`, `src/components/CrossClusterTopicSearch.test.tsx`
   - Do: Add an App-level regression that recovers a gateway from 401 through its contextual connection action while a second gateway remains usable; verify invalid or rejected tokens are never rendered and a transport failure does not interrupt independent results.

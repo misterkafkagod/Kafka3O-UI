@@ -1,5 +1,6 @@
 import { Link } from "react-router";
 import { classifyGatewayError } from "../gateway/classifyGatewayError";
+import { describeGatewayTransportFailure } from "../gateway/describeGatewayTransportFailure";
 import type { GetCluster } from "../gateway/getCluster";
 import { HttpError } from "../gateway/HttpError";
 import type { GatewayEntry } from "../gateway/types";
@@ -32,7 +33,7 @@ export function ClusterCard({ gateway, getCluster, statusRefreshMs }: ClusterCar
       ) : errorKind === "gateway-unreachable" ? (
         <>
           <p>Gateway unreachable</p>
-          <p>Check the connection and that the gateway's HTTPS certificate is trusted.</p>
+          <p>{describeGatewayTransportFailure(gateway.url)}</p>
         </>
       ) : errorKind === "cluster-unreachable" ? (
         <>

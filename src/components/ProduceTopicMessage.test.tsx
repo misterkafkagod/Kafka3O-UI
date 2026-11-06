@@ -56,6 +56,8 @@ describe("ProduceTopicMessage", () => {
     await user.type(screen.getByLabelText("Value (UTF-8)"), "hello");
     await user.click(screen.getByRole("button", { name: "Send message" }));
     expect((await screen.findByRole("alert")).textContent).toContain("may already have been written");
+    expect(screen.getByRole("alert").textContent).toContain("browser cannot determine the cause");
+    expect(screen.getByRole("alert").textContent).toContain("certificate is trusted");
     expect(produce).toHaveBeenCalledTimes(1);
     expect(produce).toHaveBeenCalledWith(gateway.url, "orders", { value: "hello", headers: [] });
   });
