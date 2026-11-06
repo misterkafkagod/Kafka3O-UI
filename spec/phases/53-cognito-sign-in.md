@@ -225,7 +225,7 @@ is linked to a local account by email.
     verified group refresh, local isolation, stale/pending/disabled/revoked
     sessions, changed keys, exact deadlines, queued work, malformed state
     and operational failure; focused Cognito tests and `go test ./...` pass.
-- [ ] **T53.3 Issue and refresh Cognito application sessions** — Covers: F27-AC2, F27-AC4
+- [x] **T53.3 Issue and refresh Cognito application sessions** — Covers: F27-AC2, F27-AC4
   - Files: Gateway `internal/console/cognito/` (new exchange/refresh
     actions/tests), `internal/console/session/` and
     `internal/console/storage/` (new Cognito identity, session and refresh
