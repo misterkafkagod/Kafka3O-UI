@@ -88,6 +88,18 @@ is linked to a local account by email.
     audience reordering, changed identities/audiences, stale, malformed,
     forged and expired tokens, key-service outage and unchanged initial
     verification, and `go test ./...` passes.
+- [x] **T53.3c Protect retained refresh tokens** — Covers: foundation of F27-AC4
+  - Files: Gateway `internal/console/cognito/` protection actions/tests,
+    exchange fixture tests and Gateway `internal/console/README.md`,
+    `spec/TECH-SPEC.md`.
+  - Do: Protect a bounded provider refresh token with AES-256-GCM under a
+    separate deployment key; bind it to the provider, callback, identity,
+    session and refresh generation. Reject malformed tokens, reused attempt
+    keys, wrong bindings, tampering and random-source failures. Do not claim
+    persistence, rotation, rollback prevention, sessions or a login route.
+  - Done when: protection tests cover key separation, limits, tampering,
+    substitution and concurrency; exchange tests reject malformed refresh
+    tokens; focused Cognito tests and `go test ./...` pass.
 - [ ] **T53.3 Issue and refresh Cognito application sessions** — Covers: F27-AC2, F27-AC4
   - Files: Gateway `internal/console/cognito/` (new exchange/refresh
     actions/tests), `internal/console/session/` and
