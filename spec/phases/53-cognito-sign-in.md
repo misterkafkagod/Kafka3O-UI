@@ -187,8 +187,25 @@ is linked to a local account by email.
     concurrent requests and managers, cancellation, restart/unresolved
     reservations, outages, revocation, audit failure, local sessions and
     HTTP cookie handling; focused Cognito and preview tests, `go test ./...`
-    and the UI suite pass. Browser SSO, group grants, retention cleanup and
-    secured deployment remain unfinished.
+    and the UI suite pass. Browser SSO, group grants and secured deployment
+    remain unfinished.
+- [x] **T53.3i Clean up inactive Cognito session credentials** — Covers: foundation of F27-AC3, F27-AC4
+  - Files: Gateway `internal/console/storage/` cleanup action/tests,
+    `cmd/console/` maintenance wiring/tests, Gateway
+    `internal/console/README.md`, `spec/TECH-SPEC.md`, `spec/ROADMAP.md`.
+  - Do: Transactionally revoke and remove retained Cognito credentials only
+    for sessions already revoked, disabled, or at their idle/absolute expiry.
+    Preserve active sessions with stale claims or unresolved refreshes and
+    preserve refresh-reservation audit events. Process at most 100 credentials
+    per batch with a redacted audit event per session. Run one bounded batch
+    on Console startup and every minute; report maintenance failures without
+    preventing independent local login, and stop the worker on shutdown.
+    Document backlog, database/WAL/backup and undeployed-process limitations.
+  - Done when: tests cover exact deadlines, local and active-session
+    isolation, unresolved refresh, disable/reenable, concurrency with refresh
+    and logout, bounded batches, restart, audit/commit failure, clock and
+    cancellation, and worker scheduling/error/shutdown behavior; focused
+    cleanup tests and `go test ./...` pass.
 - [ ] **T53.3 Issue and refresh Cognito application sessions** — Covers: F27-AC2, F27-AC4
   - Files: Gateway `internal/console/cognito/` (new exchange/refresh
     actions/tests), `internal/console/session/` and
