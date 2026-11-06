@@ -59,6 +59,21 @@ is linked to a local account by email.
   - Done when: `go test ./internal/console/cognito ./internal/console/storage -run 'Test.*Cognito'`
     passes replay, browser binding, expiry, encryption, migration, audit
     failure and concurrent-consumption cases, and `go test ./...` passes.
+- [x] **T53.3a Exchange consumed authorization codes once** — Covers: foundation of F27-AC2
+  - Files: Gateway `go.mod`, `internal/console/cognito/`, related SQLite
+    audit/attempt actions and tests, Gateway `internal/console/README.md`,
+    `spec/TECH-SPEC.md`, `spec/ROADMAP.md`.
+  - Do: Bind pending attempts to the exact provider and callback, then
+    durably reserve a consumed attempt once before exchanging its code over
+    verified HTTPS with explicit client authentication. Verify the ID token
+    and nonce, bound responses, prevent redirects and automatic retries, and
+    withhold credentials on audit, expiry or uncertain outcomes. Older
+    unbound pending attempts must fail closed after upgrade.
+  - Done when: synthetic public/confidential TLS fixtures cover successful,
+    forged, expired, wrong-nonce, wrong-provider/callback, replay, concurrent,
+    audit-failure, interrupted, redirect and untrusted-TLS cases;
+    `go test ./internal/console/cognito ./internal/console/storage -run 'Test.*Cognito'`
+    and `go test ./...` pass.
 - [ ] **T53.3 Issue and refresh Cognito application sessions** — Covers: F27-AC2, F27-AC4
   - Files: Gateway `internal/console/cognito/` (new exchange/refresh
     actions/tests), `internal/console/session/` and
@@ -73,7 +88,12 @@ is linked to a local account by email.
     atomically. Reverify issuer, subject, client, token use, expiry and
     groups at most five minutes or token expiry; fail closed on outage,
     revocation, stale/changed/disabled identity, audit failure or unknown
-    refresh, without retry. Apply only configured exact group bindings;
+    refresh, without retry. In accordance with OIDC Core 12.2, compare the
+    refreshed issuer, subject and audience to the original; allow an absent
+    refresh nonce but require the original nonce if one is present. Reject a
+    refresh without an ID token because it cannot refresh group claims. Keep
+    the initial authorization-code nonce check mandatory. Apply only
+    configured exact group bindings;
     preserve local session behavior and logout.
   - Done when: `go test ./internal/console/cognito ./internal/console/session ./internal/console/storage -run 'Test.*Cognito'`
     passes role-free identity, no email linking, refresh/rotation,

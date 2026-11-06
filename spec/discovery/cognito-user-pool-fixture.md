@@ -56,6 +56,14 @@
   key outside SQLite; invalidate the application session independently of
   provider logout. Live propagation, rotation, logout and error behavior
   still require a real User Pool.
+- **Refresh ID-token correction:** [OpenID Connect Core 12.2](https://openid.net/specs/openid-connect-core-1_0.html#RefreshTokenResponse)
+  permits a refresh response without an ID token. If it contains one, its
+  issuer, subject and audience must match the original ID token; it should
+  omit `nonce`, but if present the nonce must match the original. P53 requires
+  fresh verified groups, so a response without an ID token must fail closed.
+  Refresh verification needs a separate path from authorization-code nonce
+  validation; never disable the nonce check on the initial login. Actual
+  Cognito refresh-token claim behavior remains unverified.
 
 ## Fixture recipe
 1. Configure a synthetic issuer and separate managed-login endpoint over
