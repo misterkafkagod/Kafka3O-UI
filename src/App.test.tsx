@@ -410,11 +410,14 @@ describe("App", () => {
       </MemoryRouter>,
     );
     expect(await screen.findByText("Authentication required")).toBeDefined();
-    await user.click(screen.getByText("Gateway credentials"));
+    await user.click(screen.getByRole("button", { name: "Gateway credentials" }));
     await user.type(screen.getByLabelText("Token for Dev"), "a".repeat(32));
     await user.click(screen.getByRole("button", { name: "Use token" }));
+    await user.click(screen.getByRole("button", { name: "Close" }));
     expect(await screen.findByRole("table", { name: "Topic partitions" })).toBeDefined();
+    await user.click(screen.getByRole("button", { name: "Gateway credentials" }));
     await user.click(screen.getByRole("button", { name: "Remove token" }));
+    await user.click(screen.getByRole("button", { name: "Close" }));
     expect(await screen.findByText("Authentication required")).toBeDefined();
     expect(screen.queryByRole("table", { name: "Topic partitions" })).toBeNull();
   });

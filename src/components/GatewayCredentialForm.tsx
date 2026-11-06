@@ -1,5 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent, type Ref } from "react";
 import type { GatewayCredentials } from "../gateway/GatewayCredentials";
 import { isValidGatewayToken } from "../gateway/isValidGatewayToken";
 import type { GatewayEntry } from "../gateway/types";
@@ -9,9 +9,10 @@ type GatewayCredentialFormProps = {
   credentials: GatewayCredentials;
   credentialRevision: number;
   onCredentialChange: () => void;
+  inputRef?: Ref<HTMLInputElement>;
 };
 
-export function GatewayCredentialForm({ gateway, credentials, credentialRevision, onCredentialChange }: GatewayCredentialFormProps) {
+export function GatewayCredentialForm({ gateway, credentials, credentialRevision, onCredentialChange, inputRef }: GatewayCredentialFormProps) {
   const queryClient = useQueryClient();
   const [token, setToken] = useState("");
   const [hasToken, setHasToken] = useState(false);
@@ -66,7 +67,7 @@ export function GatewayCredentialForm({ gateway, credentials, credentialRevision
     <form onSubmit={onSubmit} aria-label={`Credentials for ${gateway.name}`}>
       <label>
         Token for {gateway.name}
-        <input type="password" autoComplete="off" value={token} onChange={(event) => setToken(event.target.value)} />
+        <input ref={inputRef} type="password" autoComplete="off" value={token} onChange={(event) => setToken(event.target.value)} />
       </label>{" "}
       <button type="submit">Use token</button>{" "}
       {hasToken ? (

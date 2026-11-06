@@ -72,11 +72,6 @@
   margin-right: auto;
 }
 
-.shell > :global(header) > :global(details) {
-  min-width: 0;
-  max-width: 100%;
-}
-
 .shell :global(nav[aria-label="Primary navigation"]),
 .shell :global(nav[aria-label="Cluster sections"]),
 .shell :global(nav[aria-label="Topic views"]) {
@@ -338,10 +333,6 @@
 }
 
 @media (max-width: 40rem) {
-  .shell > :global(header) > :global(details) {
-    flex-basis: 100%;
-  }
-
   .shell :global(form label) {
     grid-template-columns: minmax(0, 1fr);
     gap: 0.35rem;

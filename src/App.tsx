@@ -1,4 +1,5 @@
 import { type QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useState } from "react";
 import { Route, Routes } from "react-router";
 import { AppShell } from "./components/AppShell";
 import type { LoadGatewayConfig } from "./config/loadGatewayConfig";
@@ -53,9 +54,18 @@ export function App({
   copyMessageLink,
   statusRefreshMs,
 }: AppProps) {
+  const [connectionPanel, setConnectionPanel] = useState<{ gatewayId?: string } | null>(null);
+
   return (
     <QueryClientProvider client={queryClient}>
-      <AppShell loadGatewayConfig={loadGatewayConfig} credentials={gatewayCredentials}>
+      <AppShell
+        loadGatewayConfig={loadGatewayConfig}
+        credentials={gatewayCredentials}
+        connectionOpen={connectionPanel !== null}
+        selectedGatewayId={connectionPanel?.gatewayId}
+        onOpenConnection={() => setConnectionPanel({})}
+        onCloseConnection={() => setConnectionPanel(null)}
+      >
         <Routes>
           <Route
             path="/"

@@ -11,11 +11,15 @@ type AppShellProps = {
   children: ReactNode;
   loadGatewayConfig: LoadGatewayConfig;
   credentials: GatewayCredentials;
+  connectionOpen: boolean;
+  selectedGatewayId?: string;
+  onOpenConnection: () => void;
+  onCloseConnection: () => void;
 };
 
 type Breadcrumb = { label: string; to: string } | { label: string; current: true };
 
-export function AppShell({ children, loadGatewayConfig, credentials }: AppShellProps) {
+export function AppShell({ children, loadGatewayConfig, credentials, connectionOpen, selectedGatewayId, onOpenConnection, onCloseConnection }: AppShellProps) {
   const location = useLocation();
   const clusterMatch = useMatch({ path: "/clusters/:gatewayId", end: false });
   const topicMatch = useMatch({ path: "/clusters/:gatewayId/topics/:topicName", end: false });
@@ -59,7 +63,14 @@ export function AppShell({ children, loadGatewayConfig, credentials }: AppShellP
             Clusters
           </Link>
         </nav>
-        <GatewayCredentialsPanel loadGatewayConfig={loadGatewayConfig} credentials={credentials} />
+        <GatewayCredentialsPanel
+          loadGatewayConfig={loadGatewayConfig}
+          credentials={credentials}
+          open={connectionOpen}
+          selectedGatewayId={selectedGatewayId}
+          onOpen={onOpenConnection}
+          onClose={onCloseConnection}
+        />
       </header>
       {breadcrumbs.length > 0 ? (
         <nav aria-label="Breadcrumb">
