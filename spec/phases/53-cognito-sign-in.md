@@ -368,6 +368,20 @@ is linked to a local account by email.
     deadlines, wrong or replaced markers, queued changes, concurrent
     reservation, restart, audit/commit failure, clock regression, redaction
     and unbound isolation; `go test ./...` passes.
+- [x] **T53.4h Guard bound refresh dispatch** — Covers: foundation of F27-AC4
+  - Files: Gateway `internal/console/cognito/` refresh types,
+    `internal/console/storage/` bound dispatch guard and tests, Gateway
+    `internal/console/README.md`, `spec/TECH-SPEC.md`, `spec/ROADMAP.md`.
+  - Do: Add a storage-only pre-dispatch guard that rechecks the exact
+    attempted reservation, current session and browser binding, identity,
+    deadlines, provider credential and original verified snapshot. Require a
+    non-regressing clock, withhold success for changed, expired or uncertain
+    state, and keep marker and provider data out of output and audit. Do not
+    call the provider or expose a bound manager or route.
+  - Done when: focused `Test.*BoundCognitoRefreshDispatch` tests cover valid,
+    changed and replaced bindings and snapshots, queued replacement, replay,
+    deadlines, clock regression, restart and redaction; `go test ./...`
+    passes.
 - [ ] **T53.4 Expose opt-in HTTPS SSO and logout** — Covers: F27-AC2, F27-AC3
   - Files: Gateway `internal/console/httpapi/` (new SSO handlers/tests and
     necessary API wiring), `cmd/console/` (configuration/composition and
