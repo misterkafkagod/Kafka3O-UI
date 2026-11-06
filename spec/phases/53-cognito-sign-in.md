@@ -136,6 +136,22 @@ is linked to a local account by email.
     identities, key/tampering, audit and commit failures, and unaffected
     local sessions; focused Cognito tests and `go test ./...` pass. Provider
     requests, successful rotation and browser integration remain unfinished.
+- [x] **T53.3f Exchange reserved Cognito refreshes once** — Covers: foundation of F27-AC4
+  - Files: Gateway `internal/console/cognito/` and `storage/` refresh
+    actions/tests, Gateway `internal/console/README.md`,
+    `spec/TECH-SPEC.md`, `spec/ROADMAP.md`.
+  - Do: After the durable reservation, send one verified-HTTPS refresh
+    request using the configured client authentication; never retry or
+    follow redirects. Require and verify a fresh ID token against the
+    previous identity and original nonce, protect the rotated or retained
+    refresh token for the next generation, and return only a private,
+    provider-bound completion proof. Audit failures without tokens and keep
+    the application session blocked until a later atomic completion.
+  - Done when: synthetic TLS tests cover public/confidential clients, rotation
+    and no rotation, invalid/missing/forged claims, malformed token responses,
+    outage/redirect/interruption, replay/concurrency, expiration and audit
+    failures; focused Cognito tests and `go test ./...` pass. Atomic storage
+    completion, group grants and browser integration remain unfinished.
 - [ ] **T53.3 Issue and refresh Cognito application sessions** — Covers: F27-AC2, F27-AC4
   - Files: Gateway `internal/console/cognito/` (new exchange/refresh
     actions/tests), `internal/console/session/` and
