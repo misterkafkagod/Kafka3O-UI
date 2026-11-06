@@ -334,6 +334,24 @@ is linked to a local account by email.
     deletion/audit, commit failure, restart, redaction and unbound isolation;
     HTTP tests cover uncertain logout without cookie deletion; `go test ./...`
     passes.
+- [x] **T53.4f Reauthorize bound administrators** — Covers: foundation of F27-AC4, F28-AC3
+  - Files: Gateway `internal/console/identity/` administrator actor,
+    `internal/console/storage/` administrator authorization and its callers
+    and tests, Gateway `internal/console/README.md`, `spec/TECH-SPEC.md`,
+    `spec/ROADMAP.md`.
+  - Do: Allow a trusted administrator actor to carry the optional browser
+    marker digest. For bound actors, transactionally verify the session's
+    digest and current browser-to-session mapping alongside current local
+    global-ADMIN, identity, credential and lifetime checks on every
+    administrator reservation, completion, listing and mutation. Reject
+    regressing clocks as operational failures and prevent an old or wrong
+    binding from authorizing actions after replacement. Keep marker digests
+    out of outputs and audit, preserve unbound isolation, and do not accept
+    browser-supplied actor fields or expose bound routes.
+  - Done when: focused `Test.*BoundAdmin` tests cover all administrator
+    action families, current/wrong/replaced bindings, reservation races,
+    revocation/disablement/grant changes, failures, redaction and unbound
+    isolation; `go test ./...` passes.
 - [ ] **T53.4 Expose opt-in HTTPS SSO and logout** — Covers: F27-AC2, F27-AC3
   - Files: Gateway `internal/console/httpapi/` (new SSO handlers/tests and
     necessary API wiring), `cmd/console/` (configuration/composition and
