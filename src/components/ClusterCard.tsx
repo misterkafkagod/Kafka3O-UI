@@ -4,6 +4,7 @@ import type { GetCluster } from "../gateway/getCluster";
 import { HttpError } from "../gateway/HttpError";
 import type { GatewayEntry } from "../gateway/types";
 import { useClusterStatus } from "../hooks/useClusterStatus";
+import { GatewayCredentialAction } from "./GatewayCredentialAction";
 
 type ClusterCardProps = {
   gateway: GatewayEntry;
@@ -25,7 +26,8 @@ export function ClusterCard({ gateway, getCluster, statusRefreshMs }: ClusterCar
       {errorKind === "authentication-required" ? (
         <>
           <p>Authentication required</p>
-          <p>Enter a token under Gateway credentials.</p>
+          <p>Enter or update this gateway's token.</p>
+          <GatewayCredentialAction gateway={gateway} />
         </>
       ) : errorKind === "gateway-unreachable" ? (
         <>

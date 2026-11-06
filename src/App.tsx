@@ -64,6 +64,7 @@ export function App({
         connectionOpen={connectionPanel !== null}
         selectedGatewayId={connectionPanel?.gatewayId}
         onOpenConnection={() => setConnectionPanel({})}
+        onOpenGatewayConnection={(gatewayId) => setConnectionPanel({ gatewayId })}
         onCloseConnection={() => setConnectionPanel(null)}
       >
         <Routes>

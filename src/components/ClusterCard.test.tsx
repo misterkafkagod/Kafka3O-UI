@@ -1,5 +1,6 @@
 import { screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import userEvent from "@testing-library/user-event";
+import { describe, expect, it, vi } from "vitest";
 import { HttpError } from "../gateway/HttpError";
 import type { ClusterInfo } from "../gateway/types";
 import { renderWithQuery } from "../test/renderWithQuery";
@@ -61,13 +62,18 @@ describe("ClusterCard", () => {
     expect(await screen.findByText("Gateway unreachable")).toBeDefined();
   });
 
-  it("shows when authentication is required", async () => {
+  it("offers a gateway-specific credential action when authentication is required", async () => {
+    const openConnection = vi.fn();
     renderWithQuery(
       <ClusterCard gateway={gateway} statusRefreshMs={60_000} getCluster={async () => {
         throw new HttpError(401, "unauthorized");
       }} />,
+      "/",
+      openConnection,
     );
     expect(await screen.findByText("Authentication required")).toBeDefined();
+    await userEvent.click(screen.getByRole("button", { name: "Manage credentials for Dev" }));
+    expect(openConnection).toHaveBeenCalledWith("dev");
   });
 
   it("shows Cluster unreachable with the gateway's message", async () => {

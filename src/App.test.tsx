@@ -4,6 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { MemoryRouter, useNavigate } from "react-router";
 import { describe, expect, it, vi } from "vitest";
 import { App } from "./App";
+import type { GetCluster } from "./gateway/getCluster";
 import { HttpError } from "./gateway/HttpError";
 import type { GatewayEntry } from "./gateway/types";
 
@@ -21,7 +22,7 @@ const linkOrigin = "https://console.example";
 const copyMessageLink = async () => {};
 const gatewayCredentials = { read: () => null, save: () => {}, clear: () => {} };
 
-function renderApp(initialEntry = "/", gateways: GatewayEntry[] = []) {
+function renderApp(initialEntry = "/", gateways: GatewayEntry[] = [], getCluster: GetCluster = pendingGetCluster) {
   return render(
     <MemoryRouter initialEntries={[initialEntry]}>
       <App
@@ -32,7 +33,7 @@ function renderApp(initialEntry = "/", gateways: GatewayEntry[] = []) {
         deleteTopic={deleteTopic}
         confirmTopicDeletion={confirmTopicDeletion}
         loadGatewayConfig={async () => gateways}
-        getCluster={pendingGetCluster}
+        getCluster={getCluster}
         listTopics={pendingListTopics}
         listConsumerGroups={pendingListConsumerGroups}
         getTopicDetail={pendingGetTopicDetail}
@@ -57,6 +58,26 @@ function HistoryControls() {
 }
 
 describe("App", () => {
+  it("opens the selected gateway's credentials from its authentication card", async () => {
+    const user = userEvent.setup();
+    const dev = { id: "dev", name: "Dev", url: "https://dev.example" };
+    const prod = { id: "prod", name: "Prod", url: "https://prod.example" };
+    renderApp("/", [dev, prod], async (url) => {
+      if (url === prod.url) throw new HttpError(401, "unauthorized");
+      return { clusterId: "dev-cluster", controllerId: 1, brokers: [] };
+    });
+
+    const prodCard = await screen.findByRole("article", { name: "Prod" });
+    const action = await within(prodCard).findByRole("button", { name: "Manage credentials for Prod" });
+    expect(await within(screen.getByRole("article", { name: "Dev" })).findByText("Healthy")).toBeDefined();
+    await user.click(action);
+    const dialog = screen.getByRole("dialog", { name: "Gateway credentials" });
+    expect(within(dialog).getByText("Prod", { selector: "strong" })).toBeDefined();
+    expect(document.activeElement).toBe(within(dialog).getByLabelText("Token for Prod"));
+    await user.keyboard("{Escape}");
+    expect(document.activeElement).toBe(action);
+  });
+
   it("offers a keyboard skip link to the page content", async () => {
     const user = userEvent.setup();
     renderApp();

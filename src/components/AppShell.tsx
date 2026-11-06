@@ -6,6 +6,7 @@ import type { GatewayCredentials } from "../gateway/GatewayCredentials";
 import { useGatewayConfig } from "../hooks/useGatewayConfig";
 import styles from "./AppShell.module.css";
 import { GatewayCredentialsPanel } from "./GatewayCredentialsPanel";
+import { GatewayConnectionContext } from "./GatewayConnectionContext";
 
 type AppShellProps = {
   children: ReactNode;
@@ -14,12 +15,13 @@ type AppShellProps = {
   connectionOpen: boolean;
   selectedGatewayId?: string;
   onOpenConnection: () => void;
+  onOpenGatewayConnection: (gatewayId: string) => void;
   onCloseConnection: () => void;
 };
 
 type Breadcrumb = { label: string; to: string } | { label: string; current: true };
 
-export function AppShell({ children, loadGatewayConfig, credentials, connectionOpen, selectedGatewayId, onOpenConnection, onCloseConnection }: AppShellProps) {
+export function AppShell({ children, loadGatewayConfig, credentials, connectionOpen, selectedGatewayId, onOpenConnection, onOpenGatewayConnection, onCloseConnection }: AppShellProps) {
   const location = useLocation();
   const clusterMatch = useMatch({ path: "/clusters/:gatewayId", end: false });
   const topicMatch = useMatch({ path: "/clusters/:gatewayId/topics/:topicName", end: false });
@@ -88,7 +90,9 @@ export function AppShell({ children, loadGatewayConfig, credentials, connectionO
         </nav>
       ) : null}
       <div id="main-content" className={styles.content} tabIndex={-1}>
-        {children}
+        <GatewayConnectionContext.Provider value={onOpenGatewayConnection}>
+          {children}
+        </GatewayConnectionContext.Provider>
       </div>
     </div>
   );
