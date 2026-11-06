@@ -152,6 +152,24 @@ is linked to a local account by email.
     outage/redirect/interruption, replay/concurrency, expiration and audit
     failures; focused Cognito tests and `go test ./...` pass. Atomic storage
     completion, group grants and browser integration remain unfinished.
+- [x] **T53.3g Complete reserved Cognito refreshes atomically** — Covers: foundation of F27-AC4
+  - Files: Gateway `internal/console/cognito/` and `storage/` refresh
+    actions/tests, Gateway `internal/console/README.md`,
+    `spec/TECH-SPEC.md`, `spec/ROADMAP.md`.
+  - Do: Consume the private completion proof once. In one transaction,
+    recheck its reservation and outcome, the unchanged protected credential
+    and verified snapshot, enabled identity, revocation, source, generation,
+    provider/key binding and claim/session deadlines. Atomically replace the
+    verified claims and encrypted retained or rotated token, advance the
+    generation and append a redacted success audit. Fail closed on stale,
+    changed, replayed, failed-audit or uncertain state; never resend or
+    automatically retry a consumed generation.
+  - Done when: synthetic tests cover persistence/restart, repeated rotation,
+    no rotation, exact claim deadlines, concurrency/replay, altered snapshot,
+    tampering, provider/key mismatch, expiry, revocation, disablement, audit
+    and commit failures, and unaffected local sessions; focused Cognito tests
+    and `go test ./...` pass. Session-manager refresh coordination, browser
+    integration, group grants and secured deployment remain unfinished.
 - [ ] **T53.3 Issue and refresh Cognito application sessions** — Covers: F27-AC2, F27-AC4
   - Files: Gateway `internal/console/cognito/` (new exchange/refresh
     actions/tests), `internal/console/session/` and
