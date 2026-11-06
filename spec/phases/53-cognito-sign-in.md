@@ -250,6 +250,21 @@ is linked to a local account by email.
     passes role-free identity, no email linking, refresh/rotation,
     concurrency, revocation, disabled identity, outage, audit and
     no-replay cases, and `go test ./...` passes.
+- [x] **T53.4a Prepare browser-bound Cognito authorization** — Covers: foundation of F27-AC2
+  - Files: Gateway `internal/console/cognito/` authorization URL and
+    transient-cookie actions/tests, `internal/console/storage/` synthetic
+    provider integration tests, Gateway `internal/console/README.md`,
+    `spec/TECH-SPEC.md`, `spec/ROADMAP.md`.
+  - Do: Construct an authorization URL only from the verified configured
+    provider and exact callback, with `openid`, code flow, state, nonce and
+    PKCE S256. Provide a host-only Secure HttpOnly SameSite=Lax cookie for
+    the short-lived browser binding and a matching deletion cookie. Reject
+    malformed or expired inputs; never put the browser binding, PKCE verifier,
+    client secret or provider tokens into the URL. Keep the existing
+    application cookie Strict. Expose no browser route yet.
+  - Done when: focused `Test.*CognitoBrowser` tests cover exact parameters,
+    provider/callback binding, malformed and expired inputs, cookie
+    attributes, deletion and redaction, and `go test ./...` passes.
 - [ ] **T53.4 Expose opt-in HTTPS SSO and logout** — Covers: F27-AC2, F27-AC3
   - Files: Gateway `internal/console/httpapi/` (new SSO handlers/tests and
     necessary API wiring), `cmd/console/` (configuration/composition and
