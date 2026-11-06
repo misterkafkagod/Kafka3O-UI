@@ -120,7 +120,7 @@ The console should be comfortable for dense technical data, easy to navigate, an
     - Demo: cancel deletion, then confirm it and observe the accepted deletion request.
 
 ### M6 — A consistent, accessible console foundation
-- **Status:** Active
+- **Status:** Done
 - **Features:** F18, F19, F20
 - **Goal:** Replace the browser-default presentation and permanent credential forms with a coherent shell, shared visual baseline and accessible connection panel across the existing pages.
 - **Phases:**
@@ -136,7 +136,7 @@ The console should be comfortable for dense technical data, easy to navigate, an
     - Demo: with two gateway fixtures, exercise loading, empty, no-match and failure states plus one healthy and one failed gateway; verify no false zero or healthy status.
   - **P33** F20-B1 + F20-B2 · Manage gateway credentials in an accessible connection panel — Covers: F20-AC1, F20-AC2 · Discovery: — · Status: Done
     - Demo: open the panel from the shell and an authentication prompt; add or remove one of two tokens and verify focus behavior, session isolation and cache refresh.
-  - **P34** F20-B3 · Recover safely from credential and transport errors — Covers: F20-AC3 · Discovery: — · Status: Review
+  - **P34** F20-B3 · Recover safely from credential and transport errors — Covers: F20-AC3 · Discovery: — · Status: Done
     - Demo: submit invalid credentials, recover from 401, then simulate a network/TLS failure; verify no token exposure or certificate bypass and keep the other gateway usable.
 
 ### M7 — Efficient investigation of clusters, topics and messages
@@ -162,6 +162,10 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
 - **Verification debt:** Run the built gateway container in a deployment; the image was built and scanned on EKS-D but was not started as a container.
 
 ## Learnings
+- 2026-11-06 (M6 retro): P28–P34 cover all F18–F20 acceptance criteria; shared navigation, accessible states and contextual recovery preserve existing routes and write safeguards.
+- 2026-11-06 (M6 retro): Browser fixtures made focus, failure and gateway-isolation behavior reproducible, while the EKS-D checks confirmed the actual static assets and secured Kafka connections.
+- 2026-11-06 (M6 retro): Replacing the manual pod rotates its test credentials and certificates; preserve the prior ConfigMap, restore the tunnel and tell testers to trust the new certificates and copy fresh tokens.
+- 2026-11-06 (M6 retro): Verify milestone tests and builds on the declared Node 24 runtime rather than relying on the workstation's older default Node version. The Node runtime vulnerability scan remains pending.
 - 2026-11-06 (P33): A native modal needs verified Escape and focus restoration in the embedded browser; gateway-specific recovery must be available on read and write authentication prompts, without replaying writes.
 - 2026-11-06 (P32): Missing or invalid gateway configuration is distinct from a network or server failure retrieving configuration; only the latter needs a recoverable error.
 - 2026-11-05 (M6–M8 planning): The live UI and source review showed browser-default styling, no stylesheet files, global inline credentials, payloads expanded inside message rows and inline consumer-group details. Approved an incremental UX redesign: shared console foundation first, investigation pages second, operational workflows third. M1–M5 remain Done; F15–F17 remain in backlog; no new dependencies or gateway capabilities are proposed.

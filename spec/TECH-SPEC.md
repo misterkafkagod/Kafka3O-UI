@@ -23,11 +23,11 @@ Covers both repositories: **Kafka3O-Gateway** (one per Kafka cluster) and **Kafk
 - Rejected: gin/echo — no OpenAPI generated from types
 
 ### UI (Kafka3O-UI)
-- Runtime: Node 24.21.0 LTS; CVE status: pending scan
-- Language/framework: TypeScript 7.0.2, React 19.3.1, Vite 8.3.4; CVE status: `npm audit` 2026-11-05: 0 findings
-- Routing: React Router 8.4.0; CVE status: `npm audit` 2026-11-05: 0 findings
-- Type definitions (dev): @types/react 19.3.0, @types/react-dom 19.3.0; CVE status: `npm audit` 2026-11-05: 0 findings
-- Data fetching: TanStack Query 5.104.4 — one independent query per gateway with its own polling, timeout, error state and retry, so one slow gateway never blocks another; CVE status: `npm audit` 2026-11-05: 0 findings
+- Runtime: Node 24.21.0 LTS for build and test; CVE status: pending runtime scan (`npm audit` covers packages, not Node itself)
+- Language/framework: TypeScript 7.0.2, React 19.3.1, Vite 8.3.4; CVE status: `npm audit` 2026-11-06: 0 findings
+- Routing: React Router 8.4.0; CVE status: `npm audit` 2026-11-06: 0 findings
+- Type definitions (dev): @types/react 19.3.0, @types/react-dom 19.3.0; CVE status: `npm audit` 2026-11-06: 0 findings
+- Data fetching: TanStack Query 5.104.4 — one independent query per gateway with its own polling, timeout, error state and retry, so one slow gateway never blocks another; CVE status: `npm audit` 2026-11-06: 0 findings
 - Styling: CSS Modules for component styles, with minimal global styles for typography, theme tokens and baseline normalization; no new styling dependency
 - Rejected: Next.js — a static SPA suffices; no server needed
 - Rejected: MUI / Tailwind — unnecessary weight for M1

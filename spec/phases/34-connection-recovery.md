@@ -2,7 +2,7 @@
 - **Milestone:** M6
 - **Covers:** F20-AC3
 - **Discovery:** —
-- **Status:** Review
+- **Status:** Done
 
 ## Demo
 1. Submit invalid credentials, then replace them after a 401; verify an explicit correction path and no token in visible output or URLs.
@@ -19,3 +19,8 @@
   - Done when: `npm test -- src/App.test.tsx src/components/GatewayCredentialForm.test.tsx src/components/CrossClusterTopicSearch.test.tsx` passes and `npm run build` passes.
 
 ## Review
+- **Demo:** Synthetic browser and App-level checks rejected invalid input, recovered from a 401 with a corrected token, and kept a second gateway healthy and searchable. Tokens were absent from visible output and URLs. A simulated transport failure offered network, gateway, CORS and HTTPS certificate-trust checks without claiming a cause or bypassing certificate validation.
+- **EKS-D:** The manual deployment serves `kafka3o-manual-ui-p34`; its JavaScript and CSS match the Node 24 production build byte for byte. Both forwarded gateways passed pinned-certificate HTTPS, authentication, Kafka metadata and CORS checks. Kafka A and B remained Ready (1/1); no Kafka writes were made. The live browser showed the expected certificate-trust guidance until the new self-signed certificates are accepted.
+- **Validation:** `npm test` passed all 304 tests in 82 files and `npm run build` passed with Node 24.21.0. The deployed connection dialog opened and returned focus to its invoker.
+- **Vulnerability scan:** `npm audit --audit-level=low` and `npm audit --omit=dev --audit-level=low` each reported 0 vulnerabilities on 2026-11-06. The Node runtime itself was not scanned.
+- **Notes:** Existing write handlers were retained; credential correction never automatically repeats a write. No dependency or speculative option was added. The manual pod replacement rotated its temporary credentials and certificates, and the localhost tunnel was restored.
