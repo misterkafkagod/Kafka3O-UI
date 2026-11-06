@@ -296,6 +296,23 @@ is linked to a local account by email.
     local/Cognito conflicts and concurrency, expiry/revocation/disablement,
     retained binding after replacement, audit and operational failures,
     redaction and unbound isolation; `go test ./...` passes.
+- [x] **T53.4d Revalidate browser-bound sessions and grants** — Covers: foundation of F27-AC2, F27-AC4
+  - Files: Gateway `internal/console/storage/` session-use and grant
+    resolution actions/tests, Gateway `internal/console/README.md`,
+    `spec/TECH-SPEC.md`, `spec/ROADMAP.md`.
+  - Do: Add separate bound session-use and grant-resolution actions that
+    require a nonzero marker digest and transactionally verify both the
+    session digest and its current marker-to-session mapping. Reuse existing
+    session, credential, claim-freshness and grant rules. Fail closed for
+    stale, wrong, missing, replaced, revoked, disabled or expired bindings,
+    and surface storage failures. Preserve the existing unbound paths,
+    including their independence from the binding table. Expose no manager
+    or route; bound refresh, logout and administrator reauthorization remain
+    unavailable until their own binding checks are implemented.
+  - Done when: focused `Test.*BoundSession` tests cover local and Cognito
+    sessions, direct and group grants, wrong or replaced markers, revocation,
+    disablement, expiration, storage failure, restart, redaction and unbound
+    isolation; `go test ./...` passes.
 - [ ] **T53.4 Expose opt-in HTTPS SSO and logout** — Covers: F27-AC2, F27-AC3
   - Files: Gateway `internal/console/httpapi/` (new SSO handlers/tests and
     necessary API wiring), `cmd/console/` (configuration/composition and
