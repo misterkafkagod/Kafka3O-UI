@@ -152,7 +152,7 @@ The console should be comfortable for dense technical data, easy to navigate, an
     - Demo: filter topics, open an encoded topic name and inspect its partitions and hidden sensitive configuration.
   - **P38** F22-B1 · Select and inspect message read results — Covers: F22-AC1 · Discovery: — · Status: Done
     - Demo: read several records, select each by keyboard and inspect its position, payload formats and headers.
-  - **P39** F22-B2 · Inspect bounded message search results — Covers: F22-AC2 · Discovery: — · Status: Review
+  - **P39** F22-B2 · Inspect bounded message search results — Covers: F22-AC2 · Discovery: — · Status: Done
     - Demo: search messages, select a match and verify the scanned count, truncation notice and retry behavior.
   - **P40** F22-B3 · Inspect and share exact message links — Covers: F22-AC3 · Discovery: — · Status: Planned
     - Demo: copy an exact message link and reopen it, then check an unavailable or unverifiable position.

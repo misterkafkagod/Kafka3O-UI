@@ -2,7 +2,7 @@
 - **Milestone:** M7
 - **Covers:** F22-AC2
 - **Discovery:** —
-- **Status:** Review
+- **Status:** Done
 
 ## Demo
 1. Search for matching records, select another result and verify the scan count and exclusion notice remain accurate without another search.
@@ -15,3 +15,8 @@
   - Done when: `npm test -- src/components/SearchTopicMessages.test.tsx src/pages/TopicPage.test.tsx src/App.test.tsx` and `npm run build` pass.
 
 ## Review
+- **Demo:** Browser fixtures showed the examined count and excluded-offset notice alongside two matches. Keyboard selection updated the inspector without a second search. A failed repeat search hid stale results, and retry showed the accurate empty, non-truncated outcome.
+- **Responsive:** The search controls, summary and workspace had no page-wide overflow at 320, 768 or 1440 CSS pixels.
+- **Validation:** All 316 UI tests and the production build passed on Node 24.21.0. The M7 deployment remains deferred until the milestone's final phase.
+- **Vulnerability scan:** Not run; P39 adds no dependencies and is not the final M7 phase.
+- **Notes:** The search input describes the existing case-sensitive, bounded scan to assistive technology.
