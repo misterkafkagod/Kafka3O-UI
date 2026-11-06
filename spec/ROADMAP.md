@@ -225,6 +225,7 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
     - Demo: complete the documented flow against a controlled Cognito-compatible fixture and reject forged, expired, wrong-client and replayed callbacks. Real Cognito testing is deferred until a user pool is available.
   - **P54** F28-B1 + F28-B3 + F30-B1 · Access administration and cluster classification — Covers: F28-AC1, F28-AC3, F28-AC4, F30-AC1 · Discovery: — · Status: Defined
     - Demo: global ADMIN changes scoped grants and Production classification; cluster ADMIN cannot change global policy.
+    - A bounded, audited local-account listing API is implemented on the loopback Console foundation; it requires a current local global ADMIN and exposes no credentials or grants. Grant management, classification, the access-management UI and secured deployment remain outstanding.
   - **P55** F29-B1 + F29-B2 + F30-B2 · Console-to-Gateway delegation and enforcement — Covers: F29-AC1, F29-AC2, F29-AC3, F30-AC2 · Discovery: Gateway service trust · Status: Defined
     - Demo: direct or replayed Gateway requests and non-ADMIN Production writes are denied before Kafka.
   - **P56** F30-B3 · Production-aware confirmation and reason — Covers: F30-AC4 · Discovery: — · Status: Defined
