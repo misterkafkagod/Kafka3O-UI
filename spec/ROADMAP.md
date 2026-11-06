@@ -148,7 +148,7 @@ The console should be comfortable for dense technical data, easy to navigate, an
     - Demo: open the overview with two gateways, search topics and verify one failure does not hide the other gateway's result.
   - **P36** F21-B2 · Inspect cluster and broker context — Covers: F21-AC2 · Discovery: — · Status: Done
     - Demo: open a healthy cluster and a failed cluster; compare the factual summary, broker table and recoverable error.
-  - **P37** F21-B3 · Browse topics, partitions and configuration — Covers: F21-AC3 · Discovery: — · Status: Building
+  - **P37** F21-B3 · Browse topics, partitions and configuration — Covers: F21-AC3 · Discovery: — · Status: Review
     - Demo: filter topics, open an encoded topic name and inspect its partitions and hidden sensitive configuration.
   - **P38** F22-B1 · Select and inspect message read results — Covers: F22-AC1 · Discovery: — · Status: Planned
     - Demo: read several records, select each by keyboard and inspect its position, payload formats and headers.

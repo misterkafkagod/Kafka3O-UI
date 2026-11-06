@@ -8,6 +8,7 @@ import type { ConfirmTopicDeletion, DeleteTopic as DeleteAction } from "../gatew
 import { HttpError } from "../gateway/HttpError";
 import type { GatewayEntry } from "../gateway/types";
 import { useTopicDetail } from "../hooks/useTopicDetail";
+import styles from "./TopicDetailPage.module.css";
 
 type TopicDetailPageProps = {
   gateway: GatewayEntry;
@@ -26,7 +27,7 @@ export function TopicDetailPage({ gateway, topicName, getTopicDetail, deleteTopi
         <main>
           <h2>Topic not found</h2>
           <p>Topic "{topicName}" no longer exists on this cluster.</p>
-          <Link to={`/clusters/${gateway.id}/topics`}>Back to topics</Link>
+          <Link to={`/clusters/${encodeURIComponent(gateway.id)}/topics`}>Back to topics</Link>
         </main>
       );
     }
@@ -37,56 +38,70 @@ export function TopicDetailPage({ gateway, topicName, getTopicDetail, deleteTopi
   }
   return (
     <main>
-      <Link to={`/clusters/${gateway.id}/topics`}>Back to topics</Link>
+      <Link to={`/clusters/${encodeURIComponent(gateway.id)}/topics`}>Back to topics</Link>
       <TopicTabs gateway={gateway} topicName={topicName} />
-      <h2>{detail.name}</h2>
-      <DeleteTopic key={JSON.stringify([gateway.id, topicName])} gateway={gateway} topicName={topicName} deleteTopic={deleteTopic} confirmTopicDeletion={confirmTopicDeletion} />
-      <h3>Partitions</h3>
-      <ScrollableTableRegion label="Topic partitions table scroll area">
-        <table aria-label="Topic partitions">
-          <thead>
-            <tr>
-              <th scope="col">Partition</th>
-              <th scope="col">Leader</th>
-              <th scope="col">Replicas</th>
-              <th scope="col">ISR</th>
-              <th scope="col">Start offset</th>
-              <th scope="col">End offset</th>
-            </tr>
-          </thead>
-          <tbody>
-            {detail.partitions.map((partition) => (
-              <tr key={partition.id}>
-                <td>{partition.id}</td>
-                <td>{partition.leader}</td>
-                <td>{partition.replicas.join(", ")}</td>
-                <td>{partition.isr.join(", ")}</td>
-                <td>{partition.startOffset}</td>
-                <td>{partition.endOffset}</td>
+      <header className={styles.heading}>
+        <div>
+          <h2>{detail.name}</h2>
+          <div className={styles.summary}>
+            <span>{detail.partitions.length} {detail.partitions.length === 1 ? "partition" : "partitions"}</span>
+            <span>{detail.config.length} configuration {detail.config.length === 1 ? "entry" : "entries"}</span>
+          </div>
+        </div>
+        <DeleteTopic key={JSON.stringify([gateway.id, topicName])} gateway={gateway} topicName={topicName} deleteTopic={deleteTopic} confirmTopicDeletion={confirmTopicDeletion} />
+      </header>
+      <section aria-labelledby="topic-partitions-heading" className={styles.section}>
+        <h3 id="topic-partitions-heading">Partitions</h3>
+        {detail.partitions.length === 0 ? <p>No partitions reported.</p> : null}
+        <ScrollableTableRegion label="Topic partitions table scroll area">
+          <table aria-label="Topic partitions">
+            <thead>
+              <tr>
+                <th scope="col">Partition</th>
+                <th scope="col">Leader</th>
+                <th scope="col">Replicas</th>
+                <th scope="col">ISR</th>
+                <th scope="col">Start offset</th>
+                <th scope="col">End offset</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </ScrollableTableRegion>
-      <h3>Configuration</h3>
-      <ScrollableTableRegion label="Topic configuration table scroll area">
-        <table aria-label="Topic configuration">
-          <thead>
-            <tr>
-              <th scope="col">Name</th>
-              <th scope="col">Value</th>
-            </tr>
-          </thead>
-          <tbody>
-            {detail.config.map((entry) => (
-              <tr key={entry.name}>
-                <td>{entry.name}</td>
-                <td>{entry.sensitive ? "Sensitive value hidden" : entry.value}</td>
+            </thead>
+            <tbody>
+              {detail.partitions.map((partition) => (
+                <tr key={partition.id}>
+                  <td>{partition.id}</td>
+                  <td>{partition.leader}</td>
+                  <td>{partition.replicas.join(", ")}</td>
+                  <td>{partition.isr.join(", ")}</td>
+                  <td>{partition.startOffset}</td>
+                  <td>{partition.endOffset}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </ScrollableTableRegion>
+      </section>
+      <section aria-labelledby="topic-configuration-heading" className={styles.section}>
+        <h3 id="topic-configuration-heading">Configuration</h3>
+        {detail.config.length === 0 ? <p>No configuration entries reported.</p> : null}
+        <ScrollableTableRegion label="Topic configuration table scroll area">
+          <table aria-label="Topic configuration">
+            <thead>
+              <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Value</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </ScrollableTableRegion>
+            </thead>
+            <tbody>
+              {detail.config.map((entry) => (
+                <tr key={entry.name}>
+                  <td>{entry.name}</td>
+                  <td>{entry.sensitive ? "Sensitive value hidden" : entry.value}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </ScrollableTableRegion>
+      </section>
     </main>
   );
 }

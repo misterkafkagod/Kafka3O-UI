@@ -46,7 +46,7 @@ export function TopicPage({ loadGatewayConfig, getTopicDetail, listConsumerGroup
     return (
       <main>
         <h2>Topic not found</h2>
-        <Link to={`/clusters/${gateway.id}/topics`}>Back to topics</Link>
+        <Link to={`/clusters/${encodeURIComponent(gateway.id)}/topics`}>Back to topics</Link>
       </main>
     );
   }

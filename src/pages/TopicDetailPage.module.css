@@ -1,0 +1,31 @@
+.heading {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+
+.heading > div {
+  min-width: 0;
+}
+
+.summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.summary span {
+  padding: 0.3rem 0.65rem;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 0.5rem;
+  background: var(--color-surface-subtle);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.section {
+  margin-top: 1.5rem;
+}

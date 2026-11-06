@@ -17,7 +17,7 @@ const detail: TopicDetail = {
   ],
   config: [
     { name: "cleanup.policy", value: "compact", sensitive: false },
-    { name: "secret", value: "", sensitive: true },
+    { name: "secret", value: "must-not-leak", sensitive: true },
   ],
 };
 
@@ -32,6 +32,10 @@ describe("TopicDetailPage", () => {
     renderWithQuery(<TopicDetailPage gateway={gateway} topicName="orders" getTopicDetail={async () => detail} deleteTopic={deleteTopic} confirmTopicDeletion={confirmTopicDeletion} />);
 
     expect(await screen.findByRole("heading", { name: "orders" })).toBeDefined();
+    expect(screen.getByText("2 partitions")).toBeDefined();
+    expect(screen.getByText("2 configuration entries")).toBeDefined();
+    expect(screen.getByRole("region", { name: "Partitions" })).toBeDefined();
+    expect(screen.getByRole("region", { name: "Configuration" })).toBeDefined();
     const partitionRegion = screen.getByRole("region", { name: "Topic partitions table scroll area" });
     const partitions = within(within(partitionRegion).getByRole("table", { name: "Topic partitions" }));
     const rows = partitions.getAllByRole("row").slice(1);
@@ -62,6 +66,20 @@ describe("TopicDetailPage", () => {
 
     expect(await screen.findByRole("heading", { name: "Topic not found" })).toBeDefined();
     expect(screen.getByRole("link", { name: "Back to topics" }).getAttribute("href")).toBe("/clusters/dev/topics");
+  });
+
+  it("encodes gateway IDs in both topic back links", async () => {
+    const encodedGateway = { ...gateway, id: "dev/west" };
+    const page = renderWithQuery(
+      <TopicDetailPage gateway={encodedGateway} topicName="orders" getTopicDetail={async () => detail} deleteTopic={deleteTopic} confirmTopicDeletion={confirmTopicDeletion} />,
+    );
+
+    expect((await screen.findByRole("link", { name: "Back to topics" })).getAttribute("href")).toBe("/clusters/dev%2Fwest/topics");
+    page.unmount();
+    renderWithQuery(
+      <TopicDetailPage gateway={encodedGateway} topicName="orders" getTopicDetail={async () => { throw new HttpError(404, "Not found"); }} deleteTopic={deleteTopic} confirmTopicDeletion={confirmTopicDeletion} />,
+    );
+    expect((await screen.findByRole("link", { name: "Back to topics" })).getAttribute("href")).toBe("/clusters/dev%2Fwest/topics");
   });
 
   it("shows unavailable with Retry, then the topic detail", async () => {
