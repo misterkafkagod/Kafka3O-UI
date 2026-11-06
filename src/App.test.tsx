@@ -1,7 +1,7 @@
 import { QueryClient } from "@tanstack/react-query";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { MemoryRouter } from "react-router";
+import { MemoryRouter, useNavigate } from "react-router";
 import { describe, expect, it, vi } from "vitest";
 import { App } from "./App";
 import { HttpError } from "./gateway/HttpError";
@@ -43,6 +43,16 @@ function renderApp(initialEntry = "/", gateways: GatewayEntry[] = []) {
         statusRefreshMs={60_000}
       />
     </MemoryRouter>,
+  );
+}
+
+function HistoryControls() {
+  const navigate = useNavigate();
+  return (
+    <>
+      <button type="button" onClick={() => navigate(-1)}>Go back</button>
+      <button type="button" onClick={() => navigate(1)}>Go forward</button>
+    </>
   );
 }
 
@@ -314,12 +324,42 @@ describe("App", () => {
     first.unmount();
 
     const url = new URL(copied);
-    render(<MemoryRouter initialEntries={[url.pathname + url.search]}>{app()}</MemoryRouter>);
+    render(
+      <MemoryRouter initialEntries={[url.pathname + url.search]}>
+        <HistoryControls />
+        {app()}
+      </MemoryRouter>,
+    );
     expect(await screen.findByText("exact")).toBeDefined();
     expect(list).toHaveBeenLastCalledWith("http://localhost:8081", "orders & audit", {
       partition: 2,
       offset: "9007199254740993",
     });
+
+    const breadcrumb = screen.getByRole("navigation", { name: "Breadcrumb" });
+    expect((await within(breadcrumb).findByRole("link", { name: "Dev" })).getAttribute("href")).toBe(
+      "/clusters/dev%20%26%20west",
+    );
+    await user.click(within(breadcrumb).getByRole("link", { name: "Topics" }));
+    const clusterSections = await screen.findByRole("navigation", { name: "Cluster sections" });
+    expect(within(clusterSections).getByRole("link", { name: "Topics" }).getAttribute("aria-current")).toBe("page");
+    expect(
+      within(screen.getByRole("navigation", { name: "Breadcrumb" })).getByText("Topics").getAttribute("aria-current"),
+    ).toBe("page");
+
+    await user.click(screen.getByRole("button", { name: "Go back" }));
+    const topicViews = await screen.findByRole("navigation", { name: "Topic views" });
+    expect(within(topicViews).getByRole("link", { name: "Messages" }).getAttribute("aria-current")).toBe("page");
+    expect(
+      within(screen.getByRole("navigation", { name: "Breadcrumb" }))
+        .getByText("orders & audit")
+        .getAttribute("aria-current"),
+    ).toBe("page");
+    expect(await screen.findByText("exact")).toBeDefined();
+
+    await user.click(screen.getByRole("button", { name: "Go forward" }));
+    const forwardSections = await screen.findByRole("navigation", { name: "Cluster sections" });
+    expect(within(forwardSections).getByRole("link", { name: "Topics" }).getAttribute("aria-current")).toBe("page");
   });
 
   it("allows authentication and removal from a direct topic link", async () => {
