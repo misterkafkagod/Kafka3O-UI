@@ -265,6 +265,21 @@ is linked to a local account by email.
   - Done when: focused `Test.*CognitoBrowser` tests cover exact parameters,
     provider/callback binding, malformed and expired inputs, cookie
     attributes, deletion and redaction, and `go test ./...` passes.
+- [x] **T53.4b Validate browser callbacks and bindings** — Covers: foundation of F27-AC2
+  - Files: Gateway `internal/console/cognito/` callback and cookie readers,
+    authorization-code validation and tests, `internal/console/storage/`
+    synthetic provider integration tests, Gateway
+    `internal/console/README.md`, `spec/TECH-SPEC.md`, `spec/ROADMAP.md`.
+  - Do: Parse only bounded, unambiguous callback parameters with one
+    canonical state and either a code or a provider error; reject duplicate,
+    unknown, malformed or unsafe values. Ignore provider error descriptions
+    and destinations instead of returning or following them. Read exactly
+    one valid browser-binding cookie without exposing its value. Reuse
+    authorization-code validation for both callback and exchange. Expose no
+    route and do not claim session-replacement protection.
+  - Done when: focused `Test.*CognitoBrowser` tests cover valid and rejected
+    parameters, redaction, cookie ambiguity, one-shot synthetic exchange and
+    replay denial, and `go test ./...` passes.
 - [ ] **T53.4 Expose opt-in HTTPS SSO and logout** — Covers: F27-AC2, F27-AC3
   - Files: Gateway `internal/console/httpapi/` (new SSO handlers/tests and
     necessary API wiring), `cmd/console/` (configuration/composition and
