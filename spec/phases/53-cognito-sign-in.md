@@ -352,6 +352,22 @@ is linked to a local account by email.
     action families, current/wrong/replaced bindings, reservation races,
     revocation/disablement/grant changes, failures, redaction and unbound
     isolation; `go test ./...` passes.
+- [x] **T53.4g Inspect and reserve bound Cognito refreshes** — Covers: foundation of F27-AC4
+  - Files: Gateway `internal/console/storage/` Cognito refresh inspection and
+    reservation actions and tests, Gateway `internal/console/README.md`,
+    `spec/TECH-SPEC.md`, `spec/ROADMAP.md`.
+  - Do: Add storage-only bound inspection and reservation actions that
+    transactionally verify both the session marker digest and its current
+    browser mapping, current identity and lifetime, protected credential and
+    durable per-generation replay reservation. Reject regressing clocks as
+    operational failures; withhold reservation material after uncertain
+    commits or expired post-commit checks. Keep unbound behavior independent
+    of the binding table and reject bound sessions on unbound paths. Do not
+    dispatch provider refresh or expose bound managers or routes yet.
+  - Done when: focused `Test.*BoundCognitoRefresh` tests cover exact claim
+    deadlines, wrong or replaced markers, queued changes, concurrent
+    reservation, restart, audit/commit failure, clock regression, redaction
+    and unbound isolation; `go test ./...` passes.
 - [ ] **T53.4 Expose opt-in HTTPS SSO and logout** — Covers: F27-AC2, F27-AC3
   - Files: Gateway `internal/console/httpapi/` (new SSO handlers/tests and
     necessary API wiring), `cmd/console/` (configuration/composition and
