@@ -1,0 +1,170 @@
+.shell {
+  min-height: 100vh;
+  padding: clamp(1rem, 3vw, 2rem);
+  background: var(--color-canvas);
+  color: var(--color-text);
+  overflow-wrap: anywhere;
+}
+
+.shell :global(:focus-visible) {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  max-width: 76rem;
+  margin: 0 auto;
+}
+
+.brand {
+  font-size: 1.5rem;
+  font-weight: 750;
+  letter-spacing: -0.035em;
+}
+
+.badge {
+  padding: 0.3rem 0.55rem;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  font-weight: 650;
+}
+
+.main {
+  display: grid;
+  place-items: start center;
+  padding: clamp(2rem, 9vh, 5rem) 0 2rem;
+}
+
+.card {
+  width: min(100%, 30rem);
+  padding: clamp(1.25rem, 4vw, 2rem);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 0.9rem;
+  background: var(--color-surface);
+  box-shadow: 0 0.25rem 1rem rgb(15 23 42 / 6%);
+}
+
+.card h1 {
+  margin: 0.25rem 0 0.6rem;
+  font-size: clamp(1.5rem, 4vw, 1.9rem);
+  line-height: 1.2;
+}
+
+.card p {
+  line-height: 1.55;
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.intro,
+.context,
+.help {
+  color: var(--color-text-muted);
+}
+
+.help {
+  font-size: 0.9rem;
+}
+
+.card fieldset {
+  display: grid;
+  gap: 1rem;
+  min-width: 0;
+  margin: 1.5rem 0 0;
+  padding: 0;
+  border: 0;
+}
+
+.card label {
+  display: grid;
+  gap: 0.4rem;
+  font-weight: 650;
+}
+
+.card input {
+  width: 100%;
+  min-width: 0;
+  min-height: 2.75rem;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.45rem;
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.card .checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  font-weight: 500;
+}
+
+.card .checkbox input {
+  width: 1.1rem;
+  min-width: 1.1rem;
+  min-height: 1.1rem;
+  margin: 0.2rem 0 0;
+}
+
+.card button {
+  min-height: 2.75rem;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid var(--color-primary);
+  border-radius: 0.45rem;
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.card button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.card .secondary {
+  margin-top: 0.8rem;
+  border-color: var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.actions .secondary {
+  margin-top: 0;
+}
+
+.notice,
+.warning,
+.error {
+  padding: 0.75rem;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 0.5rem;
+  background: var(--color-surface-subtle);
+}
+
+.warning,
+.error {
+  border-color: var(--color-alert-text);
+  background: var(--color-alert-surface);
+  color: var(--color-alert-text);
+}

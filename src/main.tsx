@@ -4,7 +4,14 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router";
 import "./styles.css";
 import { App } from "./App";
+import { ConsoleSessionGate } from "./components/ConsoleSessionGate";
 import { loadGatewayConfig } from "./config/loadGatewayConfig";
+import type { ConsoleSessionClient, ConsoleSessionTransport } from "./console/ConsoleSession";
+import { changeLocalPassword } from "./console/changeLocalPassword";
+import { readConsoleSession } from "./console/readConsoleSession";
+import { requestConsoleSession } from "./console/requestConsoleSession";
+import { signInLocal } from "./console/signInLocal";
+import { signOutConsole } from "./console/signOutConsole";
 import { alterConfiguration } from "./gateway/alterConfiguration";
 import { clearGatewayToken } from "./gateway/clearGatewayToken";
 import { createTopic } from "./gateway/createTopic";
@@ -29,6 +36,15 @@ import { setGatewayToken } from "./gateway/setGatewayToken";
 
 const gatewayTimeoutMs = 5000;
 const statusRefreshMs = 15_000;
+const consolePreview = import.meta.env.VITE_KAFKA3O_CONSOLE_AUTH_PREVIEW === "true";
+const consoleTransport: ConsoleSessionTransport = (operation, signal) =>
+  requestConsoleSession(window.fetch.bind(window), window.location.origin, () => document.cookie, 15_000, operation, signal);
+const consoleSession: ConsoleSessionClient = {
+  inspect: (signal) => readConsoleSession(consoleTransport, signal),
+  signIn: (username, password) => signInLocal(consoleTransport, username, password),
+  changePassword: (current, replacement) => changeLocalPassword(consoleTransport, current, replacement),
+  signOut: () => signOutConsole(consoleTransport),
+};
 const manualProxyOrigin = import.meta.env.VITE_KAFKA3O_MANUAL_PROXY === "true" ? window.location.origin : undefined;
 const boundFetchJson = (url: string) => fetchJson(window.fetch.bind(window), url, gatewayTimeoutMs);
 const gatewayCredentials = {
@@ -45,7 +61,7 @@ const queryClient = new QueryClient();
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <BrowserRouter>
+    {consolePreview ? <ConsoleSessionGate client={consoleSession} /> : <BrowserRouter>
       <App
         queryClient={queryClient}
         loadGatewayConfig={() => loadGatewayConfig(boundFetchJson)}
@@ -74,6 +90,6 @@ createRoot(document.getElementById("root")!).render(
         copyMessageLink={(text) => navigator.clipboard.writeText(text)}
         statusRefreshMs={statusRefreshMs}
       />
-    </BrowserRouter>
+    </BrowserRouter>}
   </StrictMode>,
 );

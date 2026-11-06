@@ -1,6 +1,7 @@
 import type { ReactElement } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { LoadGatewayConfig } from "./config/loadGatewayConfig";
+import type { ConsoleSessionClient } from "./console/ConsoleSession";
 import type { GatewayCredentials } from "./gateway/GatewayCredentials";
 import type { GetCluster } from "./gateway/getCluster";
 import type { CreateTopic } from "./gateway/createTopic";
@@ -56,6 +57,9 @@ afterEach(() => {
   document.body.innerHTML = "";
   window.sessionStorage.clear();
   vi.unstubAllGlobals();
+  vi.unstubAllEnvs();
+  vi.resetModules();
+  renderApp.mockClear();
 });
 
 describe("main composition", () => {
@@ -125,5 +129,19 @@ describe("main composition", () => {
     expect(new Headers(fetchFn.mock.calls[6][1]?.headers).get("Authorization")).toBe(`Bearer ${token}`);
     props.gatewayCredentials.clear("https://gateway");
     expect(props.gatewayCredentials.read("https://gateway")).toBeNull();
+  });
+
+  it("renders only the authentication preview even when the manual proxy is enabled", async () => {
+    document.body.innerHTML = '<div id="root"></div>';
+    vi.stubEnv("VITE_KAFKA3O_CONSOLE_AUTH_PREVIEW", "true");
+    vi.stubEnv("VITE_KAFKA3O_MANUAL_PROXY", "true");
+    const fetchFn = vi.fn<typeof fetch>();
+    vi.stubGlobal("fetch", fetchFn);
+    await import("./main");
+    const tree = renderApp.mock.calls[0][0] as ReactElement<{ children: ReactElement<{ client: ConsoleSessionClient }> }>;
+    const { ConsoleSessionGate } = await import("./components/ConsoleSessionGate");
+    expect(tree.props.children.type).toBe(ConsoleSessionGate);
+    await expect(tree.props.children.props.client.inspect()).rejects.toMatchObject({ code: "insecure_origin" });
+    expect(fetchFn).not.toHaveBeenCalled();
   });
 });
