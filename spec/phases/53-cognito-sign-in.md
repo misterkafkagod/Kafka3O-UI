@@ -2,7 +2,7 @@
 - **Milestone:** M10
 - **Covers:** F27-AC2, the Cognito portions of F27-AC3 and F27-AC4
 - **Discovery:** [cognito-user-pool-fixture.md](../discovery/cognito-user-pool-fixture.md)
-- **Status:** Planned
+- **Status:** Building
 
 ## Existing baseline and boundaries
 P51/P52 supply local Console sessions, audited local account administration
@@ -30,7 +30,7 @@ is linked to a local account by email.
    verify no request is automatically replayed or credentials logged.
 
 ## Tasks
-- [ ] **T53.1 Verify configured Cognito ID tokens** — Covers: F27-AC2
+- [x] **T53.1 Verify configured Cognito ID tokens** — Covers: F27-AC2
   - Files: Gateway `go.mod`, `go.sum`, `internal/console/cognito/` (new
     discovery, verifier and tests), Gateway `internal/console/README.md`,
     `spec/TECH-SPEC.md`, `spec/ROADMAP.md`.
