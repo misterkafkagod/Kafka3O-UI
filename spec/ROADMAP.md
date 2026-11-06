@@ -3,16 +3,17 @@
 ## Vision
 Kafka3O is a multi-cluster Kafka console for developers and operators: one web UI (Kafka3O-UI) shows every cluster side by side — health, topics, messages, consumer lag. Each cluster is fronted by its own small, stateless gateway (Kafka3O-Gateway) that owns the broker connection and credentials close to that cluster; the browser never talks to Kafka directly.
 
-The console should be comfortable for dense technical data, easy to navigate, and explicit about connection problems and write outcomes. M6–M8 turn the existing functional pages into a consistent, accessible operator interface without changing the gateway API or the completed M1–M5 behavior.
+The console should be comfortable for dense technical data, easy to navigate, and explicit about connection problems and write outcomes. M6–M8 turn the existing functional pages into a consistent, accessible operator interface without changing the gateway API or the completed M1–M5 behavior. M9 extends the gateway and UI with explicitly confirmed Kafka configuration and partition administration. The next milestone, M10, adds local/Cognito login, global and per-cluster authorization, Production safeguards, and an attributable audit trail.
 
 ## Out of Scope
 - A gateway serving more than one cluster
 - The UI connecting to Kafka directly
-- Cluster administration beyond the listed write features: ACLs, quotas, partition reassignment, broker config changes
-- Kafka Connect, ksqlDB, or Schema Registry administration
+- Cluster-wide broker default changes, ksqlDB administration, and Redpanda-specific management APIs
+- Kafka ACLs/quotas, Kafka Connect, and Schema Registry administration in M10; these are deferred backlog candidates, not part of the authentication release
 - Replaying, copying, or transforming messages between topics
 - Persistence in the gateway (no database; stateless)
-- UI redesign introducing new Kafka capabilities, live streaming, invented metrics, roles, or a backend/API redesign
+- Invented metrics or Gateway-to-Kafka connection-setting changes from the UI
+- Direct SSO integrations other than Amazon Cognito in M10; additional providers are in the backlog
 
 ## Features
 - **F1** User can see every configured cluster on one page with its health (gateway reachable, cluster reachable, broker count)
@@ -36,6 +37,13 @@ The console should be comfortable for dense technical data, easy to navigate, an
 - **F22** User can read and search messages in a compact list with a selected-record inspector for payload, headers and exact position
 - **F23** User can inspect consumer groups and partition lag through summary-to-detail navigation
 - **F24** User can produce messages and create or delete topics through contextual forms with explicit pending, confirmed and uncertain outcomes
+- **F25** User can inspect and change editable per-broker and topic Kafka configuration while sensitive and restart-required settings remain protected
+- **F26** User can increase a topic's partitions and request manual replica placement while inspecting reassignment progress
+- **F27** User can sign in with a local account or Amazon Cognito SSO and end or recover their Console session safely
+- **F28** An authorized administrator can manage users, Cognito group mappings, and global/per-cluster role assignments
+- **F29** User can access only permitted cluster resources and actions, with authorization enforced by the Gateway as well as the Console
+- **F30** An authorized administrator can flag a cluster as Production, where only an ADMIN for that cluster can perform Kafka mutations
+- **F31** An authorized user can inspect an attributable audit trail of authentication, access-control changes, denied actions, and Kafka mutation outcomes
 
 ## Milestones
 ### M1 — See all my clusters and what topics they hold, from one screen
@@ -175,16 +183,118 @@ The console should be comfortable for dense technical data, easy to navigate, an
 
 M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded reads/searches and write safeguards. Each milestone must be served and verified at the EKS-D manual-test URL before it is marked Done; broker data and existing access endpoints must be preserved.
 
+### M9 — Kafka configuration and partition administration
+- **Status:** Done
+- **Features:** F25, F26
+- **Goal:** Offer explicitly confirmed per-resource Kafka configuration and partition operations without changing Gateway connection settings or silently retrying writes.
+- **Phases:**
+  - **P46** F25 + F26 · Gateway configuration and partition APIs, validation and uncertain outcomes — Status: Done
+  - **P47** F25 + F26 · Broker/topic management views and confirmation flows — Status: Done
+  - **P48** F25 + F26 · Regression, read-only EKS-D verification and manual deployment — Status: Done
+    - Both persistent brokers passed metadata, configuration, reassignment-status, security and invalid Kafka validate-only checks; before/after checks confirmed no configuration or partition change. Browser checks covered navigation, cancellation, focus and responsive layout.
+    - The persistent clusters have one broker each. Successful live writes and multi-broker placement remain unverified and require a separately approved test fixture.
+
+### M10 — Authenticated, authorized and auditable cluster operations
+- **Status:** Active — the deployed M9 shared-token/manual-test behavior remains unchanged until the secured deployment is verified.
+- **Features:** F27, F28, F29, F30, F31
+- **Goal:** Give each operator an identity and explicit access, enforce Production protection at the Gateway, and record who attempted or performed each sensitive operation.
+- **Approved direction (2026-11-06):**
+  - Local username/password login and Amazon Cognito User Pool SSO first. Other direct identity-provider integrations remain in F42.
+  - Add one central Console backend for login, secure server-side sessions, access management, cluster classification and audit persistence. Keep one stateless Gateway per Kafka cluster; the backend does not move Kafka credentials into the browser.
+  - Use a dedicated durable SQLite volume and one Console instance. A separate test-only database/volume may be created on `eksd-01`; Kafka volumes are not reused.
+  - Support both global and per-cluster `VIEWER`, `OPERATOR`, and `ADMIN` grants. Global grants apply to all registered clusters; cluster grants add access only to their cluster. No grant means no access; grants combine by highest role, with no implicit deny/override model in this release.
+  - `VIEWER` can read permitted clusters; `OPERATOR` can perform supported Kafka writes on non-Production clusters; `ADMIN` can also write on Production. A global ADMIN can administer Console identities/policy; a cluster ADMIN cannot grant global access or downgrade its cluster's Production flag.
+  - The extra ADMIN-only mutation guard applies **only to Production**. Non-Production writes still require the normal action permission; this does not make every authenticated user a writer.
+  - Production covers every Kafka mutation: produce, topic creation/deletion, broker/topic configuration changes, partition increases and replica reassignment. ADMIN operations still require the existing validation/confirmation plus a recorded Production change reason.
+  - Gateways authorize the actual request against current server-owned policy, including direct API calls. Shared-token access and the automatic manual-test proxy must not bypass M10 policy.
+  - Persist authentication/security events, policy changes, denials, mutation intent and the accepted/rejected/unknown outcome. Provide a permission-scoped audit page with filters and export; exclude credentials, payloads and sensitive configuration values.
+- **Phases:** Existing M9 access stays in place until the complete secured path is ready; unfinished phases do not imply enforcement is deployed.
+  - **P49** F28-B2 + F30-B2 · Additive role resolution and Production mutation policy — Covers: F28-AC2, F30-AC3 · Discovery: — · Status: Done
+    - Demo: policy tests cover global/cluster grants and VIEWER/OPERATOR/ADMIN across both environments and missing classification.
+    - Review: role/action/Production matrix, race detector, vet and Gateway regression tests passed. This is a standalone policy package; it does not enforce access in the running deployment until P55.
+  - **P50** F31-B1 · Durable single-instance SQLite storage and audit foundation — Covers: storage foundation of F31-AC4 · Discovery: SQLite durability and backup · Status: Done
+    - Demo: migrate, persist and reopen a dedicated database without exposing credential or payload data.
+    - Storage migration, scoped event queries and snapshot/restore tests passed locally and in isolated EKS-D temporary files. Audit integration, deployed-volume backup/retention and end-to-end redaction remain outstanding.
+  - **P51** F27-B1 + F27-B4 · Bootstrap and local account login — Covers: F27-AC1, F27-AC4 · Discovery: — · Status: Building
+    - Demo: bootstrap one administrator, authenticate an enabled local user and reject invalid/disabled accounts.
+    - The tested local-authentication foundation provides one-use bootstrap, salted Argon2id passwords, durable throttling, password replacement, and redacted audit events. Session primitives now support password-change revocation and mandatory-change gating, but neither is wired to HTTP; recovery, account-disable revocation, and integration are still outstanding.
+  - **P52** F27-B3 + F29-B3 · Session expiration, logout and revocation — Covers: F27-AC3, F29-AC4 · Discovery: — · Status: Defined
+    - Demo: logout or revoke a session and verify its next protected request is rejected without replay.
+    - Tested standalone primitives cover opaque session/CSRF tokens, idle and absolute expiry, logout, and atomic revocation on password change. HTTP enforcement, authorized administrative revocation and UI cache clearing are not yet implemented.
+  - **P53** F27-B2 · Amazon Cognito sign-in and group refresh — Covers: F27-AC2 · Discovery: Cognito User Pool/app client · Status: Defined
+    - Demo: complete the documented flow against a controlled Cognito-compatible fixture and reject forged, expired, wrong-client and replayed callbacks. Real Cognito testing is deferred until a user pool is available.
+  - **P54** F28-B1 + F28-B3 + F30-B1 · Access administration and cluster classification — Covers: F28-AC1, F28-AC3, F28-AC4, F30-AC1 · Discovery: — · Status: Defined
+    - Demo: global ADMIN changes scoped grants and Production classification; cluster ADMIN cannot change global policy.
+  - **P55** F29-B1 + F29-B2 + F30-B2 · Console-to-Gateway delegation and enforcement — Covers: F29-AC1, F29-AC2, F29-AC3, F30-AC2 · Discovery: Gateway service trust · Status: Defined
+    - Demo: direct or replayed Gateway requests and non-ADMIN Production writes are denied before Kafka.
+  - **P56** F30-B3 · Production-aware confirmation and reason — Covers: F30-AC4 · Discovery: — · Status: Defined
+    - Demo: an ADMIN confirms an allowed Production mutation with a reason; canceling or omitting the reason sends no write.
+  - **P57** F31-B1 + F31-B3 · Correlated security and mutation audit — Covers: F31-AC1, F31-AC2, F31-AC5 · Discovery: — · Status: Defined
+    - Demo: audit denial and durable intent/outcome; persistence failure prevents dispatch or reports an uncertain outcome.
+  - **P58** F31-B2 · Permission-scoped audit investigation — Covers: F31-AC3 · Discovery: — · Status: Defined
+    - Demo: cluster ADMIN filters/exports only its cluster's audit; global security events remain inaccessible.
+  - **P59** F27–F31 · End-to-end regression, migration and secure manual deployment — Covers: release integration of F27–F31 · Discovery: EKS-D HTTPS/cutover · Status: Defined
+    - Demo: preserve the existing Kafka data while verifying secured browser, Console, Gateway, policy and audit paths.
+- **Completion evidence:** Local login and Cognito-compatible fixture tests; global/cluster role and Production/non-Production matrices; direct-Gateway bypass and revocation tests; audit-failure/unknown-write tests; persistent identity/audit restart checks; migration and rollback exercise on the manual EKS-D deployment. Mutation tests use separately approved synthetic fixtures, not existing persistent topic data. Real Cognito login remains unverified until a User Pool is available and must be checked before relying on SSO in production.
+- **Discovery before completion:** Cognito user pool/app client, callback/logout URLs and group claims; SQLite backup/retention procedure and exact supported dependency versions; authenticated Console-to-Gateway delegation and policy API; legacy-token/manual-proxy cutover.
+- **Contracts:** Detailed behaviors and acceptance criteria are in [FUNC-SPEC.md](./FUNC-SPEC.md#f27--local-and-cognito-sign-in-planned-m10); the Gateway trust flow and migration are in [TECH-SPEC.md](./TECH-SPEC.md#m10-identity-authorization-and-audit-planned).
+
 ## Backlog
-- **F15** User can reset a consumer group's offsets to earliest, latest or a timestamp
-- **F16** User can decode Avro/Protobuf values via a Schema Registry
-- **F17** User can add or remove gateways from the UI instead of a config file
+M10 is next. The following items are candidates after M10, not commitments to implement every Redpanda feature. All future writes must use F29/F30 authorization and F31 audit; no candidate silently expands the current bounded reads or changes Kafka connection credentials.
+
+- **F15 · High:** User can reset a consumer group's offsets to earliest, latest or a timestamp, with a preview and inactive-group checks.
+- **F16 · High:** User can decode Avro/Protobuf values via a Schema Registry.
+- **F17 · Deferred:** User can add or remove registered Gateway endpoints from an authorized Console page instead of a config file; this does not edit a Gateway's Kafka connection settings.
+- **F32 · High:** User can browse Schema Registry subjects, versions and references, check compatibility, and explicitly register or delete schema versions.
+- **F33 · High:** An authorized user can inspect/manage Kafka ACLs and supported broker principals/credentials; Kafka permissions remain distinct from Console roles.
+- **F34 · Medium:** An authorized user can delete inactive consumer groups or selected committed offsets, separately from F15 offset resets.
+- **F35 · Medium:** User can inspect configured Kafka Connect clusters/connectors and explicitly create, update, pause, resume, restart or delete supported connectors/tasks.
+- **F36 · Medium:** User can filter records by headers/decoded fields and, if justified, sandboxed expressions with CPU/time/scan limits; no unbounded JavaScript execution in a Gateway.
+- **F37 · Medium:** User can continue message browsing with exact-offset cursors and explicit page/session budgets instead of only a single bounded result window.
+- **F38 · Medium:** User can inspect raw bytes in hex, download individual record bytes, and select additional supported key/value/header codecs; complements F16 rather than duplicating schema lifecycle.
+- **F39 · Deferred:** An ADMIN can request supported record-range deletion with a precise offset preview and audit; Kafka truncation is not arbitrary deletion of one selected record.
+- **F40 · Medium:** User can view sanitized topic documentation and ownership/runbook links, optionally synchronized from an explicitly configured Git repository.
+- **F41 · Deferred:** User can inspect genuine broker/partition health diagnostics and available metrics, with explicit unavailable states and a separately configured metrics source.
+- **F42 · Deferred:** User can sign in through additional directly integrated OIDC providers, starting with Keycloak, Authentik, Microsoft Entra ID, Okta and Google Workspace; Cognito federation is not a claim that these integrations have been tested.
+- **F43 · Deferred:** Deployments with compatible brokers can optionally propagate end-user identity to Kafka/upstream APIs instead of a shared service principal; this is not required for Cognito login or M10 application auditing.
+- **F44 · Deferred:** An authorized user can inspect client quotas and, after Kafka API discovery, explicitly change supported quotas.
+
+### Redpanda Console comparison (checked 2026-11-06)
+Compared current official Redpanda documentation (pages identify Console v3.14.0) with the Kafka3O specs and registered Gateway routes. This is a documented-behavior comparison, not a feature-by-feature execution test or a licensing guarantee. Authentication/RBAC are enterprise features in the referenced Redpanda documentation; Redpanda broker audit logging is also enterprise and must not be presented as generic Kafka or Console application auditing.
+
+| Documented Redpanda behavior | Kafka3O today / gap | Roadmap mapping |
+| --- | --- | --- |
+| Topic/broker inspection, configuration, produce/create/delete, consumer lag | Already covered by M1–M9; no duplicate backlog feature | F1–F14, F25–F26 |
+| OIDC/basic sign-in and Console roles [R2, R3] | Only shared Gateway tokens/local test proxy; no user identity or authorization | M10: F27–F30; other SSO: F42 |
+| API identity forwarding; Redpanda broker audit events [R2, R10] | Kafka3O needs its own user-attributed audit even while Kafka sees a Gateway service account | M10: F31; optional upstream identity: F43 |
+| Consumer offset reset and group/offset management [R1, R3] | Inspection exists; offset and group mutation do not | F15, F34 |
+| Schema-backed decoding and schema lifecycle/compatibility [R4, R5] | Text/JSON/base64 only; no Schema Registry integration | F16, F32 |
+| ACLs, principals/credential rotation and quota visibility [R1, R3] | No corresponding UI/Gateway APIs | F33, F44 |
+| Kafka Connect lifecycle [R6] | No Connect integration; Redpanda documents it as community-supported | F35 |
+| Programmable record filters and continuous pagination [R7, R8] | Bounded substring search and bounded reads exist; no structured scripting/pagination workflow | F36, F37 |
+| Additional deserializers, hex inspection and raw-byte download [R5] | No codec selection beyond text/JSON/base64 or binary download workflow | F38 |
+| Record deletion [R3] | Topic deletion exists, record-range deletion does not | F39 |
+| Git-backed topic documentation [R9] | No documentation tab/source | F40 |
+| Broader broker/partition health monitoring [R1] | Metadata/lag are available, not a metrics/diagnostics integration | F41 |
+| Production flag and ADMIN-only Production mutations | Kafka3O user requirement; not asserted as Redpanda parity | M10: F30 |
+
+**Sources:** [R1 Console overview](https://docs.redpanda.com/current/console/); [R2 Authentication](https://docs.redpanda.com/current/console/config/security/authentication/); [R3 Authorization and role capabilities](https://docs.redpanda.com/current/console/config/security/authorization/); [R4 Schema Registry](https://docs.redpanda.com/current/console/ui/schema-reg/); [R5 Record deserialization](https://docs.redpanda.com/current/console/ui/record-deserialization/); [R6 Kafka Connect](https://docs.redpanda.com/current/console/config/kafka-connect/); [R7 JavaScript filters](https://docs.redpanda.com/current/console/ui/programmable-push-filters/); [R8 Pagination](https://docs.redpanda.com/current/console/ui/paginate-messages-events/); [R9 Topic documentation](https://docs.redpanda.com/current/console/config/topic-documentation/); [R10 Redpanda broker audit logging](https://docs.redpanda.com/current/manage/audit-logging/).
+
+Redpanda-only Shadow Links, its Admin API, and Redpanda-specific diagnostic operations are not promised for generic Kafka. Replay/copy workflows and live tailing are not added to scope by this comparison.
+
+### Existing verification debt
 - **Verification debt:** Run the Docker-only stopped-broker test and P14 browser demo, and verify the remaining cross-cluster and consumer-group browser demos.
 - **Verification debt:** Repeat the P24–P27 browser smoke test with a trusted deployment certificate and complete the producer key/header browser demo.
 - **Verification debt:** Run the built gateway container in a deployment; the image was built and scanned on EKS-D but was not started as a container.
 - **Verification debt:** Repeat M7/M8 exact-record and consumer-detail browser demos with trusted Gateway certificates when test records and consumer groups are available; real write demos require scoped synthetic data.
+- **Verification debt:** Verify successful configuration/partition writes and multi-broker reassignment on a separately approved fixture; the persistent EKS-D checks intentionally do not apply changes.
+- **Verification debt:** Run the Cognito sign-in, group refresh and logout integration against a real User Pool when an AWS account and app client become available; fixture tests are not evidence of live provider compatibility.
 
 ## Learnings
+- 2026-11-06 (M10 planning): User selected a central Console backend, Cognito first plus local login, global and per-cluster roles, and an ADMIN-only Kafka mutation guard only on Production clusters. Existing bearer tokens do not establish user identity; enforcement and attributable audit must extend to the Gateway, not just disabled UI controls. This is a planned architecture change, not a deployment or completed security feature.
+- 2026-11-06 (M10 execution): The user does not yet have an AWS account and approved continuing without a live Cognito test. Use controlled provider fixtures and keep live Cognito compatibility explicitly unverified.
+- 2026-11-06 (M9): Kafka reports `auto.create.topics.enable` as read-only; both live brokers exposed editable dynamic settings while protecting sensitive values. Their single-broker topology cannot verify replicated placement.
+- 2026-11-06 (M9): A configuration editor must remain visible and restore keyboard focus even when selected from hundreds of broker settings. Unknown writes require a fresh read, not an automatic retry.
 - 2026-11-06 (M8 retro): P41–P45 cover F23–F24 with accessible consumer-summary navigation and contextual create, produce and delete workflows.
 - 2026-11-06 (M8 retro): Fixture-driven demos exercised validation, pending guards, uncertain writes, cancellation and exact offsets without modifying persistent Kafka data.
 - 2026-11-06 (M8 retro): Both live consumer-group reads succeeded but returned no groups, so live group-detail and exact-record demos remain outstanding.

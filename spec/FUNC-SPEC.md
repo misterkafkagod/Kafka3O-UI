@@ -1,5 +1,7 @@
 # Functional Spec
 
+M1–M9 describe the implemented baseline. F27–F31 specify the planned M10 release; they do not claim that login, roles, Production protection or user auditing are deployed. In M10 secured mode, F29/F30 authorization applies to every existing read/write feature and F31 records sensitive operations; F12's shared-token/manual-proxy paths cannot remain an alternative route around those checks.
+
 ### F1 — Cluster overview
 Every configured gateway is shown as a cluster card with live health.
 
@@ -175,11 +177,13 @@ Protect each gateway and its Kafka operations with a per-gateway shared bearer t
 - **F12-B1** A gateway starts only with a configured token and usable TLS certificate and key; all requests except liveness and permitted CORS preflights require the token
 - **F12-B2** A user enters or removes a gateway token in the UI → it is stored only in that tab's session storage, used only for that HTTPS gateway, and discarded when the session ends
 - **F12-B3** A token is missing or rejected, TLS is unavailable, or a request fails → the UI reports the error and allows the user to correct credentials or retry without exposing the token
+- **F12-B4** For the explicitly enabled local manual-test build only, a loopback proxy supplies each test Gateway's token and verifies its TLS certificate; the browser receives neither token
 
 **Acceptance criteria**
 - **F12-AC1** (B1) Missing or invalid tokens receive 401; valid tokens reach the API; anonymous liveness and allowed-origin preflight still work; gateway startup fails without a valid token or TLS configuration
 - **F12-AC2** (B2) Token entry, replacement, removal, session storage, HTTPS-only requests, per-gateway isolation, and query-cache reset work without putting tokens in URLs or config files
 - **F12-AC3** (B3) Authentication, TLS, and gateway failures are visible; authenticated redirects are not followed; the gateway does not log or return the token
+- **F12-AC4** (B4) With the manual-test build flag enabled on the exact `http://localhost:5173` origin, only the two designated same-origin test-proxy routes are allowed, no browser token is read or sent, and proxy failures are reported. Normal builds retain the HTTPS-only behavior
 
 **External dependencies:** TLS certificate and private key supplied by the deployment; a strong token supplied through the gateway environment. The shared token grants the same read/write access to everyone who holds it; there are no per-user roles.
 
@@ -246,13 +250,15 @@ Manage gateway connections in a dedicated, keyboard-accessible panel rather than
 - **F20-B1** User opens connection management from the shell or an authentication prompt → a dedicated panel shows gateway context, masked token entry and whether a token is stored
 - **F20-B2** User enters, replaces or removes a token → only that gateway's tab-session credentials change and the existing gateway query caches are reset
 - **F20-B3** Credentials are rejected or a transport request fails → the interface provides appropriate correction or troubleshooting guidance without exposing credentials or disabling other gateways
+- **F20-B4** In the opt-in local manual-test build, automatically authenticated test connections are identified without displaying token-entry controls
 
 **Acceptance criteria**
 - **F20-AC1** (B1) Given a closed panel, its entry point remains available without exposing the token forms on every page; opening from a gateway prompt identifies that gateway. The dialog has an accessible name, sensible initial focus, contained keyboard focus, Escape/close behavior and focus restoration to its invoker
 - **F20-AC2** (B2) Given separate tokens for two gateways, entering, replacing and removing one preserves the other's credentials; tokens remain masked and confined to the existing tab-session storage for configured HTTPS gateways, never URLs, runtime config or persistent local storage, and credential changes retain the existing cache-reset behavior
 - **F20-AC3** (B3) Given invalid input or a 401 response, the user can correct credentials with an explicit error; given a generic transport failure, network/TLS troubleshooting is offered without claiming to identify its cause reliably. No certificate bypass is introduced, no token is exposed, and another gateway remains usable
+- **F20-AC4** (B4) Automatic test connections explain that their credentials are managed by the local proxy; other configured gateways retain their normal credential controls
 
-**External dependencies:** Existing gateway authentication and browser session storage; browser dialog/focus facilities. Browser-trusted gateway TLS remains a deployment requirement.
+**External dependencies:** Existing gateway authentication and browser session storage; browser dialog/focus facilities. Browser-trusted gateway TLS remains a deployment requirement except for the opt-in manual-test proxy, which verifies Gateway TLS itself.
 
 ### F21 — Investigation overview and detail pages
 Explore clusters, brokers, topics and configuration through organized, dense overview/detail pages, retaining topic filtering and cross-cluster search.
@@ -311,3 +317,115 @@ Produce messages and create or delete topics through contextual forms with confi
 - **F24-AC3** (B3) The delete action identifies the topic and consequences, requires the existing confirmation, sends nothing on cancellation or unavailable confirmation, prevents repeated pending/accepted requests, and distinguishes accepted asynchronous deletion from an uncertain failure.
 
 **External dependencies:** Existing authenticated topic-create, message-produce and topic-delete APIs, and the browser confirmation facility.
+
+### F25 — Kafka configuration
+Inspect effective per-broker and per-topic Kafka settings and change only editable, non-sensitive entries. Gateway connection settings and cluster-wide broker defaults are not edited.
+
+**Behaviors**
+- **F25-B1** User selects a broker or opens a topic's management page → the UI lists searchable Kafka settings with effective value, source, type/documentation when supplied, and editability; sensitive values are hidden and restart-required entries are read-only.
+- **F25-B2** User sets an editable value or resets this resource's dynamic override → the UI identifies the target and requires confirmation; the gateway reads current editability and asks Kafka to validate before submitting once.
+- **F25-B3** A write cannot be confirmed → the UI explains it may have taken effect, blocks another submission until the configuration is successfully refreshed, and never retries automatically.
+
+**Acceptance criteria**
+- **F25-AC1** Broker selection scopes settings to the selected broker; topic settings are scoped to that topic. Sensitive values and documentation are not exposed, and `auto.create.topics.enable` cannot be changed when Kafka reports it read-only.
+- **F25-AC2** Cancelling or failing confirmation sends no write. Read-only, sensitive, invalid and Kafka-rejected changes never reach the apply step. Reset removes only a local topic or per-broker override, not inherited defaults.
+- **F25-AC3** Pending submissions cannot be duplicated; acceptance is not presented as verified propagation. Unknown outcomes require a successful refresh before another submission.
+
+**External dependencies:** Authenticated gateway configuration APIs and Kafka DescribeConfigs/IncrementalAlterConfigs permissions.
+
+### F26 — Topic partitions and replica placement
+Increase the total partition count or choose the ordered replica broker IDs for one partition, with explicit consequences and reassignment status.
+
+**Behaviors**
+- **F26-B1** User requests a larger total count → the UI warns that increases are irreversible and may affect keyed routing and ordering, requires confirmation, and the gateway validates before one apply.
+- **F26-B2** User chooses a partition and nonempty, unique, existing broker IDs → the UI warns that data may move and durability can change. The gateway rejects a currently active reassignment and never interprets an empty list as cancellation.
+- **F26-B3** The UI displays active reassignments and polls their status; acceptance means the request was accepted, not that data movement is complete. Uncertain outcomes require a successful topic, broker and status refresh before another submission.
+
+**Acceptance criteria**
+- **F26-AC1** Invalid counts, nonexistent brokers, duplicate/empty IDs, unchanged assignments, or an active reassignment cause no write. Replica assignment is disabled when its status is unavailable. Cancelling confirmation causes no write.
+- **F26-AC2** A successful request is not retried automatically, pending requests cannot be duplicated, and a timeout is reported as potentially accepted rather than failure.
+- **F26-AC3** Multi-broker placement is covered by fake-broker tests; the two persistent single-broker test clusters cannot prove replication across brokers.
+
+**External dependencies:** Authenticated gateway, Kafka metadata/CreatePartitions/AlterPartitionReassignments/ListPartitionReassignments permissions, and the browser confirmation facility.
+
+### F27 — Local and Cognito sign-in (planned M10)
+Sign in to one Console session with a local account or Amazon Cognito, without handling Kafka/Gateway credentials.
+
+**Behaviors**
+- **F27-B1** User selects local login and supplies credentials → the backend authenticates an enabled, administrator-provisioned account and creates a server-side session; invalid attempts get a generic visible error and throttling.
+- **F27-B2** User selects Cognito SSO → the backend completes a validated OIDC authorization-code flow and links the verified issuer/subject to an application identity; no automatic role is granted to an unknown identity.
+- **F27-B3** User logs out, an account is disabled, or a session expires/is revoked → subsequent requests are denied, displayed data/caches are cleared, and a pending write is never replayed after login.
+- **F27-B4** An administrator bootstraps the first global ADMIN or resets a local password → a controlled, audited flow replaces any temporary credential and revokes existing sessions; public registration and automatic email-based local/SSO account merging are not provided.
+
+**Acceptance criteria**
+- **F27-AC1** (B1) Valid local credentials establish an opaque HttpOnly session; invalid/disabled users cannot sign in. Passwords are stored as salted, adaptive hashes, never plaintext. Login/reset throttling, password-change and logout paths are tested without logging credentials.
+- **F27-AC2** (B2) A Cognito-compatible authorization flow validates state, nonce, PKCE, signature, issuer, intended client, token use and expiry in controlled tests. Wrong-pool/client, expired, forged and replayed callbacks fail. User Pool group names map only through administrator-configured bindings; local login remains available during an IdP outage. Real Cognito compatibility remains unverified until a User Pool is available.
+- **F27-AC3** (B3) Logout/revocation immediately invalidates the application session on the next request, including direct Gateway access. An unavailable or expired session yields 401, not a Kafka call. Local logout also offers the configured Cognito sign-out flow without claiming it signs out every federated upstream provider.
+- **F27-AC4** (B4) Bootstrap cannot be reused or create a default password; role-free first SSO login reveals no clusters. Reset/disable/revoke events are audited. Cognito identity, local account and Kafka principal remain explicitly distinct.
+
+**External dependencies:** Amazon Cognito User Pool/app client and managed login, verified HTTPS callback/logout configuration, and central durable identity/session storage. Provider configuration and live callback tests require discovery; direct integrations with other providers are F42.
+
+### F28 — Global and per-cluster access management (planned M10)
+An authorized administrator can provision users, map Cognito groups and control global/per-cluster access.
+
+**Behaviors**
+- **F28-B1** A global ADMIN opens Access management → they can manage local accounts, application identities, sessions, Cognito group mappings, and global or cluster-scoped role bindings.
+- **F28-B2** A user has global and/or cluster grants → the system computes the highest granted role for the target cluster; no binding means no access, and a cluster ADMIN grant does not grant Console-wide identity/policy administration.
+- **F28-B3** An administrator changes access → confirmation identifies the affected subject and scope, and the next authorization decision uses the committed policy; unauthorized/self-escalating requests are rejected and audited.
+
+**Acceptance criteria**
+- **F28-AC1** (B1) Users cannot self-register or assign their own roles. A cluster ADMIN cannot manage global grants, classify clusters, or edit Cognito mappings. The last enabled local global ADMIN cannot be removed/demoted without the documented recovery procedure.
+- **F28-AC2** (B2) A global VIEWER plus ADMIN on cluster A can read all clusters but write Production A only; it cannot write Production B. Global ADMIN covers all clusters. A cluster VIEWER grant does not restrict a pre-existing global OPERATOR/ADMIN grant; the UI explains this additive model before saving.
+- **F28-AC3** (B3) Disabling a user, revoking an app session, or changing local role/group mappings affects subsequent requests without trusting stale browser permissions. Removing Cognito group membership is reflected on a new verified provider token within the documented refresh bound, not claimed to be an immediate provider push.
+- **F28-AC4** (B1–B3) The management UI identifies grants by source/scope and distinguishes 401, 403, save conflicts and service failures. Canceling sends no mutation; policy changes produce redacted before/after audit entries.
+
+**External dependencies:** Central policy/identity store and verified Cognito group claims; the initial roles are VIEWER, OPERATOR and ADMIN, not a custom policy-language editor.
+
+### F29 — End-to-end Gateway authorization (planned M10)
+Every protected cluster request is authorized for its actual user, action and target, including requests made outside the UI.
+
+**Behaviors**
+- **F29-B1** User opens a permitted cluster or submits an action → the Console backend authenticates the session and forwards a target-bound user delegation; the Gateway independently obtains a current authorization decision before calling Kafka.
+- **F29-B2** User lacks permission or supplies a forged, expired, replayed or wrong-cluster delegation → the Gateway denies the request without calling the Kafka action; the UI explains the restriction instead of presenting it as an unavailable broker.
+- **F29-B3** Policy, delegation validation or required durable auditing is unavailable → the request fails closed with an explicit service error, with no fallback to a shared token or automatic write retry.
+
+**Acceptance criteria**
+- **F29-AC1** (B1) All current API actions, including metadata/messages/config reads and every F13/F14/F25/F26 write, have explicit action mappings. Unknown/new routes default to deny; only documented anonymous liveness/necessary preflight remain exempt.
+- **F29-AC2** (B2) Missing identity returns 401; authenticated but forbidden returns 403. Direct API tests, changed paths/body/cluster IDs, forged user/role headers, stale capabilities, shared tokens and the old automatic proxy cannot bypass authorization. Rejected requests make zero Kafka action calls.
+- **F29-AC3** (B1–B3) Roles are enforced identically for local and Cognito identities. Kafka credentials stay in their Gateway; a valid Console permission cannot override Kafka ACLs, sensitive/read-only configuration, validation or active-reassignment safeguards.
+- **F29-AC4** (B3) A policy/audit outage reports unavailability instead of a false permission denial or success. Logout or access revocation is respected on the next decision; a request already authorized/in flight is not promised to be canceled.
+
+**External dependencies:** An authenticated, verified-TLS Console/Gateway delegation and policy interface; exact trust and cutover contracts are in the planned technical spec.
+
+### F30 — Production classification and mutation guard (planned M10)
+Use a server-owned Production flag to require an effective ADMIN role for Kafka mutations only in Production.
+
+**Behaviors**
+- **F30-B1** A global ADMIN classifies a registered cluster → server policy records Production or non-Production with confirmation, a reason and an audit event; every cluster page/action displays the authoritative environment.
+- **F30-B2** A non-ADMIN tries a Kafka mutation in Production → both Console and Gateway deny it; permitted read-only investigation remains available.
+- **F30-B3** An ADMIN for the Production cluster confirms a supported mutation and supplies a reason → normal action permissions/validation still apply, and intent/outcome are audited.
+
+**Acceptance criteria**
+- **F30-AC1** (B1) Classification is persisted and cannot be changed through browser config, query parameters, a cluster display name, spoofed headers or a cluster-only ADMIN role. Existing clusters must be classified during migration; missing/unknown classification blocks writes rather than defaulting to non-Production.
+- **F30-AC2** (B2) Non-ADMIN Production requests to produce, create/delete topics, alter broker/topic settings, increase partitions or reassign replicas receive 403 and make zero Kafka write calls. Denials are audited; every future Kafka mutation must opt into the same guard.
+- **F30-AC3** (B2–B3) VIEWER is read-only everywhere. OPERATOR may perform supported writes in non-Production but cannot in Production. Cluster ADMIN only overrides the Production guard within its assigned cluster; global ADMIN covers all clusters.
+- **F30-AC4** (B3) ADMIN cannot bypass read-only/sensitive settings, Kafka ACLs, irreversible-operation warnings or confirmation. Canceling or omitting the Production change reason causes no write. Promoting a cluster to Production affects requests authorized after the classification commit; already in-flight operations remain visible in audit.
+
+**External dependencies:** F28 policy administration, F29 enforcement and F31 durable auditing. This feature classifies Console policy; it does not change broker configuration or deployment topology.
+
+### F31 — Security and operation audit trail (planned M10)
+Inspect who authenticated, changed access, attempted a protected action or requested a Kafka mutation, and what is known about its outcome.
+
+**Behaviors**
+- **F31-B1** A security event or Kafka mutation is attempted → the responsible backend/Gateway records correlated structured audit events with actor, authentication source, cluster/environment, action/resource, decision, time, reason and outcome.
+- **F31-B2** An authorized user opens Audit → they can filter by time, actor, cluster, action and outcome, inspect a correlated event timeline, and export only their authorized scope.
+- **F31-B3** A mutation outcome cannot be confirmed or an audit component fails → the UI reports uncertainty/unavailability explicitly; an audit failure never turns an accepted Kafka request into a definite failure or triggers a retry.
+
+**Acceptance criteria**
+- **F31-AC1** (B1) Successful/failed login, logout/revocation, account/role/group-mapping changes, environment changes, authorization denials and all Kafka mutation attempts/outcomes are recorded. Invalid anonymous attempts use an anonymous actor, not a fabricated username. Permitted read-only polling does not create per-poll audit noise in M10.
+- **F31-AC2** (B1) No Kafka mutation starts before a durable authorized intent is recorded. Events distinguish denied, validation-rejected, accepted, confirmed, failed-before-send and unknown; accepted is not completion. An incomplete intent after restart is surfaced as unresolved, never automatically replayed.
+- **F31-AC3** (B2) Global ADMIN can inspect global audit; cluster ADMIN can inspect only its cluster's operational audit, not global identity/security events. Audit reads/exports require backend authorization and are themselves audited; operators cannot alter/delete records through the application.
+- **F31-AC4** (B1–B3) Passwords, bearer/session/delegation tokens, message keys/values/headers and sensitive setting values never appear in audit or application logs. Sanitized metadata survives backend/Gateway restarts; retention, SQLite-consistent backup/restore, restricted file access and append-only application permissions are verified. SQLite has no database-user privilege separation, and an administrator or process with database-file access can alter the underlying storage.
+- **F31-AC5** (B3) Audit unavailability before dispatch blocks mutation. If Kafka may have accepted a request but the outcome cannot be durably appended, the client sees an unknown result with a correlation ID; the existing intent remains inspectable and operational alerts identify the persistence failure.
+
+**External dependencies:** Durable central audit storage with restricted file access and application-authorized reads/writes, server time and correlation IDs; retention/export policy and deployment provisioning remain discovery decisions.
