@@ -227,7 +227,7 @@ describe("TopicPage", () => {
 
     const alert = await screen.findByRole("alert");
     await userEvent.click(within(alert).getByRole("button", { name: "Retry" }));
-    expect(await screen.findByRole("table", { name: "Topic messages" })).toBeDefined();
+    expect(await screen.findByRole("region", { name: "Message results" })).toBeDefined();
     expect(listLatestTopicMessages).toHaveBeenCalledTimes(2);
   });
 
@@ -256,7 +256,7 @@ describe("TopicPage", () => {
     await user.type(screen.getByRole("spinbutton", { name: "Offset" }), "11");
     await user.click(screen.getByRole("button", { name: "Read messages" }));
 
-    expect(await screen.findByRole("table", { name: "Topic messages" })).toBeDefined();
+    expect(await screen.findByRole("region", { name: "Message results" })).toBeDefined();
     expect(screen.getByText("value")).toBeDefined();
     expect(listLatestTopicMessages).toHaveBeenLastCalledWith(gateway.url, "orders", { partition: 2, offset: 11 });
   });
@@ -278,7 +278,7 @@ describe("TopicPage", () => {
     await user.type(screen.getByRole("spinbutton", { name: "Timestamp (Unix milliseconds)" }), "1700000000123");
     await user.click(screen.getByRole("button", { name: "Read messages" }));
 
-    expect(await screen.findByRole("table", { name: "Topic messages" })).toBeDefined();
+    expect(await screen.findByRole("region", { name: "Message results" })).toBeDefined();
     expect(listLatestTopicMessages).toHaveBeenLastCalledWith(gateway.url, "orders", {
       partition: 1,
       timestamp: 1700000000123,

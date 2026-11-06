@@ -29,7 +29,7 @@ describe("SearchTopicMessages", () => {
 
     expect(await screen.findByText("Examined 500 records (limit: 500 offset positions).")).toBeDefined();
     expect(screen.getByText("Older offsets or partitions were excluded from this search.")).toBeDefined();
-    expect(screen.getByRole("table", { name: "Topic messages" })).toBeDefined();
+    expect(screen.getByRole("region", { name: "Message results" })).toBeDefined();
     expect(search).toHaveBeenCalledWith(gateway.url, "orders", "order");
   });
 
@@ -67,12 +67,12 @@ describe("SearchTopicMessages", () => {
     renderWithQuery(<SearchTopicMessages gateway={gateway} topicName="orders" searchTopicMessages={search} />);
     await user.type(screen.getByRole("searchbox", { name: "Search key or value" }), "x");
     await user.click(screen.getByRole("button", { name: "Search" }));
-    expect(await screen.findByRole("table", { name: "Topic messages" })).toBeDefined();
+    expect(await screen.findByRole("region", { name: "Message results" })).toBeDefined();
 
     await user.click(screen.getByRole("button", { name: "Search" }));
     const alert = await screen.findByRole("alert");
     expect(within(alert).getByText("offline")).toBeDefined();
-    expect(screen.queryByRole("table", { name: "Topic messages" })).toBeNull();
+    expect(screen.queryByRole("region", { name: "Message results" })).toBeNull();
     await user.click(within(alert).getByRole("button", { name: "Retry" }));
     expect(await screen.findByText("No matching messages.")).toBeDefined();
     expect(search).toHaveBeenCalledTimes(3);

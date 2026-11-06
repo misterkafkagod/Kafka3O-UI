@@ -1,0 +1,150 @@
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(14rem, 0.8fr) minmax(0, 1.5fr);
+  align-items: start;
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+
+.results,
+.inspector {
+  min-width: 0;
+  padding: 1rem;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 0.7rem;
+  background: var(--color-surface);
+}
+
+.resultHeading {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.25rem 0.75rem;
+}
+
+.resultHeading h4,
+.inspector h4,
+.payload h5 {
+  margin: 0;
+}
+
+.resultHeading p {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+}
+
+.resultList {
+  display: grid;
+  gap: 0.5rem;
+  max-height: 32rem;
+  margin: 0.75rem 0 0;
+  padding: 0.3rem;
+  overflow: auto;
+  list-style: none;
+}
+
+.workspace .resultButton {
+  display: grid;
+  gap: 0.2rem;
+  width: 100%;
+  min-width: 0;
+  padding: 0.7rem 0.8rem;
+  text-align: left;
+}
+
+.workspace .resultButton[aria-pressed="true"] {
+  border-color: var(--color-primary);
+  background: var(--color-surface-subtle);
+  box-shadow: inset 0.25rem 0 var(--color-primary);
+}
+
+.resultButton time {
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  font-weight: 400;
+}
+
+.metadata {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
+  gap: 0.6rem;
+  margin: 0.8rem 0 0;
+}
+
+.metadata > div {
+  min-width: 0;
+  padding: 0.65rem;
+  border-radius: 0.45rem;
+  background: var(--color-surface-subtle);
+}
+
+.metadata dt {
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.metadata dd {
+  margin: 0.25rem 0 0;
+  overflow-wrap: anywhere;
+}
+
+.payload {
+  margin-top: 1rem;
+}
+
+.payload h5 {
+  font-size: 0.95rem;
+}
+
+.payload pre {
+  max-height: 24rem;
+  margin: 0.5rem 0 0;
+  padding: 0.7rem;
+  overflow: auto;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 0.45rem;
+  background: var(--color-surface-subtle);
+}
+
+.payload p,
+.payload ul {
+  margin: 0.5rem 0 0;
+}
+
+.valueHeading {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.format {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.workspace .format select {
+  width: auto;
+}
+
+.link {
+  margin-top: 1rem;
+}
+
+@media (max-width: 48rem) {
+  .workspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .resultList {
+    max-height: 18rem;
+  }
+}

@@ -4,7 +4,7 @@ import { findLinkedTopicMessage } from "../messages/findLinkedTopicMessage";
 import type { MessageLinkContext } from "../messages/messageLink";
 import type { TopicMessageLinkPosition } from "../messages/topicMessageLinkPosition";
 import { ErrorWithRetry } from "./ErrorWithRetry";
-import { MessageTable } from "./MessageTable";
+import { MessageWorkspace } from "./MessageWorkspace";
 
 type LinkedTopicMessageProps = {
   position: TopicMessageLinkPosition;
@@ -34,5 +34,5 @@ export function LinkedTopicMessage({ position, gateway, messages, isError, error
   if (result.kind === "not-found") {
     return <p role="alert">No message is available at this partition and offset.</p>;
   }
-  return <MessageTable messages={[result.message]} messageLinks={messageLinks} />;
+  return <MessageWorkspace messages={[result.message]} messageLinks={messageLinks} />;
 }

@@ -5,7 +5,7 @@ import { useSearchTopicMessages } from "../hooks/useSearchTopicMessages";
 import { messageSearchSubmission } from "../messages/messageSearchSubmission";
 import type { MessageLinkContext } from "../messages/messageLink";
 import { ErrorWithRetry } from "./ErrorWithRetry";
-import { MessageTable } from "./MessageTable";
+import { MessageWorkspace } from "./MessageWorkspace";
 
 type SearchTopicMessagesProps = {
   gateway: GatewayEntry;
@@ -56,7 +56,7 @@ export function SearchTopicMessages({ gateway, topicName, searchTopicMessages, m
               ? "Older offsets or partitions were excluded from this search."
               : "No available offsets were excluded from this search."}
           </p>
-          {data.messages.length === 0 ? <p>No matching messages.</p> : <MessageTable messages={data.messages} messageLinks={messageLinks} />}
+          {data.messages.length === 0 ? <p>No matching messages.</p> : <MessageWorkspace messages={data.messages} messageLinks={messageLinks} />}
         </>
       )}
     </section>

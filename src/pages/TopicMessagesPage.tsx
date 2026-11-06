@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useSearchParams } from "react-router";
 import { ErrorWithRetry } from "../components/ErrorWithRetry";
-import { MessageTable } from "../components/MessageTable";
+import { MessageWorkspace } from "../components/MessageWorkspace";
 import { LinkedTopicMessage } from "../components/LinkedTopicMessage";
 import { ProduceTopicMessage } from "../components/ProduceTopicMessage";
 import { ReadTopicMessagesForm } from "../components/ReadTopicMessagesForm";
@@ -82,7 +82,7 @@ export function TopicMessagesPage({ gateway, topicName, listLatestTopicMessages,
               ) : messages.length === 0 ? (
                 <p>No messages found.</p>
               ) : (
-                <MessageTable messages={messages} messageLinks={messageLinks} />
+                <MessageWorkspace messages={messages} messageLinks={messageLinks} />
               )}
             </>
           )}
