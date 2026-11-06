@@ -40,13 +40,14 @@ export function ClusterPage({ loadGatewayConfig, getCluster, listTopics, listCon
       {view === "consumer-groups" ? (
         <ConsumerGroups gateway={gateway} listConsumerGroups={listConsumerGroups} />
       ) : view === "topics" ? (
-        <>
+        <main>
+          <h2>Topics</h2>
           <details>
             <summary>Create topic</summary>
             <CreateTopic key={gateway.id} gateway={gateway} createTopic={createTopic} />
           </details>
           <TopicList gateway={gateway} listTopics={listTopics} />
-        </>
+        </main>
       ) : (
         <ClusterDetails gateway={gateway} getCluster={getCluster} statusRefreshMs={statusRefreshMs} />
       )}

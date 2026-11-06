@@ -4,6 +4,7 @@ import type { LoadGatewayConfig } from "../config/loadGatewayConfig";
 import { findGatewayById } from "../config/findGatewayById";
 import type { GatewayCredentials } from "../gateway/GatewayCredentials";
 import { useGatewayConfig } from "../hooks/useGatewayConfig";
+import styles from "./AppShell.module.css";
 import { GatewayCredentialsPanel } from "./GatewayCredentialsPanel";
 
 type AppShellProps = {
@@ -44,7 +45,7 @@ export function AppShell({ children, loadGatewayConfig, credentials }: AppShellP
   }
 
   return (
-    <>
+    <div className={styles.shell}>
       <header>
         <h1>
           <Link to="/">Kafka3O</Link>
@@ -75,6 +76,6 @@ export function AppShell({ children, loadGatewayConfig, credentials }: AppShellP
         </nav>
       ) : null}
       {children}
-    </>
+    </div>
   );
 }

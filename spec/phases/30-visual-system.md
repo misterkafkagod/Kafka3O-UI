@@ -2,7 +2,7 @@
 - **Milestone:** M6
 - **Covers:** F19-AC1
 - **Discovery:** —
-- **Status:** Building
+- **Status:** Review
 
 ## Demo
 1. Open the updated manual-test UI in system light mode and system dark mode; inspect the cluster overview, a topic table, and the message view.
@@ -13,7 +13,7 @@
   - Files: `src/styles.css` (new), `src/main.tsx`
   - Do: Define light/dark theme tokens, system preference selection, typography and baseline normalization without adding theme persistence or a styling dependency.
   - Done when: `npm run build` passes and the built app follows both system color-scheme preferences.
-- [ ] **T30.2 Style the shared shell and page primitives** — Covers: F19-AC1
+- [x] **T30.2 Style the shared shell and page primitives** — Covers: F19-AC1
   - Files: `src/components/AppShell.module.css` (new), `src/components/AppShell.tsx` (from T28.1)
   - Do: Apply token-based, shell-scoped CSS Module styles for page surfaces, headings, tables, forms, actions and status indicators across existing routes; retain accessible names and text labels, with visible focus boundaries.
   - Done when: `npm test -- src/App.test.tsx` and `npm run build` pass; browser contrast measurements meet all three thresholds in both themes.

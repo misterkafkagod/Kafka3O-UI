@@ -157,6 +157,8 @@ describe("App", () => {
 
     await user.click(await screen.findByRole("link", { name: "Topics" }));
 
+    expect(screen.getByRole("main")).toBeDefined();
+    expect(screen.getByRole("heading", { name: "Topics", level: 2 })).toBeDefined();
     expect(await screen.findByRole("table", { name: "Topics" })).toBeDefined();
     expect(screen.getByText("orders")).toBeDefined();
   });

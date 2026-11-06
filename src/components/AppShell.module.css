@@ -1,0 +1,303 @@
+.shell {
+  min-height: 100vh;
+  padding: 1.25rem clamp(1rem, 3vw, 2.5rem) 2rem;
+  background: var(--color-canvas);
+  color: var(--color-text);
+}
+
+.shell a {
+  color: var(--color-link);
+  text-underline-offset: 0.18em;
+}
+
+.shell a:hover {
+  text-decoration-thickness: 0.12em;
+}
+
+.shell :global(:focus-visible) {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+.shell > :global(header) {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: min(100%, 76rem);
+  margin: 0 auto 1.25rem;
+  padding: 0.9rem 1.15rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.8rem;
+  background: var(--color-surface);
+  box-shadow: 0 0.25rem 0.9rem rgb(15 23 42 / 7%);
+}
+
+.shell > :global(header) h1 {
+  margin: 0;
+  font-size: clamp(1.4rem, 2.4vw, 1.8rem);
+  letter-spacing: -0.035em;
+}
+
+.shell > :global(header) h1 a {
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.shell > :global(header) > :global(nav) {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-right: auto;
+}
+
+.shell :global(nav[aria-label="Primary navigation"]),
+.shell :global(nav[aria-label="Cluster sections"]),
+.shell :global(nav[aria-label="Topic views"]) {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.shell :global(nav[aria-label="Primary navigation"] a),
+.shell :global(nav[aria-label="Cluster sections"] a),
+.shell :global(nav[aria-label="Topic views"] a) {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.5rem;
+  padding: 0.45rem 0.75rem;
+  border-radius: 0.5rem;
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.shell :global(nav[aria-label="Primary navigation"] a[aria-current="page"]),
+.shell :global(nav[aria-label="Primary navigation"] a[aria-current="location"]),
+.shell :global(nav[aria-label="Cluster sections"] a[aria-current="page"]),
+.shell :global(nav[aria-label="Topic views"] a[aria-current="page"]) {
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+}
+
+.shell > :global(nav[aria-label="Breadcrumb"]) {
+  width: min(100%, 76rem);
+  margin: 0 auto 1rem;
+  color: var(--color-text-muted);
+}
+
+.shell :global(nav[aria-label="Breadcrumb"] ol) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.shell :global(nav[aria-label="Breadcrumb"] li + li)::before {
+  content: "/";
+  margin-right: 0.4rem;
+  color: var(--color-text-muted);
+}
+
+.shell :global(nav[aria-label="Breadcrumb"] [aria-current="page"]) {
+  color: var(--color-text-muted);
+  font-weight: 650;
+}
+
+.shell > :global(nav[aria-label="Cluster sections"]),
+.shell > :global(nav[aria-label="Topic views"]) {
+  width: min(100%, 76rem);
+  margin: 1rem auto 0;
+}
+
+.shell > :global(main) {
+  width: min(100%, 76rem);
+  margin: 1.25rem auto 0;
+  padding: clamp(1rem, 2.5vw, 2rem);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 0.9rem;
+  background: var(--color-surface);
+  box-shadow: 0 0.25rem 1rem rgb(15 23 42 / 6%);
+}
+
+.shell > :global(main) h2 {
+  margin: 0 0 0.75rem;
+  font-size: clamp(1.3rem, 2vw, 1.65rem);
+  line-height: 1.3;
+}
+
+.shell > :global(main) h3 {
+  margin: 1.35rem 0 0.65rem;
+  font-size: 1.15rem;
+}
+
+.shell > :global(main) p {
+  line-height: 1.55;
+}
+
+.shell :global(section[aria-label="Search topics across clusters"]) {
+  margin-bottom: 1.25rem;
+  padding: 1rem;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 0.7rem;
+  background: var(--color-surface-subtle);
+}
+
+.shell :global(article[aria-label]) {
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 0.7rem;
+  background: var(--color-surface);
+}
+
+.shell :global(article[aria-label] h2) {
+  margin: 0 0 0.5rem;
+  font-size: 1.1rem;
+}
+
+.shell :global(table) {
+  width: 100%;
+  margin: 1rem 0;
+  border: 1px solid var(--color-border);
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 0.6rem;
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.shell :global(th),
+.shell :global(td) {
+  padding: 0.65rem 0.75rem;
+  border-bottom: 1px solid var(--color-border-subtle);
+  text-align: left;
+  vertical-align: top;
+}
+
+.shell :global(th) {
+  background: var(--color-surface-subtle);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.shell :global(tbody tr:nth-child(even)) {
+  background: var(--color-surface-subtle);
+}
+
+.shell :global(form) {
+  display: grid;
+  gap: 0.85rem;
+  margin: 1rem 0;
+}
+
+.shell :global(form label) {
+  display: grid;
+  grid-template-columns: minmax(8rem, 12rem) minmax(0, 1fr);
+  align-items: center;
+  gap: 0.75rem;
+  font-weight: 600;
+}
+
+.shell :global(fieldset) {
+  display: grid;
+  gap: 0.65rem;
+  padding: 0.9rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.6rem;
+}
+
+.shell :global(legend) {
+  padding: 0 0.35rem;
+  font-weight: 650;
+}
+
+.shell :global(input:not([type="checkbox"]):not([type="radio"])),
+.shell :global(select),
+.shell :global(textarea) {
+  width: 100%;
+  min-width: 0;
+  padding: 0.55rem 0.65rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.45rem;
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.shell :global(input[type="checkbox"]),
+.shell :global(input[type="radio"]) {
+  width: 1rem;
+  height: 1rem;
+  accent-color: var(--color-primary);
+}
+
+.shell :global(textarea) {
+  min-height: 7rem;
+  resize: vertical;
+}
+
+.shell :global(button),
+.shell :global(summary) {
+  min-height: 2.5rem;
+  padding: 0.5rem 0.8rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  font-weight: 650;
+}
+
+.shell :global(button) {
+  cursor: pointer;
+}
+
+.shell :global(button[type="submit"]) {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+}
+
+.shell :global(button:hover:not(:disabled)),
+.shell :global(summary:hover) {
+  border-color: var(--color-focus);
+}
+
+.shell :global(summary) {
+  cursor: pointer;
+}
+
+.shell > :global(details) {
+  width: min(100%, 76rem);
+  margin: 1rem auto;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.65rem;
+  background: var(--color-surface);
+}
+
+.shell > :global(p) {
+  width: min(100%, 76rem);
+  margin: 1rem auto;
+  line-height: 1.55;
+}
+
+.shell :global([role="alert"]) {
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--color-alert-text);
+  border-inline-start-width: 0.3rem;
+  border-radius: 0.55rem;
+  background: var(--color-alert-surface);
+  color: var(--color-alert-text);
+}
+
+.shell :global([role="alert"] p) {
+  margin: 0.2rem 0;
+}
+
+.shell :global([role="status"]) {
+  color: var(--color-text);
+  font-weight: 650;
+}
