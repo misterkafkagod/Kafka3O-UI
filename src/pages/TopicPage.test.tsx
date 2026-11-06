@@ -212,6 +212,22 @@ describe("TopicPage", () => {
     expect(listLatestTopicMessages).toHaveBeenCalledWith(gateway.url, "orders");
   });
 
+  it("selects read records without another request and keeps the gateway in the back link", async () => {
+    const encodedGateway = { ...gateway, id: "dev/west" };
+    const list = vi.fn<ListLatestTopicMessages>(async () => [
+      { partition: 0, offset: 1, timestamp: "2026-01-02T03:04:05Z", key: null, value: "Zmlyc3Q=", headers: [] },
+      { partition: 1, offset: 2, timestamp: "2026-01-02T03:04:06Z", key: null, value: "c2Vjb25k", headers: [] },
+    ]);
+    const user = userEvent.setup();
+    renderTopicPage(async () => [encodedGateway], async () => ({ name: "orders", partitions: [], config: [] }), list, "messages", undefined, "/clusters/dev%2Fwest/topics/orders/messages");
+
+    expect(await screen.findByRole("region", { name: "Message read controls" })).toBeDefined();
+    expect((await screen.findByRole("link", { name: "Back to topics" })).getAttribute("href")).toBe("/clusters/dev%2Fwest/topics");
+    await user.click(await screen.findByRole("button", { name: "Inspect record 2, partition 1, offset 2" }));
+    expect(within(screen.getByRole("region", { name: "Selected message" })).getByText("second")).toBeDefined();
+    expect(list).toHaveBeenCalledTimes(1);
+  });
+
   it("shows an error with Retry and reloads latest messages", async () => {
     let failed = false;
     const listLatestTopicMessages = vi.fn(async () => {

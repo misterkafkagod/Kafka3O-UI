@@ -14,6 +14,7 @@ import type { GatewayEntry, TopicMessagePosition } from "../gateway/types";
 import { useLatestTopicMessages } from "../hooks/useLatestTopicMessages";
 import type { MessageLinkContext } from "../messages/messageLink";
 import { topicMessageLinkPosition } from "../messages/topicMessageLinkPosition";
+import styles from "./TopicMessagesPage.module.css";
 
 type TopicMessagesPageProps = {
   gateway: GatewayEntry;
@@ -39,14 +40,19 @@ export function TopicMessagesPage({ gateway, topicName, listLatestTopicMessages,
   );
   return (
     <main>
-      <Link to={`/clusters/${gateway.id}/topics`}>Back to topics</Link>
+      <Link to={`/clusters/${encodeURIComponent(gateway.id)}/topics`}>Back to topics</Link>
       <TopicTabs gateway={gateway} topicName={topicName} />
-      <h2>{topicName}</h2>
+      <header className={styles.heading}>
+        <div>
+          <h2>{topicName}</h2>
+          <p>Read and inspect messages for this topic.</p>
+        </div>
+        <details className={styles.produce}>
+          <summary>Produce message</summary>
+          <ProduceTopicMessage key={JSON.stringify([gateway.id, topicName])} gateway={gateway} topicName={topicName} produceTopicMessage={produceTopicMessage} />
+        </details>
+      </header>
       <h3>Messages</h3>
-      <details>
-        <summary>Produce message</summary>
-        <ProduceTopicMessage key={JSON.stringify([gateway.id, topicName])} gateway={gateway} topicName={topicName} produceTopicMessage={produceTopicMessage} />
-      </details>
       {linkPosition.kind !== "none" ? (
         <>
           <Link to={`/clusters/${encodeURIComponent(gateway.id)}/topics/${encodeURIComponent(topicName)}/messages`}>Back to message reads</Link>
@@ -67,14 +73,19 @@ export function TopicMessagesPage({ gateway, topicName, listLatestTopicMessages,
         </>
       ) : (
         <>
-          <button type="button" onClick={() => setSearching((current) => !current)}>
-            {searching ? "Back to message reads" : "Search messages"}
-          </button>
+          <div className={styles.mode}>
+            <p>{searching ? "Search recent messages by key or value." : "Read the latest messages or choose a starting position."}</p>
+            <button type="button" onClick={() => setSearching((current) => !current)}>
+              {searching ? "Back to message reads" : "Search messages"}
+            </button>
+          </div>
           {searching ? (
             <SearchTopicMessages gateway={gateway} topicName={topicName} searchTopicMessages={searchTopicMessages} messageLinks={messageLinks} />
           ) : (
             <>
-              <ReadTopicMessagesForm onRead={setPosition} onReadLatest={() => setPosition(undefined)} />
+              <section aria-label="Message read controls" className={styles.readControls}>
+                <ReadTopicMessagesForm onRead={setPosition} onReadLatest={() => setPosition(undefined)} />
+              </section>
               {isError ? (
                 <ErrorWithRetry error={error} gateway={gateway} onRetry={() => void refetch()} />
               ) : messages === undefined ? (

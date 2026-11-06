@@ -150,7 +150,7 @@ The console should be comfortable for dense technical data, easy to navigate, an
     - Demo: open a healthy cluster and a failed cluster; compare the factual summary, broker table and recoverable error.
   - **P37** F21-B3 · Browse topics, partitions and configuration — Covers: F21-AC3 · Discovery: — · Status: Done
     - Demo: filter topics, open an encoded topic name and inspect its partitions and hidden sensitive configuration.
-  - **P38** F22-B1 · Select and inspect message read results — Covers: F22-AC1 · Discovery: — · Status: Building
+  - **P38** F22-B1 · Select and inspect message read results — Covers: F22-AC1 · Discovery: — · Status: Review
     - Demo: read several records, select each by keyboard and inspect its position, payload formats and headers.
   - **P39** F22-B2 · Inspect bounded message search results — Covers: F22-AC2 · Discovery: — · Status: Planned
     - Demo: search messages, select a match and verify the scanned count, truncation notice and retry behavior.
