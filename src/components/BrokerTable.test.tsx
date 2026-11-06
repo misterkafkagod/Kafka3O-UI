@@ -19,6 +19,8 @@ describe("BrokerTable", () => {
       />,
     );
 
+    const region = screen.getByRole("region", { name: "Brokers table scroll area" });
+    expect(within(region).getByRole("table", { name: "Brokers" })).toBeDefined();
     expect(bodyRows().map((cells) => cells[0])).toEqual(["1", "2", "3"]);
     expect(bodyRows()[1][1]).toBe("kafka-2:9093");
   });

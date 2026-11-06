@@ -19,6 +19,8 @@ describe("TopicTable", () => {
       </MemoryRouter>,
     );
 
+    const region = screen.getByRole("region", { name: "Topics table scroll area" });
+    expect(within(region).getByRole("table", { name: "Topics" })).toBeDefined();
     const headers = screen.getAllByRole("columnheader").map((h) => h.textContent);
     expect(headers).toEqual(["Name", "Partitions", "Replication", "Messages"]);
     expect(bodyRows()).toEqual([["orders", "6", "3", "~1000"]]);

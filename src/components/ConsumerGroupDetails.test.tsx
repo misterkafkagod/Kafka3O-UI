@@ -22,8 +22,10 @@ describe("ConsumerGroupDetails", () => {
     renderWithQuery(<ConsumerGroupDetails group={group} onRetry={() => {}} />);
 
     expect(screen.getByText("State: Stable · Protocol: classic")).toBeDefined();
-    expect(within(screen.getByRole("table", { name: "Members of orders-group" })).getByText("instance-1")).toBeDefined();
-    const table = screen.getByRole("table", { name: "Partition lag for orders-group" });
+    const members = screen.getByRole("region", { name: "Members of orders-group table scroll area" });
+    expect(within(within(members).getByRole("table", { name: "Members of orders-group" })).getByText("instance-1")).toBeDefined();
+    const lag = screen.getByRole("region", { name: "Partition lag for orders-group table scroll area" });
+    const table = within(lag).getByRole("table", { name: "Partition lag for orders-group" });
     const [, body] = within(table).getAllByRole("rowgroup");
     const rows = within(body).getAllByRole("row").map((row) =>
       within(row).getAllByRole("cell").map((cell) => cell.textContent),

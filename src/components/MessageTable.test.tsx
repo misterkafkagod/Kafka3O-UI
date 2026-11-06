@@ -20,7 +20,8 @@ describe("MessageTable", () => {
   it("renders message metadata, text values, headers, and empty values", () => {
     render(<MessageTable messages={messages} />);
 
-    const table = within(screen.getByRole("table", { name: "Topic messages" }));
+    const region = screen.getByRole("region", { name: "Topic messages table scroll area" });
+    const table = within(within(region).getByRole("table", { name: "Topic messages" }));
     const rows = table.getAllByRole("row");
     expect(rows[0].textContent).toContain("Value");
     expect(within(rows[1]).getByText("2")).toBeDefined();

@@ -26,14 +26,16 @@ describe("TopicDetailPage", () => {
     renderWithQuery(<TopicDetailPage gateway={gateway} topicName="orders" getTopicDetail={async () => detail} deleteTopic={deleteTopic} confirmTopicDeletion={confirmTopicDeletion} />);
 
     expect(await screen.findByRole("heading", { name: "orders" })).toBeDefined();
-    const partitions = within(screen.getByRole("table", { name: "Topic partitions" }));
+    const partitionRegion = screen.getByRole("region", { name: "Topic partitions table scroll area" });
+    const partitions = within(within(partitionRegion).getByRole("table", { name: "Topic partitions" }));
     const rows = partitions.getAllByRole("row").slice(1);
     expect(rows.map((row) => within(row).getAllByRole("cell").map((cell) => cell.textContent))).toEqual([
       ["0", "1", "1, 2", "1", "3", "9"],
       ["1", "2", "2, 1", "2, 1", "0", "5"],
     ]);
 
-    const config = within(screen.getByRole("table", { name: "Topic configuration" }));
+    const configRegion = screen.getByRole("region", { name: "Topic configuration table scroll area" });
+    const config = within(within(configRegion).getByRole("table", { name: "Topic configuration" }));
     expect(config.getByText("compact")).toBeDefined();
     expect(config.getByText("Sensitive value hidden")).toBeDefined();
     expect(config.queryByText("must-not-leak")).toBeNull();

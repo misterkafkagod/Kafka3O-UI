@@ -13,8 +13,8 @@
   - Files: `src/components/ScrollableTableRegion.tsx` (new), `src/components/ScrollableTableRegion.module.css` (new), `src/components/ScrollableTableRegion.test.tsx` (new)
   - Do: Create one reusable, labeled and keyboard-focusable region that contains horizontal overflow without changing table semantics.
   - Done when: `npm test -- src/components/ScrollableTableRegion.test.tsx` passes, confirming the region's accessible name and contained table.
-- [ ] **T31.2 Contain overflow for every existing data table** — Covers: F19-AC2
-  - Files: `src/components/BrokerTable.tsx`, `src/components/TopicTable.tsx`, `src/components/MessageTable.tsx`, `src/components/ConsumerGroupDetails.tsx`, `src/pages/TopicDetailPage.tsx`, `src/components/ConsumerGroupDetails.test.tsx` (new)
+- [x] **T31.2 Contain overflow for every existing data table** — Covers: F19-AC2
+  - Files: `src/components/BrokerTable.tsx`, `src/components/TopicTable.tsx`, `src/components/MessageTable.tsx`, `src/components/ConsumerGroupDetails.tsx`, `src/pages/TopicDetailPage.tsx`, and their existing tests
   - Do: Wrap each broker, topic, message, consumer-group and topic-detail table in the shared region; verify the consumer-group tables retain their accessible names and content.
   - Done when: `npm test -- src/components/ScrollableTableRegion.test.tsx src/components/BrokerTable.test.tsx src/components/TopicTable.test.tsx src/components/MessageTable.test.tsx src/components/ConsumerGroupDetails.test.tsx src/pages/TopicDetailPage.test.tsx` passes and `npm run build` passes.
 - [ ] **T31.3 Add responsive shell, skip navigation and keyboard focus support** — Covers: F19-AC2
