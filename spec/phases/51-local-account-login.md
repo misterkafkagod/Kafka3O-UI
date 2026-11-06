@@ -2,7 +2,7 @@
 - **Milestone:** M10
 - **Covers:** F27-AC1 and the local-account portion of F27-AC4
 - **Discovery:** —
-- **Status:** Review
+- **Status:** Done
 
 ## Existing baseline
 The Gateway already provides the tested offline bootstrap, local
@@ -40,3 +40,23 @@ security boundary.
   - Done when: the real HTTPS fixture and the full Gateway and UI test suites pass; record any unavailable manual-browser or deployment checks as not run.
 
 ## Review
+- **Demo (2026-11-06):** Console tests passed one-use bootstrap, local login,
+  mandatory password replacement, disabled-account rejection and logout.
+  The built preview completed denied and successful login, password
+  replacement and logout against the real loopback HTTPS API. The fixture
+  verified the test CA and hostname, rejected an untrusted CA and wrong
+  hostname, and observed no legacy Gateway requests, including when both
+  preview and manual-proxy build flags were enabled.
+- **Regression:** the full Gateway suite, Console race tests and `go vet`
+  passed. The full UI suite passed 373 tests with the opt-in integration test
+  skipped; that integration test passed separately. Preview and default
+  builds passed. The existing manual UI returned HTTP 200; the EKS-D node,
+  both Kafka pods, manual pod and both persistent volumes remained healthy.
+- **Not run:** a native browser was not connected to the isolated HTTPS
+  fixture, so native certificate trust and cookie behavior are not verified.
+  The preview and secured Console were not deployed to EKS-D.
+- **Vulnerability scan:** not required for this phase; no dependency
+  manifests changed.
+- **Notes:** jsdom and the verified Node HTTPS transport provide a real API
+  integration check, not evidence of native-browser security or Gateway
+  authorization. SSO, recovery and the secured Kafka path remain later work.
