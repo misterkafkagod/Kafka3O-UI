@@ -206,6 +206,25 @@ is linked to a local account by email.
     and logout, bounded batches, restart, audit/commit failure, clock and
     cancellation, and worker scheduling/error/shutdown behavior; focused
     cleanup tests and `go test ./...` pass.
+- [x] **T53.3j Resolve configured Cognito group grants** — Covers: foundation of F27-AC2, F27-AC4
+  - Files: Gateway `internal/console/storage/` migration and session-grant
+    actions/tests, `internal/console/session/` grant-resolution action/tests,
+    `internal/console/cognito/` provider-binding checks, Gateway
+    `internal/console/README.md`, `spec/TECH-SPEC.md`, `spec/ROADMAP.md`.
+  - Do: Add an initially empty server-owned mapping of exact issuer and
+    case-sensitive verified group names to global or per-cluster roles.
+    Resolve only current session-bound verified claims, combining matching
+    mappings with direct grants additively. Recheck session, account,
+    provider/key binding, pending refresh, claim freshness and current
+    mappings in one transaction; never return stale claims or group names.
+    Local sessions use direct grants only. Do not expose mapping changes or
+    secured Kafka access here; their audited administration and independent
+    enforcement remain P54/P55.
+  - Done when: tests cover migration/restart, unmapped, case/prefix/issuer
+    mismatches, additive global/scoped roles, current mapping changes,
+    verified group refresh, local isolation, stale/pending/disabled/revoked
+    sessions, changed keys, exact deadlines, queued work, malformed state
+    and operational failure; focused Cognito tests and `go test ./...` pass.
 - [ ] **T53.3 Issue and refresh Cognito application sessions** — Covers: F27-AC2, F27-AC4
   - Files: Gateway `internal/console/cognito/` (new exchange/refresh
     actions/tests), `internal/console/session/` and
