@@ -57,6 +57,17 @@ function HistoryControls() {
 }
 
 describe("App", () => {
+  it("offers a keyboard skip link to the page content", async () => {
+    const user = userEvent.setup();
+    renderApp();
+
+    const skip = screen.getByRole("link", { name: "Skip to main content" });
+    expect(skip.getAttribute("href")).toBe("#main-content");
+    expect(document.getElementById("main-content")?.getAttribute("tabindex")).toBe("-1");
+    await user.tab();
+    expect(document.activeElement).toBe(skip);
+  });
+
   it("renders the Kafka3O header", () => {
     renderApp();
 

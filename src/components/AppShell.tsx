@@ -46,6 +46,7 @@ export function AppShell({ children, loadGatewayConfig, credentials }: AppShellP
 
   return (
     <div className={styles.shell}>
+      <a className={styles.skipLink} href="#main-content">Skip to main content</a>
       <header>
         <h1>
           <Link to="/">Kafka3O</Link>
@@ -75,7 +76,9 @@ export function AppShell({ children, loadGatewayConfig, credentials }: AppShellP
           </ol>
         </nav>
       ) : null}
-      {children}
+      <div id="main-content" className={styles.content} tabIndex={-1}>
+        {children}
+      </div>
     </div>
   );
 }
