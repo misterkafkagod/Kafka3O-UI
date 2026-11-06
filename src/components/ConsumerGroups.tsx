@@ -2,6 +2,7 @@ import type { ListConsumerGroups } from "../gateway/listConsumerGroups";
 import type { GatewayEntry } from "../gateway/types";
 import { useConsumerGroups } from "../hooks/useConsumerGroups";
 import { ConsumerGroupDetails } from "./ConsumerGroupDetails";
+import { ConsumerGroupSummary } from "./ConsumerGroupSummary";
 import { ErrorWithRetry } from "./ErrorWithRetry";
 
 type ConsumerGroupsProps = {
@@ -22,7 +23,10 @@ export function ConsumerGroups({ gateway, listConsumerGroups }: ConsumerGroupsPr
       ) : groups.length === 0 ? (
         <p>No consumer groups.</p>
       ) : (
-        groups.map((group) => <ConsumerGroupDetails key={group.id} group={group} onRetry={() => void refetch()} />)
+        <>
+          <ConsumerGroupSummary groups={groups} />
+          {groups.map((group) => <ConsumerGroupDetails key={group.id} group={group} onRetry={() => void refetch()} />)}
+        </>
       )}
     </main>
   );

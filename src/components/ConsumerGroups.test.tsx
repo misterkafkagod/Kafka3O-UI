@@ -50,4 +50,17 @@ describe("ConsumerGroups", () => {
     expect(await screen.findByText("No active members.")).toBeDefined();
     expect(screen.queryByRole("alert")).toBeNull();
   });
+
+  it("connects a group's summary link to its existing details without another fetch", async () => {
+    const named = { ...group, id: "reader & west/1" };
+    const list = vi.fn(async () => [named]);
+    renderWithQuery(<ConsumerGroups gateway={gateway} listConsumerGroups={list} />);
+
+    const summary = await screen.findByRole("navigation", { name: "Consumer group summary" });
+    const link = within(summary).getByRole("link", { name: named.id });
+    const details = screen.getByRole("region", { name: `Consumer group ${named.id}` });
+    expect(decodeURIComponent(link.getAttribute("href")!.slice(1))).toBe(details.id);
+    expect(within(details).getByText("No active members.")).toBeDefined();
+    expect(list).toHaveBeenCalledOnce();
+  });
 });

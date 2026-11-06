@@ -1,6 +1,8 @@
 import type { ConsumerGroup } from "../gateway/types";
+import { consumerGroupAnchor } from "../groups/consumerGroupAnchor";
 import { consumerLagStatusLabel } from "../groups/consumerLagStatusLabel";
 import { ScrollableTableRegion } from "./ScrollableTableRegion";
+import styles from "./ConsumerGroupDetails.module.css";
 
 type ConsumerGroupDetailsProps = {
   group: ConsumerGroup;
@@ -9,7 +11,7 @@ type ConsumerGroupDetailsProps = {
 
 export function ConsumerGroupDetails({ group, onRetry }: ConsumerGroupDetailsProps) {
   return (
-    <section aria-label={`Consumer group ${group.id}`}>
+    <section id={consumerGroupAnchor(group.id)} tabIndex={-1} aria-label={`Consumer group ${group.id}`} className={styles.detail}>
       <h3>{group.id}</h3>
       <p>State: {group.state || "Unknown"} · Protocol: {group.protocol}</p>
       {group.error ? (
