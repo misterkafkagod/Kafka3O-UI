@@ -22,6 +22,12 @@ const detail: TopicDetail = {
 };
 
 describe("TopicDetailPage", () => {
+  it("announces topic loading", () => {
+    renderWithQuery(<TopicDetailPage gateway={gateway} topicName="orders" getTopicDetail={() => new Promise<never>(() => {})} deleteTopic={deleteTopic} confirmTopicDeletion={confirmTopicDeletion} />);
+
+    expect(screen.getByRole("status").textContent).toBe("Loading topic…");
+  });
+
   it("shows partition metadata and topic config without exposing sensitive values", async () => {
     renderWithQuery(<TopicDetailPage gateway={gateway} topicName="orders" getTopicDetail={async () => detail} deleteTopic={deleteTopic} confirmTopicDeletion={confirmTopicDeletion} />);
 

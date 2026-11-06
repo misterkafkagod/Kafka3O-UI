@@ -1,5 +1,6 @@
 import { Link, useParams } from "react-router";
 import { ClusterNotFound } from "../components/ClusterNotFound";
+import { GatewayConfigError } from "../components/GatewayConfigError";
 import { TopicConsumerGroups } from "../components/TopicConsumerGroups";
 import { findGatewayById } from "../config/findGatewayById";
 import type { LoadGatewayConfig } from "../config/loadGatewayConfig";
@@ -29,10 +30,13 @@ type TopicPageProps = {
 
 export function TopicPage({ loadGatewayConfig, getTopicDetail, listConsumerGroups, listLatestTopicMessages, searchTopicMessages, produceTopicMessage, deleteTopic, confirmTopicDeletion, linkOrigin, copyMessageLink, view = "details" }: TopicPageProps) {
   const { gatewayId, topicName } = useParams();
-  const { data: gateways } = useGatewayConfig(loadGatewayConfig);
+  const { data: gateways, isError, refetch } = useGatewayConfig(loadGatewayConfig);
 
+  if (isError) {
+    return <GatewayConfigError onRetry={() => void refetch()} />;
+  }
   if (gateways === undefined) {
-    return <p>Loading…</p>;
+    return <main><p role="status">Loading…</p></main>;
   }
   const gateway = findGatewayById(gateways, gatewayId);
   if (gateway === undefined) {

@@ -22,7 +22,7 @@ export function TopicList({ gateway, listTopics }: TopicListProps) {
     return <ErrorWithRetry error={error} onRetry={() => void refetch()} />;
   }
   if (topics === undefined) {
-    return <p>Loading topics…</p>;
+    return <p role="status">Loading topics…</p>;
   }
   const available = filterTopics(topics, { showInternal, text: "" });
   const visible = filterTopics(topics, { showInternal, text }).sort(compareTopicsByName);

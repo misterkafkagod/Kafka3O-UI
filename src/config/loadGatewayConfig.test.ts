@@ -27,10 +27,16 @@ describe("loadGatewayConfig", () => {
     await expect(loadGatewayConfig(realFetchJson)).resolves.toEqual([]);
   });
 
-  it("returns an empty list on a network error", async () => {
+  it("propagates a network error rather than reporting no gateways", async () => {
     server.use(http.get("/config.json", () => HttpResponse.error()));
 
-    await expect(loadGatewayConfig(realFetchJson)).resolves.toEqual([]);
+    await expect(loadGatewayConfig(realFetchJson)).rejects.toThrow();
+  });
+
+  it("propagates a server error rather than reporting no gateways", async () => {
+    server.use(http.get("/config.json", () => new HttpResponse(null, { status: 503 })));
+
+    await expect(loadGatewayConfig(realFetchJson)).rejects.toMatchObject({ status: 503 });
   });
 
   it("returns an empty list when the config is invalid", async () => {

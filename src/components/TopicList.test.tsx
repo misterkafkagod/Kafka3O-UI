@@ -18,7 +18,7 @@ describe("TopicList", () => {
   it("shows Loading topics… while the list loads", () => {
     renderWithQuery(<TopicList gateway={gateway} listTopics={() => new Promise(() => {})} />);
 
-    expect(screen.getByText("Loading topics…")).toBeDefined();
+    expect(screen.getByRole("status").textContent).toBe("Loading topics…");
   });
 
   it("shows the topics sorted by name", async () => {

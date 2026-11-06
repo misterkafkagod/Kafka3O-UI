@@ -4,6 +4,7 @@ import { ClusterNotFound } from "../components/ClusterNotFound";
 import { ClusterTabs } from "../components/ClusterTabs";
 import { ConsumerGroups } from "../components/ConsumerGroups";
 import { CreateTopic } from "../components/CreateTopic";
+import { GatewayConfigError } from "../components/GatewayConfigError";
 import { TopicList } from "../components/TopicList";
 import { findGatewayById } from "../config/findGatewayById";
 import type { LoadGatewayConfig } from "../config/loadGatewayConfig";
@@ -25,10 +26,13 @@ type ClusterPageProps = {
 
 export function ClusterPage({ loadGatewayConfig, getCluster, listTopics, listConsumerGroups, createTopic, statusRefreshMs, view }: ClusterPageProps) {
   const { gatewayId } = useParams();
-  const { data: gateways } = useGatewayConfig(loadGatewayConfig);
+  const { data: gateways, isError, refetch } = useGatewayConfig(loadGatewayConfig);
 
+  if (isError) {
+    return <GatewayConfigError onRetry={() => void refetch()} />;
+  }
   if (gateways === undefined) {
-    return <p>Loading…</p>;
+    return <main><p role="status">Loading…</p></main>;
   }
   const gateway = findGatewayById(gateways, gatewayId);
   if (gateway === undefined) {

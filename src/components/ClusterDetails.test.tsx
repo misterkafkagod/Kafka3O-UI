@@ -10,7 +10,7 @@ describe("ClusterDetails", () => {
     renderWithQuery(<ClusterDetails gateway={gateway} statusRefreshMs={60_000} getCluster={() => new Promise(() => {})} />);
 
     expect(screen.getByRole("heading", { name: "Dev" })).toBeDefined();
-    expect(screen.getByText("Checking…")).toBeDefined();
+    expect(screen.getByRole("status").textContent).toBe("Checking…");
   });
 
   it("shows the cluster ID, controller and broker table", async () => {

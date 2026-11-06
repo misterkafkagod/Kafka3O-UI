@@ -30,10 +30,10 @@ export function TopicDetailPage({ gateway, topicName, getTopicDetail, deleteTopi
         </main>
       );
     }
-    return <ErrorWithRetry error={error} onRetry={() => void refetch()} />;
+    return <main><ErrorWithRetry error={error} onRetry={() => void refetch()} /></main>;
   }
   if (detail === undefined) {
-    return <p>Loading topic…</p>;
+    return <main><p role="status">Loading topic…</p></main>;
   }
   return (
     <main>

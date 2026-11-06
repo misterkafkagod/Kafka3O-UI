@@ -1,5 +1,6 @@
 import { ClusterCard } from "../components/ClusterCard";
 import { CrossClusterTopicSearch } from "../components/CrossClusterTopicSearch";
+import { GatewayConfigError } from "../components/GatewayConfigError";
 import { NoGatewaysConfigured } from "../components/NoGatewaysConfigured";
 import type { LoadGatewayConfig } from "../config/loadGatewayConfig";
 import type { GetCluster } from "../gateway/getCluster";
@@ -14,10 +15,13 @@ type ClustersPageProps = {
 };
 
 export function ClustersPage({ loadGatewayConfig, getCluster, listTopics, statusRefreshMs }: ClustersPageProps) {
-  const { data: gateways } = useGatewayConfig(loadGatewayConfig);
+  const { data: gateways, isError, refetch } = useGatewayConfig(loadGatewayConfig);
 
+  if (isError) {
+    return <GatewayConfigError onRetry={() => void refetch()} />;
+  }
   if (gateways === undefined) {
-    return <p>Loading…</p>;
+    return <main><p role="status">Loading…</p></main>;
   }
   if (gateways.length === 0) {
     return <NoGatewaysConfigured />;

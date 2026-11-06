@@ -43,6 +43,22 @@ function renderTopicPage(
 }
 
 describe("TopicPage", () => {
+  it("announces configuration loading", () => {
+    renderTopicPage(() => new Promise<never>(() => {}), async () => ({ name: "orders", partitions: [], config: [] }));
+
+    expect(screen.getByRole("status").textContent).toBe("Loading…");
+  });
+
+  it("offers configuration retry on topic routes", async () => {
+    const load = vi.fn<LoadGatewayConfig>().mockRejectedValueOnce(new TypeError("Failed to fetch")).mockResolvedValueOnce([gateway]);
+    renderTopicPage(load, async () => ({ name: "orders", partitions: [], config: [] }));
+
+    const alert = await screen.findByRole("alert");
+    expect(within(alert).getByText("Gateway configuration unavailable")).toBeDefined();
+    await userEvent.click(within(alert).getByRole("button", { name: "Retry" }));
+    expect(await screen.findByRole("heading", { name: "orders" })).toBeDefined();
+  });
+
   it("opens message search and forwards the selected gateway and topic", async () => {
     const search = vi.fn<SearchTopicMessages>(async () => ({ messages: [], scanned: 0, truncated: false }));
     const user = userEvent.setup();

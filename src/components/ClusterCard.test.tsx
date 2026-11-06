@@ -31,7 +31,7 @@ describe("ClusterCard", () => {
   it("shows Checking… while the status loads", () => {
     renderWithQuery(<ClusterCard gateway={gateway} statusRefreshMs={60_000} getCluster={() => new Promise(() => {})} />);
 
-    expect(screen.getByText("Checking…")).toBeDefined();
+    expect(screen.getByRole("status").textContent).toBe("Checking…");
   });
 
   it("shows Healthy, the cluster ID and the broker count", async () => {

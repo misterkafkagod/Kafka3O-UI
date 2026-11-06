@@ -49,7 +49,7 @@ export function ClusterCard({ gateway, getCluster, statusRefreshMs }: ClusterCar
           <p>{cluster.brokers.length === 1 ? "1 broker" : `${cluster.brokers.length} brokers`}</p>
         </>
       ) : (
-        <p>Checking…</p>
+        <p role="status">Checking…</p>
       )}
     </article>
   );

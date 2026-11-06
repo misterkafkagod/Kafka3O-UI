@@ -132,7 +132,7 @@ The console should be comfortable for dense technical data, easy to navigate, an
     - Demo: check representative pages in light and dark themes; verify contrast, accessible control names and text-based statuses.
   - **P31** F19-B2 · Keep pages usable across viewports and input modes — Covers: F19-AC2 · Discovery: — · Status: Done
     - Demo: check 320, 768 and 1440 CSS-pixel widths and 200% zoom; navigate by keyboard and verify skip navigation, focus, contained table overflow and reduced motion.
-  - **P32** F19-B3 · Show truthful loading, empty, error and partial-result states — Covers: F19-AC3 · Discovery: — · Status: Planned
+  - **P32** F19-B3 · Show truthful loading, empty, error and partial-result states — Covers: F19-AC3 · Discovery: — · Status: Building
     - Demo: with two gateway fixtures, exercise loading, empty, no-match and failure states plus one healthy and one failed gateway; verify no false zero or healthy status.
   - **P33** F20-B1 + F20-B2 · Manage gateway credentials in an accessible connection panel — Covers: F20-AC1, F20-AC2 · Discovery: — · Status: Planned
     - Demo: open the panel from the shell and an authentication prompt; add or remove one of two tokens and verify focus behavior, session isolation and cache refresh.

@@ -37,6 +37,26 @@ function renderClusterPage(route: string, props = pageProps) {
 }
 
 describe("ClusterPage", () => {
+  it("announces configuration loading", () => {
+    renderClusterPage("/clusters/dev", { ...pageProps, loadGatewayConfig: () => new Promise<never>(() => {}) });
+
+    expect(screen.getByRole("status").textContent).toBe("Loading…");
+  });
+
+  it("offers a retry when gateway configuration cannot be loaded", async () => {
+    server.use(http.get("/config.json", () => HttpResponse.error()));
+    renderClusterPage("/clusters/dev");
+
+    const alert = await screen.findByRole("alert");
+    expect(within(alert).getByText("Gateway configuration unavailable")).toBeDefined();
+    server.use(
+      http.get("/config.json", () => HttpResponse.json({ gateways: [dev] })),
+      http.get("http://localhost:8081/api/v1/cluster", () => HttpResponse.json({ clusterId: "abc", controllerId: 1, brokers: [] })),
+    );
+    await userEvent.click(within(alert).getByRole("button", { name: "Retry" }));
+    expect(await screen.findByText("Controller: 1")).toBeDefined();
+  });
+
   it("refreshes the topic list after creation", async () => {
     const user = userEvent.setup();
     let created = false;

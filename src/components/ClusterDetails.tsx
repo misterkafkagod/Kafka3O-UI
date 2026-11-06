@@ -21,7 +21,7 @@ export function ClusterDetails({ gateway, getCluster, statusRefreshMs }: Cluster
       {isError ? (
         <ErrorWithRetry error={error} onRetry={() => void refetch()} />
       ) : isPending ? (
-        <p>Checking…</p>
+        <p role="status">Checking…</p>
       ) : cluster ? (
         <>
           <p>Cluster ID: {cluster.clusterId}</p>
