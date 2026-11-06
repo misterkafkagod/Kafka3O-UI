@@ -36,6 +36,7 @@ describe("GatewayCredentialForm", () => {
     expect(values.get(gateway.url)).toBe(validToken);
     expect((screen.getByLabelText("Token for Dev") as HTMLInputElement).value).toBe("");
     expect(document.body.textContent).not.toContain(validToken);
+    expect(window.location.href).not.toContain(validToken);
     await waitFor(() => expect(client.getQueryData(["gateway", "dev", "topics"])).toBeUndefined());
     expect(client.getQueryData(["gateway", "alias", "cluster"])).toBeUndefined();
 

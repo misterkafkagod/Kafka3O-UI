@@ -1,5 +1,5 @@
 import { QueryClient } from "@tanstack/react-query";
-import { render, screen, within } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, useNavigate } from "react-router";
 import { describe, expect, it, vi } from "vitest";
@@ -76,6 +76,93 @@ describe("App", () => {
     expect(document.activeElement).toBe(within(dialog).getByLabelText("Token for Prod"));
     await user.keyboard("{Escape}");
     expect(document.activeElement).toBe(action);
+  });
+
+  it("corrects a rejected token while another gateway and its search results remain usable", async () => {
+    const user = userEvent.setup();
+    const dev = { id: "dev", name: "Dev", url: "https://dev.example" };
+    const prod = { id: "prod", name: "Prod", url: "https://prod.example" };
+    const rejected = "x".repeat(32);
+    const corrected = "a".repeat(32);
+    const prodToken = "b".repeat(32);
+    const tokens = new Map([[prod.url, prodToken]]);
+    const credentials = {
+      read: (url: string) => tokens.get(url) ?? null,
+      save: (url: string, token: string) => { tokens.set(url, token); },
+      clear: (url: string) => { tokens.delete(url); },
+    };
+    const authenticate = (url: string) => {
+      if (tokens.get(url) !== (url === dev.url ? corrected : prodToken)) throw new HttpError(401, "unauthorized");
+    };
+    render(
+      <MemoryRouter>
+        <App
+          queryClient={new QueryClient({ defaultOptions: { queries: { retry: false } } })}
+          gatewayCredentials={credentials}
+          produceTopicMessage={produceTopicMessage}
+          createTopic={createTopic}
+          deleteTopic={deleteTopic}
+          confirmTopicDeletion={confirmTopicDeletion}
+          loadGatewayConfig={async () => [dev, prod]}
+          getCluster={async (url) => {
+            authenticate(url);
+            return { clusterId: url === dev.url ? "dev-cluster" : "prod-cluster", controllerId: 1, brokers: [] };
+          }}
+          listTopics={async (url) => {
+            authenticate(url);
+            return [{ name: "orders", partitions: 1, replicationFactor: 1, internal: false, approxMessages: 0 }];
+          }}
+          listConsumerGroups={pendingListConsumerGroups}
+          getTopicDetail={pendingGetTopicDetail}
+          listLatestTopicMessages={pendingListLatestTopicMessages}
+          searchTopicMessages={pendingSearchTopicMessages}
+          linkOrigin={linkOrigin}
+          copyMessageLink={copyMessageLink}
+          statusRefreshMs={60_000}
+        />
+      </MemoryRouter>,
+    );
+
+    const devCard = await screen.findByRole("article", { name: "Dev" });
+    const prodCard = screen.getByRole("article", { name: "Prod" });
+    expect(await within(prodCard).findByText("Healthy")).toBeDefined();
+    await user.type(screen.getByRole("searchbox", { name: "Topic name" }), "ord");
+    const prodResults = screen.getByRole("region", { name: "Prod topic results" });
+    expect(await within(prodResults).findByRole("link", { name: "orders" })).toBeDefined();
+    await user.click(await within(devCard).findByRole("button", { name: "Manage credentials for Dev" }));
+    let dialog = screen.getByRole("dialog", { name: "Gateway credentials" });
+    let input = within(dialog).getByLabelText("Token for Dev");
+    expect(input.getAttribute("type")).toBe("password");
+    await user.type(input, "short");
+    await user.click(within(dialog).getAllByRole("button", { name: "Use token" })[0]);
+    expect(within(dialog).getByRole("alert").textContent).toContain("at least 32");
+    expect(tokens.has(dev.url)).toBe(false);
+    await user.clear(input);
+    await user.type(input, rejected);
+    await user.click(within(dialog).getAllByRole("button", { name: "Use token" })[0]);
+    expect(tokens.get(dev.url)).toBe(rejected);
+    expect((input as HTMLInputElement).value).toBe("");
+    await user.click(within(dialog).getByRole("button", { name: "Close" }));
+    expect(await within(devCard).findByText("Authentication required")).toBeDefined();
+    expect(await within(prodResults).findByRole("link", { name: "orders" })).toBeDefined();
+
+    await user.click(await within(devCard).findByRole("button", { name: "Manage credentials for Dev" }));
+    dialog = screen.getByRole("dialog", { name: "Gateway credentials" });
+    input = within(dialog).getByLabelText("Token for Dev");
+    await user.type(input, corrected);
+    await user.click(within(dialog).getAllByRole("button", { name: "Use token" })[0]);
+    await waitFor(() => expect(within(devCard).getByText("Healthy")).toBeDefined());
+    await user.click(within(dialog).getByRole("button", { name: "Close" }));
+    expect(document.activeElement).toBe(screen.getByRole("button", { name: "Gateway credentials" }));
+    expect(tokens.get(dev.url)).toBe(corrected);
+    expect(tokens.get(prod.url)).toBe(prodToken);
+    expect(await within(prodCard).findByText("Healthy")).toBeDefined();
+    expect(await within(prodResults).findByRole("link", { name: "orders" })).toBeDefined();
+    for (const token of [rejected, corrected, prodToken]) {
+      expect(document.body.textContent).not.toContain(token);
+      expect(window.location.href).not.toContain(token);
+      for (const link of document.querySelectorAll("a[href]")) expect(link.getAttribute("href")).not.toContain(token);
+    }
   });
 
   it("offers a keyboard skip link to the page content", async () => {

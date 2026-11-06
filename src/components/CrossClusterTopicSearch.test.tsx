@@ -85,6 +85,24 @@ describe("CrossClusterTopicSearch", () => {
     expect(within(dev).getByRole("link", { name: "orders" })).toBeDefined();
   });
 
+  it("keeps other results available during a transport failure", async () => {
+    const user = userEvent.setup();
+    const listTopics: ListTopics = async (url) => {
+      if (url === gateways[1].url) throw new TypeError("Failed to fetch");
+      return [topic("orders")];
+    };
+    renderWithQuery(<CrossClusterTopicSearch gateways={gateways} listTopics={listTopics} />);
+
+    await user.type(screen.getByRole("searchbox", { name: "Topic name" }), "ord");
+    const dev = screen.getByRole("region", { name: "Dev topic results" });
+    const prod = screen.getByRole("region", { name: "Prod topic results" });
+    expect(await within(dev).findByRole("link", { name: "orders" })).toBeDefined();
+    expect(await within(prod).findByText("Gateway unreachable")).toBeDefined();
+    expect(within(prod).getByText(/browser cannot determine the cause/)).toBeDefined();
+    expect(within(prod).queryByText('No topics match "ord".')).toBeNull();
+    expect(within(dev).getByRole("link", { name: "orders" })).toBeDefined();
+  });
+
   it("reports no matches per gateway without blocking on another gateway", async () => {
     const listTopics = vi.fn<ListTopics>((url) =>
       url === gateways[0].url ? Promise.resolve([topic("audit")]) : new Promise<never>(() => {}),
