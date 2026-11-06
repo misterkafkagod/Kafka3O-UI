@@ -20,6 +20,10 @@ describe("CreateTopic", () => {
     client.setQueryData(["gateway", "alias", "topics"], []);
     client.setQueryData(["gateway", "dev", "cluster"], "cluster");
     render(<QueryClientProvider client={client}><CreateTopic gateway={gateway} createTopic={create} /></QueryClientProvider>);
+    expect(screen.getByRole("form", { name: "Create topic" }).textContent).toContain("Destination gateway: Dev");
+    const nameHelp = screen.getByLabelText("Topic name").getAttribute("aria-describedby");
+    expect(nameHelp).toBeTruthy();
+    expect(document.getElementById(nameHelp!)?.textContent).toContain("1-249");
     await user.click(screen.getByRole("button", { name: "Create topic" }));
     expect(screen.getByRole("alert").textContent).toContain("1-249");
     expect(create).not.toHaveBeenCalled();
@@ -35,6 +39,7 @@ describe("CreateTopic", () => {
     expect(screen.getByRole("button", { name: "Creating…" }).matches(":disabled")).toBe(true);
     resolve();
     expect(await screen.findByText(/Creation of "orders" was accepted/)).toBeDefined();
+    expect(screen.getByRole("status").textContent).toContain('Creation of "orders" was accepted');
     await waitFor(() => expect(client.getQueryState(["gateway", "dev", "topics"])?.isInvalidated).toBe(true));
     expect(client.getQueryState(["gateway", "alias", "topics"])?.isInvalidated).toBe(true);
     expect(client.getQueryState(["gateway", "dev", "cluster"])?.isInvalidated).toBe(false);

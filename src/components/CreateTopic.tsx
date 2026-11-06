@@ -1,5 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useRef, useState, type FormEvent } from "react";
+import { useId, useRef, useState, type FormEvent } from "react";
 import type { CreateTopic as CreateAction } from "../gateway/createTopic";
 import { classifyGatewayError } from "../gateway/classifyGatewayError";
 import { describeCreateTopicError } from "../gateway/describeCreateTopicError";
@@ -7,6 +7,7 @@ import type { GatewayEntry, GatewayErrorKind } from "../gateway/types";
 import { createTopicFromForm } from "../topics/createTopicFromForm";
 import { isGatewayTopicListQuery } from "../topics/isGatewayTopicListQuery";
 import { GatewayErrorRecovery } from "./GatewayErrorRecovery";
+import styles from "./CreateTopic.module.css";
 
 type CreateTopicProps = {
   gateway: GatewayEntry;
@@ -15,6 +16,7 @@ type CreateTopicProps = {
 
 export function CreateTopic({ gateway, createTopic }: CreateTopicProps) {
   const queryClient = useQueryClient();
+  const nameHelpId = useId();
   const [name, setName] = useState("");
   const [partitions, setPartitions] = useState("1");
   const [replicationFactor, setReplicationFactor] = useState("1");
@@ -53,11 +55,16 @@ export function CreateTopic({ gateway, createTopic }: CreateTopicProps) {
   }
 
   return (
-    <form onSubmit={submit} aria-label="Create topic" noValidate>
+    <form onSubmit={submit} aria-label="Create topic" className={styles.form} noValidate>
+      <p className={styles.context}>Destination gateway: <strong>{gateway.name}</strong></p>
       <fieldset disabled={pending}>
-        <label>Topic name<input value={name} onChange={(event) => setName(event.target.value)} /></label>
-        <label>Partitions<input type="number" min="1" max="2147483647" step="1" value={partitions} onChange={(event) => setPartitions(event.target.value)} /></label>
-        <label>Replication factor<input type="number" min="1" max="32767" step="1" value={replicationFactor} onChange={(event) => setReplicationFactor(event.target.value)} /></label>
+        <legend>Topic settings</legend>
+        <div className={styles.fields}>
+          <label>Topic name<input value={name} aria-describedby={nameHelpId} onChange={(event) => setName(event.target.value)} /></label>
+          <p id={nameHelpId} className={styles.help}>Use 1-249 ASCII letters, digits, dots, underscores or hyphens; . and .. are not allowed.</p>
+          <label>Partitions<input type="number" min="1" max="2147483647" step="1" value={partitions} onChange={(event) => setPartitions(event.target.value)} /></label>
+          <label>Replication factor<input type="number" min="1" max="32767" step="1" value={replicationFactor} onChange={(event) => setReplicationFactor(event.target.value)} /></label>
+        </div>
         <button type="submit">{pending ? "Creating…" : "Create topic"}</button>
       </fieldset>
       {error ? (
@@ -66,7 +73,7 @@ export function CreateTopic({ gateway, createTopic }: CreateTopicProps) {
           <GatewayErrorRecovery gateway={gateway} kind={errorKind} />
         </div>
       ) : null}
-      {created ? <p>Creation of "{created}" was accepted; it may take a moment to appear.</p> : null}
+      {created ? <p role="status">Creation of "{created}" was accepted; it may take a moment to appear.</p> : null}
     </form>
   );
 }

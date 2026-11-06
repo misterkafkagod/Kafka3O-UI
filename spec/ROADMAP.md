@@ -166,7 +166,7 @@ The console should be comfortable for dense technical data, easy to navigate, an
     - Demo: navigate from group summaries to exact partition-lag details and retry an incomplete group.
   - **P42** F23-B2 · Investigate topic-specific consumer groups — Covers: F23-AC2 · Discovery: — · Status: Done
     - Demo: inspect a topic's associated group and distinguish an unresolved association.
-  - **P43** F24-B1 · Create topics with contextual feedback — Covers: F24-AC1 · Discovery: — · Status: Planned
+  - **P43** F24-B1 · Create topics with contextual feedback — Covers: F24-AC1 · Discovery: — · Status: Review
     - Demo: validate topic settings and inspect accepted and uncertain outcomes without repeating a pending request.
   - **P44** F24-B2 · Produce messages with contextual feedback — Covers: F24-AC2 · Discovery: — · Status: Planned
     - Demo: submit a synthetic message with an optional key and header, then inspect its exact acknowledged position or an uncertain outcome.
