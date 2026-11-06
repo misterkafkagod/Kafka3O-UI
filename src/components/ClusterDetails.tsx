@@ -2,6 +2,7 @@ import type { GetCluster } from "../gateway/getCluster";
 import type { GatewayEntry } from "../gateway/types";
 import { useClusterStatus } from "../hooks/useClusterStatus";
 import { BrokerTable } from "./BrokerTable";
+import styles from "./ClusterDetails.module.css";
 import { ErrorWithRetry } from "./ErrorWithRetry";
 
 type ClusterDetailsProps = {
@@ -15,8 +16,10 @@ export function ClusterDetails({ gateway, getCluster, statusRefreshMs }: Cluster
 
   return (
     <main>
-      <h2>{gateway.name}</h2>
-      <p>{gateway.url}</p>
+      <header className={styles.header}>
+        <h2>{gateway.name}</h2>
+        <p>{gateway.url}</p>
+      </header>
       {/* Error is checked before data: React Query keeps the last data after a failed refetch. */}
       {isError ? (
         <ErrorWithRetry error={error} gateway={gateway} onRetry={() => void refetch()} />
@@ -24,9 +27,19 @@ export function ClusterDetails({ gateway, getCluster, statusRefreshMs }: Cluster
         <p role="status">Checking…</p>
       ) : cluster ? (
         <>
-          <p>Cluster ID: {cluster.clusterId}</p>
-          <p>Controller: {cluster.controllerId}</p>
-          <BrokerTable brokers={cluster.brokers} />
+          <section aria-labelledby="cluster-summary-heading">
+            <h3 id="cluster-summary-heading">Cluster summary</h3>
+            <dl className={styles.summary}>
+              <div><dt>Cluster ID</dt><dd>{cluster.clusterId}</dd></div>
+              <div><dt>Controller</dt><dd>{cluster.controllerId}</dd></div>
+              <div><dt>Brokers</dt><dd>{cluster.brokers.length}</dd></div>
+            </dl>
+          </section>
+          <section aria-labelledby="brokers-heading">
+            <h3 id="brokers-heading">Brokers</h3>
+            {cluster.brokers.length === 0 ? <p>No brokers reported.</p> : null}
+            <BrokerTable brokers={cluster.brokers} />
+          </section>
         </>
       ) : null}
     </main>

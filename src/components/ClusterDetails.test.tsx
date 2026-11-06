@@ -22,8 +22,10 @@ describe("ClusterDetails", () => {
       />,
     );
 
-    expect(await screen.findByText("Cluster ID: abc")).toBeDefined();
-    expect(screen.getByText("Controller: 2")).toBeDefined();
+    const summary = await screen.findByRole("region", { name: "Cluster summary" });
+    expect(within(summary).getByText("Cluster ID").nextElementSibling?.textContent).toBe("abc");
+    expect(within(summary).getByText("Controller").nextElementSibling?.textContent).toBe("2");
+    expect(within(summary).getByText("Brokers").nextElementSibling?.textContent).toBe("1");
     expect(screen.getByRole("table", { name: "Brokers" })).toBeDefined();
   });
 
@@ -42,5 +44,37 @@ describe("ClusterDetails", () => {
     expect(within(alert).getByText("Gateway unreachable")).toBeDefined();
     expect(within(alert).getByRole("button", { name: "Retry" })).toBeDefined();
     expect(screen.queryByRole("table", { name: "Brokers" })).toBeNull();
+    expect(screen.queryByRole("region", { name: "Cluster summary" })).toBeNull();
+  });
+
+  it("replaces a successful summary with an error after a failed refresh", async () => {
+    let failed = false;
+    renderWithQuery(
+      <ClusterDetails
+        gateway={gateway}
+        statusRefreshMs={20}
+        getCluster={async () => {
+          if (failed) throw new TypeError("Failed to fetch");
+          return { clusterId: "abc", controllerId: 1, brokers: [{ id: 1, host: "kafka-1", port: 9092 }] };
+        }}
+      />,
+    );
+
+    expect(await screen.findByRole("region", { name: "Cluster summary" })).toBeDefined();
+    failed = true;
+    expect(await screen.findByRole("alert")).toBeDefined();
+    expect(screen.queryByRole("region", { name: "Cluster summary" })).toBeNull();
+    expect(screen.queryByRole("table", { name: "Brokers" })).toBeNull();
+  });
+
+  it("reports zero brokers only when the gateway returned an empty list", async () => {
+    renderWithQuery(
+      <ClusterDetails gateway={gateway} statusRefreshMs={60_000} getCluster={async () => ({ clusterId: "abc", controllerId: 1, brokers: [] })} />,
+    );
+
+    const summary = await screen.findByRole("region", { name: "Cluster summary" });
+    expect(within(summary).getByText("Brokers").nextElementSibling?.textContent).toBe("0");
+    expect(screen.getByText("No brokers reported.")).toBeDefined();
+    expect(screen.getByRole("table", { name: "Brokers" })).toBeDefined();
   });
 });

@@ -54,7 +54,7 @@ describe("ClusterPage", () => {
       http.get("http://localhost:8081/api/v1/cluster", () => HttpResponse.json({ clusterId: "abc", controllerId: 1, brokers: [] })),
     );
     await userEvent.click(within(alert).getByRole("button", { name: "Retry" }));
-    expect(await screen.findByText("Controller: 1")).toBeDefined();
+    expect((await screen.findByText("Controller")).nextElementSibling?.textContent).toBe("1");
   });
 
   it("refreshes the topic list after creation", async () => {
@@ -104,8 +104,8 @@ describe("ClusterPage", () => {
 
     renderClusterPage("/clusters/dev");
 
-    expect(await screen.findByText("Cluster ID: nDF93h0CSDizRRs5DIdLeQ")).toBeDefined();
-    expect(screen.getByText("Controller: 2")).toBeDefined();
+    expect((await screen.findByText("Cluster ID")).nextElementSibling?.textContent).toBe("nDF93h0CSDizRRs5DIdLeQ");
+    expect(screen.getByText("Controller").nextElementSibling?.textContent).toBe("2");
     const [, body] = within(screen.getByRole("table", { name: "Brokers" })).getAllByRole("rowgroup");
     const ids = within(body)
       .getAllByRole("row")

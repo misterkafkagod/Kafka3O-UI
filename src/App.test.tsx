@@ -245,7 +245,7 @@ describe("App", () => {
 
     await user.click(await screen.findByRole("link", { name: "Dev" }));
 
-    expect(await screen.findByText("Controller: 1")).toBeDefined();
+    expect((await screen.findByText("Controller")).nextElementSibling?.textContent).toBe("1");
     expect(screen.getByRole("table", { name: "Brokers" })).toBeDefined();
   });
 
