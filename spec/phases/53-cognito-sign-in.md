@@ -280,6 +280,22 @@ is linked to a local account by email.
   - Done when: focused `Test.*CognitoBrowser` tests cover valid and rejected
     parameters, redaction, cookie ambiguity, one-shot synthetic exchange and
     replay denial, and `go test ./...` passes.
+- [x] **T53.4c Serialize browser-bound session issuance** — Covers: foundation of F27-AC2, F27-AC4
+  - Files: Gateway `internal/console/storage/` migration, local/Cognito
+    session creation and binding tests, `internal/console/session/` record
+    and error types, Gateway `internal/console/README.md`,
+    `spec/TECH-SPEC.md`, `spec/ROADMAP.md`.
+  - Do: Add an optional server-side digest of a separate stable browser
+    marker to a session and transactionally bind that marker to at most one
+    active local or Cognito session. Reject and audit competing issuance;
+    allow replacement only after definite revocation, disablement or
+    idle/absolute expiry. Preserve old unbound sessions. Until a bound
+    resolver exists, ordinary session use, grants and provider refresh must
+    fail closed for bound sessions. Do not expose marker or login routes.
+  - Done when: focused `Test.*BrowserSession` tests cover migration/restart,
+    local/Cognito conflicts and concurrency, expiry/revocation/disablement,
+    retained binding after replacement, audit and operational failures,
+    redaction and unbound isolation; `go test ./...` passes.
 - [ ] **T53.4 Expose opt-in HTTPS SSO and logout** — Covers: F27-AC2, F27-AC3
   - Files: Gateway `internal/console/httpapi/` (new SSO handlers/tests and
     necessary API wiring), `cmd/console/` (configuration/composition and
