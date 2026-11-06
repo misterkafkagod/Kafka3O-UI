@@ -120,6 +120,22 @@ is linked to a local account by email.
     migration preserves existing state and
     focused Cognito tests plus `go test ./...` pass. Provider refresh and
     browser integration remain separate unfinished work.
+- [x] **T53.3e Reserve Cognito refreshes durably** — Covers: foundation of F27-AC4
+  - Files: Gateway `internal/console/cognito/`, `session/`, and `storage/`
+    refresh-reservation actions/tests, Gateway `internal/console/README.md`,
+    `spec/TECH-SPEC.md`, `spec/ROADMAP.md`.
+  - Do: Reserve one refresh per session and generation in durable audit
+    before any provider request. Recheck the session, enabled identity,
+    provider-bound encrypted credential and idle/absolute expiry after
+    queued work. Block session use while a reservation remains unresolved;
+    deny replay, concurrent reservation, audit failures and uncertain
+    outcomes without returning provider material or retrying. Keep local
+    login and local logout independent.
+  - Done when: synthetic tests cover restart/replay, concurrent reservations,
+    protected snapshot recovery, stale claims, expiry, revocation, disabled
+    identities, key/tampering, audit and commit failures, and unaffected
+    local sessions; focused Cognito tests and `go test ./...` pass. Provider
+    requests, successful rotation and browser integration remain unfinished.
 - [ ] **T53.3 Issue and refresh Cognito application sessions** — Covers: F27-AC2, F27-AC4
   - Files: Gateway `internal/console/cognito/` (new exchange/refresh
     actions/tests), `internal/console/session/` and
