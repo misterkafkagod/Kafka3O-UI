@@ -1,10 +1,11 @@
 import { QueryClient } from "@tanstack/react-query";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
 import { describe, expect, it, vi } from "vitest";
 import { App } from "./App";
 import { HttpError } from "./gateway/HttpError";
+import type { GatewayEntry } from "./gateway/types";
 
 const pendingGetCluster = () => new Promise<never>(() => {});
 const pendingListTopics = () => new Promise<never>(() => {});
@@ -20,9 +21,9 @@ const linkOrigin = "https://console.example";
 const copyMessageLink = async () => {};
 const gatewayCredentials = { read: () => null, save: () => {}, clear: () => {} };
 
-function renderApp() {
+function renderApp(initialEntry = "/", gateways: GatewayEntry[] = []) {
   return render(
-    <MemoryRouter>
+    <MemoryRouter initialEntries={[initialEntry]}>
       <App
         queryClient={new QueryClient()}
         gatewayCredentials={gatewayCredentials}
@@ -30,7 +31,7 @@ function renderApp() {
         createTopic={createTopic}
         deleteTopic={deleteTopic}
         confirmTopicDeletion={confirmTopicDeletion}
-        loadGatewayConfig={async () => []}
+        loadGatewayConfig={async () => gateways}
         getCluster={pendingGetCluster}
         listTopics={pendingListTopics}
         listConsumerGroups={pendingListConsumerGroups}
@@ -56,6 +57,36 @@ describe("App", () => {
     renderApp();
 
     expect(screen.getByRole("link", { name: "Kafka3O" }).getAttribute("href")).toBe("/");
+    const primaryNavigation = screen.getByRole("navigation", { name: "Primary navigation" });
+    expect(within(primaryNavigation).getByRole("link", { name: "Clusters" }).getAttribute("aria-current")).toBe("page");
+  });
+
+  it("shows active cluster navigation and breadcrumbs on cluster pages", async () => {
+    renderApp("/clusters/dev/topics", [{ id: "dev", name: "Dev", url: "http://localhost:8081" }]);
+
+    expect(await screen.findByRole("navigation", { name: "Breadcrumb" })).toBeDefined();
+    const primaryNavigation = screen.getByRole("navigation", { name: "Primary navigation" });
+    expect(within(primaryNavigation).getByRole("link", { name: "Clusters" }).getAttribute("aria-current")).toBe(
+      "location",
+    );
+    const breadcrumb = screen.getByRole("navigation", { name: "Breadcrumb" });
+    expect((await within(breadcrumb).findByRole("link", { name: "Dev" })).getAttribute("href")).toBe("/clusters/dev");
+    expect(within(breadcrumb).getByText("Topics").getAttribute("aria-current")).toBe("page");
+    const clusterSections = screen.getByRole("navigation", { name: "Cluster sections" });
+    expect(within(clusterSections).getByRole("link", { name: "Topics" }).getAttribute("aria-current")).toBe("page");
+  });
+
+  it("shows decoded topic context and correct breadcrumb destinations", async () => {
+    renderApp("/clusters/dev/topics/orders%20%26%20audit/messages", [
+      { id: "dev", name: "Dev", url: "http://localhost:8081" },
+    ]);
+
+    const breadcrumb = await screen.findByRole("navigation", { name: "Breadcrumb" });
+    expect(within(breadcrumb).getByRole("link", { name: "Clusters" }).getAttribute("href")).toBe("/");
+    expect((await within(breadcrumb).findByRole("link", { name: "Dev" })).getAttribute("href")).toBe("/clusters/dev");
+    expect(within(breadcrumb).getByRole("link", { name: "Topics" }).getAttribute("href")).toBe("/clusters/dev/topics");
+    expect(within(breadcrumb).getByText("orders & audit").getAttribute("aria-current")).toBe("page");
+    expect(within(screen.getByRole("navigation", { name: "Topic views" })).getByRole("link", { name: "Messages" }).getAttribute("aria-current")).toBe("page");
   });
 
   it("clicking the Dev card opens its cluster page", async () => {
