@@ -134,7 +134,7 @@ The console should be comfortable for dense technical data, easy to navigate, an
     - Demo: check 320, 768 and 1440 CSS-pixel widths and 200% zoom; navigate by keyboard and verify skip navigation, focus, contained table overflow and reduced motion.
   - **P32** F19-B3 · Show truthful loading, empty, error and partial-result states — Covers: F19-AC3 · Discovery: — · Status: Done
     - Demo: with two gateway fixtures, exercise loading, empty, no-match and failure states plus one healthy and one failed gateway; verify no false zero or healthy status.
-  - **P33** F20-B1 + F20-B2 · Manage gateway credentials in an accessible connection panel — Covers: F20-AC1, F20-AC2 · Discovery: — · Status: Review
+  - **P33** F20-B1 + F20-B2 · Manage gateway credentials in an accessible connection panel — Covers: F20-AC1, F20-AC2 · Discovery: — · Status: Done
     - Demo: open the panel from the shell and an authentication prompt; add or remove one of two tokens and verify focus behavior, session isolation and cache refresh.
   - **P34** F20-B3 · Recover safely from credential and transport errors — Covers: F20-AC3 · Discovery: — · Status: Planned
     - Demo: submit invalid credentials, recover from 401, then simulate a network/TLS failure; verify no token exposure or certificate bypass and keep the other gateway usable.
@@ -162,6 +162,7 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
 - **Verification debt:** Run the built gateway container in a deployment; the image was built and scanned on EKS-D but was not started as a container.
 
 ## Learnings
+- 2026-11-06 (P33): A native modal needs verified Escape and focus restoration in the embedded browser; gateway-specific recovery must be available on read and write authentication prompts, without replaying writes.
 - 2026-11-06 (P32): Missing or invalid gateway configuration is distinct from a network or server failure retrieving configuration; only the latter needs a recoverable error.
 - 2026-11-05 (M6–M8 planning): The live UI and source review showed browser-default styling, no stylesheet files, global inline credentials, payloads expanded inside message rows and inline consumer-group details. Approved an incremental UX redesign: shared console foundation first, investigation pages second, operational workflows third. M1–M5 remain Done; F15–F17 remain in backlog; no new dependencies or gateway capabilities are proposed.
 - 2026-11-05 (M1 retro): Real secured Kafka testing uncovered the separate per-read clients; sharing the main client's options keeps message reads authenticated and encrypted.
