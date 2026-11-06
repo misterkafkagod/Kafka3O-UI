@@ -2,7 +2,7 @@
 - **Milestone:** M6
 - **Covers:** F19-AC3
 - **Discovery:** —
-- **Status:** Review
+- **Status:** Done
 
 ## Demo
 1. Use the existing UI fixtures to exercise loading, no configured gateways, empty data, no search matches, authentication failure, gateway failure and cluster failure.
@@ -23,3 +23,8 @@
   - Done when: `npm test -- src/components/NoGatewaysConfigured.test.tsx src/pages/ClustersPage.test.tsx` and `npm run build` pass.
 
 ## Review
+- **Demo:** Synthetic browser fixtures exercised accessible loading, missing/empty configuration, configuration failure and Retry, empty topics, no search matches, authentication failure, gateway transport failure and cluster failure. Successful cross-cluster results remained visible alongside a failed gateway and its Retry action; failures were not presented as empty results.
+- **Empty configuration:** The browser check confirmed a main landmark and an HTTPS configuration example.
+- **Validation:** All 285 UI tests and the production build passed. EKS-D's manual deployment and both persistent Kafka StatefulSets remained Ready (1/1); no Kafka writes were made. Deployment of the updated UI is deferred until the end of M6 to avoid repeatedly rotating the manual test credentials.
+- **Vulnerability scan:** Not run; P32 changes no dependencies and is not the final M6 phase.
+- **Notes:** Missing, malformed and empty configuration retain the existing no-gateways behavior; network and non-404 server failures now show a distinct recoverable error.
