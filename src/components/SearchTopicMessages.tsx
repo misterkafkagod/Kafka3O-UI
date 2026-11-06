@@ -47,7 +47,7 @@ export function SearchTopicMessages({ gateway, topicName, searchTopicMessages, m
       {query === undefined ? null : isError ? (
         <ErrorWithRetry error={error} onRetry={() => void refetch()} />
       ) : isFetching || data === undefined ? (
-        <p>Searching messages…</p>
+        <p role="status">Searching messages…</p>
       ) : (
         <>
           <p>Examined {data.scanned} records (limit: 500 offset positions).</p>

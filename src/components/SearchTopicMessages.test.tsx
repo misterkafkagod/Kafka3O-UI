@@ -9,6 +9,16 @@ const gateway = { id: "dev", name: "Dev", url: "http://localhost:8081" };
 const message = { partition: 1, offset: 7, timestamp: "2026-01-02T03:04:05Z", key: "", value: "b3JkZXI=", headers: [] };
 
 describe("SearchTopicMessages", () => {
+  it("announces a pending message search", async () => {
+    const user = userEvent.setup();
+    renderWithQuery(<SearchTopicMessages gateway={gateway} topicName="orders" searchTopicMessages={() => new Promise<never>(() => {})} />);
+
+    await user.type(screen.getByRole("searchbox", { name: "Search key or value" }), "order");
+    await user.click(screen.getByRole("button", { name: "Search" }));
+    expect(screen.getByRole("status").textContent).toBe("Searching messages…");
+    expect(screen.queryByText("No matching messages.")).toBeNull();
+  });
+
   it("shows matches, examined count, limit, and excluded offsets", async () => {
     const search = vi.fn<SearchTopicMessagesAction>(async () => ({ messages: [message], scanned: 500, truncated: true }));
     const user = userEvent.setup();

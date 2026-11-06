@@ -24,7 +24,7 @@ export function LinkedTopicMessage({ position, messages, isError, error, isFetch
     return <ErrorWithRetry error={error} onRetry={onRetry} />;
   }
   if (isFetching || messages === undefined) {
-    return <p>Loading linked message…</p>;
+    return <p role="status">Loading linked message…</p>;
   }
   const result = findLinkedTopicMessage(messages, position);
   if (result.kind === "unverifiable") {

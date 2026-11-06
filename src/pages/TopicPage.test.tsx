@@ -103,6 +103,20 @@ describe("TopicPage", () => {
     expect(screen.getByRole("link", { name: "Back to message reads" }).getAttribute("href")).toBe("/clusters/dev/topics/orders/messages");
   });
 
+  it("announces loading while an exact linked message is being read", async () => {
+    renderTopicPage(
+      async () => [gateway],
+      async () => ({ name: "orders", partitions: [], config: [] }),
+      () => new Promise<never>(() => {}),
+      "messages",
+      undefined,
+      "/clusters/dev/topics/orders/messages?partition=0&offset=9",
+    );
+
+    expect((await screen.findByText("Loading linked message…")).getAttribute("role")).toBe("status");
+    expect(screen.queryByText("No message is available at this partition and offset.")).toBeNull();
+  });
+
   it("does not display the next record when the linked offset is absent", async () => {
     const list = vi.fn<ListLatestTopicMessages>(async () => [
       { partition: 0, offset: 10, timestamp: "2026-01-02T03:04:05Z", key: null, value: "bGF0ZXI=", headers: [] },
@@ -174,7 +188,7 @@ describe("TopicPage", () => {
     );
     renderTopicPage(async () => [gateway], async () => ({ name: "orders", partitions: [], config: [] }), listLatestTopicMessages, "messages");
 
-    expect(await screen.findByText("Loading messages…")).toBeDefined();
+    expect((await screen.findByText("Loading messages…")).getAttribute("role")).toBe("status");
     resolveMessages?.([]);
     expect(await screen.findByText("No messages found.")).toBeDefined();
     expect(listLatestTopicMessages).toHaveBeenCalledWith(gateway.url, "orders");

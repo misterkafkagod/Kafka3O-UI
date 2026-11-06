@@ -77,7 +77,7 @@ export function TopicMessagesPage({ gateway, topicName, listLatestTopicMessages,
               {isError ? (
                 <ErrorWithRetry error={error} onRetry={() => void refetch()} />
               ) : messages === undefined ? (
-                <p>Loading messages…</p>
+                <p role="status">Loading messages…</p>
               ) : messages.length === 0 ? (
                 <p>No messages found.</p>
               ) : (

@@ -18,7 +18,7 @@ export function ConsumerGroups({ gateway, listConsumerGroups }: ConsumerGroupsPr
       {isError ? (
         <ErrorWithRetry error={error} onRetry={() => void refetch()} />
       ) : groups === undefined ? (
-        <p>Loading consumer groups…</p>
+        <p role="status">Loading consumer groups…</p>
       ) : groups.length === 0 ? (
         <p>No consumer groups.</p>
       ) : (

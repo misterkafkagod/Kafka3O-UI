@@ -22,7 +22,7 @@ export function GatewayTopicSearchResults({ gateway, listTopics, text }: Gateway
       {isError ? (
         <ErrorWithRetry error={error} onRetry={() => void refetch()} />
       ) : topics === undefined ? (
-        <p>Loading topics…</p>
+        <p role="status">Loading topics…</p>
       ) : matches.length === 0 ? (
         <p>No topics match "{text}".</p>
       ) : (

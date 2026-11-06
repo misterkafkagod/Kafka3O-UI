@@ -60,6 +60,7 @@ describe("CrossClusterTopicSearch", () => {
     expect(await within(dev).findByRole("link", { name: "orders" })).toBeDefined();
     const alert = await within(prod).findByRole("alert");
     expect(within(alert).getByText("offline")).toBeDefined();
+    expect(within(prod).queryByText('No topics match "ord".')).toBeNull();
     expect(within(dev).getByRole("link", { name: "orders" })).toBeDefined();
     await user.click(within(alert).getByRole("button", { name: "Retry" }));
     expect(await within(prod).findByRole("link", { name: "orders" })).toBeDefined();
@@ -74,6 +75,6 @@ describe("CrossClusterTopicSearch", () => {
 
     await user.type(screen.getByRole("searchbox", { name: "Topic name" }), "ord");
     expect(await within(screen.getByRole("region", { name: "Dev topic results" })).findByText('No topics match "ord".')).toBeDefined();
-    expect(within(screen.getByRole("region", { name: "Prod topic results" })).getByText("Loading topics…")).toBeDefined();
+    expect(within(screen.getByRole("region", { name: "Prod topic results" })).getByRole("status").textContent).toBe("Loading topics…");
   });
 });

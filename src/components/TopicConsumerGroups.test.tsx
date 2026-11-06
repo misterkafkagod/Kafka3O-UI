@@ -15,6 +15,13 @@ const reader: ConsumerGroup = {
 };
 
 describe("TopicConsumerGroups", () => {
+  it("announces loading without claiming the topic has no groups", () => {
+    renderWithQuery(<TopicConsumerGroups gateway={gateway} topicName="orders" listConsumerGroups={() => new Promise<never>(() => {})} />);
+
+    expect(screen.getByRole("status").textContent).toBe("Loading consumer groups…");
+    expect(screen.queryByText("No consumer groups for this topic.")).toBeNull();
+  });
+
   it("shows only associated groups and this topic's partition rows", async () => {
     const other = { ...reader, id: "other", topics: ["audit"] };
     const list = vi.fn(async () => [reader, other]);

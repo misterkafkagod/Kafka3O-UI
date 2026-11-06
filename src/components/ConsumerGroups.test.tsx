@@ -11,7 +11,7 @@ const group: ConsumerGroup = { id: "orders", protocol: "classic", state: "Empty"
 describe("ConsumerGroups", () => {
   it("shows loading and empty states", async () => {
     const pending = renderWithQuery(<ConsumerGroups gateway={gateway} listConsumerGroups={() => new Promise(() => {})} />);
-    expect(screen.getByText("Loading consumer groups…")).toBeDefined();
+    expect(screen.getByRole("status").textContent).toBe("Loading consumer groups…");
     pending.unmount();
 
     renderWithQuery(<ConsumerGroups gateway={gateway} listConsumerGroups={async () => []} />);
