@@ -20,17 +20,27 @@ describe("SearchTopicMessages", () => {
   });
 
   it("shows matches, examined count, limit, and excluded offsets", async () => {
-    const search = vi.fn<SearchTopicMessagesAction>(async () => ({ messages: [message], scanned: 500, truncated: true }));
+    const secondMessage = { ...message, offset: 8, value: "c2Vjb25k" };
+    const search = vi.fn<SearchTopicMessagesAction>(async () => ({ messages: [message, secondMessage], scanned: 500, truncated: true }));
     const user = userEvent.setup();
     renderWithQuery(<SearchTopicMessages gateway={gateway} topicName="orders" searchTopicMessages={search} />);
 
-    await user.type(screen.getByRole("searchbox", { name: "Search key or value" }), "order");
+    const input = screen.getByRole("searchbox", { name: "Search key or value" });
+    expect(input.getAttribute("aria-describedby")).toBeTruthy();
+    expect(document.getElementById(input.getAttribute("aria-describedby")!)?.textContent).toContain("case-sensitive");
+    await user.type(input, "order");
     await user.click(screen.getByRole("button", { name: "Search" }));
 
     expect(await screen.findByText("Examined 500 records (limit: 500 offset positions).")).toBeDefined();
-    expect(screen.getByText("Older offsets or partitions were excluded from this search.")).toBeDefined();
+    const summary = screen.getByRole("region", { name: "Search summary" });
+    expect(within(summary).getByText("Older offsets or partitions were excluded from this search.")).toBeDefined();
     expect(screen.getByRole("region", { name: "Message results" })).toBeDefined();
     expect(search).toHaveBeenCalledWith(gateway.url, "orders", "order");
+
+    await user.click(screen.getByRole("button", { name: "Inspect record 2, partition 1, offset 8" }));
+    expect(within(screen.getByRole("region", { name: "Selected message" })).getByText("second")).toBeDefined();
+    expect(within(summary).getByText("Examined 500 records (limit: 500 offset positions).")).toBeDefined();
+    expect(search).toHaveBeenCalledTimes(1);
   });
 
   it("shows an empty result without claiming offsets were excluded", async () => {
