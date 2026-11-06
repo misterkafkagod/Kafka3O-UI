@@ -5,6 +5,7 @@ import { useTopics } from "../hooks/useTopics";
 import { compareTopicsByName } from "../topics/compareTopicsByName";
 import { filterTopics } from "../topics/filterTopics";
 import { ErrorWithRetry } from "./ErrorWithRetry";
+import styles from "./CrossClusterTopicSearch.module.css";
 
 type GatewayTopicSearchResultsProps = {
   gateway: GatewayEntry;
@@ -17,7 +18,7 @@ export function GatewayTopicSearchResults({ gateway, listTopics, text }: Gateway
   const matches = topics === undefined ? [] : filterTopics(topics, { showInternal: true, text }).sort(compareTopicsByName);
 
   return (
-    <section aria-label={`${gateway.name} topic results`}>
+    <section aria-label={`${gateway.name} topic results`} className={styles.result}>
       <h3>{gateway.name}</h3>
       {isError ? (
         <ErrorWithRetry error={error} gateway={gateway} onRetry={() => void refetch()} />

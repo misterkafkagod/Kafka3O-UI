@@ -27,10 +27,12 @@ describe("CrossClusterTopicSearch", () => {
     const user = userEvent.setup();
     renderWithQuery(<CrossClusterTopicSearch gateways={gateways} listTopics={listTopics} />);
     expect(listTopics).not.toHaveBeenCalled();
+    expect(screen.getByText("Enter a topic name to see results for each gateway.")).toBeDefined();
 
     await user.type(screen.getByRole("searchbox", { name: "Topic name" }), "ORD");
     const dev = screen.getByRole("region", { name: "Dev topic results" });
     const prod = screen.getByRole("region", { name: "Prod topic results" });
+    expect(screen.queryByText("Enter a topic name to see results for each gateway.")).toBeNull();
     expect((await within(dev).findByRole("link", { name: "orders & audit" })).getAttribute("href")).toBe(
       "/clusters/dev/topics/orders%20%26%20audit",
     );

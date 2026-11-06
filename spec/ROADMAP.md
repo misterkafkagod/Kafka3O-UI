@@ -144,7 +144,7 @@ The console should be comfortable for dense technical data, easy to navigate, an
 - **Features:** F21, F22
 - **Goal:** Organize the read workflows into dense, readable overview/detail pages and a message workspace with a compact result list and selected-record inspector.
 - **Phases:**
-  - **P35** F21-B1 · Review clusters and cross-cluster topic results — Covers: F21-AC1 · Discovery: — · Status: Building
+  - **P35** F21-B1 · Review clusters and cross-cluster topic results — Covers: F21-AC1 · Discovery: — · Status: Review
     - Demo: open the overview with two gateways, search topics and verify one failure does not hide the other gateway's result.
   - **P36** F21-B2 · Inspect cluster and broker context — Covers: F21-AC2 · Discovery: — · Status: Planned
     - Demo: open a healthy cluster and a failed cluster; compare the factual summary, broker table and recoverable error.
