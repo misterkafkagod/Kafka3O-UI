@@ -2,7 +2,7 @@
 - **Milestone:** M10
 - **Covers:** The local Console-session portions of F27-AC3 and F29-AC4, and the revocation-audit portion of F27-AC4
 - **Discovery:** —
-- **Status:** Review
+- **Status:** Done
 
 ## Existing baseline and boundaries
 P51's loopback Console already issues opaque local sessions, checks idle and
@@ -44,3 +44,23 @@ does not deploy the preview or alter the existing manual access path.
   - Done when: the opt-in built-preview HTTPS integration, `npm test`, `npm run build`, and `go test ./...` pass; no persistent Kafka data or existing deployment is changed.
 
 ## Review
+- **Demo (2026-11-06):** the loopback HTTPS API listed active sessions in
+  bounded, credential-free pages and audited local global-ADMIN decisions.
+  Revoking another session or the actor's own session rejected its next
+  request while preserving unrelated sessions; restricted, role-free and
+  cluster-only administrators were denied. A separate administrator
+  revoked the built preview's session over verified HTTPS; the preview then
+  received 401, discarded signed-in state and did not replay the request or
+  fall back to the legacy Gateway.
+- **Regression:** the full Gateway suite, Console race tests and `go vet`
+  passed. The full UI suite passed 373 tests with the opt-in integration
+  test skipped; that test passed separately. Preview and default builds
+  passed. The existing manual UI returned HTTP 200; the EKS-D node, both
+  Kafka pods, the manual pod and both persistent volumes remained healthy.
+- **Not run:** native-browser TLS/cookie validation and secured Console
+  deployment. Gateway-side revocation, protected Kafka routes, secured-UI
+  cache clearing and Cognito logout remain P55/P59 and P53 respectively.
+- **Vulnerability scan:** not required for this phase; no dependency
+  manifests changed.
+- **Notes:** the preview discovers revocation on its next Console request;
+  the authentication-only preview contains no Kafka data or query cache.
