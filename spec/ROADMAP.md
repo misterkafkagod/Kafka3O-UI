@@ -164,7 +164,7 @@ The console should be comfortable for dense technical data, easy to navigate, an
 - **Phases:**
   - **P41** F23-B1 · Navigate cluster consumer-group summaries and details — Covers: F23-AC1 · Discovery: — · Status: Done
     - Demo: navigate from group summaries to exact partition-lag details and retry an incomplete group.
-  - **P42** F23-B2 · Investigate topic-specific consumer groups — Covers: F23-AC2 · Discovery: — · Status: Planned
+  - **P42** F23-B2 · Investigate topic-specific consumer groups — Covers: F23-AC2 · Discovery: — · Status: Review
     - Demo: inspect a topic's associated group and distinguish an unresolved association.
   - **P43** F24-B1 · Create topics with contextual feedback — Covers: F24-AC1 · Discovery: — · Status: Planned
     - Demo: validate topic settings and inspect accepted and uncertain outcomes without repeating a pending request.

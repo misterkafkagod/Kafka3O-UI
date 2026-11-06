@@ -4,6 +4,7 @@ import type { GatewayEntry } from "../gateway/types";
 import { topicConsumerGroups } from "../groups/topicConsumerGroups";
 import { useConsumerGroups } from "../hooks/useConsumerGroups";
 import { ConsumerGroupDetails } from "./ConsumerGroupDetails";
+import { ConsumerGroupSummary } from "./ConsumerGroupSummary";
 import { ErrorWithRetry } from "./ErrorWithRetry";
 import { TopicTabs } from "./TopicTabs";
 
@@ -23,6 +24,7 @@ export function TopicConsumerGroups({ gateway, topicName, listConsumerGroups }: 
       <TopicTabs gateway={gateway} topicName={topicName} />
       <h2>{topicName}</h2>
       <h3>Consumers</h3>
+      <p>Inspect groups associated with this topic and their topic-specific partition lag.</p>
       {isError ? (
         <ErrorWithRetry error={error} gateway={gateway} onRetry={() => void refetch()} />
       ) : filtered === undefined ? (
@@ -32,9 +34,12 @@ export function TopicConsumerGroups({ gateway, topicName, listConsumerGroups }: 
           {filtered.associated.length === 0 ? (
             <p>{filtered.unresolved.length > 0 ? "No known consumer groups for this topic." : "No consumer groups for this topic."}</p>
           ) : (
-            filtered.associated.map((group) => (
-              <ConsumerGroupDetails key={group.id} group={group} onRetry={() => void refetch()} />
-            ))
+            <>
+              <ConsumerGroupSummary groups={filtered.associated} />
+              {filtered.associated.map((group) => (
+                <ConsumerGroupDetails key={group.id} group={group} onRetry={() => void refetch()} />
+              ))}
+            </>
           )}
           {filtered.unresolved.map((group) => (
             <div role="alert" key={group.id}>

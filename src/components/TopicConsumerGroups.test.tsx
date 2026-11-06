@@ -28,6 +28,10 @@ describe("TopicConsumerGroups", () => {
     renderWithQuery(<TopicConsumerGroups gateway={gateway} topicName="orders" listConsumerGroups={list} />);
 
     const table = await screen.findByRole("table", { name: "Partition lag for reader" });
+    const summary = within(screen.getByRole("navigation", { name: "Consumer group summary" }));
+    expect(summary.getByRole("link", { name: "reader" }).getAttribute("href")).toBe("#consumer-group-reader");
+    expect(summary.queryByRole("link", { name: "other" })).toBeNull();
+    expect(screen.getByRole("region", { name: "Consumer group reader" }).id).toBe("consumer-group-reader");
     expect(within(table).getByText("orders")).toBeDefined();
     expect(within(table).queryByText("audit")).toBeNull();
     expect(screen.queryByRole("heading", { name: "other" })).toBeNull();
@@ -45,6 +49,7 @@ describe("TopicConsumerGroups", () => {
     const alert = screen.getByRole("alert");
     expect(alert.textContent).toContain('Could not determine whether group "unknown" consumes this topic');
     expect(alert.textContent).toContain("group access denied");
+    expect(screen.queryByRole("navigation", { name: "Consumer group summary" })).toBeNull();
     expect(screen.queryByRole("heading", { name: "unknown" })).toBeNull();
   });
 
