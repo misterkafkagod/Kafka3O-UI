@@ -6,7 +6,8 @@ describe("NoGatewaysConfigured", () => {
   it("shows the message and a config.json example", () => {
     render(<NoGatewaysConfigured />);
 
+    expect(screen.getByRole("main")).toBeDefined();
     expect(screen.getByRole("heading", { name: "No gateways configured" })).toBeDefined();
-    expect(screen.getByText(/"gateways":\[\{"id":"dev"/)).toBeDefined();
+    expect(screen.getByText(/"url":"https:\/\/localhost:8081"/)).toBeDefined();
   });
 });

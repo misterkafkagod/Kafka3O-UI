@@ -17,5 +17,9 @@
   - Files: `src/pages/TopicMessagesPage.tsx`, `src/components/LinkedTopicMessage.tsx`, `src/components/SearchTopicMessages.tsx`, `src/components/ConsumerGroups.tsx`, `src/components/TopicConsumerGroups.tsx`, `src/components/GatewayTopicSearchResults.tsx`, `src/pages/TopicPage.test.tsx`, `src/components/SearchTopicMessages.test.tsx`, `src/components/ConsumerGroups.test.tsx`, `src/components/TopicConsumerGroups.test.tsx`, `src/components/CrossClusterTopicSearch.test.tsx`
   - Do: Expose these loading states accessibly while preserving distinct empty/no-match and error states, retry actions and successful cross-cluster results when another gateway fails.
   - Done when: `npm test -- src/pages/TopicPage.test.tsx src/components/SearchTopicMessages.test.tsx src/components/ConsumerGroups.test.tsx src/components/TopicConsumerGroups.test.tsx src/components/CrossClusterTopicSearch.test.tsx` passes and `npm run build` passes.
+- [x] **T32.3 Fix the empty-configuration landmark and example** — Covers: F19-AC3
+  - Files: `src/components/NoGatewaysConfigured.tsx`, `src/components/NoGatewaysConfigured.test.tsx`
+  - Do: Give the empty-configuration view a main landmark and show a usable HTTPS gateway example, consistent with the secured-gateway requirement.
+  - Done when: `npm test -- src/components/NoGatewaysConfigured.test.tsx src/pages/ClustersPage.test.tsx` and `npm run build` pass.
 
 ## Review
