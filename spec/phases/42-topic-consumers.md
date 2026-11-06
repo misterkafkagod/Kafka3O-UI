@@ -2,7 +2,7 @@
 - **Milestone:** M8
 - **Covers:** F23-AC2
 - **Discovery:** —
-- **Status:** Review
+- **Status:** Done
 
 ## Demo
 1. Inspect a topic with an associated group and verify its summary links only to that topic's partition rows.
@@ -15,3 +15,6 @@
   - Done when: `npm test -- src/components/TopicConsumerGroups.test.tsx src/pages/TopicPage.test.tsx src/App.test.tsx` and `npm run build` pass.
 
 ## Review
+- **Demo:** Browser fixtures showed only the associated group and this topic's partition rows. An unresolved association remained a visible error, then cleared after a successful retry.
+- **Validation:** All 320 UI tests and the production build passed on Node 24.21.0. The M8 deployment remains deferred until the milestone's final phase.
+- **Vulnerability scan:** Not run; P42 adds no dependencies and is not the final M8 phase.
