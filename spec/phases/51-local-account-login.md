@@ -26,7 +26,7 @@ security boundary.
    outstanding.
 
 ## Tasks
-- [ ] **T51.1 Add a same-origin Console session client** — Covers: F27-AC1
+- [x] **T51.1 Add a same-origin Console session client** — Covers: F27-AC1
   - Files: `src/console/ConsoleSession.ts` (new), `src/console/ConsoleSessionError.ts` (new), `src/console/requestConsoleSession.ts` (new), `src/console/readConsoleCsrf.ts` (new), `src/console/parseConsoleSession.ts` (new), `src/console/readConsoleSession.ts` (new), `src/console/signInLocal.ts` (new), `src/console/changeLocalPassword.ts` (new), `src/console/signOutConsole.ts` (new), and corresponding tests (new).
   - Do: Use injected browser I/O, verified same-origin HTTPS, fixed session paths, same-origin cookies, no redirects or caching, bounded request time, and the session-bound CSRF cookie for mutations. Validate responses and expose distinct authentication, throttling, service and uncertain-mutation outcomes without storing or logging credentials or retrying mutations.
   - Done when: `npm test -- src/console` and `npm run typecheck` pass, including insecure origins, malformed responses, missing CSRF, redirects, expired sessions, throttle and unknown-outcome cases.
