@@ -2,7 +2,7 @@
 - **Milestone:** M10
 - **Covers:** The local Console-session portions of F27-AC3 and F29-AC4, and the revocation-audit portion of F27-AC4
 - **Discovery:** —
-- **Status:** Planned
+- **Status:** Building
 
 ## Existing baseline and boundaries
 P51's loopback Console already issues opaque local sessions, checks idle and
@@ -26,8 +26,8 @@ does not deploy the preview or alter the existing manual access path.
    then verify the default UI and persistent Kafka deployment remain intact.
 
 ## Tasks
-- [ ] **T52.1 Add audited single-session revocation** — Covers: local F27-AC3, F27-AC4, F29-AC4
-  - Files: Gateway `internal/console/identity/account.go`, `internal/console/identity/validate_session_id.go` (new), `internal/console/identity/revoke_admin_session.go` (new), `internal/console/identity/revoke_admin_session_test.go` (new), `internal/console/storage/revoke_admin_session.go` (new), `internal/console/storage/revoke_admin_session_test.go` (new), Gateway `internal/console/README.md`.
+- [x] **T52.1 Add audited single-session revocation** — Covers: local F27-AC3, F27-AC4, F29-AC4
+  - Files: Gateway `internal/console/identity/account.go`, `internal/console/identity/validate_session_id.go` (new), `internal/console/identity/revoke_admin_session.go` (new), `internal/console/identity/revoke_admin_session_test.go` (new), `internal/console/storage/revoke_admin_session.go` (new), `internal/console/storage/revoke_admin_session_test.go` (new), Gateway `internal/console/README.md`, `spec/ROADMAP.md`, `spec/TECH-SPEC.md`.
   - Do: Give a current unrestricted local global ADMIN an individually targeted, audited session revocation. Recheck the actor's current session and grant after obtaining the SQLite transaction; atomically commit the target revocation and redacted outcome. Handle invalid, missing, expired, already-revoked and self-targeted sessions explicitly, and report audit failure or an uncertain transaction without automatic retry. Never expose or log token or CSRF material.
   - Done when: `go test ./internal/console/identity ./internal/console/storage -run 'Test.*AdminSession|Test.*SessionID'` passes, covering success, self-revocation, unrelated sessions, denial, queued expiry, redaction, audit failure and uncertain outcomes.
 - [ ] **T52.2 Add bounded active-session listing** — Covers: local F27-AC3, F29-AC4
