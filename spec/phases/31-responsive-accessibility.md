@@ -2,14 +2,14 @@
 - **Milestone:** M6
 - **Covers:** F19-AC2
 - **Discovery:** —
-- **Status:** Planned
+- **Status:** Building
 
 ## Demo
 1. On the updated manual-test UI, check 320, 768 and 1440 CSS-pixel viewport widths and a separate 200% zoom check; confirm there is no page-wide horizontal overflow and wide tables scroll in labeled regions.
 2. Navigate using only the keyboard; verify the skip link, logical focus order and visible focus. Emulate reduced motion and confirm nonessential motion is removed.
 
 ## Tasks
-- [ ] **T31.1 Add an accessible scroll region for wide tables** — Covers: F19-AC2
+- [x] **T31.1 Add an accessible scroll region for wide tables** — Covers: F19-AC2
   - Files: `src/components/ScrollableTableRegion.tsx` (new), `src/components/ScrollableTableRegion.module.css` (new), `src/components/ScrollableTableRegion.test.tsx` (new)
   - Do: Create one reusable, labeled and keyboard-focusable region that contains horizontal overflow without changing table semantics.
   - Done when: `npm test -- src/components/ScrollableTableRegion.test.tsx` passes, confirming the region's accessible name and contained table.
