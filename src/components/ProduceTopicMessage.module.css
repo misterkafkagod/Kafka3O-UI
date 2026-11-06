@@ -1,0 +1,52 @@
+.context,
+.help {
+  margin: 0;
+  color: var(--color-text-muted);
+  overflow-wrap: anywhere;
+}
+
+.help {
+  font-size: 0.9rem;
+}
+
+.form fieldset {
+  gap: 0.85rem;
+}
+
+.form fieldset label {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.35rem;
+}
+
+.form fieldset .checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.form h4 {
+  margin: 0;
+}
+
+.headerRow {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) auto;
+  align-items: end;
+  gap: 0.65rem;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+@media (max-width: 40rem) {
+  .headerRow {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .actions button {
+    flex: 1 1 100%;
+  }
+}

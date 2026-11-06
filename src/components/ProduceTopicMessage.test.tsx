@@ -26,6 +26,8 @@ describe("ProduceTopicMessage", () => {
         </MemoryRouter>
       </QueryClientProvider>,
     );
+    expect(screen.getByRole("form", { name: "Produce message" }).textContent).toContain("Destination: orders on Dev");
+    expect(screen.getByRole("group", { name: "Message content" })).toBeDefined();
     await user.click(screen.getByLabelText("Include key"));
     await user.click(screen.getByRole("button", { name: "Add header" }));
     await user.type(screen.getByLabelText("Header 1 key"), "source");
@@ -39,6 +41,7 @@ describe("ProduceTopicMessage", () => {
     expect(screen.getByRole("button", { name: "Sending…" }).matches(":disabled")).toBe(true);
     resolve({ partition: 2, offset: "9007199254740993" });
     expect(await screen.findByText(/Sent to partition 2, offset 9007199254740993/)).toBeDefined();
+    expect(screen.getByRole("status").textContent).toContain("9007199254740993");
     expect(screen.getByRole("link", { name: "Read this message" }).getAttribute("href"))
       .toBe("/clusters/dev/topics/orders/messages?partition=2&offset=9007199254740993");
     await waitFor(() => expect(client.getQueryState(["gateway", "dev", "topics"])?.isInvalidated).toBe(true));

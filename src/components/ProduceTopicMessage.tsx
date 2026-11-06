@@ -8,6 +8,7 @@ import type { GatewayEntry, GatewayErrorKind } from "../gateway/types";
 import { produceMessageFromForm, type ProduceHeaderField } from "../messages/produceMessageFromForm";
 import { isGatewayTopicListQuery } from "../topics/isGatewayTopicListQuery";
 import { GatewayErrorRecovery } from "./GatewayErrorRecovery";
+import styles from "./ProduceTopicMessage.module.css";
 
 type ProduceTopicMessageProps = {
   gateway: GatewayEntry;
@@ -51,20 +52,23 @@ export function ProduceTopicMessage({ gateway, topicName, produceTopicMessage }:
   }
 
   return (
-    <form onSubmit={submit} aria-label="Produce message">
+    <form onSubmit={submit} aria-label="Produce message" className={styles.form}>
+      <p className={styles.context}>Destination: <strong>{topicName}</strong> on <strong>{gateway.name}</strong></p>
+      <p className={styles.help}>An empty value is allowed. Selecting Include key sends a key, even if it is empty.</p>
       <fieldset disabled={pending}>
+        <legend>Message content</legend>
         <label>
           Value (UTF-8)
           <textarea value={value} onChange={(event) => setValue(event.target.value)} />
         </label>
-        <label>
+        <label className={styles.checkbox}>
           <input type="checkbox" checked={includeKey} onChange={(event) => setIncludeKey(event.target.checked)} />
           Include key
         </label>
         {includeKey ? <label>Key (UTF-8)<input value={key} onChange={(event) => setKey(event.target.value)} /></label> : null}
         <h4>Headers</h4>
         {headers.map((header, index) => (
-          <div key={header.id}>
+          <div key={header.id} className={styles.headerRow}>
             <label>
               Header {index + 1} key
               <input value={header.key} onChange={(event) => {
@@ -83,11 +87,13 @@ export function ProduceTopicMessage({ gateway, topicName, produceTopicMessage }:
               setHeaders((current) => current.filter((item) => item.id !== header.id))}>Remove</button>
           </div>
         ))}
-        <button type="button" onClick={() => {
-          const id = nextHeader.current++;
-          setHeaders((current) => [...current, { id, key: "", value: "" }]);
-        }}>Add header</button>
-        <button type="submit">{pending ? "Sending…" : "Send message"}</button>
+        <div className={styles.actions}>
+          <button type="button" onClick={() => {
+            const id = nextHeader.current++;
+            setHeaders((current) => [...current, { id, key: "", value: "" }]);
+          }}>Add header</button>
+          <button type="submit">{pending ? "Sending…" : "Send message"}</button>
+        </div>
       </fieldset>
       {error ? (
         <div role="alert">
@@ -96,7 +102,7 @@ export function ProduceTopicMessage({ gateway, topicName, produceTopicMessage }:
         </div>
       ) : null}
       {result ? (
-        <p>
+        <p role="status">
           Sent to partition {result.partition}, offset {result.offset}.{" "}
           <Link to={`/clusters/${encodeURIComponent(gateway.id)}/topics/${encodeURIComponent(topicName)}/messages?${new URLSearchParams({ partition: String(result.partition), offset: result.offset })}`}>Read this message</Link>
         </p>
