@@ -54,6 +54,8 @@ describe("TopicList", () => {
     );
 
     await screen.findByRole("table", { name: "Topics" });
+    expect(screen.getByRole("region", { name: "Topic filters" })).toBeDefined();
+    expect(screen.getByRole("status").textContent).toBe("Showing 1 of 1 topic");
     expect(topicNames()).toEqual(["orders"]);
     const toggle = screen.getByRole("checkbox", { name: "Show internal" });
     expect((toggle as HTMLInputElement).checked).toBe(false);
@@ -61,6 +63,7 @@ describe("TopicList", () => {
     await userEvent.click(toggle);
 
     expect(topicNames()).toEqual(["__consumer_offsets", "orders"]);
+    expect(screen.getByRole("status").textContent).toBe("Showing 2 of 2 topics");
   });
 
   it("shows No topics when only internal topics exist (F3-AC4)", async () => {
@@ -77,6 +80,7 @@ describe("TopicList", () => {
     await userEvent.type(screen.getByRole("searchbox", { name: "Filter topics" }), "ORD");
 
     expect(topicNames()).toEqual(["orders"]);
+    expect(screen.getByRole("status").textContent).toBe("Showing 1 of 2 topics");
   });
 
   it("shows No topics match when nothing matches", async () => {
@@ -86,6 +90,7 @@ describe("TopicList", () => {
     await userEvent.type(screen.getByRole("searchbox", { name: "Filter topics" }), "zzz");
 
     expect(screen.getByText('No topics match "zzz"')).toBeDefined();
+    expect(screen.getByRole("status").textContent).toBe("Showing 0 of 2 topics");
     expect(screen.queryByText("No topics")).toBeNull();
     expect(screen.queryByRole("table", { name: "Topics" })).toBeNull();
   });

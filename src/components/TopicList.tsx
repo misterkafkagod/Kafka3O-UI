@@ -5,6 +5,7 @@ import { useTopics } from "../hooks/useTopics";
 import { compareTopicsByName } from "../topics/compareTopicsByName";
 import { filterTopics } from "../topics/filterTopics";
 import { ErrorWithRetry } from "./ErrorWithRetry";
+import styles from "./TopicList.module.css";
 import { TopicTable } from "./TopicTable";
 
 type TopicListProps = {
@@ -29,13 +30,18 @@ export function TopicList({ gateway, listTopics }: TopicListProps) {
 
   return (
     <>
-      <label>
-        Filter topics <input type="search" value={text} onChange={(event) => setText(event.target.value)} />
-      </label>{" "}
-      <label>
-        <input type="checkbox" checked={showInternal} onChange={(event) => setShowInternal(event.target.checked)} /> Show
-        internal
-      </label>
+      <section aria-label="Topic filters" className={styles.filters}>
+        <label className={styles.search}>
+          Filter topics <input type="search" value={text} onChange={(event) => setText(event.target.value)} />
+        </label>
+        <label className={styles.internal}>
+          <input type="checkbox" checked={showInternal} onChange={(event) => setShowInternal(event.target.checked)} /> Show
+          internal
+        </label>
+      </section>
+      <p className={styles.count} role="status">
+        Showing {visible.length} of {available.length} {available.length === 1 ? "topic" : "topics"}
+      </p>
       {available.length === 0 ? (
         <p>No topics</p>
       ) : visible.length === 0 ? (

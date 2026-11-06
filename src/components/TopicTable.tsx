@@ -18,7 +18,7 @@ export function TopicTable({ gatewayId, topics }: { gatewayId: string; topics: T
           {topics.map((topic) => (
             <tr key={topic.name}>
               <td>
-                <Link to={`/clusters/${gatewayId}/topics/${encodeURIComponent(topic.name)}`}>{topic.name}</Link>
+                <Link to={`/clusters/${encodeURIComponent(gatewayId)}/topics/${encodeURIComponent(topic.name)}`}>{topic.name}</Link>
               </td>
               <td>{topic.partitions}</td>
               <td>{topic.replicationFactor}</td>

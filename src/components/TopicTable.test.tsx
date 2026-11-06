@@ -56,4 +56,19 @@ describe("TopicTable", () => {
       "/clusters/dev/topics/orders%20%26%20audit",
     );
   });
+
+  it("encodes gateway IDs and topic names independently", () => {
+    render(
+      <MemoryRouter>
+        <TopicTable
+          gatewayId="dev/west"
+          topics={[{ name: "orders & audit", partitions: 1, replicationFactor: 1, internal: false, approxMessages: 0 }]}
+        />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole("link", { name: "orders & audit" }).getAttribute("href")).toBe(
+      "/clusters/dev%2Fwest/topics/orders%20%26%20audit",
+    );
+  });
 });
