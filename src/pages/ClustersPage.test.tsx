@@ -64,6 +64,9 @@ describe("ClustersPage", () => {
     expect(await screen.findByRole("article", { name: "Dev" })).toBeDefined();
     expect(screen.getByRole("article", { name: "Prod" })).toBeDefined();
     expect(screen.getAllByRole("article")).toHaveLength(2);
+    expect(screen.getByRole("heading", { name: "Clusters", level: 2 })).toBeDefined();
+    expect(screen.getByText("2 gateways configured")).toBeDefined();
+    expect(within(screen.getByRole("region", { name: "Configured clusters" })).getAllByRole("article")).toHaveLength(2);
   });
 
   it("shows Healthy, cluster ID and 3 brokers (F1-AC2)", async () => {

@@ -2,14 +2,14 @@
 - **Milestone:** M7
 - **Covers:** F21-AC1
 - **Discovery:** —
-- **Status:** Planned
+- **Status:** Building
 
 ## Demo
 1. Open an overview with two gateway fixtures at 320, 768 and 1440 CSS pixels; verify independently loading, healthy and failed cards show only available metadata.
 2. Search across both gateways with one failing; verify the other gateway's matches remain usable and the failed gateway offers recovery.
 
 ## Tasks
-- [ ] **T35.1 Organize the responsive cluster overview** — Covers: F21-AC1
+- [x] **T35.1 Organize the responsive cluster overview** — Covers: F21-AC1
   - Files: `src/pages/ClustersPage.tsx`, `src/components/ClusterCard.tsx`, `src/components/ClusterOverview.module.css` (new), and their tests
   - Do: Add a clearly headed responsive card grid and factual configured-gateway context. Retain the existing independent status, authentication and transport states; encode gateway IDs in card links and never show unavailable metadata as a count.
   - Done when: `npm test -- src/pages/ClustersPage.test.tsx src/components/ClusterCard.test.tsx src/App.test.tsx` and `npm run build` pass.

@@ -1,4 +1,5 @@
 import { ClusterCard } from "../components/ClusterCard";
+import styles from "../components/ClusterOverview.module.css";
 import { CrossClusterTopicSearch } from "../components/CrossClusterTopicSearch";
 import { GatewayConfigError } from "../components/GatewayConfigError";
 import { NoGatewaysConfigured } from "../components/NoGatewaysConfigured";
@@ -27,11 +28,17 @@ export function ClustersPage({ loadGatewayConfig, getCluster, listTopics, status
     return <NoGatewaysConfigured />;
   }
   return (
-    <main>
+    <main className={styles.overview}>
+      <header className={styles.heading}>
+        <h2>Clusters</h2>
+        <p>{gateways.length} {gateways.length === 1 ? "gateway" : "gateways"} configured</p>
+      </header>
       <CrossClusterTopicSearch gateways={gateways} listTopics={listTopics} />
-      {gateways.map((gateway) => (
-        <ClusterCard key={gateway.id} gateway={gateway} getCluster={getCluster} statusRefreshMs={statusRefreshMs} />
-      ))}
+      <section aria-label="Configured clusters" className={styles.grid}>
+        {gateways.map((gateway) => (
+          <ClusterCard key={gateway.id} gateway={gateway} getCluster={getCluster} statusRefreshMs={statusRefreshMs} />
+        ))}
+      </section>
     </main>
   );
 }

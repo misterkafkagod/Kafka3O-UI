@@ -5,6 +5,7 @@ import type { GetCluster } from "../gateway/getCluster";
 import { HttpError } from "../gateway/HttpError";
 import type { GatewayEntry } from "../gateway/types";
 import { useClusterStatus } from "../hooks/useClusterStatus";
+import styles from "./ClusterOverview.module.css";
 import { GatewayCredentialAction } from "./GatewayCredentialAction";
 
 type ClusterCardProps = {
@@ -19,40 +20,40 @@ export function ClusterCard({ gateway, getCluster, statusRefreshMs }: ClusterCar
   const errorKind = isError ? classifyGatewayError(error) : undefined;
 
   return (
-    <article aria-label={gateway.name}>
-      <h2>
-        <Link to={`/clusters/${gateway.id}`}>{gateway.name}</Link>
-      </h2>
-      <p>{gateway.url}</p>
+    <article aria-label={gateway.name} className={styles.card}>
+      <h3>
+        <Link to={`/clusters/${encodeURIComponent(gateway.id)}`}>{gateway.name}</Link>
+      </h3>
+      <p className={styles.endpoint}>{gateway.url}</p>
       {errorKind === "authentication-required" ? (
         <>
-          <p>Authentication required</p>
+          <p className={`${styles.status} ${styles.failure}`}>Authentication required</p>
           <p>Enter or update this gateway's token.</p>
           <GatewayCredentialAction gateway={gateway} />
         </>
       ) : errorKind === "gateway-unreachable" ? (
         <>
-          <p>Gateway unreachable</p>
+          <p className={`${styles.status} ${styles.failure}`}>Gateway unreachable</p>
           <p>{describeGatewayTransportFailure(gateway.url)}</p>
         </>
       ) : errorKind === "cluster-unreachable" ? (
         <>
-          <p>Cluster unreachable</p>
+          <p className={`${styles.status} ${styles.failure}`}>Cluster unreachable</p>
           <p>{error instanceof HttpError ? error.problem?.detail : undefined}</p>
         </>
       ) : errorKind === "other" ? (
         <>
-          <p>Status unavailable</p>
+          <p className={`${styles.status} ${styles.failure}`}>Status unavailable</p>
           {error instanceof Error ? <p>{error.message}</p> : null}
         </>
       ) : cluster ? (
         <>
-          <p>Healthy</p>
+          <p className={`${styles.status} ${styles.healthy}`}>Healthy</p>
           <p>Cluster ID: {cluster.clusterId}</p>
           <p>{cluster.brokers.length === 1 ? "1 broker" : `${cluster.brokers.length} brokers`}</p>
         </>
       ) : (
-        <p role="status">Checking…</p>
+        <p role="status" className={styles.status}>Checking…</p>
       )}
     </article>
   );

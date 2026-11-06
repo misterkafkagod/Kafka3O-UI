@@ -29,10 +29,19 @@ describe("ClusterCard", () => {
     expect(screen.getByRole("link", { name: "Dev" }).getAttribute("href")).toBe("/clusters/dev");
   });
 
+  it("encodes gateway IDs in cluster links", () => {
+    renderWithQuery(
+      <ClusterCard gateway={{ ...gateway, id: "dev/west & east" }} statusRefreshMs={60_000} getCluster={() => new Promise(() => {})} />,
+    );
+
+    expect(screen.getByRole("link", { name: "Dev" }).getAttribute("href")).toBe("/clusters/dev%2Fwest%20%26%20east");
+  });
+
   it("shows Checking… while the status loads", () => {
     renderWithQuery(<ClusterCard gateway={gateway} statusRefreshMs={60_000} getCluster={() => new Promise(() => {})} />);
 
     expect(screen.getByRole("status").textContent).toBe("Checking…");
+    expect(screen.queryByText(/broker/i)).toBeNull();
   });
 
   it("shows Healthy, the cluster ID and the broker count", async () => {
@@ -61,6 +70,7 @@ describe("ClusterCard", () => {
 
     expect(await screen.findByText("Gateway unreachable")).toBeDefined();
     expect(screen.getByText(/browser cannot determine the cause/).textContent).not.toContain("certificate");
+    expect(screen.queryByText(/broker/i)).toBeNull();
   });
 
   it("suggests certificate trust checks for an HTTPS gateway transport failure", async () => {
