@@ -2,7 +2,7 @@
 - **Milestone:** M10
 - **Covers:** F27-AC1 and the local-account portion of F27-AC4
 - **Discovery:** —
-- **Status:** Building
+- **Status:** Review
 
 ## Existing baseline
 The Gateway already provides the tested offline bootstrap, local
@@ -34,8 +34,8 @@ security boundary.
   - Files: `src/components/ConsoleSessionGate.tsx` (new), `src/components/ConsoleSessionGate.module.css` (new), `src/components/ConsoleSessionGate.test.tsx` (new), `src/main.tsx`, `src/main.test.tsx`.
   - Do: Add an explicitly opt-in authentication-only preview for session inspection, local sign-in, mandatory password replacement and logout. Make loading, errors, throttling and uncertain outcomes accessible and clear; clear password fields, prevent duplicate submissions, and never render the legacy Gateway shell or send Kafka requests in preview mode. Keep the default manual UI unchanged.
   - Done when: `npm test -- src/components/ConsoleSessionGate.test.tsx src/main.test.tsx src/App.test.tsx` and `npm run build` pass with and without the preview flag.
-- [ ] **T51.3 Verify the preview against real HTTPS** — Covers: F27-AC1, local F27-AC4
-  - Files: `src/test/consolePreviewHttps.ts` (new), `src/console/previewIntegration.test.ts` (new), Gateway `cmd/console/server_test.go`, Gateway `internal/console/README.md`, `spec/ROADMAP.md`, `spec/TECH-SPEC.md`.
+- [x] **T51.3 Verify the preview against real HTTPS** — Covers: F27-AC1, local F27-AC4
+  - Files: `src/test/consolePreviewHttps.ts` (new), `src/test/consolePreviewFetch.ts` (new), `src/console/previewIntegration.test.ts` (new), Gateway `cmd/console/preview_fixture_test.go` (new), Gateway `cmd/console/server_test.go`, Gateway `internal/console/README.md`, `spec/ROADMAP.md`, `spec/TECH-SPEC.md`.
   - Do: Provide a loopback-only, verified same-origin HTTPS test fixture for the built preview and existing Console API. Exercise bootstrap, restricted and normal login, password replacement, logout and denied credentials; verify no legacy Gateway request occurs. Keep the existing EKS-D manual deployment and persistent Kafka volumes untouched.
   - Done when: the real HTTPS fixture and the full Gateway and UI test suites pass; record any unavailable manual-browser or deployment checks as not run.
 
