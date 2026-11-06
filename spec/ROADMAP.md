@@ -128,7 +128,7 @@ The console should be comfortable for dense technical data, easy to navigate, an
     - Demo: visit the overview, cluster sections and topic views; verify the active navigation and breadcrumb destinations match each page.
   - **P29** F18-B2 · Restore direct routes and browser history — Covers: F18-AC2 · Discovery: — · Status: Done
     - Demo: open an encoded-topic exact-message URL directly, then use Back and Forward and verify the topic and exact message position.
-  - **P30** F19-B1 · Apply a shared visual language and system theme — Covers: F19-AC1 · Discovery: — · Status: Review
+  - **P30** F19-B1 · Apply a shared visual language and system theme — Covers: F19-AC1 · Discovery: — · Status: Done
     - Demo: check representative pages in light and dark themes; verify contrast, accessible control names and text-based statuses.
   - **P31** F19-B2 · Keep pages usable across viewports and input modes — Covers: F19-AC2 · Discovery: — · Status: Planned
     - Demo: check 320, 768 and 1440 CSS-pixel widths and 200% zoom; navigate by keyboard and verify skip navigation, focus, contained table overflow and reduced motion.
