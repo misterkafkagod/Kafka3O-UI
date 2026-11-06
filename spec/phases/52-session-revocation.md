@@ -2,7 +2,7 @@
 - **Milestone:** M10
 - **Covers:** The local Console-session portions of F27-AC3 and F29-AC4, and the revocation-audit portion of F27-AC4
 - **Discovery:** —
-- **Status:** Building
+- **Status:** Review
 
 ## Existing baseline and boundaries
 P51's loopback Console already issues opaque local sessions, checks idle and
@@ -38,7 +38,7 @@ does not deploy the preview or alter the existing manual access path.
   - Files: Gateway `internal/console/httpapi/session_api.go`, `internal/console/httpapi/new_session_api.go`, `internal/console/httpapi/list_admin_sessions.go` (new), `internal/console/httpapi/read_admin_session_list_query.go` (new), `internal/console/httpapi/revoke_admin_session.go` (new), corresponding HTTP and storage integration tests, Gateway `cmd/console/new_session_handler.go`, `cmd/console/server_test.go`, Gateway `internal/console/README.md`.
   - Do: Mount authenticated `GET /api/admin/sessions` and CSRF/Origin-protected `POST /api/admin/sessions/{sessionID}/revoke` on the existing loopback HTTPS API. Derive the actor from the session, use bounded validated input and no-store responses, map authorization, validation, audit and uncertain outcomes distinctly, and clear cookies on confirmed or uncertain self-revocation. Wire real services and update constructor tests without adding any Kafka route.
   - Done when: `go test ./internal/console/httpapi ./internal/console/storage ./cmd/console` passes, including TLS, global-versus-cluster ADMIN, malformed input, CSRF, self-revocation and next-request denial.
-- [ ] **T52.4 Verify revoked-session UI handling** — Covers: local F27-AC3, F29-AC4
+- [x] **T52.4 Verify revoked-session UI handling** — Covers: local F27-AC3, F29-AC4
   - Files: `src/components/ConsoleSessionGate.test.tsx`, `src/console/previewIntegration.test.ts`, and any tightly coupled fixture or UI files required by the test.
   - Do: Verify that the authentication-only preview discards signed-in state after the real Console rejects a revoked session and never replays a mutation or falls back to the legacy Gateway. Preserve the existing manual UI. Document any native-browser, deployment, secured-cache and Gateway checks not run.
   - Done when: the opt-in built-preview HTTPS integration, `npm test`, `npm run build`, and `go test ./...` pass; no persistent Kafka data or existing deployment is changed.

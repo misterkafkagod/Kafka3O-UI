@@ -233,6 +233,8 @@ describe("ConsoleSessionGate", () => {
     await user.click(await screen.findByRole("button", { name: "Sign out" }));
     expect((await screen.findByRole("status")).textContent).toContain("session has ended");
     expect(screen.getByRole("form", { name: "Local sign-in" })).toBeDefined();
+    expect(screen.queryByRole("heading", { name: "Signed in" })).toBeNull();
+    expect(client.inspect).toHaveBeenCalledTimes(1);
     expect(client.signOut).toHaveBeenCalledTimes(1);
   });
 

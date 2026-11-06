@@ -20,6 +20,7 @@ declare const jsdom: {
       hostOnly?: boolean;
     }[];
     removeAllCookiesSync: () => void;
+    cloneSync: () => PreviewCookieJar | undefined;
   };
 };
 
@@ -62,6 +63,10 @@ describe.skipIf(process.env.KAFKA3O_PREVIEW_INTEGRATION !== "1")("built Console 
     await expect(probe({ ca, servername: "wrong.invalid" })).rejects.toMatchObject({ code: "ERR_TLS_CERT_ALTNAME_INVALID" });
     expect(await probe({ ca })).toBe(200);
 
+    jsdom.cookieJar.removeAllCookiesSync();
+    const administratorJar = jsdom.cookieJar.cloneSync();
+    if (!administratorJar) throw new Error("Could not create an isolated administrator cookie jar");
+    const administrator = consolePreviewFetch(origin, ca, administratorJar);
     const network = consolePreviewFetch(origin, ca, jsdom.cookieJar);
     const html = await network.fetch(`${origin}/`);
     expect(html.status).toBe(200);
@@ -116,6 +121,53 @@ describe.skipIf(process.env.KAFKA3O_PREVIEW_INTEGRATION !== "1")("built Console 
       credentials: "same-origin", cache: "no-store", redirect: "error",
     })).status).toBe(401);
 
+    await user.type(screen.getByLabelText("Password"), "replacement passphrase");
+    await user.click(screen.getByRole("button", { name: "Sign in" }));
+    expect(await screen.findByRole("heading", { name: "Signed in" })).toBeDefined();
+    const options = { credentials: "same-origin", cache: "no-store", redirect: "error" } as const;
+    const adminLogin = await administrator.fetch(`${origin}/api/session/local`, {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username: "admin", password: "replacement passphrase" }),
+    });
+    expect(adminLogin.status).toBe(200);
+    const adminSessions = await administrator.fetch(`${origin}/api/admin/sessions`, options);
+    expect(adminSessions.status).toBe(200);
+    const adminPage: { sessions: { id: string; isCurrent: boolean }[] } = await adminSessions.json();
+    expect(adminPage.sessions).toHaveLength(2);
+    expect(adminPage.sessions.filter((item) => item.isCurrent)).toHaveLength(1);
+    const previewSessions = adminPage.sessions.filter((item) => !item.isCurrent);
+    expect(previewSessions).toHaveLength(1);
+    const previewSessionID = previewSessions[0].id;
+    expect(previewSessionID).toMatch(/^[A-Za-z0-9_-]{22}$/);
+    const csrfPrefix = "__Host-kafka3o_csrf=";
+    const adminCSRF = administratorJar.getCookieStringSync(origin, { http: true })
+      .split("; ").find((cookie) => cookie.startsWith(csrfPrefix))?.slice(csrfPrefix.length);
+    if (!adminCSRF) throw new Error("Administrator login did not provide a CSRF cookie");
+    const revocationPath = `/api/admin/sessions/${previewSessionID}/revoke`;
+    const revoked = await administrator.fetch(`${origin}${revocationPath}`, {
+      ...options, method: "POST", headers: { "X-Kafka3O-CSRF": adminCSRF },
+    });
+    expect(revoked.status).toBe(200);
+    expect(await revoked.json()).toMatchObject({ operationId: expect.any(String), signInRequired: false });
+    expect((await administrator.fetch(`${origin}/api/session`, options)).status).toBe(200);
+    expect(jsdom.cookieJar.getCookiesSync(origin, { http: true })
+      .some((cookie) => cookie.key === "__Host-kafka3o_session")).toBe(true);
+    expect(screen.getByRole("heading", { name: "Signed in" })).toBeDefined();
+    await user.click(screen.getByRole("button", { name: "Sign out" }));
+    expect(await screen.findByText("Your session has ended.")).toBeDefined();
+    expect(screen.getByRole("form", { name: "Local sign-in" })).toBeDefined();
+    expect(screen.queryByRole("heading", { name: "Signed in" })).toBeNull();
+    expect(jsdom.cookieJar.getCookiesSync(origin, { http: true })
+      .filter((cookie) => cookie.key === "__Host-kafka3o_session" || cookie.key === "__Host-kafka3o_csrf")).toHaveLength(0);
+    expect(administrator.requests.map(({ method, path, status }) => ({ method, path, status }))).toEqual([
+      { method: "POST", path: "/api/session/local", status: 200 },
+      { method: "GET", path: "/api/admin/sessions", status: 200 },
+      { method: "POST", path: revocationPath, status: 200 },
+      { method: "GET", path: "/api/session", status: 200 },
+    ]);
+
     const allowed = new Set([
       "GET /", `GET ${scriptPath}`, `GET ${stylesheetPath}`, "GET /api/session",
       "POST /api/session/local", "POST /api/session/password", "POST /api/session/logout",
@@ -123,8 +175,9 @@ describe.skipIf(process.env.KAFKA3O_PREVIEW_INTEGRATION !== "1")("built Console 
     expect(network.requests.filter((item) => item.origin !== origin || !allowed.has(`${item.method} ${item.path}`))).toEqual([]);
     expect(network.requests.filter((item) => item.path.startsWith("/api/") &&
       (item.credentials !== "same-origin" || item.cache !== "no-store" || item.redirect !== "error"))).toEqual([]);
-    expect(network.requests.filter((item) => item.method === "POST" && item.path === "/api/session/local")).toHaveLength(3);
+    expect(network.requests.filter((item) => item.method === "POST" && item.path === "/api/session/local")).toHaveLength(4);
     expect(network.requests.filter((item) => item.method === "POST" && item.path === "/api/session/password")).toHaveLength(1);
-    expect(network.requests.filter((item) => item.method === "POST" && item.path === "/api/session/logout")).toHaveLength(1);
+    expect(network.requests.filter((item) => item.method === "POST" && item.path === "/api/session/logout")
+      .map((item) => item.status)).toEqual([204, 401]);
   }, 30_000);
 });

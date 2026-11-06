@@ -13,6 +13,7 @@ export type PreviewRequest = {
   credentials: RequestCredentials | undefined;
   cache: RequestCache | undefined;
   redirect: RequestRedirect | undefined;
+  status?: number;
 };
 
 export function consolePreviewFetch(origin: string, ca: Buffer, jar: PreviewCookieJar) {
@@ -21,10 +22,11 @@ export function consolePreviewFetch(origin: string, ca: Buffer, jar: PreviewCook
     if (typeof input !== "string") throw new Error("The preview fixture accepts URL strings only");
     const url = new URL(input, origin);
     const method = init?.method ?? "GET";
-    requests.push({
+    const recorded: PreviewRequest = {
       origin: url.origin, path: url.pathname, method,
       credentials: init?.credentials, cache: init?.cache, redirect: init?.redirect,
-    });
+    };
+    requests.push(recorded);
     if (url.origin !== origin || url.username || url.password) throw new Error("The preview requested a different origin");
     if (init?.body != null && typeof init.body !== "string") throw new Error("Unexpected preview request body");
     if (init?.signal?.aborted) throw new Error("The preview request was aborted");
@@ -47,6 +49,7 @@ export function consolePreviewFetch(origin: string, ca: Buffer, jar: PreviewCook
             if (status === undefined || (status >= 300 && status < 400)) {
               throw new Error("The preview fixture received an unexpected redirect or status");
             }
+            recorded.status = status;
             const responseHeaders = new Headers();
             for (const [name, value] of Object.entries(incoming.headers)) {
               if (name === "set-cookie" || value === undefined) continue;
