@@ -313,6 +313,27 @@ is linked to a local account by email.
     sessions, direct and group grants, wrong or replaced markers, revocation,
     disablement, expiration, storage failure, restart, redaction and unbound
     isolation; `go test ./...` passes.
+- [x] **T53.4e Bind logout lookup and revocation** — Covers: foundation of F27-AC3, F27-AC4
+  - Files: Gateway `internal/console/storage/` logout lookup and session
+    revocation actions/tests, `internal/console/httpapi/` logout handler and
+    tests, Gateway `internal/console/README.md`, `spec/TECH-SPEC.md`,
+    `spec/ROADMAP.md`.
+  - Do: Add bound Cognito logout lookup and local/Cognito revocation actions
+    that require the current marker-to-session binding. Recheck that binding
+    in the transaction that revokes the session, deletes retained Cognito
+    credentials and records its audit. Permit explicit local logout of a
+    current bound Cognito session even when its claims, identity or lifetime
+    are unavailable, but never let an old or wrong binding affect a
+    replacement. Treat audit, storage and uncertain commits as operational
+    failures. The existing HTTP logout handler must clear cookies only for
+    an exact invalid-session result, not a joined operational failure.
+    Preserve unbound logout behavior and keep all managers and routes
+    unbound until the browser integration is ready.
+  - Done when: focused `Test.*BoundLogout` tests cover current, stale and
+    competing bindings, unavailable Cognito sessions, atomic credential
+    deletion/audit, commit failure, restart, redaction and unbound isolation;
+    HTTP tests cover uncertain logout without cookie deletion; `go test ./...`
+    passes.
 - [ ] **T53.4 Expose opt-in HTTPS SSO and logout** — Covers: F27-AC2, F27-AC3
   - Files: Gateway `internal/console/httpapi/` (new SSO handlers/tests and
     necessary API wiring), `cmd/console/` (configuration/composition and
