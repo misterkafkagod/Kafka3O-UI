@@ -125,6 +125,45 @@ describe("ConsoleSessionGate", () => {
     expect(client.signIn).not.toHaveBeenCalled();
   });
 
+  it("allows explicit sign-out before local sign-in when session inspection is unavailable", async () => {
+    const user = userEvent.setup();
+    const client = testClient();
+    client.inspect.mockRejectedValueOnce(new ConsoleSessionError("service_unavailable", 503));
+    render(<ConsoleSessionGate client={client} />);
+    expect(await screen.findByRole("heading", { name: "Sign-in unavailable" })).toBeDefined();
+    await user.click(screen.getByRole("button", { name: "Sign out" }));
+    expect(await screen.findByRole("form", { name: "Local sign-in" })).toBeDefined();
+    expect(client.signOut).toHaveBeenCalledTimes(1);
+    expect(client.signIn).not.toHaveBeenCalled();
+  });
+
+  it("does not claim sign-out or expose local sign-in when unavailable-session logout is uncertain", async () => {
+    const user = userEvent.setup();
+    const client = testClient();
+    client.inspect.mockRejectedValueOnce(new ConsoleSessionError("service_unavailable", 503));
+    client.signOut.mockRejectedValueOnce(new ConsoleSessionError("outcome_unknown"));
+    render(<ConsoleSessionGate client={client} />);
+    expect(await screen.findByRole("heading", { name: "Sign-in unavailable" })).toBeDefined();
+    await user.click(screen.getByRole("button", { name: "Sign out" }));
+    expect(await screen.findByRole("heading", { name: "Check your session" })).toBeDefined();
+    expect(screen.queryByRole("form", { name: "Local sign-in" })).toBeNull();
+    expect(client.signOut).toHaveBeenCalledTimes(1);
+    expect(client.signIn).not.toHaveBeenCalled();
+  });
+
+  it("keeps unavailable-session sign-out explicit when CSRF is missing", async () => {
+    const user = userEvent.setup();
+    const client = testClient();
+    client.inspect.mockRejectedValueOnce(new ConsoleSessionError("service_unavailable", 503));
+    client.signOut.mockRejectedValueOnce(new ConsoleSessionError("csrf_unavailable"));
+    render(<ConsoleSessionGate client={client} />);
+    expect(await screen.findByRole("heading", { name: "Sign-in unavailable" })).toBeDefined();
+    await user.click(screen.getByRole("button", { name: "Sign out" }));
+    expect((await screen.findAllByRole("alert")).some((alert) => alert.textContent?.includes("session may still be active"))).toBe(true);
+    expect(screen.queryByRole("form", { name: "Local sign-in" })).toBeNull();
+    expect(client.signOut).toHaveBeenCalledTimes(1);
+  });
+
   it("does not mistake an active session for a completed password change", async () => {
     const user = userEvent.setup();
     const client = testClient();

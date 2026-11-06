@@ -170,6 +170,25 @@ is linked to a local account by email.
     and commit failures, and unaffected local sessions; focused Cognito tests
     and `go test ./...` pass. Session-manager refresh coordination, browser
     integration, group grants and secured deployment remain unfinished.
+- [x] **T53.3h Coordinate Cognito session refreshes** — Covers: foundation of F27-AC3, F27-AC4
+  - Files: Gateway `internal/console/session/`, `cognito/`, `storage/` and
+    session API tests, `src/components/ConsoleSessionGate.tsx` and tests,
+    Gateway `internal/console/README.md`, `spec/TECH-SPEC.md`,
+    `spec/ROADMAP.md`.
+  - Do: Add an opt-in refresh-aware session manager using the same store as
+    the verified exchanger. Coalesce concurrent refreshes per session,
+    bound concurrent work and its duration, recheck freshness and session
+    state, and revalidate every request after completion. Never grant stale
+    claims or retry an unresolved generation. Report provider, audit and
+    in-flight uncertainty as service unavailable without clearing cookies;
+    preserve independent local login and CSRF-checked local logout, and
+    offer sign-out from the unavailable preview state.
+  - Done when: synthetic HTTPS tests cover stale refresh, rotation,
+    concurrent requests and managers, cancellation, restart/unresolved
+    reservations, outages, revocation, audit failure, local sessions and
+    HTTP cookie handling; focused Cognito and preview tests, `go test ./...`
+    and the UI suite pass. Browser SSO, group grants, retention cleanup and
+    secured deployment remain unfinished.
 - [ ] **T53.3 Issue and refresh Cognito application sessions** — Covers: F27-AC2, F27-AC4
   - Files: Gateway `internal/console/cognito/` (new exchange/refresh
     actions/tests), `internal/console/session/` and

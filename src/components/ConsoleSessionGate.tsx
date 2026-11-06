@@ -227,7 +227,10 @@ export function ConsoleSessionGate({ client }: ConsoleSessionGateProps) {
           {screen.kind === "unavailable" ? (
             <div>
               <p role="alert">The Console session could not be checked. Use verified HTTPS and check the service connection.</p>
-              <button type="button" onClick={inspectAgain} disabled={pending !== null}>{pending === "inspect" ? "Checking..." : "Check again"}</button>
+              <div className={styles.actions}>
+                <button type="button" onClick={inspectAgain} disabled={pending !== null}>{pending === "inspect" ? "Checking..." : "Check again"}</button>
+                <button type="button" className={styles.secondary} onClick={signOut} disabled={pending !== null}>{pending === "signOut" ? "Signing out..." : "Sign out"}</button>
+              </div>
             </div>
           ) : null}
           {screen.kind === "signedOut" ? (
