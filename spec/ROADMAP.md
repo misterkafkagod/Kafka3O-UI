@@ -158,10 +158,20 @@ The console should be comfortable for dense technical data, easy to navigate, an
     - Demo: copy an exact message link and reopen it, then check an unavailable or unverifiable position.
 
 ### M8 — Clear operational workflows
-- **Status:** Planned
+- **Status:** Active
 - **Features:** F23, F24
 - **Goal:** Make consumer lag investigation and existing write operations understandable, contextual and explicit about safety and uncertain outcomes.
-- **Phases:** To be defined by `skill-phase-breakdown`.
+- **Phases:**
+  - **P41** F23-B1 · Navigate cluster consumer-group summaries and details — Covers: F23-AC1 · Discovery: — · Status: Planned
+    - Demo: navigate from group summaries to exact partition-lag details and retry an incomplete group.
+  - **P42** F23-B2 · Investigate topic-specific consumer groups — Covers: F23-AC2 · Discovery: — · Status: Planned
+    - Demo: inspect a topic's associated group and distinguish an unresolved association.
+  - **P43** F24-B1 · Create topics with contextual feedback — Covers: F24-AC1 · Discovery: — · Status: Planned
+    - Demo: validate topic settings and inspect accepted and uncertain outcomes without repeating a pending request.
+  - **P44** F24-B2 · Produce messages with contextual feedback — Covers: F24-AC2 · Discovery: — · Status: Planned
+    - Demo: submit a synthetic message with an optional key and header, then inspect its exact acknowledged position or an uncertain outcome.
+  - **P45** F24-B3 · Request topic deletion with explicit consequences — Covers: F24-AC3 · Discovery: — · Status: Planned
+    - Demo: cancel a deletion, then confirm a synthetic request and distinguish acceptance from completed removal.
 
 M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded reads/searches and write safeguards. Each milestone must be served and verified at the EKS-D manual-test URL before it is marked Done; broker data and existing access endpoints must be preserved.
 

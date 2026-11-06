@@ -287,5 +287,27 @@ Read and search messages in a compact result list with a selected-record inspect
 ### F23 — Consumer investigation
 Inspect consumer groups and partition lag through summary-to-detail navigation, preserving explicit unknown, unavailable and missing-commit states.
 
+**Behaviors**
+- **F23-B1** User opens cluster consumer groups → a compact summary links to each group's existing member and partition-lag details
+- **F23-B2** User opens a topic's consumers → the same summary and details show only known associations for that topic, while unresolved associations remain visible
+
+**Acceptance criteria**
+- **F23-AC1** (B1) Given consumer groups, the overview identifies each group and its reported state and links to its details. Members, exact decimal offsets, missing commits, out-of-range and unavailable lag remain distinct; loading, empty, gateway-error and individual-group-error states retain their existing recovery.
+- **F23-AC2** (B2) Given a topic, the overview includes only associated groups and topic-specific partition rows. Unknown associations and incomplete data remain explicit and retryable; an unresolved association is not presented as a definite empty result.
+
+**External dependencies:** Existing consumer-group snapshots and topic association logic; no offset reset or new gateway API.
+
 ### F24 — Contextual write workflows
 Produce messages and create or delete topics through contextual forms with confirmation, pending-state protection and explicit confirmed, asynchronous or uncertain outcomes.
+
+**Behaviors**
+- **F24-B1** User creates a topic → a contextual form presents the existing topic settings and the accepted or uncertain outcome
+- **F24-B2** User produces a message → a contextual form presents the destination, payload, optional key and headers, and the exact acknowledged position or uncertain outcome
+- **F24-B3** User requests deletion → a clearly identified destructive action retains the existing confirmation and asynchronous or uncertain outcome
+
+**Acceptance criteria**
+- **F24-AC1** (B1) The create form identifies its gateway, keeps name and numeric validation, disables duplicate pending requests, reports acceptance, conflict or uncertain failure accurately, and refreshes topic lists.
+- **F24-AC2** (B2) The produce form identifies its topic and gateway, preserves empty values, optional keys and headers, prevents duplicate pending submissions, reports an exact acknowledged position or possible delivery, and never retries a write automatically.
+- **F24-AC3** (B3) The delete action identifies the topic and consequences, requires the existing confirmation, sends nothing on cancellation or unavailable confirmation, prevents repeated pending/accepted requests, and distinguishes accepted asynchronous deletion from an uncertain failure.
+
+**External dependencies:** Existing authenticated topic-create, message-produce and topic-delete APIs, and the browser confirmation facility.
