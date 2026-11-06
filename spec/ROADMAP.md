@@ -158,7 +158,7 @@ The console should be comfortable for dense technical data, easy to navigate, an
     - Demo: copy an exact message link and reopen it, then check an unavailable or unverifiable position.
 
 ### M8 — Clear operational workflows
-- **Status:** Active
+- **Status:** Done
 - **Features:** F23, F24
 - **Goal:** Make consumer lag investigation and existing write operations understandable, contextual and explicit about safety and uncertain outcomes.
 - **Phases:**
@@ -170,7 +170,7 @@ The console should be comfortable for dense technical data, easy to navigate, an
     - Demo: validate topic settings and inspect accepted and uncertain outcomes without repeating a pending request.
   - **P44** F24-B2 · Produce messages with contextual feedback — Covers: F24-AC2 · Discovery: — · Status: Done
     - Demo: submit a synthetic message with an optional key and header, then inspect its exact acknowledged position or an uncertain outcome.
-  - **P45** F24-B3 · Request topic deletion with explicit consequences — Covers: F24-AC3 · Discovery: — · Status: Review
+  - **P45** F24-B3 · Request topic deletion with explicit consequences — Covers: F24-AC3 · Discovery: — · Status: Done
     - Demo: cancel a deletion, then confirm a synthetic request and distinguish acceptance from completed removal.
 
 M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded reads/searches and write safeguards. Each milestone must be served and verified at the EKS-D manual-test URL before it is marked Done; broker data and existing access endpoints must be preserved.
@@ -182,8 +182,14 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
 - **Verification debt:** Run the Docker-only stopped-broker test and P14 browser demo, and verify the remaining cross-cluster and consumer-group browser demos.
 - **Verification debt:** Repeat the P24–P27 browser smoke test with a trusted deployment certificate and complete the producer key/header browser demo.
 - **Verification debt:** Run the built gateway container in a deployment; the image was built and scanned on EKS-D but was not started as a container.
+- **Verification debt:** Repeat M7/M8 exact-record and consumer-detail browser demos with trusted Gateway certificates when test records and consumer groups are available; real write demos require scoped synthetic data.
 
 ## Learnings
+- 2026-11-06 (M8 retro): P41–P45 cover F23–F24 with accessible consumer-summary navigation and contextual create, produce and delete workflows.
+- 2026-11-06 (M8 retro): Fixture-driven demos exercised validation, pending guards, uncertain writes, cancellation and exact offsets without modifying persistent Kafka data.
+- 2026-11-06 (M8 retro): Both live consumer-group reads succeeded but returned no groups, so live group-detail and exact-record demos remain outstanding.
+- 2026-11-06 (M8 retro): The final EKS-D rollout retained the previous UI ConfigMap and healthy brokers; its test certificates and tokens rotated and the tunnel was restored.
+- 2026-11-06 (M8 retro): Both npm audits had zero findings; Node itself remains pending a runtime vulnerability scan.
 - 2026-11-06 (M7 retro): P35–P40 cover F21–F22 while preserving independent Gateway failures, bounded searches and exact message positions.
 - 2026-11-06 (M7 retro): A shared selectable inspector avoids repeated payload expansion and keeps selection local to the current result set.
 - 2026-11-06 (M7 retro): Browser fixtures exercised large offsets, unavailable records and recovery; the persistent clusters had no sampled records for a real exact-position demo, so that check remains unrun.
