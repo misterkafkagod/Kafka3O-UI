@@ -168,7 +168,7 @@ The console should be comfortable for dense technical data, easy to navigate, an
     - Demo: inspect a topic's associated group and distinguish an unresolved association.
   - **P43** F24-B1 · Create topics with contextual feedback — Covers: F24-AC1 · Discovery: — · Status: Done
     - Demo: validate topic settings and inspect accepted and uncertain outcomes without repeating a pending request.
-  - **P44** F24-B2 · Produce messages with contextual feedback — Covers: F24-AC2 · Discovery: — · Status: Review
+  - **P44** F24-B2 · Produce messages with contextual feedback — Covers: F24-AC2 · Discovery: — · Status: Done
     - Demo: submit a synthetic message with an optional key and header, then inspect its exact acknowledged position or an uncertain outcome.
   - **P45** F24-B3 · Request topic deletion with explicit consequences — Covers: F24-AC3 · Discovery: — · Status: Planned
     - Demo: cancel a deletion, then confirm a synthetic request and distinguish acceptance from completed removal.
