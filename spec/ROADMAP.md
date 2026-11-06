@@ -170,7 +170,7 @@ The console should be comfortable for dense technical data, easy to navigate, an
     - Demo: validate topic settings and inspect accepted and uncertain outcomes without repeating a pending request.
   - **P44** F24-B2 · Produce messages with contextual feedback — Covers: F24-AC2 · Discovery: — · Status: Done
     - Demo: submit a synthetic message with an optional key and header, then inspect its exact acknowledged position or an uncertain outcome.
-  - **P45** F24-B3 · Request topic deletion with explicit consequences — Covers: F24-AC3 · Discovery: — · Status: Planned
+  - **P45** F24-B3 · Request topic deletion with explicit consequences — Covers: F24-AC3 · Discovery: — · Status: Review
     - Demo: cancel a deletion, then confirm a synthetic request and distinguish acceptance from completed removal.
 
 M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded reads/searches and write safeguards. Each milestone must be served and verified at the EKS-D manual-test URL before it is marked Done; broker data and existing access endpoints must be preserved.

@@ -7,6 +7,7 @@ import type { GatewayEntry, GatewayErrorKind } from "../gateway/types";
 import { isGatewayTopicListQuery } from "../topics/isGatewayTopicListQuery";
 import { isGatewayTopicQuery } from "../topics/isGatewayTopicQuery";
 import { GatewayErrorRecovery } from "./GatewayErrorRecovery";
+import styles from "./DeleteTopic.module.css";
 
 type DeleteTopicProps = {
   gateway: GatewayEntry;
@@ -57,7 +58,8 @@ export function DeleteTopic({ gateway, topicName, deleteTopic, confirmTopicDelet
   }
 
   return (
-    <section aria-label="Delete topic">
+    <section aria-label="Delete topic" className={styles.danger}>
+      <p>Deleting <strong>{topicName}</strong> on <strong>{gateway.name}</strong> may permanently remove its messages.</p>
       <button type="button" disabled={pending || accepted} onClick={() => void submit()}>
         {pending ? "Requesting deletion…" : accepted ? "Deletion requested" : "Delete topic"}
       </button>
@@ -67,7 +69,7 @@ export function DeleteTopic({ gateway, topicName, deleteTopic, confirmTopicDelet
           <GatewayErrorRecovery gateway={gateway} kind={errorKind} />
         </div>
       ) : null}
-      {accepted ? <p>Deletion was accepted. Removing the topic and its messages may take time.</p> : null}
+      {accepted ? <p role="status">Deletion was accepted. Removing the topic and its messages may take time.</p> : null}
     </section>
   );
 }

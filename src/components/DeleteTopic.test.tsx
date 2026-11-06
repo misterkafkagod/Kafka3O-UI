@@ -17,6 +17,8 @@ describe("DeleteTopic", () => {
     render(<QueryClientProvider client={new QueryClient()}>
       <DeleteTopic gateway={gateway} topicName="orders" deleteTopic={remove} confirmTopicDeletion={confirm} />
     </QueryClientProvider>);
+    expect(screen.getByRole("region", { name: "Delete topic" }).textContent)
+      .toContain("Deleting orders on Dev may permanently remove its messages.");
     await user.click(screen.getByRole("button", { name: "Delete topic" }));
     expect(confirm).toHaveBeenCalledWith("orders");
     expect(remove).not.toHaveBeenCalled();
@@ -43,6 +45,7 @@ describe("DeleteTopic", () => {
     expect(screen.getByRole("button", { name: "Requesting deletion…" }).matches(":disabled")).toBe(true);
     resolve();
     expect(await screen.findByText(/Deletion was accepted/)).toBeDefined();
+    expect(screen.getByRole("status").textContent).toContain("Deletion was accepted");
     expect(screen.getByText(/may take time/)).toBeDefined();
     expect(screen.getByRole("button", { name: "Deletion requested" }).matches(":disabled")).toBe(true);
     await waitFor(() => expect(client.getQueryState(["gateway", "dev", "topics"])?.isInvalidated).toBe(true));
