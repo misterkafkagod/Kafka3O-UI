@@ -21,11 +21,21 @@ const confirmTopicDeletion = () => false;
 const linkOrigin = "https://console.example";
 const copyMessageLink = async () => {};
 const gatewayCredentials = { read: () => null, save: () => {}, clear: () => {} };
+const unusedAdministrationCall = async () => { throw new Error("Unexpected administration request"); };
+const administration = {
+  getConfigurations: unusedAdministrationCall,
+  alterConfiguration: unusedAdministrationCall,
+  increasePartitions: unusedAdministrationCall,
+  listReassignments: unusedAdministrationCall,
+  reassignPartition: unusedAdministrationCall,
+  confirmChange: () => false,
+};
 
 function renderApp(initialEntry = "/", gateways: GatewayEntry[] = [], getCluster: GetCluster = pendingGetCluster) {
   return render(
     <MemoryRouter initialEntries={[initialEntry]}>
       <App
+        administration={administration}
         queryClient={new QueryClient()}
         gatewayCredentials={gatewayCredentials}
         produceTopicMessage={produceTopicMessage}
@@ -97,6 +107,7 @@ describe("App", () => {
     render(
       <MemoryRouter>
         <App
+          administration={administration}
           queryClient={new QueryClient({ defaultOptions: { queries: { retry: false } } })}
           gatewayCredentials={credentials}
           produceTopicMessage={produceTopicMessage}
@@ -223,6 +234,7 @@ describe("App", () => {
     render(
       <MemoryRouter>
         <App
+          administration={administration}
           queryClient={new QueryClient()}
           gatewayCredentials={gatewayCredentials}
           produceTopicMessage={produceTopicMessage}
@@ -254,6 +266,7 @@ describe("App", () => {
     render(
       <MemoryRouter initialEntries={["/clusters/dev"]}>
         <App
+          administration={administration}
           queryClient={new QueryClient()}
           gatewayCredentials={gatewayCredentials}
           produceTopicMessage={produceTopicMessage}
@@ -290,6 +303,7 @@ describe("App", () => {
     render(
       <MemoryRouter initialEntries={["/clusters/dev"]}>
         <App
+          administration={administration}
           queryClient={new QueryClient()}
           gatewayCredentials={gatewayCredentials}
           produceTopicMessage={produceTopicMessage}
@@ -319,6 +333,7 @@ describe("App", () => {
     render(
       <MemoryRouter initialEntries={["/clusters/dev/topics"]}>
         <App
+          administration={administration}
           queryClient={new QueryClient()}
           gatewayCredentials={gatewayCredentials}
           produceTopicMessage={produceTopicMessage}
@@ -358,6 +373,7 @@ describe("App", () => {
     render(
       <MemoryRouter initialEntries={["/clusters/dev%20%26%20west/topics/orders%20%26%20audit"]}>
         <App
+          administration={administration}
           queryClient={new QueryClient()}
           gatewayCredentials={gatewayCredentials}
           produceTopicMessage={produceTopicMessage}
@@ -388,6 +404,7 @@ describe("App", () => {
     render(
       <MemoryRouter>
         <App
+          administration={administration}
           queryClient={new QueryClient()}
           gatewayCredentials={gatewayCredentials}
           produceTopicMessage={produceTopicMessage}
@@ -421,6 +438,7 @@ describe("App", () => {
     ]);
     const app = () => (
       <App
+        administration={administration}
         queryClient={new QueryClient()}
         gatewayCredentials={gatewayCredentials}
         produceTopicMessage={produceTopicMessage}
@@ -497,6 +515,7 @@ describe("App", () => {
     render(
       <MemoryRouter initialEntries={["/clusters/dev/topics/orders"]}>
         <App
+          administration={administration}
           queryClient={new QueryClient({ defaultOptions: { queries: { retry: false } } })}
           gatewayCredentials={credentials}
           produceTopicMessage={produceTopicMessage}
@@ -539,6 +558,7 @@ describe("App", () => {
     render(
       <MemoryRouter initialEntries={["/clusters/dev/topics/orders"]}>
         <App
+          administration={administration}
           queryClient={new QueryClient({ defaultOptions: { queries: { retry: false } } })}
           gatewayCredentials={gatewayCredentials}
           produceTopicMessage={produceTopicMessage}

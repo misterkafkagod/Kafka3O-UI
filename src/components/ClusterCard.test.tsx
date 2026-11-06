@@ -143,4 +143,17 @@ describe("ClusterCard", () => {
 
     expect(await screen.findByText("Status unavailable")).toBeDefined();
   });
+
+  it("explains local proxy failures instead of asking for a browser token", async () => {
+    const detail = "The local test proxy could not authenticate to its Gateway. Check the manual deployment.";
+    renderWithQuery(
+      <ClusterCard gateway={gateway} statusRefreshMs={60_000} getCluster={async () => {
+        throw new HttpError(502, "GET failed with 502", { code: "manual_gateway_authentication_failed", detail });
+      }} />,
+    );
+
+    expect(await screen.findByText("Status unavailable")).toBeDefined();
+    expect(screen.getByText(detail)).toBeDefined();
+    expect(screen.queryByText("Authentication required")).toBeNull();
+  });
 });

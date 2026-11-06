@@ -2,7 +2,7 @@ import { Link } from "react-router";
 
 type ClusterTabsProps = {
   gatewayId: string;
-  view: "brokers" | "topics" | "consumer-groups";
+  view: "brokers" | "topics" | "consumer-groups" | "configuration";
 };
 
 export function ClusterTabs({ gatewayId, view }: ClusterTabsProps) {
@@ -17,6 +17,9 @@ export function ClusterTabs({ gatewayId, view }: ClusterTabsProps) {
       </Link>{" "}
       <Link to={`${clusterPath}/consumer-groups`} aria-current={view === "consumer-groups" ? "page" : undefined}>
         Consumer groups
+      </Link>{" "}
+      <Link to={`${clusterPath}/configuration`} aria-current={view === "configuration" ? "page" : undefined}>
+        Broker configuration
       </Link>
     </nav>
   );

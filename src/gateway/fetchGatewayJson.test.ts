@@ -68,4 +68,45 @@ describe("fetchGatewayJson", () => {
       1000, () => "a".repeat(32), true, { method: "POST", body: "{}" })).rejects.toThrow(/outside/);
     expect(fetchFn).toHaveBeenCalledTimes(1);
   });
+
+  it("uses the explicitly enabled local test proxy without reading or sending a browser token", async () => {
+    const fetchFn = vi.fn<typeof fetch>(async () => Response.json({ ok: true }));
+    const readToken = vi.fn(() => "a".repeat(32));
+    const gateway = "http://localhost:5173/manual/gateways/a";
+    await expect(fetchGatewayJson(fetchFn, gateway, `${gateway}/api/v1/topics?query=x`,
+      1000, readToken, true, undefined, "http://localhost:5173")).resolves.toEqual({ ok: true });
+
+    const init = fetchFn.mock.calls[0][1]!;
+    expect(readToken).not.toHaveBeenCalled();
+    expect(new Headers(init.headers).get("X-Kafka3O-Manual")).toBe("1");
+    expect(new Headers(init.headers).has("Authorization")).toBe(false);
+    expect(init.redirect).toBe("error");
+    expect(init.credentials).toBe("omit");
+  });
+
+  it("preserves write and request-boundary checks for the local test proxy", async () => {
+    const fetchFn = vi.fn<typeof fetch>(async () => Response.json({ ok: true }));
+    const readToken = vi.fn(() => null);
+    const gateway = "http://localhost:5173/manual/gateways/b";
+    await fetchGatewayJson(fetchFn, gateway, `${gateway}/api/v1/topics`, 1000, readToken, true,
+      { method: "POST", body: '{"name":"example"}' }, "http://localhost:5173");
+    const init = fetchFn.mock.calls[0][1]!;
+    expect(init.method).toBe("POST");
+    expect(init.body).toBe('{"name":"example"}');
+    expect(new Headers(init.headers).get("Content-Type")).toBe("application/json");
+    expect(new Headers(init.headers).get("X-Kafka3O-Manual")).toBe("1");
+    expect(new Headers(init.headers).has("Authorization")).toBe(false);
+
+    for (const [url, secure, origin] of [
+      ["http://localhost:5173/manual/gateways/a/api/v1/topics", true, "http://localhost:5173"],
+      ["http://attacker.example/manual/gateways/b/api/v1/topics", true, "http://localhost:5173"],
+      [`${gateway}/api/v1/topics`, false, "http://localhost:5173"],
+      [`${gateway}/api/v1/topics`, true, undefined],
+      [`${gateway}/api/v1/topics`, true, "http://127.0.0.1:5173"],
+    ] as const) {
+      await expect(fetchGatewayJson(fetchFn, gateway, url, 1000, readToken, secure, undefined, origin)).rejects.toThrow();
+    }
+    expect(fetchFn).toHaveBeenCalledTimes(1);
+    expect(readToken).not.toHaveBeenCalled();
+  });
 });

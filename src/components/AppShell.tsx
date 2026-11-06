@@ -27,13 +27,14 @@ export function AppShell({ children, loadGatewayConfig, credentials, connectionO
   const topicMatch = useMatch({ path: "/clusters/:gatewayId/topics/:topicName", end: false });
   const topicsMatch = useMatch("/clusters/:gatewayId/topics");
   const consumerGroupsMatch = useMatch("/clusters/:gatewayId/consumer-groups");
+  const brokerConfigurationMatch = useMatch("/clusters/:gatewayId/configuration");
   const { data: gateways } = useGatewayConfig(loadGatewayConfig);
   const gateway = clusterMatch ? findGatewayById(gateways ?? [], clusterMatch.params.gatewayId) : undefined;
   const topicName = topicMatch?.params.topicName;
   const clusterPath = gateway ? `/clusters/${encodeURIComponent(gateway.id)}` : undefined;
   const gatewayBreadcrumb: Breadcrumb | undefined =
     gateway && clusterPath
-      ? !topicName && !topicsMatch && !consumerGroupsMatch
+      ? !topicName && !topicsMatch && !consumerGroupsMatch && !brokerConfigurationMatch
         ? { label: gateway.name, current: true }
         : { label: gateway.name, to: clusterPath }
       : undefined;
@@ -47,6 +48,8 @@ export function AppShell({ children, loadGatewayConfig, credentials, connectionO
       breadcrumbs.push({ label: "Topics", current: true });
     } else if (consumerGroupsMatch) {
       breadcrumbs.push({ label: "Consumer groups", current: true });
+    } else if (brokerConfigurationMatch) {
+      breadcrumbs.push({ label: "Broker configuration", current: true });
     }
   }
 

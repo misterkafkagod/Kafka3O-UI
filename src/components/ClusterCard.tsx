@@ -44,7 +44,9 @@ export function ClusterCard({ gateway, getCluster, statusRefreshMs }: ClusterCar
       ) : errorKind === "other" ? (
         <>
           <p className={`${styles.status} ${styles.failure}`}>Status unavailable</p>
-          {error instanceof Error ? <p>{error.message}</p> : null}
+          {error instanceof HttpError && error.problem?.code?.startsWith("manual_gateway_") && error.problem.detail
+            ? <p>{error.problem.detail}</p>
+            : error instanceof Error ? <p>{error.message}</p> : null}
         </>
       ) : cluster ? (
         <>

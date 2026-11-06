@@ -1,7 +1,7 @@
 import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useState } from "react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import type { GatewayCredentials } from "../gateway/GatewayCredentials";
 import type { GatewayEntry } from "../gateway/types";
 import { renderWithQuery } from "../test/renderWithQuery";
@@ -123,5 +123,41 @@ describe("GatewayCredentialsPanel", () => {
     expect(await second.findByRole("button", { name: "Remove token" })).toBeDefined();
     await user.click(second.getByRole("button", { name: "Remove token" }));
     expect(await first.findByText("No token stored.")).toBeDefined();
+  });
+
+  it("explains automatic test connections without showing or reading a browser token", async () => {
+    const user = userEvent.setup();
+    const read = vi.fn(() => null);
+    const credentials = {
+      read,
+      save: vi.fn(),
+      clear: vi.fn(),
+      isAutomatic: (url: string) => url === "http://localhost:5173/manual/gateways/a",
+    };
+    renderWithQuery(<PanelFixture
+      gateways={[
+        { id: "local", name: "Local", url: "http://localhost:5173/manual/gateways/a" },
+        { id: "remote", name: "Remote", url: "https://remote.example" },
+      ]}
+      credentials={credentials}
+    />);
+    await user.click(await screen.findByRole("button", { name: "Gateway credentials" }));
+    expect(screen.getByText(/Automatic local test connection/)).toBeDefined();
+    expect(screen.queryByLabelText("Token for Local")).toBeNull();
+    expect(screen.getByLabelText("Token for Remote")).toBeDefined();
+    expect(read).not.toHaveBeenCalledWith("http://localhost:5173/manual/gateways/a");
+    expect(read).toHaveBeenCalledWith("https://remote.example");
+  });
+
+  it("shows that no browser tokens are needed when every connection is automatic", async () => {
+    const credentials = { read: vi.fn(() => null), save: vi.fn(), clear: vi.fn(), isAutomatic: () => true };
+    renderWithQuery(<PanelFixture
+      gateways={[{ id: "local", name: "Local", url: "http://localhost:5173/manual/gateways/a" }]}
+      credentials={credentials}
+    />);
+    await userEvent.click(await screen.findByRole("button", { name: "Gateway credentials" }));
+    expect(screen.getByText(/no browser tokens are needed/)).toBeDefined();
+    expect(credentials.read).not.toHaveBeenCalled();
+    expect(document.activeElement).toBe(screen.getByRole("button", { name: "Close" }));
   });
 });
