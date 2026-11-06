@@ -44,7 +44,7 @@ is linked to a local account by email.
   - Done when: `go test ./internal/console/cognito` passes the successful,
     forged, expired, wrong-pool/client/nonce/use, untrusted-TLS, endpoint
     substitution and key-rotation cases, and `go test ./...` passes.
-- [ ] **T53.2 Persist browser-bound, single-use authorization attempts** — Covers: F27-AC2
+- [x] **T53.2 Persist browser-bound, single-use authorization attempts** — Covers: F27-AC2
   - Files: Gateway `internal/console/cognito/` (new attempt actions/tests),
     `internal/console/storage/migrate_database.go` and new attempt storage
     actions/tests, Gateway `internal/console/README.md`.
