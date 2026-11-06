@@ -2,7 +2,7 @@
 - **Milestone:** M7
 - **Covers:** F22-AC1
 - **Discovery:** —
-- **Status:** Review
+- **Status:** Done
 
 ## Demo
 1. Read multiple records, select each using mouse and keyboard, and inspect its exact position, timestamp, key, value and headers in text, JSON and base64.
@@ -23,3 +23,8 @@
   - Done when: `npm test -- src/components/ReadTopicMessagesForm.test.tsx src/pages/TopicPage.test.tsx` and `npm run build` pass; browser checks at 320, 768 and 1440 CSS pixels show adjacent radio labels and no page-wide overflow.
 
 ## Review
+- **Demo:** Browser fixtures verified keyboard and mouse selection, exact large offsets, text/JSON/base64 values and headers. Changing results reset the selection, and selecting a record issued no additional message read.
+- **Responsive:** The workspace and read controls had no page-wide overflow at 320, 768 or 1440 CSS pixels. Both radio choices remained keyboard-operable and their labels were adjacent.
+- **Validation:** All 316 UI tests and the production build passed on Node 24.21.0. The M7 deployment remains deferred until the milestone's final phase.
+- **Vulnerability scan:** Not run; P38 adds no dependencies and is not the final M7 phase.
+- **Notes:** Selecting a record is local to the current result set; unavailable exact offsets cannot create a misleading link.
