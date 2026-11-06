@@ -2,7 +2,7 @@
 - **Milestone:** M7
 - **Covers:** F21-AC3
 - **Discovery:** —
-- **Status:** Review
+- **Status:** Done
 
 ## Demo
 1. Filter topics, include internal topics and open a topic with an encoded name.
@@ -19,3 +19,8 @@
   - Done when: `npm test -- src/pages/TopicDetailPage.test.tsx src/pages/TopicPage.test.tsx src/components/DeleteTopic.test.tsx` and `npm run build` pass.
 
 ## Review
+- **Demo:** Browser fixtures verified case-insensitive filtering, internal-topic visibility and truthful result counts. An encoded gateway/topic link opened the correct topic; partition offsets and configuration were visible, while a nonempty synthetic sensitive value remained hidden. Create and delete controls remained available without submitting a write.
+- **Responsive:** The topic list and detail pages had no page-wide horizontal overflow at 320, 768 or 1440 CSS pixels; wide tables remained in their labeled scroll regions.
+- **Validation:** All 309 UI tests and the production build passed on Node 24.21.0. The M7 deployment remains deferred until the milestone's final phase.
+- **Vulnerability scan:** Not run; P37 adds no dependencies and is not the final M7 phase.
+- **Notes:** Result counts describe the currently eligible topics, excluding hidden internal topics until requested.
