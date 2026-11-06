@@ -17,5 +17,9 @@
   - Files: `src/pages/TopicMessagesPage.tsx`, `src/pages/TopicMessagesPage.module.css` (new), `src/pages/TopicPage.test.tsx`
   - Do: Group the existing positioned-read, latest, search and produce entry points around the workspace without changing request semantics or write safeguards; encode gateway IDs in the back link.
   - Done when: `npm test -- src/components/ReadTopicMessagesForm.test.tsx src/pages/TopicPage.test.tsx src/App.test.tsx` and `npm run build` pass.
+- [x] **T38.3 Fix: Keep read controls compact and radio labels adjacent** — Covers: F22-AC1
+  - Files: `src/pages/TopicMessagesPage.module.css`
+  - Do: Align each offset/timestamp radio with its label and arrange the existing read fields compactly on wider screens while stacking them on narrow screens. Keep the same form fields, submission behavior and keyboard order.
+  - Done when: `npm test -- src/components/ReadTopicMessagesForm.test.tsx src/pages/TopicPage.test.tsx` and `npm run build` pass; browser checks at 320, 768 and 1440 CSS pixels show adjacent radio labels and no page-wide overflow.
 
 ## Review

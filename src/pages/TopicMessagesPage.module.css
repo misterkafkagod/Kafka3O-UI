@@ -46,5 +46,42 @@
 }
 
 .readControls form {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: start;
+  gap: 0.75rem;
   margin: 0;
+}
+
+.readControls form > label {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.35rem;
+}
+
+.readControls form fieldset {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.35rem 1rem;
+  padding: 0.55rem 0.75rem;
+}
+
+.readControls form fieldset label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.readControls form > button {
+  justify-self: start;
+}
+
+@media (max-width: 40rem) {
+  .readControls form {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .readControls form > button {
+    width: 100%;
+  }
 }
