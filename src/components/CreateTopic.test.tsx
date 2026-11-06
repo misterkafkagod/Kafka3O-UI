@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from "vitest";
 import type { CreateTopic as CreateAction } from "../gateway/createTopic";
 import { HttpError } from "../gateway/HttpError";
 import { CreateTopic } from "./CreateTopic";
+import { GatewayConnectionContext } from "./GatewayConnectionContext";
 
 const gateway = { id: "dev", name: "Dev", url: "https://gateway.example" };
 
@@ -47,6 +48,29 @@ describe("CreateTopic", () => {
     await user.click(screen.getByRole("button", { name: "Create topic" }));
     expect((await screen.findByRole("alert")).textContent).toContain("already exists");
     expect(create).toHaveBeenCalledTimes(1);
+  });
+
+  it("offers credential correction for 401 without resubmitting the write", async () => {
+    const user = userEvent.setup();
+    const openConnection = vi.fn();
+    const create = vi.fn<CreateAction>()
+      .mockRejectedValueOnce(new HttpError(401, "unauthorized"))
+      .mockRejectedValueOnce(new HttpError(409, "conflict"));
+    render(
+      <QueryClientProvider client={new QueryClient()}>
+        <GatewayConnectionContext.Provider value={openConnection}>
+          <CreateTopic gateway={gateway} createTopic={create} />
+        </GatewayConnectionContext.Provider>
+      </QueryClientProvider>,
+    );
+    await user.type(screen.getByLabelText("Topic name"), "orders");
+    await user.click(screen.getByRole("button", { name: "Create topic" }));
+    await user.click(await screen.findByRole("button", { name: "Manage credentials for Dev" }));
+    expect(openConnection).toHaveBeenCalledWith("dev");
+    expect(create).toHaveBeenCalledTimes(1);
+    await user.click(screen.getByRole("button", { name: "Create topic" }));
+    expect((await screen.findByRole("alert")).textContent).toContain("already exists");
+    expect(screen.queryByRole("button", { name: "Manage credentials for Dev" })).toBeNull();
   });
 
   it("warns when a network error leaves creation uncertain", async () => {

@@ -19,7 +19,7 @@ export function ClusterDetails({ gateway, getCluster, statusRefreshMs }: Cluster
       <p>{gateway.url}</p>
       {/* Error is checked before data: React Query keeps the last data after a failed refetch. */}
       {isError ? (
-        <ErrorWithRetry error={error} onRetry={() => void refetch()} />
+        <ErrorWithRetry error={error} gateway={gateway} onRetry={() => void refetch()} />
       ) : isPending ? (
         <p role="status">Checking…</p>
       ) : cluster ? (

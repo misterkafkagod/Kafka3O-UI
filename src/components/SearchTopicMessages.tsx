@@ -45,7 +45,7 @@ export function SearchTopicMessages({ gateway, topicName, searchTopicMessages, m
       </p>
       {validationError ? <p role="alert">Enter search text.</p> : null}
       {query === undefined ? null : isError ? (
-        <ErrorWithRetry error={error} onRetry={() => void refetch()} />
+        <ErrorWithRetry error={error} gateway={gateway} onRetry={() => void refetch()} />
       ) : isFetching || data === undefined ? (
         <p role="status">Searching messages…</p>
       ) : (

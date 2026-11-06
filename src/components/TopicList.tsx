@@ -19,7 +19,7 @@ export function TopicList({ gateway, listTopics }: TopicListProps) {
 
   // Error is checked before data: React Query keeps the last data after a failed refetch.
   if (isError) {
-    return <ErrorWithRetry error={error} onRetry={() => void refetch()} />;
+    return <ErrorWithRetry error={error} gateway={gateway} onRetry={() => void refetch()} />;
   }
   if (topics === undefined) {
     return <p role="status">Loading topics…</p>;

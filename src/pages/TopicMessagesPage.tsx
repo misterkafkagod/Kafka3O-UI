@@ -55,6 +55,7 @@ export function TopicMessagesPage({ gateway, topicName, listLatestTopicMessages,
           ) : (
             <LinkedTopicMessage
               position={linkPosition.position}
+              gateway={gateway}
               messages={messages}
               isError={isError}
               error={error}
@@ -75,7 +76,7 @@ export function TopicMessagesPage({ gateway, topicName, listLatestTopicMessages,
             <>
               <ReadTopicMessagesForm onRead={setPosition} onReadLatest={() => setPosition(undefined)} />
               {isError ? (
-                <ErrorWithRetry error={error} onRetry={() => void refetch()} />
+                <ErrorWithRetry error={error} gateway={gateway} onRetry={() => void refetch()} />
               ) : messages === undefined ? (
                 <p role="status">Loading messages…</p>
               ) : messages.length === 0 ? (

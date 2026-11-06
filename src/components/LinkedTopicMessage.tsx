@@ -1,5 +1,5 @@
 import { HttpError } from "../gateway/HttpError";
-import type { TopicMessage } from "../gateway/types";
+import type { GatewayEntry, TopicMessage } from "../gateway/types";
 import { findLinkedTopicMessage } from "../messages/findLinkedTopicMessage";
 import type { MessageLinkContext } from "../messages/messageLink";
 import type { TopicMessageLinkPosition } from "../messages/topicMessageLinkPosition";
@@ -8,6 +8,7 @@ import { MessageTable } from "./MessageTable";
 
 type LinkedTopicMessageProps = {
   position: TopicMessageLinkPosition;
+  gateway: GatewayEntry;
   messages: TopicMessage[] | undefined;
   isError: boolean;
   error: unknown;
@@ -16,12 +17,12 @@ type LinkedTopicMessageProps = {
   messageLinks: MessageLinkContext;
 };
 
-export function LinkedTopicMessage({ position, messages, isError, error, isFetching, onRetry, messageLinks }: LinkedTopicMessageProps) {
+export function LinkedTopicMessage({ position, gateway, messages, isError, error, isFetching, onRetry, messageLinks }: LinkedTopicMessageProps) {
   if (isError) {
     if (error instanceof HttpError && (error.problem?.code === "invalid_position" || error.problem?.code === "not_found")) {
       return <p role="alert">No message is available at this partition and offset.</p>;
     }
-    return <ErrorWithRetry error={error} onRetry={onRetry} />;
+    return <ErrorWithRetry error={error} gateway={gateway} onRetry={onRetry} />;
   }
   if (isFetching || messages === undefined) {
     return <p role="status">Loading linked message…</p>;

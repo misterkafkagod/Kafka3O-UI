@@ -20,6 +20,7 @@ function renderTopicPage(
   view: "details" | "messages" = "details",
   searchTopicMessages: SearchTopicMessages = async () => ({ messages: [], scanned: 0, truncated: false }),
   route = `/clusters/dev/topics/orders${view === "messages" ? "/messages" : ""}`,
+  onOpenGatewayConnection?: (gatewayId: string) => void,
 ) {
   const linkOrigin = "https://console.example";
   const copyMessageLink = async () => {};
@@ -39,6 +40,7 @@ function renderTopicPage(
       />
     </Routes>,
     route,
+    onOpenGatewayConnection,
   );
 }
 
@@ -160,6 +162,22 @@ describe("TopicPage", () => {
     const alert = await screen.findByRole("alert");
     await userEvent.click(within(alert).getByRole("button", { name: "Retry" }));
     expect(await screen.findByText("exact")).toBeDefined();
+  });
+
+  it("offers selected-gateway credentials when a linked message read returns 401", async () => {
+    const openConnection = vi.fn();
+    renderTopicPage(
+      async () => [gateway],
+      async () => ({ name: "orders", partitions: [], config: [] }),
+      async () => { throw new HttpError(401, "unauthorized"); },
+      "messages",
+      undefined,
+      "/clusters/dev/topics/orders/messages?partition=0&offset=9",
+      openConnection,
+    );
+
+    await userEvent.click(await screen.findByRole("button", { name: "Manage credentials for Dev" }));
+    expect(openConnection).toHaveBeenCalledWith("dev");
   });
 
   it("shows Cluster not found without fetching topic detail when the gateway is unknown", async () => {

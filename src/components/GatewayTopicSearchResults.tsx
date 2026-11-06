@@ -20,7 +20,7 @@ export function GatewayTopicSearchResults({ gateway, listTopics, text }: Gateway
     <section aria-label={`${gateway.name} topic results`}>
       <h3>{gateway.name}</h3>
       {isError ? (
-        <ErrorWithRetry error={error} onRetry={() => void refetch()} />
+        <ErrorWithRetry error={error} gateway={gateway} onRetry={() => void refetch()} />
       ) : topics === undefined ? (
         <p role="status">Loading topics…</p>
       ) : matches.length === 0 ? (

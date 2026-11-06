@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from "vitest";
 import type { DeleteTopic as DeleteAction } from "../gateway/deleteTopic";
 import { HttpError } from "../gateway/HttpError";
 import { DeleteTopic } from "./DeleteTopic";
+import { GatewayConnectionContext } from "./GatewayConnectionContext";
 
 const gateway = { id: "dev", name: "Dev", url: "https://gateway.example" };
 
@@ -65,6 +66,28 @@ describe("DeleteTopic", () => {
     await user.click(screen.getByRole("button", { name: "Delete topic" }));
     await waitFor(() => expect(screen.getByRole("alert").textContent).toContain("may already be deleting"));
     expect(remove).toHaveBeenCalledTimes(2);
+  });
+
+  it("offers credential correction for 401 without resubmitting the deletion", async () => {
+    const user = userEvent.setup();
+    const openConnection = vi.fn();
+    const remove = vi.fn<DeleteAction>()
+      .mockRejectedValueOnce(new HttpError(401, "unauthorized"))
+      .mockRejectedValueOnce(new HttpError(404, "missing"));
+    render(
+      <QueryClientProvider client={new QueryClient()}>
+        <GatewayConnectionContext.Provider value={openConnection}>
+          <DeleteTopic gateway={gateway} topicName="orders" deleteTopic={remove} confirmTopicDeletion={() => true} />
+        </GatewayConnectionContext.Provider>
+      </QueryClientProvider>,
+    );
+    await user.click(screen.getByRole("button", { name: "Delete topic" }));
+    await user.click(await screen.findByRole("button", { name: "Manage credentials for Dev" }));
+    expect(openConnection).toHaveBeenCalledWith("dev");
+    expect(remove).toHaveBeenCalledTimes(1);
+    await user.click(screen.getByRole("button", { name: "Delete topic" }));
+    expect((await screen.findByRole("alert")).textContent).toContain("not found");
+    expect(screen.queryByRole("button", { name: "Manage credentials for Dev" })).toBeNull();
   });
 
   it("fails closed if the confirmation dialog cannot be shown", async () => {

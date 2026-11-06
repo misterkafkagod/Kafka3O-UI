@@ -5,6 +5,7 @@ import { MemoryRouter } from "react-router";
 import { describe, expect, it, vi } from "vitest";
 import type { ProduceMessageResult, ProduceTopicMessage as ProduceAction } from "../gateway/produceTopicMessage";
 import { HttpError } from "../gateway/HttpError";
+import { GatewayConnectionContext } from "./GatewayConnectionContext";
 import { ProduceTopicMessage } from "./ProduceTopicMessage";
 
 const gateway = { id: "dev", name: "Dev", url: "https://gateway.example" };
@@ -61,16 +62,22 @@ describe("ProduceTopicMessage", () => {
 
   it("shows authentication errors and supports removing a header", async () => {
     const user = userEvent.setup();
+    const openConnection = vi.fn();
     const produce = vi.fn<ProduceAction>(async () => { throw new HttpError(401, "unauthorized"); });
     render(
       <QueryClientProvider client={new QueryClient()}>
-        <MemoryRouter><ProduceTopicMessage gateway={gateway} topicName="orders" produceTopicMessage={produce} /></MemoryRouter>
+        <GatewayConnectionContext.Provider value={openConnection}>
+          <MemoryRouter><ProduceTopicMessage gateway={gateway} topicName="orders" produceTopicMessage={produce} /></MemoryRouter>
+        </GatewayConnectionContext.Provider>
       </QueryClientProvider>,
     );
     await user.click(screen.getByRole("button", { name: "Add header" }));
     await user.click(screen.getByRole("button", { name: "Remove header 1" }));
     await user.click(screen.getByRole("button", { name: "Send message" }));
     expect((await screen.findByRole("alert")).textContent).toContain("Authentication required");
+    await user.click(screen.getByRole("button", { name: "Manage credentials for Dev" }));
+    expect(openConnection).toHaveBeenCalledWith("dev");
+    expect(produce).toHaveBeenCalledTimes(1);
     expect(produce).toHaveBeenCalledWith(gateway.url, "orders", { value: "", headers: [] });
   });
 });

@@ -2,6 +2,7 @@ import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import type { ListTopics } from "../gateway/listTopics";
+import { HttpError } from "../gateway/HttpError";
 import type { Topic } from "../gateway/types";
 import { renderWithQuery } from "../test/renderWithQuery";
 import { CrossClusterTopicSearch } from "./CrossClusterTopicSearch";
@@ -64,6 +65,24 @@ describe("CrossClusterTopicSearch", () => {
     expect(within(dev).getByRole("link", { name: "orders" })).toBeDefined();
     await user.click(within(alert).getByRole("button", { name: "Retry" }));
     expect(await within(prod).findByRole("link", { name: "orders" })).toBeDefined();
+  });
+
+  it("opens credentials for the failed gateway without hiding another gateway's matches", async () => {
+    const openConnection = vi.fn();
+    const user = userEvent.setup();
+    const listTopics: ListTopics = async (url) => {
+      if (url === gateways[1].url) throw new HttpError(401, "unauthorized");
+      return [topic("orders")];
+    };
+    renderWithQuery(<CrossClusterTopicSearch gateways={gateways} listTopics={listTopics} />, "/", openConnection);
+
+    await user.type(screen.getByRole("searchbox", { name: "Topic name" }), "ord");
+    const dev = screen.getByRole("region", { name: "Dev topic results" });
+    const prod = screen.getByRole("region", { name: "Prod topic results" });
+    expect(await within(dev).findByRole("link", { name: "orders" })).toBeDefined();
+    await user.click(await within(prod).findByRole("button", { name: "Manage credentials for Prod" }));
+    expect(openConnection).toHaveBeenCalledWith("prod");
+    expect(within(dev).getByRole("link", { name: "orders" })).toBeDefined();
   });
 
   it("reports no matches per gateway without blocking on another gateway", async () => {

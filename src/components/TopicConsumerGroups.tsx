@@ -24,7 +24,7 @@ export function TopicConsumerGroups({ gateway, topicName, listConsumerGroups }: 
       <h2>{topicName}</h2>
       <h3>Consumers</h3>
       {isError ? (
-        <ErrorWithRetry error={error} onRetry={() => void refetch()} />
+        <ErrorWithRetry error={error} gateway={gateway} onRetry={() => void refetch()} />
       ) : filtered === undefined ? (
         <p role="status">Loading consumer groups…</p>
       ) : (

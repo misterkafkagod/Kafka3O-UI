@@ -431,7 +431,7 @@ describe("App", () => {
       </MemoryRouter>,
     );
     expect(await screen.findByText("Authentication required")).toBeDefined();
-    await user.click(screen.getByRole("button", { name: "Gateway credentials" }));
+    await user.click(screen.getByRole("button", { name: "Manage credentials for Dev" }));
     await user.type(screen.getByLabelText("Token for Dev"), "a".repeat(32));
     await user.click(screen.getByRole("button", { name: "Use token" }));
     await user.click(screen.getByRole("button", { name: "Close" }));
