@@ -74,6 +74,20 @@ is linked to a local account by email.
     audit-failure, interrupted, redirect and untrusted-TLS cases;
     `go test ./internal/console/cognito ./internal/console/storage -run 'Test.*Cognito'`
     and `go test ./...` pass.
+- [x] **T53.3b Verify refreshed ID tokens** — Covers: foundation of F27-AC4
+  - Files: Gateway `internal/console/cognito/` verifier actions/tests,
+    Gateway `internal/console/README.md`, `spec/TECH-SPEC.md`.
+  - Do: Reuse the initial verifier's signature, issuer, client, expiry,
+    token-use and group validation; compare refreshed issuer, subject and
+    audience to the trusted previous identity, allow an absent nonce but
+    compare a present nonce to the original digest, and reject a missing or
+    stale ID token. Reject tokens at least five minutes old and require
+    strictly later issuance than the preceding verified token. Retain the
+    mandatory initial-login nonce check.
+  - Done when: synthetic TLS tests cover absent and matching nonces,
+    audience reordering, changed identities/audiences, stale, malformed,
+    forged and expired tokens, key-service outage and unchanged initial
+    verification, and `go test ./...` passes.
 - [ ] **T53.3 Issue and refresh Cognito application sessions** — Covers: F27-AC2, F27-AC4
   - Files: Gateway `internal/console/cognito/` (new exchange/refresh
     actions/tests), `internal/console/session/` and
