@@ -445,6 +445,21 @@ is linked to a local account by email.
     unbound isolation, password restrictions, replacement and grant changes
     between checks, storage failure, restart and redaction; `go test ./...`
     passes.
+- [x] **T53.4m Resolve and revoke bound logout** — Covers: foundation of F27-AC3, F27-AC4
+  - Files: Gateway `internal/console/session/` logout and revocation actions
+    and tests, Gateway `internal/console/storage/` tests, Gateway
+    `internal/console/README.md`, `spec/TECH-SPEC.md`, `spec/ROADMAP.md`.
+  - Do: Add trusted-marker manager actions for logout lookup and revocation.
+    Allow local logout of a current Cognito session despite stale claims,
+    provider outage, disabled identity or expired session; transactionally
+    recheck its binding before revocation, delete retained credentials and
+    preserve audit and uncertain outcomes. Do not refresh as part of logout,
+    expose a route or change unbound behavior.
+  - Done when: focused `Test.*BoundSessionManagerLogout` tests cover local
+    and Cognito logout, stale and unavailable sessions, wrong and missing
+    markers, unbound isolation, in-flight refresh, replacement, storage and
+    audit failures, exact error handling, restart and redaction;
+    `go test ./...` passes.
 - [ ] **T53.4 Expose opt-in HTTPS SSO and logout** — Covers: F27-AC2, F27-AC3
   - Files: Gateway `internal/console/httpapi/` (new SSO handlers/tests and
     necessary API wiring), `cmd/console/` (configuration/composition and
