@@ -460,6 +460,21 @@ is linked to a local account by email.
     markers, unbound isolation, in-flight refresh, replacement, storage and
     audit failures, exact error handling, restart and redaction;
     `go test ./...` passes.
+- [x] **T53.4n Issue bound sessions** — Covers: foundation of F27-AC1, F27-AC2, F27-AC4
+  - Files: Gateway `internal/console/session/` local and Cognito issuance
+    actions and tests, Gateway `internal/console/storage/` tests, Gateway
+    `internal/console/README.md`, `spec/TECH-SPEC.md`, `spec/ROADMAP.md`.
+  - Do: Add trusted-marker manager actions for local and Cognito session
+    issuance, using the existing transactional binding and audited
+    conflict checks. Reject absent markers before consuming a Cognito proof,
+    withhold all session credentials on conflict or uncertain failure,
+    preserve unbound behavior and never expose a browser route. The future
+    callback must separately bind its authorization attempt to the stable
+    marker; these actions alone do not provide that protection.
+  - Done when: focused `Test.*BoundSessionManagerIssue` tests cover local
+    and Cognito issuance, proof replay, conflicts, concurrent mixed
+    issuance, wrong or missing markers, provider/storage/audit failures,
+    restart and redaction; `go test ./...` passes.
 - [ ] **T53.4 Expose opt-in HTTPS SSO and logout** — Covers: F27-AC2, F27-AC3
   - Files: Gateway `internal/console/httpapi/` (new SSO handlers/tests and
     necessary API wiring), `cmd/console/` (configuration/composition and
