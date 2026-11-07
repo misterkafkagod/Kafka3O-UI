@@ -521,6 +521,21 @@ is linked to a local account by email.
     and Cognito replacements, disable/re-enable, expiry, active conflicts,
     concurrent issuance, audit/storage/commit failures, restart and
     redaction; `go test ./...` passes.
+- [x] **T53.4r Clean inactive browser bindings atomically** — Covers: foundation of F27-AC3, F27-AC4
+  - Files: Gateway `internal/console/storage/` browser-binding cleanup
+    actions/tests, `cmd/console/` cleanup scheduling/tests, Gateway
+    `internal/console/README.md`, `spec/TECH-SPEC.md`, `spec/ROADMAP.md`.
+  - Do: Process inactive browser bindings in bounded periodic batches.
+    Transactionally recheck each binding, revoke its old session, delete
+    any retained Cognito credentials, audit and remove the mapping.
+    Preserve active sessions and the historical session binding; surface
+    corruption, audit/storage failures and uncertain outcomes without
+    leaking markers or credentials. Serialize with replacement, logout and
+    refresh and preserve local login if cleanup is unavailable.
+  - Done when: focused browser-binding cleanup tests cover local and
+    Cognito sessions, expiry, disable/re-enable, active preservation,
+    batch limits, races, corruption, clocks, restart, failure rollback,
+    redaction and the real Console startup worker; `go test ./...` passes.
 - [ ] **T53.4 Expose opt-in HTTPS SSO and logout** — Covers: F27-AC2, F27-AC3
   - Files: Gateway `internal/console/httpapi/` (new SSO handlers/tests and
     necessary API wiring), `cmd/console/` (configuration/composition and
