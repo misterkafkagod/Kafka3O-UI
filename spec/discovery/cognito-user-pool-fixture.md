@@ -65,6 +65,24 @@
   validation; never disable the nonce check on the initial login. Actual
   Cognito refresh-token claim behavior remains unverified.
 
+### 4. Live User Pool provisioned — 2026-11-07
+- **Tried:** Created a User Pool with the AWS CLI in `sa-east-1` on the
+  Essentials plan: email sign-in, admin-created users only, MFA off, no SMS,
+  deletion protection on; a confidential app client (authorization-code
+  grant, `openid` scope only, token revocation on) with placeholder
+  `https://localhost:8443` callback and sign-out URLs; a Cognito prefix
+  domain with managed login v2; and groups `kafka3o-admins` and
+  `kafka3o-viewers`. Identifiers are kept out of this repository.
+- **Result:** Discovery at the issuer returned the exact
+  `cognito-idp.<region>.amazonaws.com/<pool-id>` issuer and JWKS, while the
+  authorization, token and `/logout` endpoints are on the prefix login
+  domain. An unauthenticated authorize request returned HTTP 302 to managed
+  login.
+- **Learned:** The endpoint allowlist must accept the login domain
+  separately from the issuer host. No sign-in, token exchange, refresh,
+  rotation or logout was exercised; the callback URLs must be updated when
+  T53.4 fixes the route.
+
 ## Fixture recipe
 1. Configure a synthetic issuer and separate managed-login endpoint over
    verified HTTPS, an exact callback and logout URL, and a synthetic app

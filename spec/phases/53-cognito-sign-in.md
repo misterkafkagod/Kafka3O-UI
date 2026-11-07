@@ -553,6 +553,82 @@ is linked to a local account by email.
   - Done when: focused `Test.*BrowserMarker` tests cover entropy failures,
     canonical encoding, domain separation, malformed and duplicate cookie
     fields, redaction and local/Cognito binding; `go test ./...` passes.
+- [ ] **T53.4t Ensure the stable browser marker over HTTPS** — Covers: foundation of F27-AC2, F27-AC3
+  - Files: Gateway `internal/console/session/` marker cookie action/tests,
+    `internal/console/httpapi/` ensure handler, wiring and tests, Gateway
+    `internal/console/README.md`.
+  - Do: Follow [browser-marker-protocol](../discovery/browser-marker-protocol.md)
+    recipe steps 1–2. Add `POST /api/session/browser` only when SSO is
+    configured: verify `Origin`; one valid marker → 204 without
+    `Set-Cookie`; no marker field → mint a 400-day Strict HttpOnly marker;
+    malformed or duplicate marker fields → 409 without `Set-Cookie`. No other
+    response sets the marker, and nothing logs it.
+  - Done when: focused `Test.*BrowserMarkerEnsure` tests cover absent, valid,
+    malformed, duplicate and noncanonical markers, Origin and HTTPS
+    rejection, entropy failure, cookie attributes, redaction and absence
+    without SSO; `go test ./...` passes.
+- [ ] **T53.4u Configure and discover opt-in Cognito** — Covers: foundation of F27-AC2
+  - Files: Gateway `cmd/console/` Cognito configuration, discovery
+    composition and tests, `internal/console/httpapi/` SSO availability
+    handler/tests, Gateway `internal/console/README.md`.
+  - Do: Read an all-or-nothing `KAFKA3O_CONSOLE_COGNITO_*` configuration:
+    issuer, client ID, explicit authorization/token/JWKS/logout URLs,
+    callback `<origin>/auth/cognito/callback`, logout return `<origin>/`,
+    client authentication, client secret and two distinct 32-byte keys
+    from the environment only. Reject partial or unsafe configuration at
+    startup. Discover the provider in the background with bounded retry;
+    while discovery fails, report SSO unavailable through
+    `GET /api/session/cognito` and keep local login serving. Never log
+    secrets, keys or provider responses.
+  - Done when: focused `Test.*CognitoConfig` and `Test.*CognitoDiscovery`
+    tests cover absent, partial and invalid settings, key reuse, outage,
+    recovery, cancellation and redaction with the synthetic HTTPS provider;
+    `go test ./...` passes.
+- [ ] **T53.4v Start and complete Cognito sign-in** — Covers: F27-AC2
+  - Files: Gateway `internal/console/httpapi/` start and callback handlers,
+    wiring and tests, Gateway `internal/console/README.md`.
+  - Do: Follow recipe steps 4–6. `POST /api/session/cognito/start` and
+    `POST /api/session/cognito/callback` verify `Origin`, require one valid
+    marker and reject an existing resolvable session. Complete through
+    `ConsumeBoundAuthorization`, `ExchangeBoundAuthorizationCode` and
+    `IssueBoundCognito`; audit provider denial; set Strict session/CSRF
+    cookies; clear the transient cookie on every terminal outcome. Unknown
+    and uncertain outcomes return generic errors and are never retried.
+    Never log bodies, queries, codes, cookies or tokens.
+  - Done when: focused `Test.*CognitoSignIn` tests cover success,
+    role-free sessions, provider denial, wrong/missing marker or transient
+    cookie, replay, existing sessions, Origin, unavailable provider,
+    uncertain exchange, cookie attributes and redaction; `go test ./...`
+    passes.
+- [ ] **T53.4w Use and sign out bound Cognito sessions** — Covers: F27-AC3, F27-AC4
+  - Files: Gateway `internal/console/httpapi/` session resolution, logout
+    and tests, Gateway `internal/console/README.md`.
+  - Do: Follow recipe step 7. When a marker is presented, resolve, authorize
+    and log out with the bound manager actions; keep unbound local sessions
+    on the existing path, which rejects bound sessions. Logout validates
+    Origin and CSRF, revokes locally first, clears cookies and returns the
+    configured Cognito logout URL only for Cognito sessions, without
+    claiming upstream sign-out.
+  - Done when: focused `Test.*BoundCognitoSessionAPI` tests cover session
+    reads, admin authorization, stale-claim refresh, wrong or missing
+    marker, revoked and replaced sessions, logout with and without provider,
+    CSRF and redaction; existing local session API tests and
+    `go test ./...` pass.
+- [ ] **T53.4x Coordinate SSO in the browser** — Covers: F27-AC2, F27-AC3
+  - Files: UI `src/console/` SSO actions and tests,
+    `src/components/ConsoleSessionGate.tsx` and its tests, UI Playwright
+    configuration and opt-in browser tests.
+  - Do: Follow recipe steps 3–7. Offer Cognito sign-in only when the Console
+    reports SSO available and `navigator.locks` exists. Run ensure, start,
+    callback completion and Cognito logout inside one exclusive
+    `kafka3o-browser-marker` lock without aborting requests. On
+    `/auth/cognito/callback`, replace the URL before completing, never
+    display or store the query, and show generic failures. After local
+    logout of a Cognito session, navigate to the returned logout URL.
+  - Done when: focused ConsoleSessionGate and SSO action tests cover
+    availability, missing Web Locks, lock usage, callback URL cleanup,
+    failures, existing sessions and logout navigation; `npm test` and
+    `npm run build` pass.
 - [ ] **T53.4 Expose opt-in HTTPS SSO and logout** — Covers: F27-AC2, F27-AC3
   - Files: Gateway `internal/console/httpapi/` (new SSO handlers/tests and
     necessary API wiring), `cmd/console/` (configuration/composition and
@@ -580,8 +656,10 @@ is linked to a local account by email.
     against the independently trusted synthetic HTTPS provider, including
     role-free login, refresh, replay/forgery denial, provider outage, local
     login and logout. Verify no legacy Gateway traffic, secrets in
-    logs/responses, or retry of an interrupted mutation. Record live Cognito,
-    native-browser and deployment limits honestly.
+    logs/responses, or retry of an interrupted mutation. Add an opt-in
+    Playwright run of the built preview against the test User Pool, reading
+    its settings and test user only from the environment. Record live
+    Cognito, native-browser and deployment limits honestly.
   - Done when: the opt-in end-to-end fixture, `go test ./...`, `npm test`,
     preview and default `npm run build`, focused race tests and the configured
     Go vulnerability scan pass; the existing EKS-D UI, Kafka pods and
