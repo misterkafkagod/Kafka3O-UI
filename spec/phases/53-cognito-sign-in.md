@@ -475,6 +475,38 @@ is linked to a local account by email.
     and Cognito issuance, proof replay, conflicts, concurrent mixed
     issuance, wrong or missing markers, provider/storage/audit failures,
     restart and redaction; `go test ./...` passes.
+- [x] **T53.4o Bind Cognito attempts to the stable marker** — Covers: foundation of F27-AC2, F27-AC4
+  - Files: Gateway `internal/console/cognito/` authorization-attempt actions
+    and tests, Gateway `internal/console/storage/` attempt tests, Gateway
+    `internal/console/README.md`, `spec/TECH-SPEC.md`, `spec/ROADMAP.md`.
+  - Do: Add separate trusted-marker authorization-start and consumption
+    actions. Bind the transient cookie digest and stable marker digest
+    together using a domain-separated digest authenticated by the existing
+    encrypted verifier. Wrong, missing or unbound markers must not consume
+    the bound attempt. Preserve the stable digest privately in the consumed
+    proof and reject it from the unbound provider exchange until bound
+    exchange and issuance are integrated. Keep existing unbound attempts
+    compatible and expose no route.
+  - Done when: focused `Test.*StableBoundCognitoAttempt` tests cover valid,
+    wrong, missing and unbound markers, tampering, audit errors, expiry,
+    replay, restart and redaction; `go test ./...` passes.
+- [ ] **T53.4p Carry the stable marker through Cognito exchange and issuance** — Covers: foundation of F27-AC2, F27-AC4
+  - Files: Gateway `internal/console/cognito/`, `session/` and `storage/`
+    exchange, proof and session actions/tests, Gateway
+    `internal/console/README.md`, `spec/TECH-SPEC.md`, `spec/ROADMAP.md`.
+  - Do: Add a trusted-marker code exchange that rejects missing, wrong or
+    unbound proofs before reservation or provider dispatch, and privately
+    binds verified exchange proofs to the attempt's marker. Require matching
+    proof markers for bound Cognito issuance at both manager and storage
+    reservation/creation boundaries, and reject bound proofs on unbound
+    paths. Wrong markers must not consume the correct proof. Preserve
+    existing unbound behavior, one-shot audit and uncertain outcomes; expose
+    no browser route.
+  - Done when: focused `Test.*StableBoundCognitoExchange` tests cover
+    successful bound issuance, wrong/missing/unbound markers and proofs,
+    direct storage bypass attempts, replay, concurrency, expiry, provider,
+    storage and audit failures, restart and redaction; focused existing
+    unbound tests and `go test ./...` pass.
 - [ ] **T53.4 Expose opt-in HTTPS SSO and logout** — Covers: F27-AC2, F27-AC3
   - Files: Gateway `internal/console/httpapi/` (new SSO handlers/tests and
     necessary API wiring), `cmd/console/` (configuration/composition and
