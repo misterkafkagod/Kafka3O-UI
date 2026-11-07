@@ -553,7 +553,7 @@ is linked to a local account by email.
   - Done when: focused `Test.*BrowserMarker` tests cover entropy failures,
     canonical encoding, domain separation, malformed and duplicate cookie
     fields, redaction and local/Cognito binding; `go test ./...` passes.
-- [ ] **T53.4t Ensure the stable browser marker over HTTPS** — Covers: foundation of F27-AC2, F27-AC3
+- [x] **T53.4t Ensure the stable browser marker over HTTPS** — Covers: foundation of F27-AC2, F27-AC3
   - Files: Gateway `internal/console/session/` marker cookie action/tests,
     `internal/console/httpapi/` ensure handler, wiring and tests, Gateway
     `internal/console/README.md`.
