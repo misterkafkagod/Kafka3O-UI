@@ -672,4 +672,18 @@ is linked to a local account by email.
   - Done when: `go test ./internal/console/httpapi ./cmd/console -run 'Test.*Cognito'`
     and `go test ./...` pass.
 
+- [x] **T53.7 Fix: move Cognito private helpers into their own files** — Covers: review convention fix
+  - Files: Gateway `internal/console/cognito/` (`refresh_token_additional_data.go`,
+    `seal_refresh_token.go`, `verified_code_exchange.go`,
+    `verify_refreshed_id_token.go`; new `valid_refresh_binding_id.go`,
+    `valid_refresh_token.go`, `verified_code_exchange_details.go`,
+    `min_time.go`, `same_audiences.go` and their tests).
+  - Do: Move `validRefreshBindingID`, `validRefreshToken`, the
+    `VerifiedCodeExchange.Details` method, `minTime` and `sameAudiences` out of
+    the files above so each file holds one function or method named after it.
+    These are pure functions, imported directly. No behavior change.
+  - Done when: each new file has a focused test, `go test ./internal/console/cognito`
+    and `go test ./...` pass, and the P53 convention check reports no file with
+    more than one function.
+
 ## Review
