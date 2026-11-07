@@ -584,7 +584,7 @@ is linked to a local account by email.
     tests cover absent, partial and invalid settings, key reuse, outage,
     recovery, cancellation and redaction with the synthetic HTTPS provider;
     `go test ./...` passes.
-- [ ] **T53.4v Start and complete Cognito sign-in** — Covers: F27-AC2
+- [x] **T53.4v Start and complete Cognito sign-in** — Covers: F27-AC2
   - Files: Gateway `internal/console/httpapi/` start and callback handlers,
     wiring and tests, Gateway `internal/console/README.md`.
   - Do: Follow recipe steps 4–6. `POST /api/session/cognito/start` and
