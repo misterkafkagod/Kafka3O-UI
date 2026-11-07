@@ -600,7 +600,7 @@ is linked to a local account by email.
     cookie, replay, existing sessions, Origin, unavailable provider,
     uncertain exchange, cookie attributes and redaction; `go test ./...`
     passes.
-- [ ] **T53.4w Use and sign out bound Cognito sessions** — Covers: F27-AC3, F27-AC4
+- [x] **T53.4w Use and sign out bound Cognito sessions** — Covers: F27-AC3, F27-AC4
   - Files: Gateway `internal/console/httpapi/` session resolution, logout
     and tests, Gateway `internal/console/README.md`.
   - Do: Follow recipe step 7. When a marker is presented, resolve, authorize
