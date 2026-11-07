@@ -413,6 +413,24 @@ is linked to a local account by email.
     retained and rotated credentials, proof isolation, changed and replaced
     bindings before and during dispatch, concurrency, failures, clocks,
     restart, redaction and unbound isolation; `go test ./...` passes.
+- [x] **T53.4k Coordinate bound refreshes** — Covers: foundation of F27-AC4
+  - Files: Gateway `internal/console/session/` refresh coordination and
+    session-resolution actions, Gateway `internal/console/storage/` tests,
+    Gateway `internal/console/README.md`, `spec/TECH-SPEC.md`,
+    `spec/ROADMAP.md`.
+  - Do: Add a trusted-marker bound resolution path and carry its digest
+    through refresh inspection, single-flight coordination, exchange and
+    completion. Coalesce only the same session and marker, apply the
+    existing global capacity and timeout limits, and revalidate each waiter
+    against the current binding after successful refresh. Preserve
+    cancellation isolation and explicit uncertain outcomes; never retry an
+    uncertain provider request or let an unbound path use a bound session.
+    Do not expose a marker, browser route or secured deployment.
+  - Done when: focused `Test.*BoundCognitoSessionRefresh` tests cover fresh
+    and stale sessions, retention and rotation, wrong and missing bindings,
+    unbound isolation, concurrent waiters and managers, cancellation,
+    replacement, provider and storage failures, clocks, restart and
+    redaction; coordinator bounds and `go test ./...` pass.
 - [ ] **T53.4 Expose opt-in HTTPS SSO and logout** — Covers: F27-AC2, F27-AC3
   - Files: Gateway `internal/console/httpapi/` (new SSO handlers/tests and
     necessary API wiring), `cmd/console/` (configuration/composition and
