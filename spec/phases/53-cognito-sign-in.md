@@ -507,6 +507,20 @@ is linked to a local account by email.
     direct storage bypass attempts, replay, concurrency, expiry, provider,
     storage and audit failures, restart and redaction; focused existing
     unbound tests and `go test ./...` pass.
+- [x] **T53.4q Retire replaced browser sessions atomically** — Covers: foundation of F27-AC3, F27-AC4
+  - Files: Gateway `internal/console/storage/` browser-binding and session
+    actions/tests, Gateway `internal/console/README.md`,
+    `spec/TECH-SPEC.md`, `spec/ROADMAP.md`.
+  - Do: When an inactive bound session is replaced, transactionally revoke
+    the previous session, delete any retained Cognito credentials and audit
+    its retirement alongside the replacement. Preserve active-session
+    conflict behavior, historical marker isolation, unbound issuance and
+    uncertain failure handling. A disabled Cognito identity that is
+    re-enabled after replacement must not retain its old credential.
+  - Done when: focused `Test.*BrowserSessionRetirement` tests cover local
+    and Cognito replacements, disable/re-enable, expiry, active conflicts,
+    concurrent issuance, audit/storage/commit failures, restart and
+    redaction; `go test ./...` passes.
 - [ ] **T53.4 Expose opt-in HTTPS SSO and logout** — Covers: F27-AC2, F27-AC3
   - Files: Gateway `internal/console/httpapi/` (new SSO handlers/tests and
     necessary API wiring), `cmd/console/` (configuration/composition and
