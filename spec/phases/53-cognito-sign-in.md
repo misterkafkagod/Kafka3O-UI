@@ -396,6 +396,23 @@ is linked to a local account by email.
     replaced, revoked and disabled sessions, wrong and unbound markers,
     durable audit and restart, clock regression, failures, redaction and
     unbound isolation; `go test ./...` passes.
+- [x] **T53.4j Exchange and complete bound refreshes** — Covers: foundation of F27-AC4
+  - Files: Gateway `internal/console/cognito/` refresh exchange and proof
+    actions, `internal/console/storage/` completion actions and tests,
+    Gateway `internal/console/README.md`, `spec/TECH-SPEC.md`,
+    `spec/ROADMAP.md`.
+  - Do: Carry the marker digest through bound reservation, pre-dispatch
+    validation, one-shot provider exchange, failure audit and an opaque
+    single-use completion proof. Atomically recheck the same current binding,
+    reservation, identity, encrypted credential, verified snapshot and
+    deadlines before persisting a verified next generation. A different or
+    unbound marker must not consume a bound proof; replacement or revocation
+    during a provider request must not restore the old session. Never retry
+    uncertain provider outcomes, and keep managers and routes unbound.
+  - Done when: focused `Test.*BoundCognitoRefreshExchange` tests cover
+    retained and rotated credentials, proof isolation, changed and replaced
+    bindings before and during dispatch, concurrency, failures, clocks,
+    restart, redaction and unbound isolation; `go test ./...` passes.
 - [ ] **T53.4 Expose opt-in HTTPS SSO and logout** — Covers: F27-AC2, F27-AC3
   - Files: Gateway `internal/console/httpapi/` (new SSO handlers/tests and
     necessary API wiring), `cmd/console/` (configuration/composition and
