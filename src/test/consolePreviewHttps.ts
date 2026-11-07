@@ -8,10 +8,13 @@ import process from "node:process";
 type PreviewFixture = {
   origin: string;
   ca: Buffer;
+  providerCA?: Buffer;
+  logs: () => string;
   close: () => Promise<void>;
 };
 
-export async function consolePreviewHttps(gatewayDirectory: string, dist: string): Promise<PreviewFixture> {
+// extraEnv selects optional fixture modes (for example KAFKA3O_TEST_CONSOLE_PREVIEW_COGNITO).
+export async function consolePreviewHttps(gatewayDirectory: string, dist: string, extraEnv: Record<string, string> = {}): Promise<PreviewFixture> {
   const directory = await mkdtemp(join(tmpdir(), "kafka3o-preview-"));
   const executable = join(directory, process.platform === "win32" ? "console-fixture.exe" : "console-fixture");
   const workingDirectory = join(gatewayDirectory, "cmd", "console");
@@ -28,7 +31,7 @@ export async function consolePreviewHttps(gatewayDirectory: string, dist: string
     });
     child = spawn(executable, ["-test.v", "-test.run=^TestConsolePreviewHTTPSFixture$", "-test.timeout=90s"], {
       cwd: workingDirectory,
-      env: { ...process.env, KAFKA3O_TEST_CONSOLE_PREVIEW: "1", KAFKA3O_TEST_CONSOLE_PREVIEW_DIST: dist },
+      env: { ...process.env, ...extraEnv, KAFKA3O_TEST_CONSOLE_PREVIEW: "1", KAFKA3O_TEST_CONSOLE_PREVIEW_DIST: dist },
       windowsHide: true,
     });
     const processHandle = child;
@@ -36,7 +39,7 @@ export async function consolePreviewHttps(gatewayDirectory: string, dist: string
     processHandle.stdout.setEncoding("utf8");
     processHandle.stderr.setEncoding("utf8");
     processHandle.stderr.on("data", (chunk: string) => { errorOutput = (errorOutput + chunk).slice(-65_536); });
-    const ready = await new Promise<{ origin: string; caFile: string }>((resolve, reject) => {
+    const ready = await new Promise<{ origin: string; caFile: string; providerCAFile?: string }>((resolve, reject) => {
       let pending = "";
       const timer = setTimeout(() => reject(new Error("Console fixture did not become ready")), 30_000);
       processHandle.once("error", (error) => { clearTimeout(timer); reject(error); });
@@ -59,12 +62,14 @@ export async function consolePreviewHttps(gatewayDirectory: string, dist: string
               throw new Error("Invalid Console fixture metadata");
             }
             const url = new URL(value.origin);
-            if (url.protocol !== "https:" || url.hostname !== "127.0.0.1" || url.origin !== value.origin ||
-                !isAbsolute(value.caFile)) {
+            const live = extraEnv.KAFKA3O_TEST_CONSOLE_PREVIEW_COGNITO === "environment";
+            const providerCAFile = "providerCAFile" in value ? value.providerCAFile : undefined;
+            if (url.protocol !== "https:" || url.hostname !== (live ? "localhost" : "127.0.0.1") || url.origin !== value.origin ||
+                !isAbsolute(value.caFile) || (providerCAFile !== undefined && (typeof providerCAFile !== "string" || !isAbsolute(providerCAFile)))) {
               throw new Error("Console fixture is not a loopback HTTPS origin");
             }
             clearTimeout(timer);
-            resolve({ origin: value.origin, caFile: value.caFile });
+            resolve({ origin: value.origin, caFile: value.caFile, providerCAFile: providerCAFile as string | undefined });
           } catch (error) {
             clearTimeout(timer);
             reject(error);
@@ -73,10 +78,13 @@ export async function consolePreviewHttps(gatewayDirectory: string, dist: string
       });
     });
     const ca = await readFile(ready.caFile);
+    const providerCA = ready.providerCAFile ? await readFile(ready.providerCAFile) : undefined;
     const exitResult = exited;
     return {
       origin: ready.origin,
       ca,
+      providerCA,
+      logs: () => output + errorOutput,
       close: async () => {
         try {
           if (processHandle.exitCode === null && processHandle.signalCode === null) {

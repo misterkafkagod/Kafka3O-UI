@@ -2,7 +2,7 @@
 - **Milestone:** M10
 - **Covers:** F27-AC2, the Cognito portions of F27-AC3 and F27-AC4
 - **Discovery:** [cognito-user-pool-fixture.md](../discovery/cognito-user-pool-fixture.md)
-- **Status:** Building
+- **Status:** Review
 
 ## Existing baseline and boundaries
 P51/P52 supply local Console sessions, audited local account administration
@@ -648,7 +648,7 @@ is linked to a local account by email.
     and focused ConsoleSessionGate tests pass, covering Origin, callback
     binding/replay, secure cookies, provider outage, logout and no replay;
     full Gateway and UI suites and default build pass.
-- [ ] **T53.5 Verify the complete fixture flow** — Covers: F27-AC2, F27-AC3, F27-AC4
+- [x] **T53.5 Verify the complete fixture flow** — Covers: F27-AC2, F27-AC3, F27-AC4
   - Files: Gateway `cmd/console/` and `internal/console/cognito/` fixture
     tests, `src/console/previewIntegration.test.ts` and tightly coupled test
     helpers, Gateway `internal/console/README.md`, `spec/TECH-SPEC.md`.

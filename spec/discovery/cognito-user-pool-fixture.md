@@ -5,7 +5,7 @@
 - **Done when:** Public provider documentation supplies a fixture recipe and
   the remaining real-pool checks are explicit.
 - **Phase:** P53
-- **Status:** Done for the controlled fixture; live-pool discovery is pending.
+- **Status:** Done for the controlled fixture; a live test User Pool was exercised on 2026-11-07 (see the [browser-marker discovery](./browser-marker-protocol.md) and P53 T53.5). Group-change propagation, refresh-token rotation and MFA remain unverified.
 - **Secrets used:** None. A real app-client secret and a separate storage
   encryption key must be deployment-provisioned, never documented by value.
 
