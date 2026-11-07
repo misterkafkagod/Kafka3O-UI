@@ -567,7 +567,7 @@ is linked to a local account by email.
     malformed, duplicate and noncanonical markers, Origin and HTTPS
     rejection, entropy failure, cookie attributes, redaction and absence
     without SSO; `go test ./...` passes.
-- [ ] **T53.4u Configure and discover opt-in Cognito** — Covers: foundation of F27-AC2
+- [x] **T53.4u Configure and discover opt-in Cognito** — Covers: foundation of F27-AC2
   - Files: Gateway `cmd/console/` Cognito configuration, discovery
     composition and tests, `internal/console/httpapi/` SSO availability
     handler/tests, Gateway `internal/console/README.md`.
