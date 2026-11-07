@@ -664,5 +664,12 @@ is linked to a local account by email.
     preview and default `npm run build`, focused race tests and the configured
     Go vulnerability scan pass; the existing EKS-D UI, Kafka pods and
     persistent volumes remain unchanged.
+- [x] **T53.6 Fix: inject Cognito services as abstractions** — Covers: review convention fix
+  - Files: Gateway `internal/console/httpapi/cognito_services.go`.
+  - Do: Replace the concrete attempt manager, code exchanger and session
+    manager in `CognitoServices` with narrow interfaces holding only the
+    bound methods the SSO handlers call. No behavior change.
+  - Done when: `go test ./internal/console/httpapi ./cmd/console -run 'Test.*Cognito'`
+    and `go test ./...` pass.
 
 ## Review
