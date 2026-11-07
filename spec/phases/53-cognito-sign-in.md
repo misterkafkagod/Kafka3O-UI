@@ -536,6 +536,23 @@ is linked to a local account by email.
     Cognito sessions, expiry, disable/re-enable, active preservation,
     batch limits, races, corruption, clocks, restart, failure rollback,
     redaction and the real Console startup worker; `go test ./...` passes.
+- [x] **T53.4s Generate and validate stable browser markers** — Covers: foundation of F27-AC2, F27-AC3
+  - Files: Gateway `internal/console/session/` marker generation, hashing
+    and cookie-parsing actions/tests, `internal/console/storage/` session
+    validation and bound integration tests, Gateway `internal/console/README.md`,
+    `spec/TECH-SPEC.md`, `spec/ROADMAP.md`.
+  - Do: Generate a 256-bit opaque marker with injected entropy and derive
+    a domain-separated digest from its canonical unpadded base64url value.
+    Strictly parse exactly one marker from raw Cookie headers, including
+    malformed and duplicate fields, without returning marker material or
+    secrets in errors. Reject marker reuse of session or CSRF token values,
+    and exercise the resulting digest across bound local issuance and Cognito
+    attempts. Expose no route or cookie setter: concurrent
+    first initialization, cookie lifetime, delayed responses and real-browser
+    behavior must be resolved separately before using these primitives.
+  - Done when: focused `Test.*BrowserMarker` tests cover entropy failures,
+    canonical encoding, domain separation, malformed and duplicate cookie
+    fields, redaction and local/Cognito binding; `go test ./...` passes.
 - [ ] **T53.4 Expose opt-in HTTPS SSO and logout** — Covers: F27-AC2, F27-AC3
   - Files: Gateway `internal/console/httpapi/` (new SSO handlers/tests and
     necessary API wiring), `cmd/console/` (configuration/composition and
