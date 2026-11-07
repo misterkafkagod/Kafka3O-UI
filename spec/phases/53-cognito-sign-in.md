@@ -382,6 +382,20 @@ is linked to a local account by email.
     changed and replaced bindings and snapshots, queued replacement, replay,
     deadlines, clock regression, restart and redaction; `go test ./...`
     passes.
+- [x] **T53.4i Audit bound refresh failures** — Covers: foundation of F27-AC4
+  - Files: Gateway `internal/console/storage/` Cognito refresh failure audit
+    actions and tests, Gateway `internal/console/README.md`,
+    `spec/TECH-SPEC.md`, `spec/ROADMAP.md`.
+  - Do: Record a bound reservation's failed-before-send or unknown outcome
+    using its original session marker digest and exact durable attempt,
+    without requiring that marker still point to the old session. Never alter
+    the replacement, expose binding material, or let unbound failure auditing
+    consume a live bound reservation. Recheck non-regressing time and report
+    audit, commit and uncertain outcomes explicitly.
+  - Done when: focused `Test.*BoundCognitoRefreshFailure` tests cover current,
+    replaced, revoked and disabled sessions, wrong and unbound markers,
+    durable audit and restart, clock regression, failures, redaction and
+    unbound isolation; `go test ./...` passes.
 - [ ] **T53.4 Expose opt-in HTTPS SSO and logout** — Covers: F27-AC2, F27-AC3
   - Files: Gateway `internal/console/httpapi/` (new SSO handlers/tests and
     necessary API wiring), `cmd/console/` (configuration/composition and
