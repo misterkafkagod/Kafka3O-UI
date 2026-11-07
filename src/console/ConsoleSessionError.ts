@@ -14,7 +14,12 @@ export type ConsoleSessionErrorCode =
   | "invalid_request"
   | "csrf_rejected"
   | "password_change_required"
-  | "request_rejected";
+  | "request_rejected"
+  | "sso_unsupported"
+  | "sso_unavailable"
+  | "sign_in_failed"
+  | "sign_in_denied"
+  | "browser_verification_failed";
 
 export class ConsoleSessionError extends Error {
   readonly code: ConsoleSessionErrorCode;

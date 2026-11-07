@@ -614,7 +614,7 @@ is linked to a local account by email.
     marker, revoked and replaced sessions, logout with and without provider,
     CSRF and redaction; existing local session API tests and
     `go test ./...` pass.
-- [ ] **T53.4x Coordinate SSO in the browser** — Covers: F27-AC2, F27-AC3
+- [x] **T53.4x Coordinate SSO in the browser** — Covers: F27-AC2, F27-AC3
   - Files: UI `src/console/` SSO actions and tests,
     `src/components/ConsoleSessionGate.tsx` and its tests, UI Playwright
     configuration and opt-in browser tests.

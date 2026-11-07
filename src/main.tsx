@@ -7,11 +7,17 @@ import { App } from "./App";
 import { ConsoleSessionGate } from "./components/ConsoleSessionGate";
 import { loadGatewayConfig } from "./config/loadGatewayConfig";
 import type { ConsoleSessionClient, ConsoleSessionTransport } from "./console/ConsoleSession";
+import type { ConsoleBrowser, ConsoleSsoClient, ConsoleSsoTransport } from "./console/ConsoleSso";
 import { changeLocalPassword } from "./console/changeLocalPassword";
+import { completeCognitoSignIn } from "./console/completeCognitoSignIn";
+import { readCognitoAvailability } from "./console/readCognitoAvailability";
 import { readConsoleSession } from "./console/readConsoleSession";
 import { requestConsoleSession } from "./console/requestConsoleSession";
+import { requestConsoleSso } from "./console/requestConsoleSso";
 import { signInLocal } from "./console/signInLocal";
 import { signOutConsole } from "./console/signOutConsole";
+import { signOutConsoleSso } from "./console/signOutConsoleSso";
+import { startCognitoSignIn } from "./console/startCognitoSignIn";
 import { alterConfiguration } from "./gateway/alterConfiguration";
 import { clearGatewayToken } from "./gateway/clearGatewayToken";
 import { createTopic } from "./gateway/createTopic";
@@ -45,7 +51,21 @@ const consoleSession: ConsoleSessionClient = {
   changePassword: (current, replacement) => changeLocalPassword(consoleTransport, current, replacement),
   signOut: () => signOutConsole(consoleTransport),
 };
-const manualProxyOrigin = import.meta.env.VITE_KAFKA3O_MANUAL_PROXY === "true" ? window.location.origin : undefined;
+const ssoTransport: ConsoleSsoTransport = (request) =>
+  requestConsoleSso(window.fetch.bind(window), window.location.origin, () => document.cookie, request);
+const browserLocks = typeof navigator === "undefined" ? undefined : navigator.locks;
+const consoleSso: ConsoleSsoClient = {
+  available: () => readCognitoAvailability(ssoTransport, browserLocks),
+  start: () => startCognitoSignIn(ssoTransport, browserLocks),
+  complete: (query) => completeCognitoSignIn(ssoTransport, browserLocks, query),
+  signOut: () => signOutConsoleSso(ssoTransport, browserLocks),
+};
+const consoleBrowser: ConsoleBrowser = {
+  path: window.location.pathname,
+  query: window.location.search,
+  replace: (path) => window.history.replaceState(null, "", path),
+  assign: (url) => window.location.assign(url),
+};const manualProxyOrigin = import.meta.env.VITE_KAFKA3O_MANUAL_PROXY === "true" ? window.location.origin : undefined;
 const boundFetchJson = (url: string) => fetchJson(window.fetch.bind(window), url, gatewayTimeoutMs);
 const gatewayCredentials = {
   read: (gatewayUrl: string) => getGatewayToken(window.sessionStorage, gatewayUrl),
@@ -61,7 +81,7 @@ const queryClient = new QueryClient();
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    {consolePreview ? <ConsoleSessionGate client={consoleSession} /> : <BrowserRouter>
+    {consolePreview ? <ConsoleSessionGate client={consoleSession} sso={consoleSso} browser={consoleBrowser} /> : <BrowserRouter>
       <App
         queryClient={queryClient}
         loadGatewayConfig={() => loadGatewayConfig(boundFetchJson)}

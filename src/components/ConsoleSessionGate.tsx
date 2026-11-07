@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import type { ConsoleSession, ConsoleSessionClient } from "../console/ConsoleSession";
 import { ConsoleSessionError } from "../console/ConsoleSessionError";
+import { cognitoCallbackPath, type ConsoleBrowser, type ConsoleSsoClient } from "../console/ConsoleSso";
+import { describeSsoFailure } from "../console/describeSsoFailure";
 import styles from "./ConsoleSessionGate.module.css";
 
 type Screen =
@@ -12,10 +14,14 @@ type Screen =
 
 type ConsoleSessionGateProps = {
   client: ConsoleSessionClient;
+  sso?: ConsoleSsoClient;
+  browser?: ConsoleBrowser;
 };
 
-export function ConsoleSessionGate({ client }: ConsoleSessionGateProps) {
+export function ConsoleSessionGate({ client, sso, browser }: ConsoleSessionGateProps) {
   const [screen, setScreen] = useState<Screen>({ kind: "checking" });
+  const [ssoAvailable, setSsoAvailable] = useState(false);
+  const callback = useRef<Promise<ConsoleSession> | null>(null);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [currentPassword, setCurrentPassword] = useState("");
@@ -24,24 +30,72 @@ export function ConsoleSessionGate({ client }: ConsoleSessionGateProps) {
   const [unresolvedChanges, setUnresolvedChanges] = useState<ReadonlySet<string>>(() => new Set());
   const [confirmedInvestigation, setConfirmedInvestigation] = useState(false);
   const [error, setError] = useState("");
-  const [pending, setPending] = useState<"inspect" | "signIn" | "changePassword" | "signOut" | null>(null);
+  const [pending, setPending] = useState<"inspect" | "signIn" | "sso" | "changePassword" | "signOut" | null>(null);
   const submitting = useRef(false);
 
   useEffect(() => {
     const controller = new AbortController();
     setScreen({ kind: "checking" });
-    client.inspect(controller.signal).then(
-      (session) => {
-        if (!controller.signal.aborted) {
-          setScreen(session ? { kind: "signedIn", session } : { kind: "signedOut" });
-        }
-      },
-      () => {
-        if (!controller.signal.aborted) setScreen({ kind: "unavailable" });
-      },
+    if (sso && browser && browser.path === cognitoCallbackPath) {
+      // Strip the code and state from the address bar before completing, and complete only once.
+      if (!callback.current) {
+        const query = browser.query;
+        browser.replace(cognitoCallbackPath);
+        callback.current = sso.complete(query);
+      }
+      callback.current.then(
+        (session) => {
+          if (controller.signal.aborted) return;
+          browser.replace("/");
+          setScreen({ kind: "signedIn", session });
+        },
+        (failure: unknown) => {
+          if (controller.signal.aborted) return;
+          browser.replace("/");
+          setScreen({ kind: "signedOut", notice: describeSsoFailure(failure) });
+        },
+      );
+    } else {
+      client.inspect(controller.signal).then(
+        (session) => {
+          if (!controller.signal.aborted) {
+            setScreen(session ? { kind: "signedIn", session } : { kind: "signedOut" });
+          }
+        },
+        () => {
+          if (!controller.signal.aborted) setScreen({ kind: "unavailable" });
+        },
+      );
+    }
+    sso?.available().then(
+      (available) => { if (!controller.signal.aborted) setSsoAvailable(available); },
+      () => { if (!controller.signal.aborted) setSsoAvailable(false); },
     );
     return () => controller.abort();
-  }, [client]);
+  }, [client, sso, browser]);
+
+  async function signInWithCognito() {
+    if (submitting.current || !sso || !browser) return;
+    submitting.current = true;
+    setPending("sso");
+    setError("");
+    let url: string;
+    try {
+      url = await sso.start();
+    } catch (failure) {
+      const code = failure instanceof ConsoleSessionError ? failure.code : "outcome_unknown";
+      if (code === "already_signed_in" || code === "outcome_unknown") {
+        setScreen({ kind: "uncertain", action: "signIn" });
+      } else {
+        setError(describeSsoFailure(failure));
+      }
+      submitting.current = false;
+      setPending(null);
+      return;
+    }
+    // Leave the button pending: the window is navigating to the provider.
+    browser.assign(url);
+  }
 
   async function inspectAgain() {
     if (submitting.current) return;
@@ -177,13 +231,22 @@ export function ConsoleSessionGate({ client }: ConsoleSessionGateProps) {
     setConfirmedInvestigation(false);
     const uncertainPassword = screen.kind === "uncertain" && screen.action === "changePassword";
     try {
-      await client.signOut();
+      let providerLogoutUrl: string | null = null;
+      try {
+        providerLogoutUrl = sso ? await sso.signOut() : (await client.signOut(), null);
+      } catch (failure) {
+        if (!(failure instanceof ConsoleSessionError && failure.code === "sso_unsupported")) throw failure;
+        await client.signOut();
+      }
       setScreen({
         kind: "signedOut",
         notice: uncertainPassword
           ? "Signed out. The password change outcome remains unknown; check the audit before retrying."
-          : "You are signed out.",
+          : providerLogoutUrl
+            ? "You are signed out of Kafka3O. Continuing to Cognito sign-out; this does not sign you out of other identity providers."
+            : "You are signed out.",
       });
+      if (providerLogoutUrl && browser) browser.assign(providerLogoutUrl);
     } catch (failure) {
       const code = failure instanceof ConsoleSessionError ? failure.code : "outcome_unknown";
       if (code === "unauthorized") {
@@ -221,7 +284,11 @@ export function ConsoleSessionGate({ client }: ConsoleSessionGateProps) {
                   : screen.kind === "unavailable" ? "Sign-in unavailable"
                     : screen.kind === "checking" ? "Checking your session" : "Sign in"}
           </h1>
-          <p className={styles.intro}>Local accounts only. SSO and Kafka access are not available in this preview.</p>
+          <p className={styles.intro}>
+            {ssoAvailable
+              ? "Local accounts or Cognito sign-in. Kafka access is not available in this preview."
+              : "Local accounts only. SSO and Kafka access are not available in this preview."}
+          </p>
 
           {screen.kind === "checking" ? <p role="status">Checking your Console session...</p> : null}
           {screen.kind === "unavailable" ? (
@@ -251,6 +318,11 @@ export function ConsoleSessionGate({ client }: ConsoleSessionGateProps) {
                   <button type="submit">{pending === "signIn" ? "Signing in..." : "Sign in"}</button>
                 </fieldset>
               </form>
+              {ssoAvailable ? (
+                <button type="button" className={styles.secondary} onClick={signInWithCognito} disabled={pending !== null}>
+                  {pending === "sso" ? "Opening Cognito..." : "Sign in with Cognito"}
+                </button>
+              ) : null}
             </>
           ) : null}
           {screen.kind === "signedIn" && screen.session.mustChangePassword ? (
