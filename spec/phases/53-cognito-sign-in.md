@@ -431,6 +431,20 @@ is linked to a local account by email.
     unbound isolation, concurrent waiters and managers, cancellation,
     replacement, provider and storage failures, clocks, restart and
     redaction; coordinator bounds and `go test ./...` pass.
+- [x] **T53.4l Resolve bound session grants** — Covers: foundation of F27-AC4, F28-AC3
+  - Files: Gateway `internal/console/session/` grant-resolution actions and
+    tests, Gateway `internal/console/storage/` tests, Gateway
+    `internal/console/README.md`, `spec/TECH-SPEC.md`, `spec/ROADMAP.md`.
+  - Do: Add a trusted-marker bound grant-resolution action that first
+    resolves and, when needed, refreshes the same bound session, then
+    transactionally rechecks its binding and current grants. Preserve
+    password-change restrictions, scoped role behavior, unbound isolation,
+    redaction and explicit operational errors. Do not mount any route.
+  - Done when: focused `Test.*BoundSessionManagerGrants` tests cover local
+    and Cognito grants, refreshed group changes, wrong and missing markers,
+    unbound isolation, password restrictions, replacement and grant changes
+    between checks, storage failure, restart and redaction; `go test ./...`
+    passes.
 - [ ] **T53.4 Expose opt-in HTTPS SSO and logout** — Covers: F27-AC2, F27-AC3
   - Files: Gateway `internal/console/httpapi/` (new SSO handlers/tests and
     necessary API wiring), `cmd/console/` (configuration/composition and
