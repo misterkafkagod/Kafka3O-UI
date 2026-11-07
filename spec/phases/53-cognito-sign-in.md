@@ -490,7 +490,7 @@ is linked to a local account by email.
   - Done when: focused `Test.*StableBoundCognitoAttempt` tests cover valid,
     wrong, missing and unbound markers, tampering, audit errors, expiry,
     replay, restart and redaction; `go test ./...` passes.
-- [ ] **T53.4p Carry the stable marker through Cognito exchange and issuance** — Covers: foundation of F27-AC2, F27-AC4
+- [x] **T53.4p Carry the stable marker through Cognito exchange and issuance** — Covers: foundation of F27-AC2, F27-AC4
   - Files: Gateway `internal/console/cognito/`, `session/` and `storage/`
     exchange, proof and session actions/tests, Gateway
     `internal/console/README.md`, `spec/TECH-SPEC.md`, `spec/ROADMAP.md`.
