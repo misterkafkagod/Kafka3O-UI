@@ -629,7 +629,7 @@ is linked to a local account by email.
     availability, missing Web Locks, lock usage, callback URL cleanup,
     failures, existing sessions and logout navigation; `npm test` and
     `npm run build` pass.
-- [ ] **T53.4 Expose opt-in HTTPS SSO and logout** — Covers: F27-AC2, F27-AC3
+- [x] **T53.4 Expose opt-in HTTPS SSO and logout** — Covers: F27-AC2, F27-AC3
   - Files: Gateway `internal/console/httpapi/` (new SSO handlers/tests and
     necessary API wiring), `cmd/console/` (configuration/composition and
     tests), `src/console/`, `src/components/ConsoleSessionGate.tsx` and
