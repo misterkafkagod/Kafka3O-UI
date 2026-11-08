@@ -229,7 +229,7 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
     - Audited grant, group-mapping and access-listing routes are on the undeployed loopback Console for local global ADMINs, with per-request grant resolution, optimistic conflicts, self-change denial and redacted before/after audit. UI, classification and deployment remain P60/P61/P59.
   - **P60** F30-B1 · Registered clusters and Production classification — Covers: F30-AC1 · Discovery: — · Status: Done
     - Demo: migration registers existing clusters unclassified; global ADMIN classifies one with confirmation and reason; cluster ADMIN, browser config and spoofed input cannot change it; unclassified blocks writes.
-  - **P61** F28-B1 + F28-B3 + F30-B1 · Access-management and classification UI — Covers: UI portion of F28-AC4, additive-model explanation of F28-AC2, F30-B1 display · Discovery: — · Status: Defined
+  - **P61** F28-B1 + F28-B3 + F30-B1 · Access-management and classification UI — Covers: UI portion of F28-AC4, additive-model explanation of F28-AC2, F30-B1 display · Discovery: — · Status: Building
     - Demo: global ADMIN manages grants, mappings and classification with confirmation naming subject and scope; cancel sends nothing; 401/403/409/503 are distinct.
   - **P55** F29-B1 + F29-B2 + F30-B2 · Console-to-Gateway delegation and enforcement — Covers: F29-AC1, F29-AC2, F29-AC3, F30-AC2 · Discovery: Gateway service trust · Status: Defined
     - Demo: direct or replayed Gateway requests and non-ADMIN Production writes are denied before Kafka.
