@@ -1,3 +1,4 @@
+import { ProductionChangeCanceled } from "../console/ProductionChangeCanceled";
 import { HttpError } from "./HttpError";
 import type { GatewayErrorKind } from "./types";
 
@@ -5,6 +6,9 @@ const unreachableNames = new Set(["TimeoutError", "AbortError"]);
 
 // Matches by name, not instanceof: fetch's DOMException may come from a different realm than the global one.
 export function classifyGatewayError(error: unknown): GatewayErrorKind {
+  if (error instanceof ProductionChangeCanceled) {
+    return "change-canceled";
+  }
   if (error instanceof HttpError && error.status === 401) {
     return "authentication-required";
   }

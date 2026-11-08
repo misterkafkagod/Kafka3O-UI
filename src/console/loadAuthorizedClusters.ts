@@ -20,9 +20,10 @@ export async function loadAuthorizedClusters(fetchFn: typeof fetch, origin: stri
     throw new Error("The Console returned an invalid cluster list.");
   }
   return body.clusters.map((entry: unknown) => {
-    if (!isRecord(entry) || typeof entry.id !== "string" || !/^[A-Za-z0-9._-]{1,128}$/.test(entry.id) || entry.id === "." || entry.id === ".." || typeof entry.name !== "string") {
+    if (!isRecord(entry) || typeof entry.id !== "string" || !/^[A-Za-z0-9._-]{1,128}$/.test(entry.id) || entry.id === "." || entry.id === ".." || typeof entry.name !== "string" ||
+        (entry.environment !== "" && entry.environment !== "NON_PRODUCTION" && entry.environment !== "PRODUCTION")) {
       throw new Error("The Console returned an invalid cluster list.");
     }
-    return { id: entry.id, name: entry.name, url: `${origin}/api/clusters/${entry.id}/gateway` };
+    return { id: entry.id, name: entry.name, url: `${origin}/api/clusters/${entry.id}/gateway`, environment: entry.environment };
   });
 }

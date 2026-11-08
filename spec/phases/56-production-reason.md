@@ -33,7 +33,7 @@ irreversible-operation confirmations are unchanged; ADMIN never bypasses them.
   - Done when: `go test ./internal/console/httpapi ./cmd/console -run 'Forward|SecuredForwarding'`
     passes with ADMIN-with-reason allowed, ADMIN-without-reason and
     OPERATOR-with-reason denied on Production, and the reason audited.
-- [ ] **T56.2 Production reason prompt in the secured UI** — Covers: F30-AC4
+- [x] **T56.2 Production reason prompt in the secured UI** — Covers: F30-AC4
   - Files: UI `src/console/loadAuthorizedClusters.ts`, `src/gateway/types.ts`,
     `src/console/fetchConsoleGatewayJson.ts`, `src/console/ProductionChangeCanceled.ts`
     (new), `src/gateway/classifyGatewayError.ts`, `src/gateway/describeGatewayError.ts`,

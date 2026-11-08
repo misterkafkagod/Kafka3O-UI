@@ -2,6 +2,8 @@ export type GatewayEntry = {
   id: string;
   name: string;
   url: string;
+  // Present only for clusters listed by the Console; the authoritative environment, never browser config.
+  environment?: "" | "NON_PRODUCTION" | "PRODUCTION";
 };
 
 export type Broker = {
@@ -100,7 +102,7 @@ export type ConsumerGroup = {
 };
 
 export type GatewayErrorKind = "authentication-required" | "gateway-unreachable" | "cluster-unreachable"
-  | "access-denied" | "authorization-unavailable" | "outcome-unknown" | "other";
+  | "access-denied" | "authorization-unavailable" | "outcome-unknown" | "change-canceled" | "other";
 
 // RFC 9457 problem body sent by the gateway on errors (only the fields the UI uses).
 export type Problem = {

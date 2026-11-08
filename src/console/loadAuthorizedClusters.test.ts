@@ -7,7 +7,7 @@ describe("loadAuthorizedClusters", () => {
       { id: "dev", name: "Dev", environment: "NON_PRODUCTION", effectiveRole: "OPERATOR" },
     ] }));
     await expect(loadAuthorizedClusters(fetchFn, "https://console.example", () => {})).resolves.toEqual([
-      { id: "dev", name: "Dev", url: "https://console.example/api/clusters/dev/gateway" },
+      { id: "dev", name: "Dev", url: "https://console.example/api/clusters/dev/gateway", environment: "NON_PRODUCTION" },
     ]);
     expect(fetchFn.mock.calls[0][1]?.credentials).toBe("same-origin");
   });
@@ -16,7 +16,7 @@ describe("loadAuthorizedClusters", () => {
     const onUnauthorized = vi.fn();
     await expect(loadAuthorizedClusters(async () => new Response(null, { status: 401 }), "https://c.example", onUnauthorized)).rejects.toThrow();
     expect(onUnauthorized).toHaveBeenCalledTimes(1);
-    for (const clusters of [[{ id: "../admin", name: "x" }], [{ id: "a/b", name: "x" }], [{ id: "..", name: "x" }], "nope"]) {
+    for (const clusters of [[{ id: "../admin", name: "x", environment: "" }], [{ id: "a/b", name: "x", environment: "" }], [{ id: "..", name: "x", environment: "" }], [{ id: "dev", name: "x", environment: "STAGING" }], "nope"]) {
       await expect(loadAuthorizedClusters(async () => Response.json({ clusters }), "https://c.example", () => {})).rejects.toThrow("invalid");
     }
   });

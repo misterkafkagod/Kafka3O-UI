@@ -149,11 +149,25 @@ function securedApp(sessionEnded: () => void) {
     sessionEnded();
   };
   const origin = window.location.origin;
+  const clusters = new Map<string, GatewayEntry>();
+  const loadClusters = async () => {
+    const entries = await loadAuthorizedClusters(window.fetch.bind(window), origin, ended);
+    clusters.clear();
+    for (const entry of entries) clusters.set(entry.url, entry);
+    return entries;
+  };
+  const productionReason = (gatewayUrl: string) => {
+    const cluster = clusters.get(gatewayUrl);
+    return cluster?.environment === "PRODUCTION"
+      ? () => window.prompt(`Production change on ${cluster.name} (${cluster.id}). Enter the change reason; cancel to send nothing.`)
+      : undefined;
+  };
   const read: GatewayRead = (gatewayUrl) => (url) =>
     fetchConsoleGatewayJson(window.fetch.bind(window), origin, () => document.cookie, gatewayUrl, url, securedTimeoutMs, ended);
   const write: GatewayWrite = (gatewayUrl) => (url, request) =>
-    fetchConsoleGatewayJson(window.fetch.bind(window), origin, () => document.cookie, gatewayUrl, url, securedTimeoutMs, ended, request);
-  return gatewayApp(read, write, securedCredentials, () => loadAuthorizedClusters(window.fetch.bind(window), origin, ended));
+    fetchConsoleGatewayJson(window.fetch.bind(window), origin, () => document.cookie, gatewayUrl, url, securedTimeoutMs, ended, request,
+      productionReason(gatewayUrl));
+  return gatewayApp(read, write, securedCredentials, loadClusters);
 }
 
 createRoot(document.getElementById("root")!).render(

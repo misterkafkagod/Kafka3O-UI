@@ -19,6 +19,9 @@ export function describeGatewayError(error: unknown, gatewayUrl: string): Gatewa
   if (kind === "access-denied") {
     return { title: "Not permitted", detail: describeAccessDenial(error instanceof HttpError ? error.problem?.detail : undefined) };
   }
+  if (kind === "change-canceled") {
+    return { title: "Change canceled", detail: "No change reason was given, so nothing was sent." };
+  }
   if (kind === "authorization-unavailable") {
     return { title: "Authorization unavailable", detail: "The Console could not check your permissions, so nothing was sent to Kafka. Try again later." };
   }

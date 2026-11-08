@@ -1,11 +1,13 @@
 import { HttpError } from "../gateway/HttpError";
 import type { GatewayWriteRequest } from "../gateway/GatewayWriteRequest";
 import { isRecord } from "../gateway/isRecord";
+import { ProductionChangeCanceled } from "./ProductionChangeCanceled";
 import { readConsoleCsrf } from "./readConsoleCsrf";
 
 // fetchConsoleGatewayJson sends a Gateway request same-origin through the Console, which authenticates the session,
 // mints a delegation and forwards it. Writes carry the CSRF header; no token or Gateway address leaves the browser.
-// A 401 means the Console session ended: onUnauthorized runs before the error is thrown.
+// A 401 means the Console session ended: onUnauthorized runs before the error is thrown. For Production clusters
+// productionReason is asked before every write; a cancel or blank answer sends nothing.
 export async function fetchConsoleGatewayJson(
   fetchFn: typeof fetch,
   origin: string,
@@ -15,6 +17,7 @@ export async function fetchConsoleGatewayJson(
   timeoutMs: number,
   onUnauthorized: () => void,
   request?: GatewayWriteRequest,
+  productionReason?: () => string | null,
 ): Promise<unknown> {
   const base = new URL(gatewayUrl);
   const target = new URL(requestUrl);
@@ -25,6 +28,13 @@ export async function fetchConsoleGatewayJson(
   const headers = new Headers({ Accept: "application/json" });
   const method = request?.method ?? "GET";
   if (method !== "GET") {
+    if (productionReason) {
+      const reason = productionReason()?.trim() ?? "";
+      if (reason === "") {
+        throw new ProductionChangeCanceled();
+      }
+      headers.set("X-Kafka3O-Change-Reason", reason);
+    }
     headers.set("X-Kafka3O-CSRF", readConsoleCsrf(readCookies()));
   }
   if (request?.body !== undefined) {

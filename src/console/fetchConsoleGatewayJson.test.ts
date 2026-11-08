@@ -64,3 +64,27 @@ describe("fetchConsoleGatewayJson", () => {
     expect(onUnauthorized).toHaveBeenCalledTimes(1);
   });
 });
+
+describe("fetchConsoleGatewayJson Production reasons", () => {
+  const write = { method: "POST", body: '{"value":"v"}' } as const;
+  const target = `${gateway}/api/v1/topics/orders/messages`;
+
+  it("sends a trimmed reason with Production writes and never asks for reads", async () => {
+    const fetchFn = vi.fn<typeof fetch>(async () => Response.json({}));
+    const reason = vi.fn(() => "  Incident 42 hotfix  ");
+    await fetchConsoleGatewayJson(fetchFn, origin, cookies, gateway, target, 8000, () => {}, write, reason);
+    expect(new Headers(fetchFn.mock.calls[0][1]?.headers).get("X-Kafka3O-Change-Reason")).toBe("Incident 42 hotfix");
+    await fetchConsoleGatewayJson(fetchFn, origin, cookies, gateway, `${gateway}/api/v1/topics`, 8000, () => {}, undefined, reason);
+    expect(reason).toHaveBeenCalledTimes(1);
+    expect(new Headers(fetchFn.mock.calls[1][1]?.headers).has("X-Kafka3O-Change-Reason")).toBe(false);
+  });
+
+  it("sends nothing when the reason is canceled or blank", async () => {
+    const fetchFn = vi.fn<typeof fetch>();
+    for (const answer of [null, "", "   "]) {
+      const error = await fetchConsoleGatewayJson(fetchFn, origin, cookies, gateway, target, 8000, () => {}, write, () => answer).catch((e: unknown) => e);
+      expect(classifyGatewayError(error)).toBe("change-canceled");
+    }
+    expect(fetchFn).not.toHaveBeenCalled();
+  });
+});
