@@ -40,7 +40,7 @@ Kafka routes and Gateway enforcement are unchanged (P55).
     the operation ID.
   - Done when: `npm test -- src/console/requestConsoleAdmin.test.ts src/console/parseAccessListing.test.ts src/console/parseClusterListing.test.ts src/console/ConsoleAdminClient.test.ts`
     passes.
-- [ ] **T61.2 Access management view** — Covers: F28-AC2, F28-AC4
+- [x] **T61.2 Access management view** — Covers: F28-AC2, F28-AC4
   - Files: `src/components/AccessManagement.tsx`, `AccessManagement.module.css`,
     `src/console/describeAdminError.ts`, `src/console/describeAccessScope.ts`
     (all new) and tests.
