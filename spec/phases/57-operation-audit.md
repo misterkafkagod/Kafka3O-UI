@@ -2,7 +2,7 @@
 - **Milestone:** M10
 - **Covers:** F31-AC1, F31-AC2, F31-AC5
 - **Discovery:** —
-- **Status:** Building
+- **Status:** Review
 
 ## Existing baseline and boundaries
 P51–P56 audit logins, logouts, revocations, account, grant, mapping and
@@ -51,7 +51,7 @@ outcome is not surfaced. Audit search/export is P58.
     it returns `503 outcome_unknown` with the operation ID instead of the
     buffered result. Reads are unchanged.
   - Done when: `go test ./internal/gatewayauth -run 'Outcome|Delegat'` and the UI gateway tests pass.
-- [ ] **T57.4 Unresolved intents and end-to-end audit** — Covers: F31-AC2, F31-AC5
+- [x] **T57.4 Unresolved intents and end-to-end audit** — Covers: F31-AC2, F31-AC5
   - Files: Gateway `internal/console/storage/list_unresolved_gateway_intents.go`
     (new), `cmd/console/run_serve.go`, `cmd/console/secured_forwarding_integration_test.go`,
     `internal/console/README.md` and tests.
