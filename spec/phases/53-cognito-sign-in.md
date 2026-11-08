@@ -2,7 +2,7 @@
 - **Milestone:** M10
 - **Covers:** F27-AC2, the Cognito portions of F27-AC3 and F27-AC4
 - **Discovery:** [cognito-user-pool-fixture.md](../discovery/cognito-user-pool-fixture.md)
-- **Status:** Review
+- **Status:** Done
 
 ## Existing baseline and boundaries
 P51/P52 supply local Console sessions, audited local account administration
@@ -687,3 +687,30 @@ is linked to a local account by email.
     more than one function.
 
 ## Review
+- **Demo:** passed (user, 2026-11-08). All three demo steps ran in a
+  temporary EKS-D pod (`golang:1.27.3`, Node 24.21.0) and locally: the built
+  preview signed in through the synthetic HTTPS provider's redirect into a
+  role-free session with no Kafka routes, refreshed stale claims, denied
+  replayed and forged callbacks, returned the provider logout URL after local
+  revocation, received 401 without replay afterwards and leaked no code,
+  state, client secret or cookie value into logs. During provider outage SSO
+  was reported unavailable while local login worked. Focused verifier tests
+  rejected wrong issuer/client, expired, wrong/missing nonce, forged signature,
+  unapproved algorithm and malformed groups; group grants failed closed on
+  refresh outage. The temporary namespace was deleted; both Kafka pods, their
+  volumes and the manual pod were unchanged.
+- **Regression:** full Gateway suite and Console `-race` tests passed; the
+  full UI suite passed 393 tests with 4 opt-in tests skipped (run separately).
+  Preview and default builds passed.
+- **Convention check:** T53.7 moved four in-file private helpers into their
+  own files; no P53 file now holds more than one function.
+- **Vulnerability scan:** `npm audit`: 0 findings. `govulncheck@v1.9.0 -test
+  -tags integration ./...`: 0 called vulnerabilities; 1 uncalled module-level
+  advisory (GO-2026-5932, `golang.org/x/crypto`, integration tooling only),
+  unchanged and within policy.
+- **Not run:** live Cognito User Pool from this environment, native-browser
+  TLS/cookie/Web Locks behavior, Safari, group-change propagation and any
+  secured deployment (P59).
+- **Notes:**
+  - Phase review should check for in-file private helpers, not only method
+    counts; T53.6 and T53.7 were both convention fixes found late.
