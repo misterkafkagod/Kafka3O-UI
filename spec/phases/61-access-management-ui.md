@@ -25,7 +25,7 @@ Kafka routes and Gateway enforcement are unchanged (P55).
    unknown outcome tells the user to investigate rather than retry.
 
 ## Tasks
-- [ ] **T61.1 Console administration client** — Covers: F28-AC4
+- [x] **T61.1 Console administration client** — Covers: F28-AC4
   - Files: `src/console/ConsoleAdmin.ts`, `ConsoleAdminError.ts`,
     `requestConsoleAdmin.ts`, `parseAccessListing.ts`,
     `parseClusterListing.ts`, `parseAccessChangeResult.ts`, `listAccess.ts`,
