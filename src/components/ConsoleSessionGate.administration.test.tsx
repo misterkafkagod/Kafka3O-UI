@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import type { ConsoleAdminClient } from "../console/ConsoleAdmin";
 import { ConsoleAdminError } from "../console/ConsoleAdminError";
@@ -54,5 +54,28 @@ describe("ConsoleSessionGate administration", () => {
     render(<ConsoleSessionGate client={testClient(normal)} admin={admin} confirm={() => false} />);
     await waitFor(() => expect(screen.getByRole("heading", { name: "Sign in" })).toBeDefined());
     expect(screen.getByText("Your session has ended. Sign in again.")).toBeDefined();
+  });
+});
+
+describe("ConsoleSessionGate secured application", () => {
+  it("renders the Kafka application for a signed-in session and returns to sign-in when it reports an ended session", async () => {
+    let ended: (() => void) | undefined;
+    const renderApp = vi.fn((sessionEnded: () => void) => {
+      ended = sessionEnded;
+      return <p>Kafka application</p>;
+    });
+    render(<ConsoleSessionGate client={testClient(normal)} renderApp={renderApp} />);
+    expect(await screen.findByText("Kafka application")).toBeDefined();
+    expect(screen.getByText(/Kafka access follows your Console roles/)).toBeDefined();
+    act(() => ended?.());
+    expect(await screen.findByRole("heading", { name: "Sign in" })).toBeDefined();
+    expect(screen.queryByText("Kafka application")).toBeNull();
+  });
+
+  it("does not render the application before the temporary password is replaced", async () => {
+    const renderApp = vi.fn(() => <p>Kafka application</p>);
+    render(<ConsoleSessionGate client={testClient({ ...normal, mustChangePassword: true })} renderApp={renderApp} />);
+    expect(await screen.findByRole("heading", { name: "Change your password" })).toBeDefined();
+    expect(renderApp).not.toHaveBeenCalled();
   });
 });

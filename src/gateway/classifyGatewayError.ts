@@ -8,6 +8,18 @@ export function classifyGatewayError(error: unknown): GatewayErrorKind {
   if (error instanceof HttpError && error.status === 401) {
     return "authentication-required";
   }
+  if (error instanceof HttpError && error.status === 403 && error.problem?.code === "forbidden") {
+    return "access-denied";
+  }
+  if (error instanceof HttpError && error.problem?.code === "authorization_unavailable") {
+    return "authorization-unavailable";
+  }
+  if (error instanceof HttpError && error.problem?.code === "gateway_outcome_unknown") {
+    return "outcome-unknown";
+  }
+  if (error instanceof HttpError && error.problem?.code === "gateway_unavailable") {
+    return "gateway-unreachable";
+  }
   if (error instanceof HttpError && error.problem?.code === "cluster_unreachable") {
     return "cluster-unreachable";
   }

@@ -1,4 +1,5 @@
 import { classifyGatewayError } from "./classifyGatewayError";
+import { describeAccessDenial } from "./describeAccessDenial";
 import { describeGatewayTransportFailure } from "./describeGatewayTransportFailure";
 import { HttpError } from "./HttpError";
 
@@ -14,6 +15,15 @@ export function describeGatewayError(error: unknown, gatewayUrl: string): Gatewa
   }
   if (kind === "gateway-unreachable") {
     return { title: "Gateway unreachable", detail: describeGatewayTransportFailure(gatewayUrl) };
+  }
+  if (kind === "access-denied") {
+    return { title: "Not permitted", detail: describeAccessDenial(error instanceof HttpError ? error.problem?.detail : undefined) };
+  }
+  if (kind === "authorization-unavailable") {
+    return { title: "Authorization unavailable", detail: "The Console could not check your permissions, so nothing was sent to Kafka. Try again later." };
+  }
+  if (kind === "outcome-unknown") {
+    return { title: "Outcome unknown", detail: "The change may have been applied. Do not retry it; reload and check first." };
   }
   if (kind === "cluster-unreachable") {
     return { title: "Cluster unreachable", detail: error instanceof HttpError ? error.problem?.detail : undefined };

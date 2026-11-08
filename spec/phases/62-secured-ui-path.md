@@ -58,7 +58,7 @@ denied); outcome audit is P57; deployment and cutover are P59.
     published with the Cognito services, so Cognito sessions are decided like
     local ones once discovery succeeds and fail closed before it.
   - Done when: `go test ./internal/console/storage ./cmd/console -run 'Delegation|Cognito'` passes with a Cognito VIEWER/OPERATOR matrix.
-- [ ] **T62.4 Secured UI mode** — Covers: F29-AC3, F29-AC4
+- [x] **T62.4 Secured UI mode** — Covers: F29-AC3, F29-AC4
   - Files: UI `src/console/fetchConsoleGatewayJson.ts`,
     `src/console/loadAuthorizedClusters.ts`, `src/console/ConsoleGatewayError.ts`
     (new), `src/components/ConsoleSessionGate.tsx`, `src/main.tsx`,

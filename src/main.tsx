@@ -17,6 +17,8 @@ import { completeCognitoSignIn } from "./console/completeCognitoSignIn";
 import { listAccess } from "./console/listAccess";
 import { listClusters } from "./console/listClusters";
 import { readCognitoAvailability } from "./console/readCognitoAvailability";
+import { fetchConsoleGatewayJson } from "./console/fetchConsoleGatewayJson";
+import { loadAuthorizedClusters } from "./console/loadAuthorizedClusters";
 import { readConsoleSession } from "./console/readConsoleSession";
 import { requestConsoleAdmin } from "./console/requestConsoleAdmin";
 import { requestConsoleSession } from "./console/requestConsoleSession";
@@ -44,10 +46,12 @@ import { listReassignments } from "./gateway/listReassignments";
 import { produceTopicMessage } from "./gateway/produceTopicMessage";
 import { reassignPartition } from "./gateway/reassignPartition";
 import type { GatewayWriteRequest } from "./gateway/GatewayWriteRequest";
+import type { GatewayEntry } from "./gateway/types";
 import { searchTopicMessages } from "./gateway/searchTopicMessages";
 import { setGatewayToken } from "./gateway/setGatewayToken";
 
 const gatewayTimeoutMs = 5000;
+const securedTimeoutMs = 8000;
 const statusRefreshMs = 15_000;
 const consolePreview = import.meta.env.VITE_KAFKA3O_CONSOLE_AUTH_PREVIEW === "true";
 const consoleTransport: ConsoleSessionTransport = (operation, signal) =>
@@ -81,7 +85,8 @@ const consoleBrowser: ConsoleBrowser = {
   query: window.location.search,
   replace: (path) => window.history.replaceState(null, "", path),
   assign: (url) => window.location.assign(url),
-};const manualProxyOrigin = import.meta.env.VITE_KAFKA3O_MANUAL_PROXY === "true" ? window.location.origin : undefined;
+};
+const manualProxyOrigin = import.meta.env.VITE_KAFKA3O_MANUAL_PROXY === "true" ? window.location.origin : undefined;
 const boundFetchJson = (url: string) => fetchJson(window.fetch.bind(window), url, gatewayTimeoutMs);
 const gatewayCredentials = {
   read: (gatewayUrl: string) => getGatewayToken(window.sessionStorage, gatewayUrl),
@@ -89,44 +94,76 @@ const gatewayCredentials = {
   clear: (gatewayUrl: string) => clearGatewayToken(window.sessionStorage, gatewayUrl),
   isAutomatic: (gatewayUrl: string) => isLocalManualGatewayUrl(gatewayUrl, manualProxyOrigin),
 };
-const gatewayFetchJson = (gatewayUrl: string) => (url: string) =>
-  fetchGatewayJson(window.fetch.bind(window), gatewayUrl, url, gatewayTimeoutMs, gatewayCredentials.read, window.isSecureContext, undefined, manualProxyOrigin);
-const gatewayFetchWrite = (gatewayUrl: string) => (url: string, request: GatewayWriteRequest) =>
-  fetchGatewayJson(window.fetch.bind(window), gatewayUrl, url, gatewayTimeoutMs, gatewayCredentials.read, window.isSecureContext, request, manualProxyOrigin);
-const queryClient = new QueryClient();
+type GatewayRead = (gatewayUrl: string) => (url: string) => Promise<unknown>;
+type GatewayWrite = (gatewayUrl: string) => (url: string, request: GatewayWriteRequest) => Promise<unknown>;
+type GatewayAppCredentials = typeof gatewayCredentials;
 
-createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    {consolePreview ? <ConsoleSessionGate client={consoleSession} sso={consoleSso} browser={consoleBrowser}
-      admin={consoleAdmin} confirm={(message) => window.confirm(message)} /> : <BrowserRouter>
+// gatewayApp is composition-root wiring of the Kafka UI over a chosen Gateway transport.
+function gatewayApp(read: GatewayRead, write: GatewayWrite, credentials: GatewayAppCredentials, loadConfig: () => Promise<GatewayEntry[]>) {
+  return (
+    <BrowserRouter>
       <App
         queryClient={queryClient}
-        loadGatewayConfig={() => loadGatewayConfig(boundFetchJson)}
-        gatewayCredentials={gatewayCredentials}
+        loadGatewayConfig={loadConfig}
+        gatewayCredentials={credentials}
         administration={{
-          getConfigurations: (gatewayUrl, resource) => getConfigurations(gatewayFetchJson(gatewayUrl), gatewayUrl, resource),
-          alterConfiguration: (gatewayUrl, resource, change) => alterConfiguration(gatewayFetchWrite(gatewayUrl), gatewayUrl, resource, change),
-          increasePartitions: (gatewayUrl, topic, count) => increasePartitions(gatewayFetchWrite(gatewayUrl), gatewayUrl, topic, count),
-          listReassignments: (gatewayUrl, topic) => listReassignments(gatewayFetchJson(gatewayUrl), gatewayUrl, topic),
-          reassignPartition: (gatewayUrl, topic, partition, replicas) => reassignPartition(gatewayFetchWrite(gatewayUrl), gatewayUrl, topic, partition, replicas),
+          getConfigurations: (gatewayUrl, resource) => getConfigurations(read(gatewayUrl), gatewayUrl, resource),
+          alterConfiguration: (gatewayUrl, resource, change) => alterConfiguration(write(gatewayUrl), gatewayUrl, resource, change),
+          increasePartitions: (gatewayUrl, topic, count) => increasePartitions(write(gatewayUrl), gatewayUrl, topic, count),
+          listReassignments: (gatewayUrl, topic) => listReassignments(read(gatewayUrl), gatewayUrl, topic),
+          reassignPartition: (gatewayUrl, topic, partition, replicas) => reassignPartition(write(gatewayUrl), gatewayUrl, topic, partition, replicas),
           confirmChange: (message) => window.confirm(message),
         }}
-        getCluster={(gatewayUrl) => getCluster(gatewayFetchJson(gatewayUrl), gatewayUrl)}
-        listTopics={(gatewayUrl) => listTopics(gatewayFetchJson(gatewayUrl), gatewayUrl)}
-        listConsumerGroups={(gatewayUrl) => listConsumerGroups(gatewayFetchJson(gatewayUrl), gatewayUrl)}
-        getTopicDetail={(gatewayUrl, topicName) => getTopicDetail(gatewayFetchJson(gatewayUrl), gatewayUrl, topicName)}
+        getCluster={(gatewayUrl) => getCluster(read(gatewayUrl), gatewayUrl)}
+        listTopics={(gatewayUrl) => listTopics(read(gatewayUrl), gatewayUrl)}
+        listConsumerGroups={(gatewayUrl) => listConsumerGroups(read(gatewayUrl), gatewayUrl)}
+        getTopicDetail={(gatewayUrl, topicName) => getTopicDetail(read(gatewayUrl), gatewayUrl, topicName)}
         listLatestTopicMessages={(gatewayUrl, topicName, position) =>
-          listLatestTopicMessages(gatewayFetchJson(gatewayUrl), gatewayUrl, topicName, position)
+          listLatestTopicMessages(read(gatewayUrl), gatewayUrl, topicName, position)
         }
-        searchTopicMessages={(gatewayUrl, topicName, query) => searchTopicMessages(gatewayFetchJson(gatewayUrl), gatewayUrl, topicName, query)}
-        produceTopicMessage={(gatewayUrl, topicName, message) => produceTopicMessage(gatewayFetchWrite(gatewayUrl), gatewayUrl, topicName, message)}
-        createTopic={(gatewayUrl, input) => createTopic(gatewayFetchWrite(gatewayUrl), gatewayUrl, input)}
-        deleteTopic={(gatewayUrl, topicName) => deleteTopic(gatewayFetchWrite(gatewayUrl), gatewayUrl, topicName)}
+        searchTopicMessages={(gatewayUrl, topicName, query) => searchTopicMessages(read(gatewayUrl), gatewayUrl, topicName, query)}
+        produceTopicMessage={(gatewayUrl, topicName, message) => produceTopicMessage(write(gatewayUrl), gatewayUrl, topicName, message)}
+        createTopic={(gatewayUrl, input) => createTopic(write(gatewayUrl), gatewayUrl, input)}
+        deleteTopic={(gatewayUrl, topicName) => deleteTopic(write(gatewayUrl), gatewayUrl, topicName)}
         confirmTopicDeletion={(topicName) => window.confirm(`Delete topic "${topicName}"? Its messages may be permanently deleted.`)}
         linkOrigin={window.location.origin}
         copyMessageLink={(text) => navigator.clipboard.writeText(text)}
         statusRefreshMs={statusRefreshMs}
       />
-    </BrowserRouter>}
+    </BrowserRouter>
+  );
+}
+
+const legacyRead: GatewayRead = (gatewayUrl) => (url) =>
+  fetchGatewayJson(window.fetch.bind(window), gatewayUrl, url, gatewayTimeoutMs, gatewayCredentials.read, window.isSecureContext, undefined, manualProxyOrigin);
+const legacyWrite: GatewayWrite = (gatewayUrl) => (url, request) =>
+  fetchGatewayJson(window.fetch.bind(window), gatewayUrl, url, gatewayTimeoutMs, gatewayCredentials.read, window.isSecureContext, request, manualProxyOrigin);
+const queryClient = new QueryClient();
+
+// Secured mode sends every Kafka request through the Console; there are no Gateway tokens to enter.
+const consoleSecured = import.meta.env.VITE_KAFKA3O_CONSOLE_SECURED === "true";
+const securedCredentials: GatewayAppCredentials = { read: () => null, save: () => undefined, clear: () => undefined, isAutomatic: () => true };
+function securedApp(sessionEnded: () => void) {
+  const ended = () => {
+    queryClient.clear();
+    sessionEnded();
+  };
+  const origin = window.location.origin;
+  const read: GatewayRead = (gatewayUrl) => (url) =>
+    fetchConsoleGatewayJson(window.fetch.bind(window), origin, () => document.cookie, gatewayUrl, url, securedTimeoutMs, ended);
+  const write: GatewayWrite = (gatewayUrl) => (url, request) =>
+    fetchConsoleGatewayJson(window.fetch.bind(window), origin, () => document.cookie, gatewayUrl, url, securedTimeoutMs, ended, request);
+  return gatewayApp(read, write, securedCredentials, () => loadAuthorizedClusters(window.fetch.bind(window), origin, ended));
+}
+
+createRoot(document.getElementById("root")!).render(
+  <StrictMode>
+    {consoleSecured ? (
+      <ConsoleSessionGate client={consoleSession} sso={consoleSso} browser={consoleBrowser}
+        admin={consoleAdmin} confirm={(message) => window.confirm(message)} renderApp={securedApp} />
+    ) : consolePreview ? (
+      <ConsoleSessionGate client={consoleSession} sso={consoleSso} browser={consoleBrowser}
+        admin={consoleAdmin} confirm={(message) => window.confirm(message)} />
+    ) : gatewayApp(legacyRead, legacyWrite, gatewayCredentials, () => loadGatewayConfig(boundFetchJson))}
   </StrictMode>,
 );

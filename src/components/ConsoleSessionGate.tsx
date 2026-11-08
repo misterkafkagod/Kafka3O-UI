@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 import type { ConsoleAdminClient } from "../console/ConsoleAdmin";
 import type { ConsoleSession, ConsoleSessionClient } from "../console/ConsoleSession";
 import { ConsoleSessionError } from "../console/ConsoleSessionError";
@@ -22,9 +22,11 @@ type ConsoleSessionGateProps = {
   // Administration is shown to every signed-in session; the Console decides who may use it.
   admin?: ConsoleAdminClient;
   confirm?: (message: string) => boolean;
+  // renderApp shows the secured Kafka UI for a signed-in session; it receives the session-ended callback.
+  renderApp?: (sessionEnded: () => void) => ReactNode;
 };
 
-export function ConsoleSessionGate({ client, sso, browser, admin, confirm }: ConsoleSessionGateProps) {
+export function ConsoleSessionGate({ client, sso, browser, admin, confirm, renderApp }: ConsoleSessionGateProps) {
   const [screen, setScreen] = useState<Screen>({ kind: "checking" });
   const [ssoAvailable, setSsoAvailable] = useState(false);
   const callback = useRef<Promise<ConsoleSession> | null>(null);
@@ -295,9 +297,11 @@ export function ConsoleSessionGate({ client, sso, browser, admin, confirm }: Con
                     : screen.kind === "checking" ? "Checking your session" : "Sign in"}
           </h1>
           <p className={styles.intro}>
-            {ssoAvailable
-              ? "Local accounts or Cognito sign-in. Kafka access is not available in this preview."
-              : "Local accounts only. SSO and Kafka access are not available in this preview."}
+            {renderApp
+              ? (ssoAvailable ? "Local accounts or Cognito sign-in. Kafka access follows your Console roles." : "Local accounts only. Kafka access follows your Console roles.")
+              : ssoAvailable
+                ? "Local accounts or Cognito sign-in. Kafka access is not available in this preview."
+                : "Local accounts only. SSO and Kafka access are not available in this preview."}
           </p>
 
           {screen.kind === "checking" ? <p role="status">Checking your Console session...</p> : null}
@@ -378,7 +382,7 @@ export function ConsoleSessionGate({ client, sso, browser, admin, confirm }: Con
               {unresolvedChanges.has(screen.session.accountId) ? (
                 <p role="alert" className={styles.warning}>An earlier password change may still have completed. Check the audit before retrying.</p>
               ) : null}
-              <p className={styles.context}>This preview does not open clusters or enforce Kafka permissions. The existing manual interface is separate.</p>
+              {renderApp ? null : <p className={styles.context}>This preview does not open clusters or enforce Kafka permissions. The existing manual interface is separate.</p>}
               <button type="button" onClick={signOut} disabled={pending !== null}>{pending === "signOut" ? "Signing out..." : "Sign out"}</button>
             </>
           ) : null}
@@ -401,6 +405,9 @@ export function ConsoleSessionGate({ client, sso, browser, admin, confirm }: Con
           ) : null}
           {error ? <p role="alert" className={styles.error}>{error}</p> : null}
         </section>
+        {renderApp && screen.kind === "signedIn" && !screen.session.mustChangePassword ? (
+          <div className={styles.application} key={`app-${screen.session.accountId}`}>{renderApp(sessionEnded)}</div>
+        ) : null}
         {admin && confirm && screen.kind === "signedIn" && !screen.session.mustChangePassword ? (
           <div className={styles.administration} key={screen.session.accountId}>
             <AccessManagement admin={admin} confirm={confirm} onUnauthorized={sessionEnded} />
