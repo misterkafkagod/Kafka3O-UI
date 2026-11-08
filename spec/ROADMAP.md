@@ -233,7 +233,7 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
     - Demo: global ADMIN manages grants, mappings and classification with confirmation naming subject and scope; cancel sends nothing; 401/403/409/503 are distinct.
   - **P55** F29-B1 + F29-B2 + F30-B2 · Console policy API and Gateway secured-mode enforcement — Covers: F29-AC1, F29-AC2, F30-AC2 · Discovery: [gateway-service-trust](./discovery/gateway-service-trust.md) · Status: Done
     - Demo: direct, forged, replayed or wrong-cluster Gateway requests and non-ADMIN Production writes are denied before Kafka; only Console mTLS with a current delegation reaches Kafka.
-  - **P62** F29-B1 + F29-B3 · Console request forwarding and secured UI path — Covers: F29-AC3, F29-AC4 · Discovery: [gateway-service-trust](./discovery/gateway-service-trust.md) · Status: Defined
+  - **P62** F29-B1 + F29-B3 · Console request forwarding and secured UI path — Covers: F29-AC3, F29-AC4 · Discovery: [gateway-service-trust](./discovery/gateway-service-trust.md) · Status: Building
     - Demo: the secured UI reads and writes through the Console with local and Cognito identities enforced identically; policy outage shows unavailability, revocation applies on the next request.
   - **P56** F30-B3 · Production-aware confirmation and reason — Covers: F30-AC4 · Discovery: — · Status: Defined
     - Demo: an ADMIN confirms an allowed Production mutation with a reason; canceling or omitting the reason sends no write.
