@@ -31,7 +31,7 @@ outcome is not surfaced. Audit search/export is P58.
     and every mutation decision still are, and a mutation's allowed decision
     remains the durable intent written before dispatch.
   - Done when: `go test ./internal/authorization ./internal/console/storage -run 'Mutation|Delegation'` passes.
-- [ ] **T57.2 Correlated outcome recording** — Covers: F31-AC2
+- [x] **T57.2 Correlated outcome recording** — Covers: F31-AC2
   - Files: Gateway `internal/console/storage/record_gateway_outcome.go` (new),
     `internal/console/delegation/` (outcome types, `record_outcome.go`),
     `internal/console/policyapi/` (outcome route) and tests.
