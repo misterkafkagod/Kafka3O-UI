@@ -23,6 +23,17 @@ describe("ClusterCard", () => {
     expect(screen.queryByRole("link", { name: "http://localhost:8081" })).toBeNull();
   });
 
+  it("shows the Console's authoritative environment instead of the forwarding URL", () => {
+    const pending = () => new Promise<ClusterInfo>(() => {});
+    const view = renderWithQuery(<ClusterCard gateway={{ ...gateway, url: "https://console.example/api/clusters/dev/gateway", environment: "PRODUCTION" }}
+      statusRefreshMs={60_000} getCluster={pending} />);
+    expect(screen.getByText("Production")).toBeDefined();
+    expect(screen.queryByText(/console\.example/)).toBeNull();
+    view.unmount();
+    renderWithQuery(<ClusterCard gateway={{ ...gateway, environment: "" }} statusRefreshMs={60_000} getCluster={pending} />);
+    expect(screen.getByText("Unclassified — writes blocked")).toBeDefined();
+  });
+
   it("links the name to /clusters/dev", () => {
     renderWithQuery(<ClusterCard gateway={gateway} statusRefreshMs={60_000} getCluster={() => new Promise(() => {})} />);
 

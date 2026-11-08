@@ -2,7 +2,7 @@
 - **Milestone:** M10
 - **Covers:** F30-AC4
 - **Discovery:** —
-- **Status:** Building
+- **Status:** Review
 
 ## Existing baseline and boundaries
 P49 denies Production mutations without a change reason and P55/P62 deliver
@@ -44,7 +44,7 @@ irreversible-operation confirmations are unchanged; ADMIN never bypasses them.
     fetch; otherwise send the trimmed reason header.
   - Done when: `npm test -- src/console/fetchConsoleGatewayJson.test.ts src/console/loadAuthorizedClusters.test.ts src/gateway`
     passes.
-- [ ] **T56.3 Authoritative Production badge** — Covers: F30-AC4 (display of F30-B1)
+- [x] **T56.3 Authoritative Production badge** — Covers: F30-AC4 (display of F30-B1)
   - Files: UI `src/components/ClusterCard.tsx`, its CSS and tests.
   - Do: Cluster cards show "Production" or "Unclassified — writes blocked"
     when the entry carries a Console environment; legacy config entries show

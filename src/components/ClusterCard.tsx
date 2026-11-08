@@ -1,4 +1,5 @@
 import { Link } from "react-router";
+import { describeEnvironment } from "../console/describeEnvironment";
 import { classifyGatewayError } from "../gateway/classifyGatewayError";
 import { describeGatewayTransportFailure } from "../gateway/describeGatewayTransportFailure";
 import type { GetCluster } from "../gateway/getCluster";
@@ -24,7 +25,11 @@ export function ClusterCard({ gateway, getCluster, statusRefreshMs }: ClusterCar
       <h3>
         <Link to={`/clusters/${encodeURIComponent(gateway.id)}`}>{gateway.name}</Link>
       </h3>
-      <p className={styles.endpoint}>{gateway.url}</p>
+      {gateway.environment === undefined ? <p className={styles.endpoint}>{gateway.url}</p> : (
+        <p className={`${styles.environment} ${gateway.environment === "PRODUCTION" ? styles.production : ""}`}>
+          {describeEnvironment(gateway.environment)}
+        </p>
+      )}
       {errorKind === "authentication-required" ? (
         <>
           <p className={`${styles.status} ${styles.failure}`}>Authentication required</p>
