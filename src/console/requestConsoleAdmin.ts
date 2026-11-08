@@ -2,6 +2,7 @@ import { isRecord } from "../gateway/isRecord";
 import type { ConsoleAdminOperation } from "./ConsoleAdmin";
 import { ConsoleAdminError, type ConsoleAdminErrorCode } from "./ConsoleAdminError";
 import { readConsoleCsrf } from "./readConsoleCsrf";
+import { isTrustworthyConsoleOrigin } from "./isTrustworthyConsoleOrigin";
 
 export async function requestConsoleAdmin(
   fetchFn: typeof fetch,
@@ -16,7 +17,7 @@ export async function requestConsoleAdmin(
   } catch {
     throw new ConsoleAdminError("insecure_origin");
   }
-  if (base.protocol !== "https:" || base.origin !== origin || base.username || base.password ||
+  if (!isTrustworthyConsoleOrigin(base) || base.origin !== origin || base.username || base.password ||
       base.pathname !== "/" || base.search || base.hash || !Number.isSafeInteger(timeoutMs) || timeoutMs <= 0 || timeoutMs > 60_000) {
     throw new ConsoleAdminError("insecure_origin");
   }

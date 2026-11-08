@@ -2,6 +2,7 @@ import { isRecord } from "../gateway/isRecord";
 import type { ConsoleSessionOperation } from "./ConsoleSession";
 import { ConsoleSessionError, type ConsoleSessionErrorCode } from "./ConsoleSessionError";
 import { readConsoleCsrf } from "./readConsoleCsrf";
+import { isTrustworthyConsoleOrigin } from "./isTrustworthyConsoleOrigin";
 
 export async function requestConsoleSession(
   fetchFn: typeof fetch,
@@ -17,7 +18,7 @@ export async function requestConsoleSession(
   } catch {
     throw new ConsoleSessionError("insecure_origin");
   }
-  if (base.protocol !== "https:" || base.origin !== origin || base.username || base.password ||
+  if (!isTrustworthyConsoleOrigin(base) || base.origin !== origin || base.username || base.password ||
       base.pathname !== "/" || base.search || base.hash) {
     throw new ConsoleSessionError("insecure_origin");
   }

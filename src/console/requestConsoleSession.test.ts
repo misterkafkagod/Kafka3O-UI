@@ -47,7 +47,7 @@ describe("requestConsoleSession", () => {
   it("blocks insecure or non-origin URLs and invalid timeouts before accessing cookies or the network", async () => {
     const fetchFn = vi.fn<typeof fetch>(async () => Response.json({}));
     const readCookies = vi.fn(cookies);
-    for (const unsafe of ["http://localhost:5173", "http://console.example", "https://user:pass@console.example",
+    for (const unsafe of ["http://127.0.0.1:5173", "http://localhost.attacker.example", "http://console.example", "https://user:pass@console.example",
       "https://console.example/path", "https://console.example?token=x", "https://console.example#fragment", "not a URL"]) {
       await expect(requestConsoleSession(fetchFn, unsafe, readCookies, 5000, { kind: "logout" }))
         .rejects.toMatchObject({ code: "insecure_origin" });

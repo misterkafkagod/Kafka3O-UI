@@ -287,7 +287,7 @@ export function ConsoleSessionGate({ client, sso, browser, admin, confirm, rende
     <div className={styles.shell}>
       <header className={styles.header}>
         <span className={styles.brand}>Kafka3O</span>
-        <span className={styles.badge}>Authentication preview</span>
+        <span className={styles.badge}>{renderApp ? "Secured" : "Authentication preview"}</span>
       </header>
       <main className={styles.main}>
         <section className={styles.card} aria-labelledby="console-session-title" aria-busy={pending !== null || screen.kind === "checking"}>

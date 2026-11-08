@@ -135,13 +135,16 @@ describe("main composition", () => {
     document.body.innerHTML = '<div id="root"></div>';
     vi.stubEnv("VITE_KAFKA3O_CONSOLE_AUTH_PREVIEW", "true");
     vi.stubEnv("VITE_KAFKA3O_MANUAL_PROXY", "true");
-    const fetchFn = vi.fn<typeof fetch>();
+    // http://localhost is a secure context, so the session check goes same-origin to the Console API.
+    const fetchFn = vi.fn<typeof fetch>(async () => Response.json({ title: "Authentication required", status: 401, code: "unauthorized" }, { status: 401 }));
     vi.stubGlobal("fetch", fetchFn);
     await import("./main");
     const tree = renderApp.mock.calls[0][0] as ReactElement<{ children: ReactElement<{ client: ConsoleSessionClient }> }>;
     const { ConsoleSessionGate } = await import("./components/ConsoleSessionGate");
     expect(tree.props.children.type).toBe(ConsoleSessionGate);
-    await expect(tree.props.children.props.client.inspect()).rejects.toMatchObject({ code: "insecure_origin" });
-    expect(fetchFn).not.toHaveBeenCalled();
+    await expect(tree.props.children.props.client.inspect()).resolves.toBeNull();
+    expect(fetchFn).toHaveBeenCalledTimes(1);
+    expect(fetchFn.mock.calls[0][0]).toBe(`${window.location.origin}/api/session`);
+    expect(fetchFn.mock.calls[0][1]?.credentials).toBe("same-origin");
   });
 });

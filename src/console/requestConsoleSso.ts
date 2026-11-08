@@ -2,6 +2,7 @@ import { isRecord } from "../gateway/isRecord";
 import type { ConsoleSsoRequest } from "./ConsoleSso";
 import { ConsoleSessionError, type ConsoleSessionErrorCode } from "./ConsoleSessionError";
 import { readConsoleCsrf } from "./readConsoleCsrf";
+import { isTrustworthyConsoleOrigin } from "./isTrustworthyConsoleOrigin";
 
 // SSO requests are never aborted or timed out: a cancelled request could still have been applied,
 // and its late response must settle before the browser-marker lock is released.
@@ -17,7 +18,7 @@ export async function requestConsoleSso(
   } catch {
     throw new ConsoleSessionError("insecure_origin");
   }
-  if (base.protocol !== "https:" || base.origin !== origin || base.username || base.password ||
+  if (!isTrustworthyConsoleOrigin(base) || base.origin !== origin || base.username || base.password ||
       base.pathname !== "/" || base.search || base.hash) {
     throw new ConsoleSessionError("insecure_origin");
   }

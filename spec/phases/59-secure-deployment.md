@@ -2,7 +2,7 @@
 - **Milestone:** M10
 - **Covers:** release integration of F27–F31
 - **Discovery:** [eksd-https-cutover](../discovery/eksd-https-cutover.md)
-- **Status:** Building
+- **Status:** Review
 
 ## Existing baseline and boundaries
 P49–P58 implement and test every M10 component, but the EKS-D manual
@@ -53,7 +53,7 @@ user; real writes are allowed only to the synthetic topic
     exports the rollback copy and applies the change.
   - Done when: `kubectl apply --dry-run=server` accepts the manifests and the
     PKI script produces certificates the Go loaders accept.
-- [ ] **T59.4 Cutover, bootstrap and live verification** — Covers: F27–F31
+- [x] **T59.4 Cutover, bootstrap and live verification** — Covers: F27–F31
   - Files: Gateway `deploy/kubernetes/secured-test/README.md`, UI
     `spec/TECH-SPEC.md`, `spec/discovery/eksd-https-cutover/verify-secured.mjs` (new).
   - Do: Apply the cutover, bootstrap the administrator (credentials given to
