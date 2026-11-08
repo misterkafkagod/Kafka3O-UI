@@ -42,7 +42,7 @@ valid cluster ID; P60 adds registry validation.
     `nextPolicyRevision` increments the counter inside a caller's transaction.
   - Done when: `go test ./internal/console/storage -run 'Migrat|Audit|PolicyRevision'`
     passes, including v10→v11 migration and rejection of non-token values.
-- [ ] **T54.2 Audited direct role-grant changes** — Covers: F28-AC1, F28-AC3, F28-AC4
+- [x] **T54.2 Audited direct role-grant changes** — Covers: F28-AC1, F28-AC3, F28-AC4
   - Files: Gateway `internal/console/storage/change_role_grant.go` (new),
     `internal/console/identity/change_role_grant.go` (new),
     `internal/console/identity/account.go` (types/errors) and tests.
