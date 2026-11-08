@@ -33,7 +33,7 @@ audit records. Retention and backup are P59.
     The read is audited (`console.audit.read`) before data is returned; audit
     failure returns 503 and no data; denials are audited and 403.
   - Done when: `go test ./internal/console/httpapi -run 'Audit'` passes.
-- [ ] **T58.2 Audited CSV export** — Covers: F31-AC3
+- [x] **T58.2 Audited CSV export** — Covers: F31-AC3
   - Files: Gateway `internal/console/httpapi/export_audit_events.go`,
     `write_audit_csv.go`, `neutralize_csv_cell.go` (new) and tests.
   - Do: `GET /api/audit/export` with the same scope and filters returns at
