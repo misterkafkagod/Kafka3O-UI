@@ -231,7 +231,7 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
     - Demo: migration registers existing clusters unclassified; global ADMIN classifies one with confirmation and reason; cluster ADMIN, browser config and spoofed input cannot change it; unclassified blocks writes.
   - **P61** F28-B1 + F28-B3 + F30-B1 · Access-management and classification UI — Covers: UI portion of F28-AC4, additive-model explanation of F28-AC2, F30-B1 display · Discovery: — · Status: Done
     - Demo: global ADMIN manages grants, mappings and classification with confirmation naming subject and scope; cancel sends nothing; 401/403/409/503 are distinct.
-  - **P55** F29-B1 + F29-B2 + F30-B2 · Console policy API and Gateway secured-mode enforcement — Covers: F29-AC1, F29-AC2, F30-AC2 · Discovery: [gateway-service-trust](./discovery/gateway-service-trust.md) · Status: Review
+  - **P55** F29-B1 + F29-B2 + F30-B2 · Console policy API and Gateway secured-mode enforcement — Covers: F29-AC1, F29-AC2, F30-AC2 · Discovery: [gateway-service-trust](./discovery/gateway-service-trust.md) · Status: Done
     - Demo: direct, forged, replayed or wrong-cluster Gateway requests and non-ADMIN Production writes are denied before Kafka; only Console mTLS with a current delegation reaches Kafka.
   - **P62** F29-B1 + F29-B3 · Console request forwarding and secured UI path — Covers: F29-AC3, F29-AC4 · Discovery: [gateway-service-trust](./discovery/gateway-service-trust.md) · Status: Defined
     - Demo: the secured UI reads and writes through the Console with local and Cognito identities enforced identically; policy outage shows unavailability, revocation applies on the next request.
@@ -299,6 +299,7 @@ Redpanda-only Shadow Links, its Admin API, and Redpanda-specific diagnostic oper
 - **Verification debt:** Run the Cognito sign-in, group refresh and logout integration against a real User Pool when an AWS account and app client become available; fixture tests are not evidence of live provider compatibility.
 
 ## Learnings
+- 2026-11-08 (P55 review): Secured Gateways accept only the Console over mTLS with a single-use, request-bound delegation consumed at the Console; every bypass in the matrix was denied before Kafka, locally and on EKS-D. Liveness needs optional client certificates on the same listener.
 - 2026-11-08 (P61 review): The preview shows administration to every signed-in session and lets the Console decide; tests that revoke sessions must wait for those reads, because a concurrent 401 correctly ends the session.
 - 2026-11-08 (P60 review): Cluster classification now lives only in the Console store, seeded unclassified from an operator file; deactivation keeps a classification, but retargeting an ID to another Gateway is refused rather than inherited.
 - 2026-11-08 (P54 review): Forbidding self-changes keeps the acting local global ADMIN in place, so grant administration cannot remove the last one; this replaces a separate last-admin check.

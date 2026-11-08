@@ -2,7 +2,7 @@
 - **Milestone:** M10
 - **Covers:** F29-AC1, F29-AC2, F30-AC2
 - **Discovery:** [gateway-service-trust](../discovery/gateway-service-trust.md)
-- **Status:** Review
+- **Status:** Done
 
 ## Existing baseline and boundaries
 P49 evaluates roles and Production policy, P54/P60 own grants and
@@ -89,3 +89,33 @@ until then); outcome audit is P57.
     `go test ./...` and `npm test` pass.
 
 ## Review
+- **Demo:** passed (auto-approved under the user's standing M10 instruction,
+  2026-11-08; run by Claude, not observed live), locally and in a temporary
+  EKS-D pod (`golang:1.27.3`; namespace deleted afterwards, Kafka pods,
+  volumes and the manual pod unchanged). `TestSecuredModeEndToEndEnforcementBeforeKafka`
+  used a real Console store with registered `dev` (non-Production), `prod`
+  (Production) and `new` (unclassified) clusters, the mTLS policy listener and
+  three secured Gateways over a generated service CA: VIEWER read `prod` and
+  was denied writes; OPERATOR produced on `dev` and was denied produce,
+  delete and configuration changes on `prod` and produce on `new`. A missing
+  client certificate, another service certificate, a missing, forged or
+  replayed delegation, a changed body, path or query, a wrong-cluster
+  delegation and an unclassified route were all rejected with zero Kafka
+  calls. A revoked session got 401 on its next request, liveness stayed
+  anonymous and a stopped policy listener produced 503. Production denials
+  were audited by reason.
+- **Plan deviations:** shared `internal/servicetls` (identities, loading,
+  test CA) and `authorization.RequestBinding` were added for both sides;
+  Gateway route registration moved to `cmd/gateway/gateway_routes.go` so the
+  catalog test walks the real route table. Production ADMIN writes stay
+  denied (`change_reason_required`) until P56; Cognito sessions fail closed at
+  the policy listener until P62 wires delegated refresh.
+- **Regression:** full Gateway suite, race tests for the new packages and
+  `go vet` passed; UI suite 418 passed, 5 opt-in skipped.
+- **Convention check:** passed (composition-root wiring and
+  constructor + `ServeHTTP` pairs only).
+- **Vulnerability scan:** not required; no dependency manifests changed.
+- **Not run:** Console-side minting from browser requests and the secured UI
+  (P62), outcome audit (P57), service-certificate provisioning and cutover on
+  EKS-D (P59).
+
