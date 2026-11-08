@@ -51,7 +51,7 @@ Kafka routes and Gateway enforcement are unchanged (P55).
     success and send nothing on cancel.
   - Done when: `npm test -- src/components/AccessManagement.test.tsx src/console/describeAdminError.test.ts src/console/describeAccessScope.test.ts`
     passes.
-- [ ] **T61.3 Cluster classification view** — Covers: F30-B1
+- [x] **T61.3 Cluster classification view** — Covers: F30-B1
   - Files: `src/components/ClusterClassification.tsx`,
     `ClusterClassification.module.css`, `src/console/describeEnvironment.ts`
     (new) and tests.
