@@ -30,7 +30,7 @@ ordinary users and environment badges are P55/P61.
    are rejected.
 
 ## Tasks
-- [ ] **T60.1 Registered-cluster schema and startup sync** — Covers: F30-AC1
+- [x] **T60.1 Registered-cluster schema and startup sync** — Covers: F30-AC1
   - Files: Gateway `internal/console/storage/migrate_database.go` (schema v12),
     `sync_registered_clusters.go` (new), `internal/console/identity/account.go`
     (types/errors), `identity/validate_cluster_id.go` (new),
