@@ -57,7 +57,7 @@ until then); outcome audit is P57.
     `POST /internal/v1/delegations/consume` returning `{allowed, actorId, source, denial}`.
   - Done when: `go test ./internal/console/policyapi ./cmd/console -run 'Policy'`
     passes, including wrong identity, unregistered cluster and malformed body.
-- [ ] **T55.3 Gateway route action catalog** — Covers: F29-AC1
+- [x] **T55.3 Gateway route action catalog** — Covers: F29-AC1
   - Files: Gateway `internal/gatewayauth/` (new: `classify_route.go` and
     tests), `cmd/gateway` route-coverage test.
   - Do: Map every registered method and path template to its P49 action;
