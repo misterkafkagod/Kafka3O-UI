@@ -50,7 +50,7 @@ denied); outcome audit is P57; deployment and cutover are P59.
     `503 gateway_unavailable` for reads and `503 gateway_outcome_unknown` for
     writes.
   - Done when: `go test ./internal/console/gatewayproxy ./internal/console/httpapi ./cmd/console -run 'Forward|Gateway'` passes.
-- [ ] **T62.3 Identical Cognito decisions** — Covers: F29-AC3
+- [x] **T62.3 Identical Cognito decisions** — Covers: F29-AC3
   - Files: Gateway `internal/console/delegation/consume_delegation.go`,
     `internal/console/httpapi/cognito_services.go`, `cmd/console/new_cognito_services.go`,
     `cmd/console/new_policy_handler.go`, `cmd/console/run_serve.go` and tests.
