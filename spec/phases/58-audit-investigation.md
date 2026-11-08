@@ -2,7 +2,7 @@
 - **Milestone:** M10
 - **Covers:** F31-AC3
 - **Discovery:** —
-- **Status:** Review
+- **Status:** Done
 
 ## Existing baseline and boundaries
 P50–P57 write append-only, sanitized audit events with server time,
@@ -51,3 +51,27 @@ audit records. Retention and backup are P59.
   - Done when: focused tests, `npm test` and all three builds pass.
 
 ## Review
+- **Demo:** passed (auto-approved under the user's standing M10 instruction,
+  2026-11-08; run by Claude, not observed live). Over verified HTTPS with a
+  real Console store: the global ADMIN's search included global security
+  events (account changes); a `prod` cluster ADMIN saw and exported only
+  `prod` events and was denied (403, audited) for global scope and `dev`; an
+  OPERATOR was denied all audit; anonymous requests got 401; malformed
+  filters 400. Each read and export was audited (`console.audit.read`,
+  `console.audit.export`) and a read that could not be audited returned 503
+  without data. CSV export used formula-neutralized cells. UI tests covered
+  scope selection, operation-grouped intent/outcome rows with reasons,
+  "Load more", the scoped export link, the scope-denial message and 401
+  returning to sign-in; all four opt-in preview integrations still passed.
+- **Plan deviations:** `httpapi` defines its own audit record/filter types and
+  `cmd/console` adapts the store, avoiding an import cycle with storage tests;
+  the UI reuses the admin transport (`listAudit`) and loads scope choices from
+  the user's authorized cluster list.
+- **Regression:** full Gateway suite; UI suite 435 passed, 5 opt-in skipped;
+  default, preview and secured builds passed.
+- **Convention check:** passed (the composition-root store adapter has the two
+  methods its interface requires).
+- **Vulnerability scan:** not required; no dependency manifests changed.
+- **Not run:** retention, SQLite-consistent backup/restore and file-permission
+  verification on the deployed volume (P59); native-browser checks.
+
