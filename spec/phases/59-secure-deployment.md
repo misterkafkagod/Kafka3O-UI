@@ -44,7 +44,7 @@ user; real writes are allowed only to the synthetic topic
     stop the Console and copy a snapshot over the database file.
   - Done when: `go test ./cmd/console -run 'Backup'` passes, including a
     snapshot reopening with its data.
-- [ ] **T59.3 Secured deployment manifests and scripts** — Covers: release integration
+- [x] **T59.3 Secured deployment manifests and scripts** — Covers: release integration
   - Files: Gateway `deploy/kubernetes/secured-test/` (README, `storage.yaml`,
     `deployment.yaml`, `prepare-service-pki.sh`, `clusters.json`, `deploy.sh`).
   - Do: Console PV/PVC, registry ConfigMap, per-pod service PKI init,
