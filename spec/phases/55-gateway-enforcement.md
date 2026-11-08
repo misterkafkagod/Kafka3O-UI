@@ -65,7 +65,7 @@ until then); outcome audit is P57.
     route. A test walks the Gateway's registered OpenAPI operations and fails
     if any lacks a mapping.
   - Done when: `go test ./internal/gatewayauth ./cmd/gateway -run 'Route|Catalog'` passes.
-- [ ] **T55.4 Gateway secured mode** — Covers: F29-AC1, F29-AC2, F30-AC2
+- [x] **T55.4 Gateway secured mode** — Covers: F29-AC1, F29-AC2, F30-AC2
   - Files: Gateway `internal/gatewayauth/with_delegated_authorization.go`,
     `console_policy_client.go`, `request_binding.go` (new), `internal/config/`
     (secured-mode settings), `cmd/gateway/main.go`,
