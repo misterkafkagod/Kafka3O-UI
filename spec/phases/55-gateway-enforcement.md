@@ -2,7 +2,7 @@
 - **Milestone:** M10
 - **Covers:** F29-AC1, F29-AC2, F30-AC2
 - **Discovery:** [gateway-service-trust](../discovery/gateway-service-trust.md)
-- **Status:** Building
+- **Status:** Review
 
 ## Existing baseline and boundaries
 P49 evaluates roles and Production policy, P54/P60 own grants and
@@ -79,7 +79,7 @@ until then); outcome audit is P57.
     unavailable → 503 problem JSON before any handler runs.
   - Done when: `go test ./internal/gatewayauth ./internal/config ./cmd/gateway -run 'Secured|Delegat|Policy'`
     passes with fake policy clients and counting handlers.
-- [ ] **T55.5 End-to-end enforcement verification** — Covers: F29-AC1, F29-AC2, F30-AC2
+- [x] **T55.5 End-to-end enforcement verification** — Covers: F29-AC1, F29-AC2, F30-AC2
   - Files: Gateway `cmd/gateway/secured_mode_integration_test.go` (new),
     `internal/console/README.md`, `deploy/README.md`.
   - Do: Wire a real Console store and policy listener with a secured
