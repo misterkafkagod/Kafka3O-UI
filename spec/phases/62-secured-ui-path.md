@@ -35,7 +35,7 @@ denied); outcome audit is P57; deployment and cutover are P59.
     role, never Gateway URLs; no-store; 401 clears cookies; resolution
     failures are 503.
   - Done when: `go test ./internal/console/httpapi ./internal/console/storage -run 'AuthorizedClusters|ActiveClusters'` passes.
-- [ ] **T62.2 Console Gateway forwarder** — Covers: F29-AC3, F29-AC4
+- [x] **T62.2 Console Gateway forwarder** — Covers: F29-AC3, F29-AC4
   - Files: Gateway `internal/console/gatewayproxy/` (new: forwarder,
     mTLS client, response mapping, tests), `internal/console/httpapi/forward_gateway_request.go`
     (new), `cmd/console/load_forwarding_config.go` (new),
