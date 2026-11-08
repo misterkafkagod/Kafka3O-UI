@@ -195,7 +195,7 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
     - The persistent clusters have one broker each. Successful live writes and multi-broker placement remain unverified and require a separately approved test fixture.
 
 ### M10 — Authenticated, authorized and auditable cluster operations
-- **Status:** Active — the deployed M9 shared-token/manual-test behavior remains unchanged until the secured deployment is verified.
+- **Status:** Done (2026-11-08) — the EKS-D manual-test deployment now runs the secured stack; shared-token access is removed. Real Cognito remains unverified until a User Pool exists.
 - **Features:** F27, F28, F29, F30, F31
 - **Goal:** Give each operator an identity and explicit access, enforce Production protection at the Gateway, and record who attempted or performed each sensitive operation.
 - **Approved direction (2026-11-06):**
@@ -241,7 +241,7 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
     - Demo: audit denial and durable intent/outcome; persistence failure prevents dispatch or reports an uncertain outcome.
   - **P58** F31-B2 · Permission-scoped audit investigation — Covers: F31-AC3 · Discovery: — · Status: Done
     - Demo: cluster ADMIN filters/exports only its cluster's audit; global security events remain inaccessible.
-  - **P59** F27–F31 · End-to-end regression, migration and secure manual deployment — Covers: release integration of F27–F31 · Discovery: [eksd-https-cutover](./discovery/eksd-https-cutover.md) · Status: Review
+  - **P59** F27–F31 · End-to-end regression, migration and secure manual deployment — Covers: release integration of F27–F31 · Discovery: [eksd-https-cutover](./discovery/eksd-https-cutover.md) · Status: Done
     - Demo: preserve the existing Kafka data while verifying secured browser, Console, Gateway, policy and audit paths.
 - **Completion evidence:** Local login and Cognito-compatible fixture tests; global/cluster role and Production/non-Production matrices; direct-Gateway bypass and revocation tests; audit-failure/unknown-write tests; persistent identity/audit restart checks; migration and rollback exercise on the manual EKS-D deployment. Mutation tests use separately approved synthetic fixtures, not existing persistent topic data. Real Cognito login remains unverified until a User Pool is available and must be checked before relying on SSO in production.
 - **Discovery before completion:** Cognito user pool/app client, callback/logout URLs and group claims; SQLite backup/retention procedure and exact supported dependency versions; authenticated Console-to-Gateway delegation and policy API; legacy-token/manual-proxy cutover.
@@ -299,6 +299,10 @@ Redpanda-only Shadow Links, its Admin API, and Redpanda-specific diagnostic oper
 - **Verification debt:** Run the Cognito sign-in, group refresh and logout integration against a real User Pool when an AWS account and app client become available; fixture tests are not evidence of live provider compatibility.
 
 ## Learnings
+- 2026-11-08 (M10 retro): P49–P62 cover F27–F31: local and Cognito-compatible sign-in, global/cluster roles with audited administration, a Console-only mTLS delegation path that every Gateway enforces before Kafka, Production ADMIN-plus-reason writes, and correlated, scoped, exportable audit; the EKS-D cutover kept every Kafka pod and volume untouched.
+- 2026-11-08 (M10 retro): What worked: one end-to-end matrix test per security boundary (secured Gateway, Console forwarding, live Chromium) caught real gaps that unit tests missed (localhost origins, fsGroup permissions, merge-on-apply).
+- 2026-11-08 (M10 retro): What did not: phases were planned too coarsely (P53 needed 40 tasks; P54/P55 had to be split) and a long test run was chained to a commit; keep phases at 3–5 tasks and never commit in the same command as a long suite.
+- 2026-11-08 (M10 retro): Next: verify real Cognito when a User Pool exists, check the secured UI in the user's own Chrome, and decide which backlog items (F15–F17, F42–F43) form M11.
 - 2026-11-08 (P57 review): A Gateway holds a mutation's response until its outcome is recorded, so an audit outage after Kafka accepted a write surfaces as an explicit unknown with an operation ID rather than an unattributed success.
 - 2026-11-08 (P62 review): The secured UI treats the Console forwarding base as each cluster's "Gateway URL", so the existing pages work unchanged while tokens and Gateway addresses never reach the browser. Never chain a commit after a long test run in one command: killing a stalled run let the commit proceed unverified.
 - 2026-11-08 (P55 review): Secured Gateways accept only the Console over mTLS with a single-use, request-bound delegation consumed at the Console; every bypass in the matrix was denied before Kafka, locally and on EKS-D. Liveness needs optional client certificates on the same listener.

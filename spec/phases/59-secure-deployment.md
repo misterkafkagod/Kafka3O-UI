@@ -2,7 +2,7 @@
 - **Milestone:** M10
 - **Covers:** release integration of F27–F31
 - **Discovery:** [eksd-https-cutover](../discovery/eksd-https-cutover.md)
-- **Status:** Review
+- **Status:** Done
 
 ## Existing baseline and boundaries
 P49–P58 implement and test every M10 component, but the EKS-D manual
@@ -65,3 +65,40 @@ user; real writes are allowed only to the synthetic topic
     above are recorded.
 
 ## Review
+- **Demo:** passed on EKS-D (auto-approved under the user's standing M10
+  instruction and explicit cutover decision, 2026-11-08; run by Claude through
+  the forwarded `http://localhost:5173` with Chromium 1194, not observed live by
+  the user). `verify-secured.mjs` passed 23/23 after the cutover and 22/22 after
+  the rollback round trip: cookie-only sessions (`HttpOnly`, `Secure`,
+  `Strict`), Kafka B "Production" and Kafka A "Non-production" with live
+  cluster data, the pre-existing `tert` topic intact, Production topic
+  creation and produce denied without a reason and allowed for ADMIN with one,
+  OPERATOR allowed on Kafka A and denied on Kafka B, OPERATOR denied audit,
+  the role-free user seeing no clusters, correlated intent/`confirmed` outcome
+  with the reason, classification audited, scoped CSV export, and the old
+  `/manual/gateways/*` path serving only the UI shell. A direct Gateway call
+  with a bearer token returned `401 service_authentication_required`; another
+  service's certificate failed the TLS handshake.
+- **Persistence, backup and rollback:** identities, grants, classification
+  and audit survived three pod replacements; a daily snapshot reopened with
+  the Console storage code (bootstrap verified, 40 audit events, both
+  classifications); `rollback.sh` restored the shared-token pod (3/3, both
+  clusters readable) and `deploy.sh` re-applied the secured stack against the
+  same database. Kafka pods kept their UIDs, start times and 0 restarts; PVs
+  unchanged; writes only to `kafka3o-m10-verify` on both clusters.
+- **Issues found and fixed during deployment:** Console clients rejected the
+  `http://localhost` secure-context origin (now accepted for exactly
+  `localhost`); identical pod templates did not roll out a new UI (UI bundle
+  hash annotation); `fsGroup` re-chmodded the owner-only database on restart
+  (`fsGroupChangePolicy: OnRootMismatch` with a 2770 volume root; one snapshot
+  written before the fix was reset to 0600); `kubectl apply` would have merged
+  into the old spec (`kubectl replace`).
+- **Plan deviation:** T59.2 became in-process daily backups (store lock).
+- **Vulnerability scan:** `npm audit`: 0 findings; `govulncheck@v1.9.0 -test
+  -tags integration ./...`: 0 called, 1 uncalled module advisory
+  (GO-2026-5932, integration tooling only), within policy.
+- **Regression:** full Gateway suite, deploy tooling tests, UI suite 436 passed
+  (5 opt-in skipped), default/preview/secured builds.
+- **Not run:** real Amazon Cognito (no User Pool; SSO stays disabled), the
+  user's own Chrome on their PC, multi-broker or HA behavior.
+
