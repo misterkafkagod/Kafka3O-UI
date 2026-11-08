@@ -2,7 +2,7 @@
 - **Milestone:** M10
 - **Covers:** F29-AC3, F29-AC4
 - **Discovery:** [gateway-service-trust](../discovery/gateway-service-trust.md)
-- **Status:** Building
+- **Status:** Review
 
 ## Existing baseline and boundaries
 P55 added the Console policy listener, delegation storage and Gateway secured
@@ -71,7 +71,7 @@ denied); outcome audit is P57; deployment and cutover are P59.
     Gateway unavailability and unknown write outcomes are distinct.
   - Done when: focused tests, `npm test` and `npm run build` (default,
     preview and secured) pass.
-- [ ] **T62.5 Secured path end to end** — Covers: F29-AC3, F29-AC4
+- [x] **T62.5 Secured path end to end** — Covers: F29-AC3, F29-AC4
   - Files: Gateway `cmd/console/secured_forwarding_integration_test.go` (new),
     Gateway `internal/console/README.md`.
   - Do: Real Console session API, forwarder and policy listener with a
