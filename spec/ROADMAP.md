@@ -241,7 +241,7 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
     - Demo: audit denial and durable intent/outcome; persistence failure prevents dispatch or reports an uncertain outcome.
   - **P58** F31-B2 · Permission-scoped audit investigation — Covers: F31-AC3 · Discovery: — · Status: Done
     - Demo: cluster ADMIN filters/exports only its cluster's audit; global security events remain inaccessible.
-  - **P59** F27–F31 · End-to-end regression, migration and secure manual deployment — Covers: release integration of F27–F31 · Discovery: EKS-D HTTPS/cutover · Status: Defined
+  - **P59** F27–F31 · End-to-end regression, migration and secure manual deployment — Covers: release integration of F27–F31 · Discovery: [eksd-https-cutover](./discovery/eksd-https-cutover.md) · Status: Defined
     - Demo: preserve the existing Kafka data while verifying secured browser, Console, Gateway, policy and audit paths.
 - **Completion evidence:** Local login and Cognito-compatible fixture tests; global/cluster role and Production/non-Production matrices; direct-Gateway bypass and revocation tests; audit-failure/unknown-write tests; persistent identity/audit restart checks; migration and rollback exercise on the manual EKS-D deployment. Mutation tests use separately approved synthetic fixtures, not existing persistent topic data. Real Cognito login remains unverified until a User Pool is available and must be checked before relying on SSO in production.
 - **Discovery before completion:** Cognito user pool/app client, callback/logout URLs and group claims; SQLite backup/retention procedure and exact supported dependency versions; authenticated Console-to-Gateway delegation and policy API; legacy-token/manual-proxy cutover.
