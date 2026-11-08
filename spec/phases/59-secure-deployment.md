@@ -35,12 +35,15 @@ user; real writes are allowed only to the synthetic topic
     `Origin: http://localhost:5173`, then present the Console origin upstream;
     strip forwarding headers; never follow redirects.
   - Done when: `go test ./deploy/kubernetes/secured-test/front` passes.
-- [ ] **T59.2 Console backup command** — Covers: F31 (backup/restore)
-  - Files: Gateway `cmd/console/run.go`, `cmd/console/run_backup.go` (new) and tests.
-  - Do: `kafka3o-console backup <absolute-destination>` opens the configured
-    database and writes a SQLite-consistent snapshot with owner-only
-    permissions; the snapshot reopens with the same schema and data.
-  - Done when: `go test ./cmd/console -run 'Backup'` passes.
+- [x] **T59.2 Console backups** — Covers: F31 (backup/restore)
+  - Files: Gateway `cmd/console/maintain_backups.go` (new), `cmd/console/run_serve.go` and tests.
+  - Do (amended 2026-11-08: the store's exclusive lock rules out a separate
+    backup command while serving): with `KAFKA3O_CONSOLE_BACKUP_DIR` the
+    running Console writes a SQLite-consistent owner-only snapshot at start and
+    every 24 h and keeps the newest 7; failures are logged alerts. Restore =
+    stop the Console and copy a snapshot over the database file.
+  - Done when: `go test ./cmd/console -run 'Backup'` passes, including a
+    snapshot reopening with its data.
 - [ ] **T59.3 Secured deployment manifests and scripts** — Covers: release integration
   - Files: Gateway `deploy/kubernetes/secured-test/` (README, `storage.yaml`,
     `deployment.yaml`, `prepare-service-pki.sh`, `clusters.json`, `deploy.sh`).
