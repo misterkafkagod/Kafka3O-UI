@@ -29,7 +29,7 @@ until then); outcome audit is P57.
    anonymous; a stopped policy listener yields 503 with no Kafka call.
 
 ## Tasks
-- [ ] **T55.1 Delegation storage and policy decision** — Covers: F29-AC2, F30-AC2
+- [x] **T55.1 Delegation storage and policy decision** — Covers: F29-AC2, F30-AC2
   - Files: Gateway `internal/console/storage/migrate_database.go` (v13),
     `storage/create_gateway_delegation.go`, `storage/consume_gateway_delegation.go`,
     `internal/console/delegation/` (new: types, `consume_delegation.go`,
