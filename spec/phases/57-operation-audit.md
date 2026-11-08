@@ -24,7 +24,7 @@ outcome is not surfaced. Audit search/export is P58.
    never replayed.
 
 ## Tasks
-- [ ] **T57.1 No audit noise for permitted reads** — Covers: F31-AC1
+- [x] **T57.1 No audit noise for permitted reads** — Covers: F31-AC1
   - Files: Gateway `internal/authorization/is_kafka_mutation.go` (new),
     `internal/console/delegation/consume_delegation.go` and tests.
   - Do: Allowed read decisions are not audited; denials, invalid delegations
