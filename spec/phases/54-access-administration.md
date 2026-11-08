@@ -2,7 +2,7 @@
 - **Milestone:** M10
 - **Covers:** F28-AC1, F28-AC3, server portion of F28-AC4
 - **Discovery:** —
-- **Status:** Planned
+- **Status:** Building
 
 ## Existing baseline and boundaries
 P49 resolves additive global/cluster roles; P51–P53 provide local and
@@ -32,7 +32,7 @@ valid cluster ID; P60 adds registry validation.
    next resolution.
 
 ## Tasks
-- [ ] **T54.1 Policy revision and before/after audit values** — Covers: foundation of F28-AC4
+- [x] **T54.1 Policy revision and before/after audit values** — Covers: foundation of F28-AC4
   - Files: Gateway `internal/console/storage/migrate_database.go`,
     `database.go`, `insert_audit_event.go`, `validate_audit_event.go`,
     `list_audit_events.go`, `next_policy_revision.go` (new) and tests.
