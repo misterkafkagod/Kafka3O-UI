@@ -27,7 +27,7 @@ user; real writes are allowed only to the synthetic topic
    re-applied; Kafka data and volumes are unchanged throughout.
 
 ## Tasks
-- [ ] **T59.1 Loopback Console front** — Covers: F27, F29 (browser path)
+- [x] **T59.1 Loopback Console front** — Covers: F27, F29 (browser path)
   - Files: Gateway `deploy/kubernetes/secured-test/front/` (new: main, handler, tests).
   - Do: Serve the secured UI on `127.0.0.1:5173` with SPA fallback and relay
     `/api/*` to the Console's HTTPS loopback origin, verifying its certificate
