@@ -2,7 +2,7 @@
 - **Milestone:** M10
 - **Covers:** F28-AC1, F28-AC3, server portion of F28-AC4
 - **Discovery:** —
-- **Status:** Building
+- **Status:** Review
 
 ## Existing baseline and boundaries
 P49 resolves additive global/cluster roles; P51–P53 provide local and
@@ -71,7 +71,7 @@ valid cluster ID; P60 adds registry validation.
     and the current policy revision, audited like the account listing; never
     return credentials.
   - Done when: `go test ./internal/console/... -run 'AccessBindings'` passes.
-- [ ] **T54.5 Access-administration HTTP routes** — Covers: F28-AC1, F28-AC3, F28-AC4
+- [x] **T54.5 Access-administration HTTP routes** — Covers: F28-AC1, F28-AC3, F28-AC4
   - Files: Gateway `internal/console/httpapi/list_access_bindings.go`,
     `change_role_grant.go`, `change_group_mapping.go` (new),
     `session_api.go`, `new_session_api.go`, `cmd/console/new_session_handler.go`,
