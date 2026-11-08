@@ -2,7 +2,7 @@
 - **Milestone:** M10
 - **Covers:** F28-AC1, F28-AC3, server portion of F28-AC4
 - **Discovery:** —
-- **Status:** Review
+- **Status:** Done
 
 ## Existing baseline and boundaries
 P49 resolves additive global/cluster roles; P51–P53 provide local and
@@ -85,3 +85,29 @@ valid cluster ID; P60 adds registry validation.
     `go test ./...` and `npm test` pass.
 
 ## Review
+- **Demo:** passed (auto-approved under the user's standing M10 instruction,
+  2026-11-08; run by Claude, not observed live). The verified-HTTPS Console
+  test granted alice global VIEWER and `cluster-a` ADMIN and mapped a
+  case-sensitive Cognito group; the no-store listing showed source, label,
+  scope and policy revision without credentials. alice (cluster-only ADMIN)
+  received 403 `global_admin_required` for grants, mappings and listing; the
+  administrator's self-demotion received 403 `self_access_change`; a stale
+  expected role received 409 `policy_conflict`; unknown identities 404 without
+  echoing input. Storage tests showed removed direct grants and group
+  mappings disappearing from the next local and Cognito grant resolution,
+  redacted before/after audit values, revision increments only on commit, and
+  audit failure blocking the change.
+- **Plan deviations:** routes are mounted by an opt-in
+  `EnableAccessAdministration` (as `EnableCognito` does) instead of widening
+  `NewSessionAPI`; no separate last-admin code path was added because the
+  actor must be an enabled local global ADMIN and cannot change its own
+  grants, so demo step 3's `last_global_admin` is mapped but unreachable.
+- **Regression:** full Gateway suite, Console race tests and `go vet` passed;
+  UI suite 393 passed, 4 opt-in skipped.
+- **Convention check:** passed; only constructor + `Execute` pairs, as the Go
+  naming convention specifies.
+- **Vulnerability scan:** not required; no dependency manifests changed.
+- **Not run:** access-management UI (P61), registered-cluster validation and
+  classification (P60), Cognito-sourced global ADMIN administration,
+  deployment.
+
