@@ -2,7 +2,7 @@
 - **Milestone:** M10
 - **Covers:** F30-AC1
 - **Discovery:** —
-- **Status:** Review
+- **Status:** Done
 
 ## Existing baseline and boundaries
 P49's policy denies Kafka mutations for an unclassified environment and P54
@@ -84,3 +84,31 @@ ordinary users and environment badges are P55/P61.
     `go test ./...` and `npm test` pass.
 
 ## Review
+- **Demo:** passed (auto-approved under the user's standing M10 instruction,
+  2026-11-08; run by Claude, not observed live). Registry sync registered
+  `dev`/`prod` unclassified as the Console service, was idempotent across
+  restart, deactivated and reactivated clusters without losing their
+  classification, and refused a changed Gateway URL without partial writes.
+  `ClusterEnvironment` reported unclassified for unknown, inactive and
+  unclassified clusters, and P49 policy denied OPERATOR writes for all of
+  them. Over verified HTTPS a global ADMIN classified `prod` Production with a
+  reason (before/after and reason audited, revision 1); missing reason (400
+  `change_reason_required`), stale expectation (409), unknown cluster (404),
+  unclassification, query parameters and extra fields were rejected; a
+  `prod` cluster ADMIN received 403 for listing and downgrade. New grants on
+  unregistered clusters return 404 `cluster_not_found`; removals on
+  deactivated clusters still work.
+- **Plan deviations:** routes use an opt-in `EnableClusterAdministration`;
+  P54 grant tests now register their clusters first. Header spoofing is
+  covered structurally (no handler reads environment headers) rather than by a
+  dedicated header test. The refused-retarget startup is verified at the
+  storage action, not by starting the Console binary.
+- **Regression:** full Gateway suite and UI suite (393 passed, 4 opt-in
+  skipped) passed. One full Gateway run stalled for over ten minutes with
+  ~75 s CPU in the pre-existing P53 stable-marker test (the process appeared
+  suspended); the package and the full suite then passed in normal time.
+- **Convention check:** passed.
+- **Vulnerability scan:** not required; no dependency manifests changed.
+- **Not run:** environment badges and the user-facing authorized cluster list
+  (P55/P61), Gateway identity binding (P55), deployment.
+

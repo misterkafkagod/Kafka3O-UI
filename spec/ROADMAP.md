@@ -227,7 +227,7 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
   - **P54** F28-B1 + F28-B3 · Audited access-administration API — Covers: F28-AC1, F28-AC3, server portion of F28-AC4 · Discovery: — · Status: Done
     - Demo: global ADMIN changes scoped grants and Cognito group mappings with before/after audit; cluster ADMIN and self-changes are denied; stale and last-admin changes conflict.
     - Audited grant, group-mapping and access-listing routes are on the undeployed loopback Console for local global ADMINs, with per-request grant resolution, optimistic conflicts, self-change denial and redacted before/after audit. UI, classification and deployment remain P60/P61/P59.
-  - **P60** F30-B1 · Registered clusters and Production classification — Covers: F30-AC1 · Discovery: — · Status: Review
+  - **P60** F30-B1 · Registered clusters and Production classification — Covers: F30-AC1 · Discovery: — · Status: Done
     - Demo: migration registers existing clusters unclassified; global ADMIN classifies one with confirmation and reason; cluster ADMIN, browser config and spoofed input cannot change it; unclassified blocks writes.
   - **P61** F28-B1 + F28-B3 + F30-B1 · Access-management and classification UI — Covers: UI portion of F28-AC4, additive-model explanation of F28-AC2, F30-B1 display · Discovery: — · Status: Defined
     - Demo: global ADMIN manages grants, mappings and classification with confirmation naming subject and scope; cancel sends nothing; 401/403/409/503 are distinct.
@@ -297,6 +297,7 @@ Redpanda-only Shadow Links, its Admin API, and Redpanda-specific diagnostic oper
 - **Verification debt:** Run the Cognito sign-in, group refresh and logout integration against a real User Pool when an AWS account and app client become available; fixture tests are not evidence of live provider compatibility.
 
 ## Learnings
+- 2026-11-08 (P60 review): Cluster classification now lives only in the Console store, seeded unclassified from an operator file; deactivation keeps a classification, but retargeting an ID to another Gateway is refused rather than inherited.
 - 2026-11-08 (P54 review): Forbidding self-changes keeps the acting local global ADMIN in place, so grant administration cannot remove the last one; this replaces a separate last-admin check.
 - 2026-11-08 (P53 review): The synthetic-provider Cognito demo passed locally and in a disposable EKS-D pod without touching the test clusters; live Cognito, native-browser cookies and secured deployment remain unverified until P59.
 - 2026-11-06 (P52 review): A separate authenticated administrator can revoke the preview's session; the next Console request receives 401 and the preview clears its signed-in state without replay. This does not yet verify Gateway enforcement, secured caches, native-browser cookies or deployment.
