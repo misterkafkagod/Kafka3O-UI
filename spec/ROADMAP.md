@@ -227,7 +227,7 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
   - **P54** F28-B1 + F28-B3 · Audited access-administration API — Covers: F28-AC1, F28-AC3, server portion of F28-AC4 · Discovery: — · Status: Done
     - Demo: global ADMIN changes scoped grants and Cognito group mappings with before/after audit; cluster ADMIN and self-changes are denied; stale and last-admin changes conflict.
     - Audited grant, group-mapping and access-listing routes are on the undeployed loopback Console for local global ADMINs, with per-request grant resolution, optimistic conflicts, self-change denial and redacted before/after audit. UI, classification and deployment remain P60/P61/P59.
-  - **P60** F30-B1 · Registered clusters and Production classification — Covers: F30-AC1 · Discovery: — · Status: Building
+  - **P60** F30-B1 · Registered clusters and Production classification — Covers: F30-AC1 · Discovery: — · Status: Review
     - Demo: migration registers existing clusters unclassified; global ADMIN classifies one with confirmation and reason; cluster ADMIN, browser config and spoofed input cannot change it; unclassified blocks writes.
   - **P61** F28-B1 + F28-B3 + F30-B1 · Access-management and classification UI — Covers: UI portion of F28-AC4, additive-model explanation of F28-AC2, F30-B1 display · Discovery: — · Status: Defined
     - Demo: global ADMIN manages grants, mappings and classification with confirmation naming subject and scope; cancel sends nothing; 401/403/409/503 are distinct.

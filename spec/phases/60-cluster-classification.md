@@ -2,7 +2,7 @@
 - **Milestone:** M10
 - **Covers:** F30-AC1
 - **Discovery:** —
-- **Status:** Building
+- **Status:** Review
 
 ## Existing baseline and boundaries
 P49's policy denies Kafka mutations for an unclassified environment and P54
@@ -67,7 +67,7 @@ ordinary users and environment badges are P55/P61.
   - Done when: `go test ./internal/console/storage -run 'ClusterEnvironment|RoleGrant|GroupMapping'`
     passes, including P49 policy denying writes for unknown, inactive and
     unclassified clusters.
-- [ ] **T60.4 Cluster administration HTTP routes** — Covers: F30-AC1
+- [x] **T60.4 Cluster administration HTTP routes** — Covers: F30-AC1
   - Files: Gateway `internal/console/httpapi/list_registered_clusters.go`,
     `change_cluster_environment.go` (new), `enable_cluster_administration.go`
     (new), `write_access_change_error.go`, `session_api.go`,
