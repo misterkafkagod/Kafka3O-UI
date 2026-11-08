@@ -7,6 +7,9 @@ import { App } from "./App";
 import { ConsoleSessionGate } from "./components/ConsoleSessionGate";
 import { loadGatewayConfig } from "./config/loadGatewayConfig";
 import type { ConsoleAdminClient, ConsoleAdminTransport } from "./console/ConsoleAdmin";
+import type { ConsoleAuditClient } from "./console/ConsoleAudit";
+import { buildAuditQuery } from "./console/buildAuditQuery";
+import { listAuditEvents } from "./console/listAuditEvents";
 import type { ConsoleSessionClient, ConsoleSessionTransport } from "./console/ConsoleSession";
 import type { ConsoleBrowser, ConsoleSsoClient, ConsoleSsoTransport } from "./console/ConsoleSso";
 import { changeGroupMapping } from "./console/changeGroupMapping";
@@ -70,6 +73,11 @@ const consoleAdmin: ConsoleAdminClient = {
   changeGroupMapping: (issuer, group, clusterId, expected, role) => changeGroupMapping(adminTransport, issuer, group, clusterId, expected, role),
   listClusters: () => listClusters(adminTransport),
   classifyCluster: (clusterId, expected, environment, reason) => classifyCluster(adminTransport, clusterId, expected, environment, reason),
+};
+const consoleAudit: ConsoleAuditClient = {
+  list: (filters, after) => listAuditEvents(adminTransport, filters, after),
+  exportUrl: (filters) => `/api/audit/export?${buildAuditQuery(filters)}`,
+  scopes: () => loadAuthorizedClusters(window.fetch.bind(window), window.location.origin, () => undefined),
 };
 const ssoTransport: ConsoleSsoTransport = (request) =>
   requestConsoleSso(window.fetch.bind(window), window.location.origin, () => document.cookie, request);
@@ -174,10 +182,10 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     {consoleSecured ? (
       <ConsoleSessionGate client={consoleSession} sso={consoleSso} browser={consoleBrowser}
-        admin={consoleAdmin} confirm={(message) => window.confirm(message)} renderApp={securedApp} />
+        admin={consoleAdmin} confirm={(message) => window.confirm(message)} renderApp={securedApp} audit={consoleAudit} />
     ) : consolePreview ? (
       <ConsoleSessionGate client={consoleSession} sso={consoleSso} browser={consoleBrowser}
-        admin={consoleAdmin} confirm={(message) => window.confirm(message)} />
+        admin={consoleAdmin} confirm={(message) => window.confirm(message)} audit={consoleAudit} />
     ) : gatewayApp(legacyRead, legacyWrite, gatewayCredentials, () => loadGatewayConfig(boundFetchJson))}
   </StrictMode>,
 );

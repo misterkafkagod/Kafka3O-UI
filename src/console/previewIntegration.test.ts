@@ -175,7 +175,7 @@ describe.skipIf(process.env.KAFKA3O_PREVIEW_INTEGRATION !== "1")("built Console 
       "GET /", `GET ${scriptPath}`, `GET ${stylesheetPath}`, "GET /api/session",
       "POST /api/session/local", "POST /api/session/password", "POST /api/session/logout",
       // The signed-in preview reads administration data; this test makes no administration changes.
-      "GET /api/admin/access", "GET /api/admin/clusters",
+      "GET /api/admin/access", "GET /api/admin/clusters", "GET /api/clusters",
     ]);
     expect(network.requests.filter((item) => item.origin !== origin || !allowed.has(`${item.method} ${item.path}`))).toEqual([]);
     expect(network.requests.filter((item) => item.path.startsWith("/api/") &&

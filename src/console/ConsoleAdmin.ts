@@ -41,6 +41,7 @@ export type ConsoleAdminOperation =
   | { kind: "changeRoleGrant"; identityId: string; clusterId: string; expectedRole: AccessRole; role: AccessRole }
   | { kind: "changeGroupMapping"; issuer: string; group: string; clusterId: string; expectedRole: AccessRole; role: AccessRole }
   | { kind: "listClusters" }
+  | { kind: "listAudit"; query: string }
   | { kind: "classifyCluster"; clusterId: string; expectedEnvironment: ClusterEnvironment; environment: Exclude<ClusterEnvironment, "">; reason: string };
 
 // A transport returns the parsed JSON body of a successful response or throws ConsoleAdminError.

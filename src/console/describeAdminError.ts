@@ -13,6 +13,8 @@ export function describeAdminError(error: unknown): string {
       return "Change your temporary password before managing access.";
     case "self_access_change":
       return "You cannot change your own access. Ask another global administrator.";
+    case "audit_access_denied":
+      return "Audit for a cluster requires ADMIN on it; all-cluster audit requires global ADMIN.";
     case "policy_conflict":
       return "Access changed since this page loaded. Review the reloaded values and try again.";
     case "last_global_admin":

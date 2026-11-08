@@ -29,6 +29,9 @@ export async function requestConsoleAdmin(
     case "listClusters":
       path = "/api/admin/clusters";
       break;
+    case "listAudit":
+      path = operation.query ? `/api/audit?${operation.query}` : "/api/audit";
+      break;
     case "changeRoleGrant":
       path = "/api/admin/role-grants";
       body = JSON.stringify({ identityId: operation.identityId, clusterId: operation.clusterId, expectedRole: operation.expectedRole, role: operation.role });
@@ -92,6 +95,7 @@ export async function requestConsoleAdmin(
   else if (response.status === 403 && problemCode === "global_admin_required") code = "global_admin_required";
   else if (response.status === 403 && problemCode === "password_change_required") code = "password_change_required";
   else if (response.status === 403 && problemCode === "self_access_change") code = "self_access_change";
+  else if (response.status === 403 && problemCode === "audit_access_denied") code = "audit_access_denied";
   else if (response.status === 403) code = "global_admin_required";
   else if (response.status === 409 && problemCode === "policy_conflict") code = "policy_conflict";
   else if (response.status === 409 && problemCode === "last_global_admin") code = "last_global_admin";

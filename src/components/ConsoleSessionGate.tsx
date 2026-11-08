@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 import type { ConsoleAdminClient } from "../console/ConsoleAdmin";
+import type { ConsoleAuditClient } from "../console/ConsoleAudit";
 import type { ConsoleSession, ConsoleSessionClient } from "../console/ConsoleSession";
 import { ConsoleSessionError } from "../console/ConsoleSessionError";
 import { cognitoCallbackPath, type ConsoleBrowser, type ConsoleSsoClient } from "../console/ConsoleSso";
 import { describeSsoFailure } from "../console/describeSsoFailure";
 import { AccessManagement } from "./AccessManagement";
+import { AuditInvestigation } from "./AuditInvestigation";
 import { ClusterClassification } from "./ClusterClassification";
 import styles from "./ConsoleSessionGate.module.css";
 
@@ -24,9 +26,10 @@ type ConsoleSessionGateProps = {
   confirm?: (message: string) => boolean;
   // renderApp shows the secured Kafka UI for a signed-in session; it receives the session-ended callback.
   renderApp?: (sessionEnded: () => void) => ReactNode;
+  audit?: ConsoleAuditClient;
 };
 
-export function ConsoleSessionGate({ client, sso, browser, admin, confirm, renderApp }: ConsoleSessionGateProps) {
+export function ConsoleSessionGate({ client, sso, browser, admin, confirm, renderApp, audit }: ConsoleSessionGateProps) {
   const [screen, setScreen] = useState<Screen>({ kind: "checking" });
   const [ssoAvailable, setSsoAvailable] = useState(false);
   const callback = useRef<Promise<ConsoleSession> | null>(null);
@@ -412,6 +415,7 @@ export function ConsoleSessionGate({ client, sso, browser, admin, confirm, rende
           <div className={styles.administration} key={screen.session.accountId}>
             <AccessManagement admin={admin} confirm={confirm} onUnauthorized={sessionEnded} />
             <ClusterClassification admin={admin} confirm={confirm} onUnauthorized={sessionEnded} />
+            {audit ? <AuditInvestigation audit={audit} onUnauthorized={sessionEnded} /> : null}
           </div>
         ) : null}
       </main>

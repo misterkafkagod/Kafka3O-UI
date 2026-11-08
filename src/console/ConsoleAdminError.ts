@@ -5,6 +5,7 @@ export type ConsoleAdminErrorCode =
   | "global_admin_required"
   | "password_change_required"
   | "self_access_change"
+  | "audit_access_denied"
   | "policy_conflict"
   | "last_global_admin"
   | "not_found"

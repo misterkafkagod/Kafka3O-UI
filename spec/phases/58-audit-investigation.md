@@ -2,7 +2,7 @@
 - **Milestone:** M10
 - **Covers:** F31-AC3
 - **Discovery:** —
-- **Status:** Building
+- **Status:** Review
 
 ## Existing baseline and boundaries
 P50–P57 write append-only, sanitized audit events with server time,
@@ -41,7 +41,7 @@ audit records. Retention and backup are P59.
     `console.audit.export`; cells beginning with `=`, `+`, `-`, `@`, tab or CR
     are prefixed with `'`.
   - Done when: `go test ./internal/console/httpapi -run 'AuditExport|CSV'` passes.
-- [ ] **T58.3 Audit investigation view** — Covers: F31-AC3
+- [x] **T58.3 Audit investigation view** — Covers: F31-AC3
   - Files: UI `src/console/ConsoleAudit.ts`, `requestConsoleAudit.ts`,
     `parseAuditPage.ts`, `groupAuditTimeline.ts`, `src/components/AuditInvestigation.tsx`
     and CSS (new), `src/components/ConsoleSessionGate.tsx`, `src/main.tsx` and tests.

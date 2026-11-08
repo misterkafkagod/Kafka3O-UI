@@ -239,7 +239,7 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
     - Demo: an ADMIN confirms an allowed Production mutation with a reason; canceling or omitting the reason sends no write.
   - **P57** F31-B1 + F31-B3 · Correlated security and mutation audit — Covers: F31-AC1, F31-AC2, F31-AC5 · Discovery: — · Status: Done
     - Demo: audit denial and durable intent/outcome; persistence failure prevents dispatch or reports an uncertain outcome.
-  - **P58** F31-B2 · Permission-scoped audit investigation — Covers: F31-AC3 · Discovery: — · Status: Building
+  - **P58** F31-B2 · Permission-scoped audit investigation — Covers: F31-AC3 · Discovery: — · Status: Review
     - Demo: cluster ADMIN filters/exports only its cluster's audit; global security events remain inaccessible.
   - **P59** F27–F31 · End-to-end regression, migration and secure manual deployment — Covers: release integration of F27–F31 · Discovery: EKS-D HTTPS/cutover · Status: Defined
     - Demo: preserve the existing Kafka data while verifying secured browser, Console, Gateway, policy and audit paths.
