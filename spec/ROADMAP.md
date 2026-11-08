@@ -237,7 +237,7 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
     - Demo: the secured UI reads and writes through the Console with local and Cognito identities enforced identically; policy outage shows unavailability, revocation applies on the next request.
   - **P56** F30-B3 · Production-aware confirmation and reason — Covers: F30-AC4 · Discovery: — · Status: Done
     - Demo: an ADMIN confirms an allowed Production mutation with a reason; canceling or omitting the reason sends no write.
-  - **P57** F31-B1 + F31-B3 · Correlated security and mutation audit — Covers: F31-AC1, F31-AC2, F31-AC5 · Discovery: — · Status: Defined
+  - **P57** F31-B1 + F31-B3 · Correlated security and mutation audit — Covers: F31-AC1, F31-AC2, F31-AC5 · Discovery: — · Status: Building
     - Demo: audit denial and durable intent/outcome; persistence failure prevents dispatch or reports an uncertain outcome.
   - **P58** F31-B2 · Permission-scoped audit investigation — Covers: F31-AC3 · Discovery: — · Status: Defined
     - Demo: cluster ADMIN filters/exports only its cluster's audit; global security events remain inaccessible.
