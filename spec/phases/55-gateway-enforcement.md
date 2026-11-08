@@ -45,7 +45,7 @@ until then); outcome audit is P57.
     passes, covering replay, expiry, binding/cluster/action mismatch,
     VIEWER/OPERATOR/ADMIN across Production, non-Production and unclassified,
     and a revoked session.
-- [ ] **T55.2 Console mTLS policy listener** — Covers: F29-AC2
+- [x] **T55.2 Console mTLS policy listener** — Covers: F29-AC2
   - Files: Gateway `internal/console/policyapi/` (new handler package and
     tests), `cmd/console/load_policy_config.go` (new), `cmd/console/run_serve.go`,
     `internal/console/README.md` and tests.
