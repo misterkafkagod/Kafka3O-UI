@@ -22,7 +22,7 @@ audit records. Retention and backup are P59.
    spreadsheet formula.
 
 ## Tasks
-- [ ] **T58.1 Permission-scoped audit search API** — Covers: F31-AC3
+- [x] **T58.1 Permission-scoped audit search API** — Covers: F31-AC3
   - Files: Gateway `internal/console/httpapi/list_audit_events.go`,
     `authorize_audit_query.go`, `read_audit_query.go`, `enable_audit_investigation.go`
     (new), `session_api.go`, `cmd/console/new_session_handler.go` and tests.
