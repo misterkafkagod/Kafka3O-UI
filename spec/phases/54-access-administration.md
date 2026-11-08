@@ -63,7 +63,7 @@ valid cluster ID; P60 adds registry validation.
     scope → role, with strict HTTPS-issuer and printable group validation.
   - Done when: `go test ./internal/console/... -run 'GroupMapping'` passes,
     including a Cognito session losing a mapped grant on its next resolution.
-- [ ] **T54.4 Bounded, audited access listing** — Covers: F28-AC4
+- [x] **T54.4 Bounded, audited access listing** — Covers: F28-AC4
   - Files: Gateway `internal/console/storage/list_access_bindings.go` (new),
     `internal/console/identity/list_access_bindings.go` (new) and tests.
   - Do: Return a bounded, cursor-paged list of identities (local username or
