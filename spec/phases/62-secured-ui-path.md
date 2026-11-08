@@ -25,7 +25,7 @@ denied); outcome audit is P57; deployment and cutover are P59.
    "Gateway unreachable"; a 403 explains the restriction.
 
 ## Tasks
-- [ ] **T62.1 Authorized cluster list** — Covers: F29-AC3
+- [x] **T62.1 Authorized cluster list** — Covers: F29-AC3
   - Files: Gateway `internal/console/storage/list_active_clusters.go`,
     `internal/console/httpapi/list_authorized_clusters.go`,
     `enable_gateway_forwarding.go` (new), `session_api.go` and tests.
