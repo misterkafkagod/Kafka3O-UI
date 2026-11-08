@@ -59,6 +59,7 @@ describe("fetchConsoleGatewayJson", () => {
     expect((denied as HttpError).problem?.detail).toBe("Not permitted: production_admin_required");
     expect(classifyGatewayError(await fail(problem(503, "authorization_unavailable")))).toBe("authorization-unavailable");
     expect(classifyGatewayError(await fail(problem(503, "gateway_outcome_unknown")))).toBe("outcome-unknown");
+    expect(classifyGatewayError(await fail(problem(503, "outcome_unknown")))).toBe("outcome-unknown");
     expect(classifyGatewayError(await fail(problem(503, "gateway_unavailable")))).toBe("gateway-unreachable");
     expect(classifyGatewayError(await fail(problem(503, "cluster_unreachable")))).toBe("cluster-unreachable");
     expect(onUnauthorized).toHaveBeenCalledTimes(1);

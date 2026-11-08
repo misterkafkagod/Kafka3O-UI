@@ -41,7 +41,7 @@ outcome is not surfaced. Audit search/export is P58.
     the same operation ID and actor; unknown, foreign or duplicate outcomes are
     rejected.
   - Done when: `go test ./internal/console/storage ./internal/console/policyapi -run 'Outcome'` passes.
-- [ ] **T57.3 Gateway outcome reporting** — Covers: F31-AC2, F31-AC5
+- [x] **T57.3 Gateway outcome reporting** — Covers: F31-AC2, F31-AC5
   - Files: Gateway `internal/gatewayauth/with_delegated_authorization.go`,
     `console_policy_client.go`, `classify_outcome.go`,
     `buffered_response.go` (new) and tests; UI `src/gateway/classifyGatewayError.ts` and test.

@@ -18,7 +18,7 @@ export function classifyGatewayError(error: unknown): GatewayErrorKind {
   if (error instanceof HttpError && error.problem?.code === "authorization_unavailable") {
     return "authorization-unavailable";
   }
-  if (error instanceof HttpError && error.problem?.code === "gateway_outcome_unknown") {
+  if (error instanceof HttpError && (error.problem?.code === "gateway_outcome_unknown" || error.problem?.code === "outcome_unknown")) {
     return "outcome-unknown";
   }
   if (error instanceof HttpError && error.problem?.code === "gateway_unavailable") {
