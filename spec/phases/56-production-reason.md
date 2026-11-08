@@ -2,7 +2,7 @@
 - **Milestone:** M10
 - **Covers:** F30-AC4
 - **Discovery:** —
-- **Status:** Review
+- **Status:** Done
 
 ## Existing baseline and boundaries
 P49 denies Production mutations without a change reason and P55/P62 deliver
@@ -53,3 +53,27 @@ irreversible-operation confirmations are unchanged; ADMIN never bypasses them.
     `npm run build` (default, preview, secured) pass.
 
 ## Review
+- **Demo:** passed (auto-approved under the user's standing M10 instruction,
+  2026-11-08; run by Claude, not observed live). Through the real Console
+  forwarding API, policy listener and a secured `prod` Gateway: an ADMIN
+  Production write without a reason was denied `change_reason_required` with
+  no Kafka call; an OPERATOR with a reason was still denied; an ADMIN with
+  "Incident 42 hotfix" reached Kafka once and the allowed decision was
+  audited with that reason and actor. Reasons on reads, duplicate and
+  over-length reasons were rejected before minting. UI tests showed the
+  trimmed reason header only on Production writes, cancel or blank answers
+  sending nothing ("Change canceled"), and cluster cards showing
+  "Production" or "Unclassified — writes blocked" from the Console.
+- **Plan deviations:** header values cannot carry leading/trailing spaces or
+  control characters over HTTP, so those reason cases are covered by the
+  validator's own tests instead of the forwarding test. The prompt uses the
+  injected `window.prompt`, consistent with the existing `window.confirm`
+  confirmations; native-browser accessibility of a custom dialog is not part
+  of this phase.
+- **Regression:** full Gateway suite; UI suite 429 passed, 5 opt-in skipped;
+  default, preview and secured builds passed.
+- **Convention check:** passed.
+- **Vulnerability scan:** not required; no dependency manifests changed.
+- **Not run:** outcome audit (P57), audit investigation (P58), native-browser
+  run and deployment (P59).
+
