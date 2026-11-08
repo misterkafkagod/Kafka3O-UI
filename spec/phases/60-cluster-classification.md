@@ -45,7 +45,7 @@ ordinary users and environment badges are P55/P61.
     Console service, and refuse a changed Gateway URL.
   - Done when: `go test ./internal/console/storage ./internal/console/identity ./cmd/console -run 'RegisteredCluster|ClusterRegistry|ValidateClusterID|Migrat'`
     passes, including restart idempotence, deactivation and retarget refusal.
-- [ ] **T60.2 Audited Production classification** — Covers: F30-AC1
+- [x] **T60.2 Audited Production classification** — Covers: F30-AC1
   - Files: Gateway `internal/console/storage/change_cluster_environment.go`
     (new), `internal/console/identity/change_cluster_environment.go` (new),
     `identity/valid_change_reason.go` (new), `identity/account.go` and tests.
