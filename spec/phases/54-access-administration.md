@@ -56,7 +56,7 @@ valid cluster ID; P60 adds registry validation.
   - Done when: `go test ./internal/console/... -run 'RoleGrant'` passes,
     covering cluster-ADMIN denial, self-change, conflict, last admin, audit
     failure and the next grant resolution observing the change.
-- [ ] **T54.3 Audited Cognito group-mapping changes** — Covers: F28-AC1, F28-AC3, F28-AC4
+- [x] **T54.3 Audited Cognito group-mapping changes** — Covers: F28-AC1, F28-AC3, F28-AC4
   - Files: Gateway `internal/console/storage/change_group_mapping.go` (new),
     `internal/console/identity/change_group_mapping.go` (new) and tests.
   - Do: The same transaction pattern for exact issuer + case-sensitive group +
