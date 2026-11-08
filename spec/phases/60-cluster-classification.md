@@ -57,7 +57,7 @@ ordinary users and environment badges are P55/P61.
   - Done when: `go test ./internal/console/... -run 'ClusterEnvironment|ChangeReason'`
     passes, covering cluster-ADMIN denial, conflict, missing reason, unknown
     or inactive cluster and audit failure.
-- [ ] **T60.3 Registry-aware environment lookup and grant scope** — Covers: F30-AC1
+- [x] **T60.3 Registry-aware environment lookup and grant scope** — Covers: F30-AC1
   - Files: Gateway `internal/console/storage/cluster_environment.go` (new),
     `storage/change_role_grant.go`, `storage/change_group_mapping.go` and tests.
   - Do: `ClusterEnvironment` returns the stored environment only for an
