@@ -237,7 +237,7 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
     - Demo: the secured UI reads and writes through the Console with local and Cognito identities enforced identically; policy outage shows unavailability, revocation applies on the next request.
   - **P56** F30-B3 · Production-aware confirmation and reason — Covers: F30-AC4 · Discovery: — · Status: Done
     - Demo: an ADMIN confirms an allowed Production mutation with a reason; canceling or omitting the reason sends no write.
-  - **P57** F31-B1 + F31-B3 · Correlated security and mutation audit — Covers: F31-AC1, F31-AC2, F31-AC5 · Discovery: — · Status: Review
+  - **P57** F31-B1 + F31-B3 · Correlated security and mutation audit — Covers: F31-AC1, F31-AC2, F31-AC5 · Discovery: — · Status: Done
     - Demo: audit denial and durable intent/outcome; persistence failure prevents dispatch or reports an uncertain outcome.
   - **P58** F31-B2 · Permission-scoped audit investigation — Covers: F31-AC3 · Discovery: — · Status: Defined
     - Demo: cluster ADMIN filters/exports only its cluster's audit; global security events remain inaccessible.
@@ -299,6 +299,7 @@ Redpanda-only Shadow Links, its Admin API, and Redpanda-specific diagnostic oper
 - **Verification debt:** Run the Cognito sign-in, group refresh and logout integration against a real User Pool when an AWS account and app client become available; fixture tests are not evidence of live provider compatibility.
 
 ## Learnings
+- 2026-11-08 (P57 review): A Gateway holds a mutation's response until its outcome is recorded, so an audit outage after Kafka accepted a write surfaces as an explicit unknown with an operation ID rather than an unattributed success.
 - 2026-11-08 (P62 review): The secured UI treats the Console forwarding base as each cluster's "Gateway URL", so the existing pages work unchanged while tokens and Gateway addresses never reach the browser. Never chain a commit after a long test run in one command: killing a stalled run let the commit proceed unverified.
 - 2026-11-08 (P55 review): Secured Gateways accept only the Console over mTLS with a single-use, request-bound delegation consumed at the Console; every bypass in the matrix was denied before Kafka, locally and on EKS-D. Liveness needs optional client certificates on the same listener.
 - 2026-11-08 (P61 review): The preview shows administration to every signed-in session and lets the Console decide; tests that revoke sessions must wait for those reads, because a concurrent 401 correctly ends the session.

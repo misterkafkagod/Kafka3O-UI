@@ -2,7 +2,7 @@
 - **Milestone:** M10
 - **Covers:** F31-AC1, F31-AC2, F31-AC5
 - **Discovery:** —
-- **Status:** Review
+- **Status:** Done
 
 ## Existing baseline and boundaries
 P51–P56 audit logins, logouts, revocations, account, grant, mapping and
@@ -62,3 +62,26 @@ outcome is not surfaced. Audit search/export is P58.
   - Done when: `go test ./cmd/console -run 'SecuredForwarding|Unresolved'`, `go test ./...` and `npm test` pass.
 
 ## Review
+- **Demo:** passed (auto-approved under the user's standing M10 instruction,
+  2026-11-08; run by Claude, not observed live). In the secured end-to-end
+  test (real Console session API, forwarder, policy listener, secured
+  Gateways): permitted reads, including repeated cluster and topic reads,
+  created no audit events; the two allowed writes (OPERATOR on `dev`, ADMIN
+  with a reason on `prod`) each had a durable intent and a correlated
+  `confirmed` outcome under the same operation ID; nothing was left
+  unresolved. Unit tests showed an outcome store failure turning a Kafka
+  success into `503 outcome_unknown` with the operation ID, `*_unknown`
+  delivery problems recorded as `unknown`, duplicate and foreign-cluster
+  outcomes rejected, a mutation without durable intent never dispatched, and
+  the unresolved-intent listing returning only mutations without outcomes.
+- **Existing coverage (F31-AC1):** logins, failures, logouts, revocations,
+  account, grant, mapping and classification changes were already audited by
+  P51–P60 and are unchanged.
+- **Regression:** full Gateway suite; UI suite 429 passed, 5 opt-in skipped.
+- **Convention check:** passed (`bufferedResponse` implements
+  `http.ResponseWriter`, an interface-mandated multi-method type).
+- **Vulnerability scan:** not required; no dependency manifests changed.
+- **Not run:** audit investigation and export (P58), operational alert
+  routing beyond the startup log, retention/backup on the deployed volume
+  (P59).
+
