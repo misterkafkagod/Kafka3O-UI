@@ -22,7 +22,7 @@ irreversible-operation confirmations are unchanged; ADMIN never bypasses them.
    read requests never ask for a reason; a reason on a read is rejected.
 
 ## Tasks
-- [ ] **T56.1 Bind change reasons into Production delegations** — Covers: F30-AC4
+- [x] **T56.1 Bind change reasons into Production delegations** — Covers: F30-AC4
   - Files: Gateway `internal/console/identity/validate_change_reason.go` (new),
     `internal/console/httpapi/forward_gateway_request.go` and tests,
     `cmd/console/secured_forwarding_integration_test.go`, `internal/console/README.md`.
