@@ -2,7 +2,7 @@
 - **Milestone:** M10
 - **Covers:** F29-AC3, F29-AC4
 - **Discovery:** [gateway-service-trust](../discovery/gateway-service-trust.md)
-- **Status:** Review
+- **Status:** Done
 
 ## Existing baseline and boundaries
 P55 added the Console policy listener, delegation storage and Gateway secured
@@ -81,3 +81,33 @@ denied); outcome audit is P57; deployment and cutover are P59.
   - Done when: `go test ./cmd/console -run 'SecuredForwarding'` and `go test ./...` pass.
 
 ## Review
+- **Demo:** passed (auto-approved under the user's standing M10 instruction,
+  2026-11-08; run by Claude, not observed live). `TestSecuredForwardingEndToEnd`
+  drove the real Console session API, forwarder and policy listener against
+  two secured Gateway handlers over a generated service CA: the VIEWER's
+  `/api/clusters` listed both clusters with authoritative environments and no
+  Gateway addresses; VIEWER read `prod` and was denied produce; OPERATOR
+  produced on `dev` and the Gateway received the exact body bytes once;
+  OPERATOR was denied deleting on `prod`. A stopped Gateway gave
+  `gateway_unavailable` for a read and `gateway_outcome_unknown` for a write;
+  a stopped policy listener gave `authorization_unavailable`; a revoked
+  session got 401 with cookies cleared; none of these reached Kafka. Cognito
+  VIEWER/OPERATOR decisions matched local ones in the storage-level matrix
+  and failed closed before discovery. UI tests covered same-origin forwarding
+  with CSRF only on writes, refusal of non-Console URLs, 401 returning to
+  sign-in and the distinct denied/unavailable/unknown messages.
+- **Plan deviations:** the Cognito half of the matrix is verified at the
+  storage/decision level (T62.3) rather than inside the T62.5 HTTP test;
+  forwarding is mounted by `EnableGatewayRequests` after
+  `EnableGatewayForwarding`. T62.1 was pushed before its full-suite run
+  completed (the run had stalled while the workstation slept); a fresh full
+  run afterwards passed.
+- **Regression:** full Gateway suite and race tests for the new packages
+  passed; UI suite 426 passed, 5 opt-in skipped; default, preview and secured
+  builds passed.
+- **Convention check:** passed.
+- **Vulnerability scan:** not required; no dependency manifests changed.
+- **Not run:** a browser-level run of the secured bundle against secured
+  Gateways (P59), Production change reasons (P56), outcome audit (P57),
+  deployment.
+
