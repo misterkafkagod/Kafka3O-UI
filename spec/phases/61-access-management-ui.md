@@ -2,7 +2,7 @@
 - **Milestone:** M10
 - **Covers:** UI portion of F28-AC4, additive-model explanation of F28-AC2, F30-B1 display
 - **Discovery:** —
-- **Status:** Review
+- **Status:** Done
 
 ## Existing baseline and boundaries
 P54 and P60 expose audited, local-global-ADMIN-only access and cluster
@@ -75,3 +75,27 @@ Kafka routes and Gateway enforcement are unchanged (P55).
     `npm run build` (default and preview) and `go test ./cmd/console` pass.
 
 ## Review
+- **Demo:** passed (auto-approved under the user's standing M10 instruction,
+  2026-11-08; run by Claude, not observed live). The opt-in
+  `previewAdministrationIntegration` test evaluated the built preview bundle
+  against the real Console over verified HTTPS with two synthetic registered
+  clusters: administration stayed hidden until the temporary password was
+  replaced; `prod` showed "Unclassified — writes blocked"; a canceled
+  classification sent no PUT; a confirmed one with a reason became
+  Production; self-change showed the 403 explanation; granting alice `prod`
+  ADMIN named subject, scope and before/after and listed "(direct)"; a
+  concurrent change produced a 409 message and reload. Component tests
+  covered the additive-model text, source/scope labels, distinct
+  401/403/409/503-audit/unknown-outcome messages and the 401 return to
+  sign-in.
+- **Regression:** UI suite 418 passed, 5 opt-in skipped; all four opt-in
+  preview integrations (local, Cognito, outage, administration) passed;
+  default and preview builds passed; full Gateway suite passed. The existing
+  local preview test now waits for the administration reads before revoking
+  its session and allows those two read routes.
+- **Convention check:** passed.
+- **Vulnerability scan:** not required; no dependency manifests changed.
+- **Not run:** native-browser acceptance at 320/768/1440 px, light/dark
+  themes and 200% zoom (jsdom only); Cognito-sourced administrators; Kafka
+  environment badges on cluster pages (P55); deployment.
+
