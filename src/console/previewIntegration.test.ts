@@ -124,6 +124,9 @@ describe.skipIf(process.env.KAFKA3O_PREVIEW_INTEGRATION !== "1")("built Console 
     await user.type(screen.getByLabelText("Password"), "replacement passphrase");
     await user.click(screen.getByRole("button", { name: "Sign in" }));
     expect(await screen.findByRole("heading", { name: "Signed in" })).toBeDefined();
+    // Let the signed-in administration reads finish before another client revokes this session.
+    expect(await screen.findByRole("region", { name: "Identities and direct grants" })).toBeDefined();
+    expect(await screen.findByText(/No clusters are registered/)).toBeDefined();
     const options = { credentials: "same-origin", cache: "no-store", redirect: "error" } as const;
     const adminLogin = await administrator.fetch(`${origin}/api/session/local`, {
       ...options,
@@ -171,6 +174,8 @@ describe.skipIf(process.env.KAFKA3O_PREVIEW_INTEGRATION !== "1")("built Console 
     const allowed = new Set([
       "GET /", `GET ${scriptPath}`, `GET ${stylesheetPath}`, "GET /api/session",
       "POST /api/session/local", "POST /api/session/password", "POST /api/session/logout",
+      // The signed-in preview reads administration data; this test makes no administration changes.
+      "GET /api/admin/access", "GET /api/admin/clusters",
     ]);
     expect(network.requests.filter((item) => item.origin !== origin || !allowed.has(`${item.method} ${item.path}`))).toEqual([]);
     expect(network.requests.filter((item) => item.path.startsWith("/api/") &&

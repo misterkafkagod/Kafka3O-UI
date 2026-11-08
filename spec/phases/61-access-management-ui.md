@@ -2,7 +2,7 @@
 - **Milestone:** M10
 - **Covers:** UI portion of F28-AC4, additive-model explanation of F28-AC2, F30-B1 display
 - **Discovery:** —
-- **Status:** Building
+- **Status:** Review
 
 ## Existing baseline and boundaries
 P54 and P60 expose audited, local-global-ADMIN-only access and cluster
@@ -62,7 +62,7 @@ Kafka routes and Gateway enforcement are unchanged (P55).
     nothing.
   - Done when: `npm test -- src/components/ClusterClassification.test.tsx src/console/describeEnvironment.test.ts`
     passes.
-- [ ] **T61.4 Administration in the signed-in preview** — Covers: F28-AC4, F30-B1
+- [x] **T61.4 Administration in the signed-in preview** — Covers: F28-AC4, F30-B1
   - Files: `src/components/ConsoleSessionGate.tsx`, its tests, `src/main.tsx`,
     `src/console/previewAdministrationIntegration.test.ts` (new), Gateway
     `cmd/console/preview_fixture_test.go`, Gateway `internal/console/README.md`.

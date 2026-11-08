@@ -1,8 +1,11 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
+import type { ConsoleAdminClient } from "../console/ConsoleAdmin";
 import type { ConsoleSession, ConsoleSessionClient } from "../console/ConsoleSession";
 import { ConsoleSessionError } from "../console/ConsoleSessionError";
 import { cognitoCallbackPath, type ConsoleBrowser, type ConsoleSsoClient } from "../console/ConsoleSso";
 import { describeSsoFailure } from "../console/describeSsoFailure";
+import { AccessManagement } from "./AccessManagement";
+import { ClusterClassification } from "./ClusterClassification";
 import styles from "./ConsoleSessionGate.module.css";
 
 type Screen =
@@ -16,9 +19,12 @@ type ConsoleSessionGateProps = {
   client: ConsoleSessionClient;
   sso?: ConsoleSsoClient;
   browser?: ConsoleBrowser;
+  // Administration is shown to every signed-in session; the Console decides who may use it.
+  admin?: ConsoleAdminClient;
+  confirm?: (message: string) => boolean;
 };
 
-export function ConsoleSessionGate({ client, sso, browser }: ConsoleSessionGateProps) {
+export function ConsoleSessionGate({ client, sso, browser, admin, confirm }: ConsoleSessionGateProps) {
   const [screen, setScreen] = useState<Screen>({ kind: "checking" });
   const [ssoAvailable, setSsoAvailable] = useState(false);
   const callback = useRef<Promise<ConsoleSession> | null>(null);
@@ -268,6 +274,10 @@ export function ConsoleSessionGate({ client, sso, browser }: ConsoleSessionGateP
     }
   }
 
+  function sessionEnded() {
+    setScreen({ kind: "signedOut", notice: "Your session has ended. Sign in again." });
+  }
+
   return (
     <div className={styles.shell}>
       <header className={styles.header}>
@@ -391,6 +401,12 @@ export function ConsoleSessionGate({ client, sso, browser }: ConsoleSessionGateP
           ) : null}
           {error ? <p role="alert" className={styles.error}>{error}</p> : null}
         </section>
+        {admin && confirm && screen.kind === "signedIn" && !screen.session.mustChangePassword ? (
+          <div className={styles.administration} key={screen.session.accountId}>
+            <AccessManagement admin={admin} confirm={confirm} onUnauthorized={sessionEnded} />
+            <ClusterClassification admin={admin} confirm={confirm} onUnauthorized={sessionEnded} />
+          </div>
+        ) : null}
       </main>
     </div>
   );

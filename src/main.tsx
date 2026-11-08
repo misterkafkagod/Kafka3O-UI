@@ -6,12 +6,19 @@ import "./styles.css";
 import { App } from "./App";
 import { ConsoleSessionGate } from "./components/ConsoleSessionGate";
 import { loadGatewayConfig } from "./config/loadGatewayConfig";
+import type { ConsoleAdminClient, ConsoleAdminTransport } from "./console/ConsoleAdmin";
 import type { ConsoleSessionClient, ConsoleSessionTransport } from "./console/ConsoleSession";
 import type { ConsoleBrowser, ConsoleSsoClient, ConsoleSsoTransport } from "./console/ConsoleSso";
+import { changeGroupMapping } from "./console/changeGroupMapping";
 import { changeLocalPassword } from "./console/changeLocalPassword";
+import { changeRoleGrant } from "./console/changeRoleGrant";
+import { classifyCluster } from "./console/classifyCluster";
 import { completeCognitoSignIn } from "./console/completeCognitoSignIn";
+import { listAccess } from "./console/listAccess";
+import { listClusters } from "./console/listClusters";
 import { readCognitoAvailability } from "./console/readCognitoAvailability";
 import { readConsoleSession } from "./console/readConsoleSession";
+import { requestConsoleAdmin } from "./console/requestConsoleAdmin";
 import { requestConsoleSession } from "./console/requestConsoleSession";
 import { requestConsoleSso } from "./console/requestConsoleSso";
 import { signInLocal } from "./console/signInLocal";
@@ -51,6 +58,15 @@ const consoleSession: ConsoleSessionClient = {
   changePassword: (current, replacement) => changeLocalPassword(consoleTransport, current, replacement),
   signOut: () => signOutConsole(consoleTransport),
 };
+const adminTransport: ConsoleAdminTransport = (operation) =>
+  requestConsoleAdmin(window.fetch.bind(window), window.location.origin, () => document.cookie, 15_000, operation);
+const consoleAdmin: ConsoleAdminClient = {
+  listAccess: (after) => listAccess(adminTransport, after),
+  changeRoleGrant: (identityId, clusterId, expected, role) => changeRoleGrant(adminTransport, identityId, clusterId, expected, role),
+  changeGroupMapping: (issuer, group, clusterId, expected, role) => changeGroupMapping(adminTransport, issuer, group, clusterId, expected, role),
+  listClusters: () => listClusters(adminTransport),
+  classifyCluster: (clusterId, expected, environment, reason) => classifyCluster(adminTransport, clusterId, expected, environment, reason),
+};
 const ssoTransport: ConsoleSsoTransport = (request) =>
   requestConsoleSso(window.fetch.bind(window), window.location.origin, () => document.cookie, request);
 const browserLocks = typeof navigator === "undefined" ? undefined : navigator.locks;
@@ -81,7 +97,8 @@ const queryClient = new QueryClient();
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    {consolePreview ? <ConsoleSessionGate client={consoleSession} sso={consoleSso} browser={consoleBrowser} /> : <BrowserRouter>
+    {consolePreview ? <ConsoleSessionGate client={consoleSession} sso={consoleSso} browser={consoleBrowser}
+      admin={consoleAdmin} confirm={(message) => window.confirm(message)} /> : <BrowserRouter>
       <App
         queryClient={queryClient}
         loadGatewayConfig={() => loadGatewayConfig(boundFetchJson)}
