@@ -254,7 +254,7 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
 - **Status:** Active
 - **Features:** F46, F45
 - **Phases:**
-  - **P63** F46-B1 · Compact signed-in session indicator — Covers: F46-AC1 · Discovery: — · Status: Building
+  - **P63** F46-B1 · Compact signed-in session indicator — Covers: F46-AC1 · Discovery: — · Status: Done
     - Demo: after signing in, only "Signed in as admin" and Sign out appear in the header corner; signing out shows the sign-in card again.
   - **P64** F46-B2 · Console reports session administration capabilities — Covers: server portion of F46-AC2 · Discovery: — · Status: Defined
     - Demo: `GET /api/session` returns `administration.access/audit` true for a global ADMIN, audit-only for a cluster ADMIN, both false otherwise, and follows grant changes.
@@ -322,6 +322,7 @@ Redpanda-only Shadow Links, its Admin API, and Redpanda-specific diagnostic oper
 - **Verification debt:** Run the Cognito sign-in, group refresh and logout integration against a real User Pool when an AWS account and app client become available; fixture tests are not evidence of live provider compatibility.
 
 ## Learnings
+- 2026-11-08 (P63 review): Callbacks passed to components that load data in effects must be stable; an unstable session-ended callback made every gate render reload administration and end revoked sessions early.
 - 2026-11-08 (re-plan): M11 = F46 (streamlined signed-in navigation) then F45 (appearance preferences), added by user request ahead of the backlog; preferences are stored per browser and chosen by each user, and F15–F17 and F42–F44 stay in the backlog.
 - 2026-11-08 (M10 retro): P49–P62 cover F27–F31: local and Cognito-compatible sign-in, global/cluster roles with audited administration, a Console-only mTLS delegation path that every Gateway enforces before Kafka, Production ADMIN-plus-reason writes, and correlated, scoped, exportable audit; the EKS-D cutover kept every Kafka pod and volume untouched.
 - 2026-11-08 (M10 retro): What worked: one end-to-end matrix test per security boundary (secured Gateway, Console forwarding, live Chromium) caught real gaps that unit tests missed (localhost origins, fsGroup permissions, merge-on-apply).
