@@ -429,3 +429,41 @@ Inspect who authenticated, changed access, attempted a protected action or reque
 - **F31-AC5** (B3) Audit unavailability before dispatch blocks mutation. If Kafka may have accepted a request but the outcome cannot be durably appended, the client sees an unknown result with a correlation ID; the existing intent remains inspectable and operational alerts identify the persistence failure.
 
 **External dependencies:** Durable central audit storage with restricted file access and application-authorized reads/writes, server time and correlation IDs; retention/export policy and deployment provisioning remain discovery decisions.
+
+### F46 — Streamlined signed-in navigation (planned M11)
+Work signed in without a permanent session card, reach administration on its own page only when permitted, and land on a cluster's topics first.
+
+**Behaviors**
+- **F46-B1** User completes sign-in → the session card is replaced by a compact indicator in the header's right corner showing "Signed in as <username>" and Sign out; sign-in, password change, unavailable and uncertain states keep the full card
+- **F46-B2** User opens Administration from the header → a separate page shows Access management, Cluster classification and Audit to a global ADMIN, and only Audit for their permitted clusters to a cluster ADMIN; other users see no Administration link, and opening its address directly shows "Not permitted"; administration sections no longer appear below other pages
+- **F46-B3** User opens a cluster → the Topics tab is first and selected; tabs are ordered Topics, Brokers, Consumer groups, Broker configuration, and Brokers has its own address
+- **F46-B4** User views a cluster's topic list → "Create topic" is visually separated from the filters below it, whether collapsed or open
+
+**Acceptance criteria**
+- **F46-AC1** (B1) Given a signed-in session that does not need a password change, no session card is shown; the header shows the username and an accessible Sign out button, readable at 320, 768 and 1440 CSS pixels without page-wide horizontal overflow; signing out still returns to the sign-in card
+- **F46-AC2** (B2) Given a global ADMIN, the Administration page shows all three sections; given a cluster ADMIN without a global grant, it shows only Audit; given any other user, there is no Administration link and `/administration` shows "Not permitted" without requesting administration data. The Console continues to authorize every administration request on the server, so the link's visibility is a convenience, not a security control, and a grant change takes effect on the next session check
+- **F46-AC3** (B3) Given `/clusters/<id>`, the Topics tab is selected and listed first; given `/clusters/<id>/brokers`, the brokers and controller are shown; existing topic, consumer-group and configuration addresses keep working
+- **F46-AC4** (B4) Given the topic list with "Create topic" collapsed or expanded, at least 1rem of space separates it from the filters
+
+**External dependencies:** The Console session endpoint, which reports the session's administration capabilities (Gateway repository change); faked in UI tests with MSW.
+
+### F45 — Appearance preferences (planned M11)
+Choose the console's color mode, color theme, font, text size and density, remembered per browser and chosen by each user.
+
+**Behaviors**
+- **F45-B1** User opens Appearance from the header or the sign-in screen and picks Light, Dark or Match system → the choice applies immediately, and Match system follows operating-system changes live
+- **F45-B2** User picks a color theme (Blue, the default; Slate; Teal; High contrast) → it applies in both light and dark mode
+- **F45-B3** User picks a font (System, the default; Hyperlegible; Serif) and a text size (Small 87.5%, Default 100%, Large 112.5%, Extra large 125%) → the console uses them
+- **F45-B4** User picks a density (Comfortable, the default; Compact) → Compact tightens table rows, list rows and cards
+- **F45-B5** User reloads, opens a new tab or restarts the browser → the saved choices are restored; a change in one tab updates other open tabs; Reset restores the defaults
+- **F45-B6** Browser storage is blocked or holds a broken value → the console uses the defaults, works normally and says that choices cannot be saved
+
+**Acceptance criteria**
+- **F45-AC1** (B1) Given Light while the operating system is dark, the light colors are used; given Match system, changing the operating-system theme updates the page without a reload; the control is a labeled, keyboard-operable group
+- **F45-AC2** (B2) Every theme in both light and dark meets the F19-AC1 thresholds, verified by an automated test over every foreground/background token pair; High contrast reaches at least 7:1 for normal text; status indicators keep their text labels
+- **F45-AC3** (B3, B4) Given every text size, F19-AC2 holds, including at 320 CSS pixels; Compact density keeps every interactive target at least 24×24 CSS pixels
+- **F45-AC4** (B5) Given saved choices, they are applied before the first render without a flash of the default theme; a change in one tab appears in the others; Reset removes the stored value
+- **F45-AC5** (B6) Given storage that throws, or a stored value that is malformed or has unknown fields or values, valid fields are kept, the rest fall back to defaults, and a "Preferences can't be saved in this browser" notice appears when saving fails
+- **F45-AC6** (B5) The stored value contains only the five appearance choices and no identity, cluster or credential; everyone using the same browser profile shares it, signing out does not clear it, and it applies in every build mode including the sign-in screen
+
+**External dependencies:** Browser `localStorage`, the `storage` event and `prefers-color-scheme`; faked in Vitest. One bundled font file (Atkinson Hyperlegible, SIL Open Font License 1.1) served from the UI's own origin.

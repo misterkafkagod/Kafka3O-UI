@@ -33,6 +33,8 @@ Covers both repositories: **Kafka3O-Gateway** (one per Kafka cluster) and **Kafk
 - Browser test runner (dev): @playwright/test 1.64.1 with its Chromium, Firefox and WebKit builds plus installed Chrome/Edge channels — real-browser cookie, Web Locks and SSO redirect checks that jsdom cannot model; CVE status: `npm audit` 2026-11-07: 0 findings
 - Data fetching: TanStack Query 5.104.4 — one independent query per gateway with its own polling, timeout, error state and retry, so one slow gateway never blocks another; CVE status: `npm audit` 2026-11-06: 0 findings
 - Styling: CSS Modules for component styles, with minimal global styles for typography, theme tokens and baseline normalization; no new styling dependency
+- Font asset (M11): Atkinson Hyperlegible, SIL Open Font License 1.1, one WOFF2 file committed under `src/appearance/fonts/` and served from the UI origin with `font-display: swap`; not an npm package; CVE status: not applicable (static font data), license recorded with the file
+- Rejected (M11): web-font CDNs — blocked by the `default-src 'self'` CSP and leak page views; theme libraries — the existing CSS custom properties already cover theming
 - Rejected: Next.js — retain the static React build; M10's approved backend need does not require replacing the frontend framework
 - Rejected: MUI / Tailwind — unnecessary weight for M1
 - M1–M9 decision: no BFF, because direct browser → Gateway was simpler. M10 deliberately introduces a Console backend to solve local identity storage, secure SSO sessions, centralized policy and durable user-attributed audit; it must retain independent per-cluster requests rather than serial aggregation.
@@ -150,6 +152,18 @@ This design deliberately uses the existing central store for opaque delegation/i
 - Test the full local/Cognito × no-access/VIEWER/OPERATOR/ADMIN × global/cluster × Production/non-Production/unclassified matrix. Test direct Gateway calls, all existing write/read routes, CSRF, delegation replay/body/target substitution, disabled users, session/role revocation, key rotation, policy/audit outage, crash recovery and accepted-but-unknown outcomes.
 - Use existing Go tests and Vitest/Testing Library/MSW for deterministic contracts and a controlled OIDC fixture for positive and negative cases. The user has no AWS account yet and approved continuing without a live Cognito pool; record real-provider login, group refresh and logout as unverified, and test them before production SSO reliance. New libraries/database dependencies need supported exact versions, vulnerability review and migration tests before adoption. Exercise actual writes only on approved synthetic fixtures; preserve persistent Kafka data and the manual access recovery path.
 
+## M11 navigation and appearance (planned)
+### Session administration capabilities (F46)
+- The Console's `GET /api/session` response gains `administration: { access: boolean, audit: boolean }`, resolved from the session's current grants on each request: `access` is true only for a global ADMIN, `audit` for a global or any cluster ADMIN. It is a display hint; every administration endpoint keeps its own server-side authorization.
+- The UI does not probe administration endpoints to discover permissions, so non-admin sign-ins do not create denied-request audit events. A missing field (older Console) means no Administration link.
+- Routing: `/administration` renders the administration sections; `/clusters/:gatewayId` renders Topics and `/clusters/:gatewayId/brokers` renders brokers. The signed-in session indicator lives in the application header; the session card is used only for signed-out, password-change, unavailable, uncertain and checking states.
+
+### Appearance preferences (F45)
+- Preferences are one `localStorage` entry, `kafka3o.appearance.v1`, holding JSON `{ mode, theme, font, textSize, density }` with enumerated values. It is a stated exception to the M10 rule of no browser storage for session data: it holds no identity, cluster or credential. Parsing is field by field; unknown or malformed fields fall back to defaults, and every storage access tolerates exceptions.
+- Application: `main.tsx` reads and applies the preference synchronously before React renders, setting `data-mode`, `data-theme`, `data-font`, `data-text-size` and `data-density` on `<html>`; no inline script (CSP `default-src 'self'`). Other tabs update through the `storage` event; Match system follows a `prefers-color-scheme` media-query listener.
+- Tokens: each theme defines light and dark values of the existing `--color-*` tokens in `styles.css`, selected by the root attributes, with no attribute meaning the current Blue/system behavior. Text size sets the root `font-size` (all component sizes and spacing are already in rem). Density adds `--density-*` tokens for table cell, list row and card padding, applied in the components that render those rows.
+- Fonts: System keeps the current stack; Serif uses a system serif stack; Hyperlegible uses the bundled font with the System stack as fallback.
+
 ## Structure
 ```
 Kafka3O-Gateway/
@@ -175,6 +189,8 @@ Kafka3O-UI/
 │   ├── hooks/                       # useClusterStatus.ts, useTopics.ts
 │   ├── pages/                       # ClustersPage.tsx, ClusterPage.tsx, TopicsPage.tsx
 │   ├── components/                  # ClusterCard.tsx, BrokerTable.tsx, TopicTable.tsx
+│   ├── console/                     # Console session, admin and secured fetch clients (M10)
+│   ├── appearance/                  # M11: parseAppearance.ts, loadAppearance.ts, saveAppearance.ts, applyAppearance.ts, useAppearance.ts, AppearancePanel.tsx, contrastRatio.ts, fonts/
 │   └── test/                        # MSW server.ts, setup.ts
 └── spec/
     ├── ROADMAP.md
@@ -187,7 +203,7 @@ Tests live next to the file they test (`*_test.go`, `*.test.ts(x)`).
 
 ## UI experience (M6–M8)
 - Direction: a restrained operator console for developers and operators, with neutral surfaces, blue primary actions, compact readable tables, consistent spacing and a clear typographic hierarchy. Status labels include text and never rely on color alone.
-- Themes and motion: follow `prefers-color-scheme` for light/dark presentation and `prefers-reduced-motion` for optional motion. No separate theme-persistence mechanism is required.
+- Themes and motion: `prefers-color-scheme` is the default light/dark presentation and `prefers-reduced-motion` governs optional motion. From M11 a user's saved appearance choice overrides the system theme (see M11 below).
 - Scope: M6 supplies the shell, shared visual baseline and connection panel across all current routes; M7 reorganizes cluster/topic/message investigation; M8 reorganizes consumer and write workflows. Completed F1–F14 behavior remains the baseline throughout.
 - Components: extract only elements with actual reuse, such as navigation, breadcrumbs, page headers, controls and state feedback. Keep styles next to their components in the existing source structure; do not introduce a general-purpose component framework or speculative abstractions.
 - Semantics: use native links, buttons, form labels, headings, landmarks and tables. Dialogs must provide accessible naming, initial/contained focus, Escape/close behavior and focus restoration; prefer native browser facilities where suitable.
@@ -215,7 +231,8 @@ Tests live next to the file they test (`*_test.go`, `*.test.ts(x)`).
 - Run: `npm test`
 - M5 verification: tests, build and `npm audit` passed on 2026-11-04. On 2026-11-05, all 268 tests and the build also passed in a disposable EKS-D pod running the declared Node 24.21.0; these UI tests use mocked gateway responses.
 - M6–M8 validation: run focused component tests for changed behavior first, then `npm test` and `npm run build` on the declared Node runtime. Continue using the existing Testing Library/MSW stack for component tests. From P53, `@playwright/test` is approved only for real-browser cookie, Web Locks and SSO redirect checks; those tests are opt-in and never point at the manual EKS-D deployment.
-- Browser acceptance: inspect the affected pages at 320, 768 and 1440 CSS pixels, in system light/dark themes and at 200% zoom. Verify table overflow containment, keyboard order, visible focus, dialog focus restoration, reduced-motion behavior and the stated contrast thresholds; record measurements rather than inferring accessibility from a screenshot.
+- Appearance tests (M11): a pure `contrastRatio` helper computes WCAG 2.x ratios, and a Vitest test checks every theme's light and dark foreground/background token pairs against F19-AC1 (High contrast: 7:1 for normal text).
+- Browser acceptance: inspect the affected pages at 320, 768 and 1440 CSS pixels, in system light/dark themes and at 200% zoom; from M11 also in every color theme and at the largest text size. Verify table overflow containment, keyboard order, visible focus, dialog focus restoration, reduced-motion behavior and the stated contrast thresholds; record measurements rather than inferring accessibility from a screenshot.
 - Regression acceptance: retain direct routes and exact-message links, per-gateway isolation, partial results, session-only credentials, explicit unknown states and write protections. Exercise real gateway read flows on EKS-D; any write demo uses scoped synthetic data and preserves existing broker data.
 - Completion evidence: confirm the updated build is served at the EKS-D manual-test URL and record browser/demo outcomes in each phase review. Checks not executed remain `not run`; screenshot review alone does not establish keyboard, accessibility or Kafka behavior.
 

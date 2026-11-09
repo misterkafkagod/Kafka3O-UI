@@ -3,7 +3,7 @@
 ## Vision
 Kafka3O is a multi-cluster Kafka console for developers and operators: one web UI (Kafka3O-UI) shows every cluster side by side — health, topics, messages, consumer lag. Each cluster is fronted by its own small, stateless gateway (Kafka3O-Gateway) that owns the broker connection and credentials close to that cluster; the browser never talks to Kafka directly.
 
-The console should be comfortable for dense technical data, easy to navigate, and explicit about connection problems and write outcomes. M6–M8 turn the existing functional pages into a consistent, accessible operator interface without changing the gateway API or the completed M1–M5 behavior. M9 extends the gateway and UI with explicitly confirmed Kafka configuration and partition administration. The next milestone, M10, adds local/Cognito login, global and per-cluster authorization, Production safeguards, and an attributable audit trail.
+The console should be comfortable for dense technical data, easy to navigate, and explicit about connection problems and write outcomes. M6–M8 turn the existing functional pages into a consistent, accessible operator interface without changing the gateway API or the completed M1–M5 behavior. M9 extends the gateway and UI with explicitly confirmed Kafka configuration and partition administration. M10 adds local/Cognito login, global and per-cluster authorization, Production safeguards, and an attributable audit trail. M11 simplifies signed-in navigation and lets each user tailor the console's appearance for comfort and readability, without weakening the accessibility baseline.
 
 ## Out of Scope
 - A gateway serving more than one cluster
@@ -14,6 +14,7 @@ The console should be comfortable for dense technical data, easy to navigate, an
 - Persistence in the gateway (no database; stateless)
 - Invented metrics or Gateway-to-Kafka connection-setting changes from the UI
 - Direct SSO integrations other than Amazon Cognito in M10; additional providers are in the backlog
+- Appearance preferences synced to a Console account, ADMIN-enforced appearance defaults, free-form color pickers or custom CSS, and fonts loaded from external sites
 
 ## Features
 - **F1** User can see every configured cluster on one page with its health (gateway reachable, cluster reachable, broker count)
@@ -44,6 +45,8 @@ The console should be comfortable for dense technical data, easy to navigate, an
 - **F29** User can access only permitted cluster resources and actions, with authorization enforced by the Gateway as well as the Console
 - **F30** An authorized administrator can flag a cluster as Production, where only an ADMIN for that cluster can perform Kafka mutations
 - **F31** An authorized user can inspect an attributable audit trail of authentication, access-control changes, denied actions, and Kafka mutation outcomes
+- **F45** User can choose the console's color mode, color theme, font, text size and density, remembered in their browser
+- **F46** User can work signed in with a compact session indicator, a separate administration page shown only to administrators, and clusters that open on their topics
 
 ## Milestones
 ### M1 — See all my clusters and what topics they hold, from one screen
@@ -247,8 +250,14 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
 - **Discovery before completion:** Cognito user pool/app client, callback/logout URLs and group claims; SQLite backup/retention procedure and exact supported dependency versions; authenticated Console-to-Gateway delegation and policy API; legacy-token/manual-proxy cutover.
 - **Contracts:** Detailed behaviors and acceptance criteria are in [FUNC-SPEC.md](./FUNC-SPEC.md#f27--local-and-cognito-sign-in-planned-m10); the Gateway trust flow and migration are in [TECH-SPEC.md](./TECH-SPEC.md#m10-identity-authorization-and-audit-planned).
 
+### M11 — Make the console comfortable and simple to navigate for each user
+- **Status:** Planned
+- **Features:** F46, F45
+- **Phases:** <filled by skill-phase-breakdown>
+- **Contracts:** Behaviors and acceptance criteria are in [FUNC-SPEC.md](./FUNC-SPEC.md#f46--streamlined-signed-in-navigation-planned-m11); the session administration flags and appearance mechanism are in [TECH-SPEC.md](./TECH-SPEC.md#m11-navigation-and-appearance-planned).
+
 ## Backlog
-M10 is next. The following items are candidates after M10, not commitments to implement every Redpanda feature. All future writes must use F29/F30 authorization and F31 audit; no candidate silently expands the current bounded reads or changes Kafka connection credentials.
+M11 is next. The following items are candidates after M11, not commitments to implement every Redpanda feature. All future writes must use F29/F30 authorization and F31 audit; no candidate silently expands the current bounded reads or changes Kafka connection credentials.
 
 - **F15 · High:** User can reset a consumer group's offsets to earliest, latest or a timestamp, with a preview and inactive-group checks.
 - **F16 · High:** User can decode Avro/Protobuf values via a Schema Registry.
@@ -299,6 +308,7 @@ Redpanda-only Shadow Links, its Admin API, and Redpanda-specific diagnostic oper
 - **Verification debt:** Run the Cognito sign-in, group refresh and logout integration against a real User Pool when an AWS account and app client become available; fixture tests are not evidence of live provider compatibility.
 
 ## Learnings
+- 2026-11-08 (re-plan): M11 = F46 (streamlined signed-in navigation) then F45 (appearance preferences), added by user request ahead of the backlog; preferences are stored per browser and chosen by each user, and F15–F17 and F42–F44 stay in the backlog.
 - 2026-11-08 (M10 retro): P49–P62 cover F27–F31: local and Cognito-compatible sign-in, global/cluster roles with audited administration, a Console-only mTLS delegation path that every Gateway enforces before Kafka, Production ADMIN-plus-reason writes, and correlated, scoped, exportable audit; the EKS-D cutover kept every Kafka pod and volume untouched.
 - 2026-11-08 (M10 retro): What worked: one end-to-end matrix test per security boundary (secured Gateway, Console forwarding, live Chromium) caught real gaps that unit tests missed (localhost origins, fsGroup permissions, merge-on-apply).
 - 2026-11-08 (M10 retro): What did not: phases were planned too coarsely (P53 needed 40 tasks; P54/P55 had to be split) and a long test run was chained to a commit; keep phases at 3–5 tasks and never commit in the same command as a long suite.
