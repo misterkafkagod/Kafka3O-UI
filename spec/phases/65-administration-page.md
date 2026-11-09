@@ -10,7 +10,7 @@
 3. As a user without an ADMIN grant, expect no Administration link and "Not permitted" at `/administration` with no administration requests; as a cluster ADMIN, only Audit.
 
 ## Tasks
-- [ ] **T65.1 Read administration capabilities from the session** — Covers: UI portion of F46-AC2
+- [x] **T65.1 Read administration capabilities from the session** — Covers: UI portion of F46-AC2
   - Files: src/console/ConsoleSession.ts, src/console/parseConsoleSession.ts, src/console/parseConsoleSession.test.ts
   - Do: `ConsoleSession` gains optional `administration: { access: boolean; audit: boolean }`, parsed only when the field is an object with two booleans; a missing field stays undefined and a malformed one is rejected as `invalid_response`.
   - Done when: `npx vitest run src/console/parseConsoleSession.test.ts` passes, covering present, missing and malformed flags.

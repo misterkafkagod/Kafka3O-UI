@@ -21,6 +21,20 @@ describe("parseConsoleSession", () => {
     });
   });
 
+  it("keeps only the administration flags when the session check reports them", () => {
+    expect(parseConsoleSession({ ...session, administration: { access: false, audit: true, extra: true } })).toEqual({
+      ...session,
+      administration: { access: false, audit: true },
+    });
+    expect(parseConsoleSession(session).administration).toBeUndefined();
+  });
+
+  it("rejects malformed administration flags", () => {
+    for (const administration of [null, true, [], {}, { access: true }, { access: "true", audit: false }, { access: true, audit: 1 }]) {
+      expect(() => parseConsoleSession({ ...session, administration }), JSON.stringify(administration)).toThrow(expect.objectContaining({ code: "invalid_response" }));
+    }
+  });
+
   it("rejects malformed or unnormalized server results", () => {
     for (const value of [
       null, [], {}, { ...session, accountId: "" }, { ...session, accountId: " id" },

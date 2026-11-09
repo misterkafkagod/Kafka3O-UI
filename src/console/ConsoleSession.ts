@@ -1,8 +1,15 @@
+export type ConsoleAdministration = {
+  access: boolean;
+  audit: boolean;
+};
+
 export type ConsoleSession = {
   accountId: string;
   username: string;
   mustChangePassword: boolean;
   absoluteExpiresAt: string;
+  // Reported by the session check only; undefined after sign-in until the session is inspected.
+  administration?: ConsoleAdministration;
 };
 
 export type ConsoleSessionOperation =

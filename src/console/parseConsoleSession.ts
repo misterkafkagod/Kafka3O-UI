@@ -1,5 +1,5 @@
 import { isRecord } from "../gateway/isRecord";
-import type { ConsoleSession } from "./ConsoleSession";
+import type { ConsoleAdministration, ConsoleSession } from "./ConsoleSession";
 import { ConsoleSessionError } from "./ConsoleSessionError";
 
 export function parseConsoleSession(value: unknown): ConsoleSession {
@@ -16,10 +16,19 @@ export function parseConsoleSession(value: unknown): ConsoleSession {
   if (!Number.isFinite(expiry) || new Date(expiry).toISOString() !== `${value.absoluteExpiresAt.slice(0, -1)}.000Z`) {
     throw new ConsoleSessionError("invalid_response");
   }
+  const flags = value.administration;
+  let administration: ConsoleAdministration | undefined;
+  if (flags !== undefined) {
+    if (!isRecord(flags) || typeof flags.access !== "boolean" || typeof flags.audit !== "boolean") {
+      throw new ConsoleSessionError("invalid_response");
+    }
+    administration = { access: flags.access, audit: flags.audit };
+  }
   return {
     accountId: value.accountId,
     username: value.username,
     mustChangePassword: value.mustChangePassword,
     absoluteExpiresAt: value.absoluteExpiresAt,
+    ...(administration ? { administration } : {}),
   };
 }
