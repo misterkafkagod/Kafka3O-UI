@@ -14,7 +14,7 @@
   - Files: src/console/ConsoleSession.ts, src/console/parseConsoleSession.ts, src/console/parseConsoleSession.test.ts
   - Do: `ConsoleSession` gains optional `administration: { access: boolean; audit: boolean }`, parsed only when the field is an object with two booleans; a missing field stays undefined and a malformed one is rejected as `invalid_response`.
   - Done when: `npx vitest run src/console/parseConsoleSession.test.ts` passes, covering present, missing and malformed flags.
-- [ ] **T65.2 Administration page and header link** — Covers: UI portion of F46-AC2
+- [x] **T65.2 Administration page and header link** — Covers: UI portion of F46-AC2
   - Files: src/components/AdministrationPage.tsx (new), src/components/AdministrationPage.module.css (new), src/components/AdministrationPage.test.tsx (new), src/components/AppShell.tsx, src/components/AppShell.test.tsx, src/App.tsx
   - Do: `AdministrationPage` shows "Checking access..." while flags are unknown, "Not permitted" when both are false (rendering no administration component, so nothing is requested), Access management and Cluster classification when `access`, and Audit when `audit`; its sections shrink to the viewport so tables scroll inside their regions. `AppShell` shows an Administration link in the primary navigation when told to; `App` adds the `/administration` route rendering the supplied page, or "Not permitted" when none is supplied.
   - Done when: `npx vitest run src/components/AdministrationPage.test.tsx src/components/AppShell.test.tsx` passes, covering global ADMIN, cluster ADMIN, no grants, unknown flags and the link.

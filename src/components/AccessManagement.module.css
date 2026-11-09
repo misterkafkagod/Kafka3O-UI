@@ -1,6 +1,11 @@
 .section {
   display: grid;
   gap: 1rem;
+  min-width: 0;
+}
+
+.section > * {
+  min-width: 0;
 }
 
 .section h2,

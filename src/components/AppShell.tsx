@@ -19,11 +19,13 @@ type AppShellProps = {
   onCloseConnection: () => void;
   // sessionIndicator is shown at the end of the header in the secured build.
   sessionIndicator?: ReactNode;
+  // administrationLink shows the Administration page in the primary navigation.
+  administrationLink?: boolean;
 };
 
 type Breadcrumb = { label: string; to: string } | { label: string; current: true };
 
-export function AppShell({ children, loadGatewayConfig, credentials, connectionOpen, selectedGatewayId, onOpenConnection, onOpenGatewayConnection, onCloseConnection, sessionIndicator }: AppShellProps) {
+export function AppShell({ children, loadGatewayConfig, credentials, connectionOpen, selectedGatewayId, onOpenConnection, onOpenGatewayConnection, onCloseConnection, sessionIndicator, administrationLink }: AppShellProps) {
   const location = useLocation();
   const clusterMatch = useMatch({ path: "/clusters/:gatewayId", end: false });
   const topicMatch = useMatch({ path: "/clusters/:gatewayId/topics/:topicName", end: false });
@@ -69,6 +71,11 @@ export function AppShell({ children, loadGatewayConfig, credentials, connectionO
           >
             Clusters
           </Link>
+          {administrationLink ? (
+            <Link to="/administration" aria-current={location.pathname === "/administration" ? "page" : undefined}>
+              Administration
+            </Link>
+          ) : null}
         </nav>
         <GatewayCredentialsPanel
           loadGatewayConfig={loadGatewayConfig}

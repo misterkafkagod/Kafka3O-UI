@@ -1,6 +1,7 @@
 import { type QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { type ReactNode, useState } from "react";
 import { Route, Routes } from "react-router";
+import { AdministrationPage } from "./components/AdministrationPage";
 import { AppShell } from "./components/AppShell";
 import type { LoadGatewayConfig } from "./config/loadGatewayConfig";
 import type { KafkaAdministration } from "./gateway/administration";
@@ -39,6 +40,9 @@ type AppProps = {
   copyMessageLink: (text: string) => Promise<void>;
   statusRefreshMs: number;
   sessionIndicator?: ReactNode;
+  // administrationPage is the secured build's Administration page; other builds show Not permitted.
+  administrationPage?: ReactNode;
+  administrationLink?: boolean;
 };
 
 export function App({
@@ -60,6 +64,8 @@ export function App({
   copyMessageLink,
   statusRefreshMs,
   sessionIndicator,
+  administrationPage,
+  administrationLink,
 }: AppProps) {
   const [connectionPanel, setConnectionPanel] = useState<{ gatewayId?: string } | null>(null);
 
@@ -74,8 +80,10 @@ export function App({
         onOpenGatewayConnection={(gatewayId) => setConnectionPanel({ gatewayId })}
         onCloseConnection={() => setConnectionPanel(null)}
         sessionIndicator={sessionIndicator}
+        administrationLink={administrationLink}
       >
         <Routes>
+          <Route path="/administration" element={administrationPage ?? <AdministrationPage administration={{ access: false, audit: false }} onUnauthorized={() => undefined} />} />
           <Route
             path="/"
             element={
