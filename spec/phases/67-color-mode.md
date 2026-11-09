@@ -2,7 +2,7 @@
 - **Milestone:** M11
 - **Covers:** F45-AC1, F45-AC4, F45-AC5, F45-AC6
 - **Discovery:** —
-- **Status:** Building
+- **Status:** Done
 
 ## Demo
 1. Open the console on a light operating-system theme, open Appearance in the header and choose Dark.
@@ -24,3 +24,8 @@
   - Done when: `npx vitest run src/appearance/AppearancePanel.test.tsx src/components/AppShell.test.tsx` passes, covering keyboard-operable radios, the immediate change, Reset and the failed-save notice; then `npm test` and `npm run build` pass.
 
 ## Review
+- **Demo:** passed (auto-approved under the user's standing M11 instruction, 2026-11-08; run by Claude). Built UI served by `vite preview`, Gateways blocked inside Chromium 1194, 14/14 checks: the default follows a light system; Dark applies immediately and switches a second open tab; it survives a reload and was already dark when the application first rendered (no flash); the stored value has only the five choices; Match system follows an emulated operating-system change live; Light overrides a dark system; Reset removes the stored value and returns to Match system; with `localStorage` throwing, the console loads without errors, the change still applies and "Preferences can't be saved in this browser." appears.
+- **Vulnerability scan:** not run; no dependency changes.
+- **Regression:** `npm test` 472 passed (5 opt-in skipped); default build.
+- **Convention check:** each appearance action is its own file (`parseAppearance`, `pickAllowed`, `loadAppearance`, `saveAppearance`, `applyAppearance`, `createAppearanceStore`, `useAppearance`, `AppearancePanel`), each with a test file except the data-only `Appearance` and the context.
+
