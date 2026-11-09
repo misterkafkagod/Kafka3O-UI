@@ -58,6 +58,23 @@ describe("ConsoleSessionGate administration", () => {
   });
 });
 
+describe("ConsoleSessionGate administration reloads", () => {
+  it("does not reload administration when the gate re-renders during sign-out", async () => {
+    const user = userEvent.setup();
+    const client = testClient(normal);
+    client.signOut.mockReturnValue(new Promise(() => {}));
+    const admin = testAdmin();
+    render(<ConsoleSessionGate client={client} admin={admin} confirm={() => true} />);
+    expect(await screen.findByRole("heading", { name: "Access management" })).toBeDefined();
+    await waitFor(() => expect(admin.listAccess).toHaveBeenCalledTimes(1));
+    const clusterReads = admin.listClusters.mock.calls.length;
+    await user.click(screen.getByRole("button", { name: "Sign out" }));
+    expect(await screen.findByRole("button", { name: "Signing out..." })).toBeDefined();
+    expect(admin.listAccess).toHaveBeenCalledTimes(1);
+    expect(admin.listClusters).toHaveBeenCalledTimes(clusterReads);
+  });
+});
+
 describe("ConsoleSessionGate secured application", () => {
   it("renders the Kafka application for a signed-in session and returns to sign-in when it reports an ended session", async () => {
     let ended: (() => void) | undefined;

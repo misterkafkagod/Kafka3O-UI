@@ -19,4 +19,9 @@
   - Do: For a signed-in session without a required password change, the gate renders no card. With `renderApp`, it renders only the application, passing `renderApp(sessionEnded, indicator)` the `SessionIndicator`; with no `renderApp` (authentication preview), the gate's own header shows the indicator and the preview note stays as a compact notice. An unresolved password-change warning stays visible as an alert. Signed-out, checking, unavailable, uncertain and password-change states keep the card. `securedApp` passes the indicator to `App`.
   - Done when: `npx vitest run src/components/ConsoleSessionGate` passes, covering no card after sign-in in both modes, the indicator in the header, sign-out back to the card and the password-change card; then `npm test` and `npm run build` pass.
 
+- [x] **T63.3 Fix: administration reloads on every gate render** — Covers: F46-AC1
+  - Files: src/components/ConsoleSessionGate.tsx, src/components/ConsoleSessionGate.administration.test.tsx
+  - Do (plan amendment 2026-11-08, found by the opt-in preview integration test): `sessionEnded` is a stable callback, so administration sections no longer reload, and end a revoked session, whenever the gate re-renders, for example while signing out.
+  - Done when: `npx vitest run src/components/ConsoleSessionGate.administration.test.tsx` passes, including no reload during sign-out, and `KAFKA3O_PREVIEW_INTEGRATION=1 npx vitest run src/console/preview` passes against the built preview.
+
 ## Review

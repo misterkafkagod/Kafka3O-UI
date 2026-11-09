@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 import type { ConsoleAdminClient } from "../console/ConsoleAdmin";
 import type { ConsoleAuditClient } from "../console/ConsoleAudit";
 import type { ConsoleSession, ConsoleSessionClient } from "../console/ConsoleSession";
@@ -281,9 +281,10 @@ export function ConsoleSessionGate({ client, sso, browser, admin, confirm, rende
     }
   }
 
-  function sessionEnded() {
+  // Stable, because the administration sections reload whenever their onUnauthorized callback changes.
+  const sessionEnded = useCallback(() => {
     setScreen({ kind: "signedOut", notice: "Your session has ended. Sign in again." });
-  }
+  }, []);
 
   const activeSession = screen.kind === "signedIn" && !screen.session.mustChangePassword ? screen.session : undefined;
   const administration = admin && confirm && activeSession ? (
