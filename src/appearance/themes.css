@@ -1,0 +1,173 @@
+/* Preset color themes selected by data-theme; Blue, the default, lives in styles.css.
+   Each theme follows the same rules as the default: system light/dark unless data-mode forces one. */
+
+:root[data-theme="slate"],
+:root[data-theme="slate"][data-mode="light"] {
+  color-scheme: light;
+  --color-canvas: #f4f5f7;
+  --color-surface: #ffffff;
+  --color-surface-subtle: #f8f9fa;
+  --color-text: #1f2937;
+  --color-text-muted: #4b5563;
+  --color-border: #6b7280;
+  --color-border-subtle: #d1d5db;
+  --color-link: #334155;
+  --color-primary: #334155;
+  --color-primary-contrast: #ffffff;
+  --color-alert-text: #b42318;
+  --color-alert-surface: #fef3f2;
+  --color-focus: #334155;
+  --color-status-good: #067647;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-theme="slate"]:not([data-mode="light"]) {
+    color-scheme: dark;
+    --color-canvas: #111315;
+    --color-surface: #1b1e22;
+    --color-surface-subtle: #23272c;
+    --color-text: #f3f4f6;
+    --color-text-muted: #c3c8cf;
+    --color-border: #8b929b;
+    --color-border-subtle: #4a5059;
+    --color-link: #cbd5e1;
+    --color-primary: #cbd5e1;
+    --color-primary-contrast: #111315;
+    --color-alert-text: #ff8a80;
+    --color-alert-surface: #3b2326;
+    --color-focus: #e2e8f0;
+    --color-status-good: #7ee2b8;
+  }
+}
+
+:root[data-theme="slate"][data-mode="dark"] {
+  color-scheme: dark;
+  --color-canvas: #111315;
+  --color-surface: #1b1e22;
+  --color-surface-subtle: #23272c;
+  --color-text: #f3f4f6;
+  --color-text-muted: #c3c8cf;
+  --color-border: #8b929b;
+  --color-border-subtle: #4a5059;
+  --color-link: #cbd5e1;
+  --color-primary: #cbd5e1;
+  --color-primary-contrast: #111315;
+  --color-alert-text: #ff8a80;
+  --color-alert-surface: #3b2326;
+  --color-focus: #e2e8f0;
+  --color-status-good: #7ee2b8;
+}
+
+:root[data-theme="teal"],
+:root[data-theme="teal"][data-mode="light"] {
+  color-scheme: light;
+  --color-canvas: #f1f7f7;
+  --color-surface: #ffffff;
+  --color-surface-subtle: #f6fafa;
+  --color-text: #13302f;
+  --color-text-muted: #3d5857;
+  --color-border: #5f7a79;
+  --color-border-subtle: #c5d8d7;
+  --color-link: #0f6e6b;
+  --color-primary: #0f6e6b;
+  --color-primary-contrast: #ffffff;
+  --color-alert-text: #b42318;
+  --color-alert-surface: #fef3f2;
+  --color-focus: #0f6e6b;
+  --color-status-good: #067647;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-theme="teal"]:not([data-mode="light"]) {
+    color-scheme: dark;
+    --color-canvas: #0a1414;
+    --color-surface: #111f1f;
+    --color-surface-subtle: #172929;
+    --color-text: #eef6f5;
+    --color-text-muted: #b4cac8;
+    --color-border: #7f9a98;
+    --color-border-subtle: #405756;
+    --color-link: #7fdcd5;
+    --color-primary: #7fdcd5;
+    --color-primary-contrast: #0a1414;
+    --color-alert-text: #ff8a80;
+    --color-alert-surface: #3b2326;
+    --color-focus: #a5ebe5;
+    --color-status-good: #7ee2b8;
+  }
+}
+
+:root[data-theme="teal"][data-mode="dark"] {
+  color-scheme: dark;
+  --color-canvas: #0a1414;
+  --color-surface: #111f1f;
+  --color-surface-subtle: #172929;
+  --color-text: #eef6f5;
+  --color-text-muted: #b4cac8;
+  --color-border: #7f9a98;
+  --color-border-subtle: #405756;
+  --color-link: #7fdcd5;
+  --color-primary: #7fdcd5;
+  --color-primary-contrast: #0a1414;
+  --color-alert-text: #ff8a80;
+  --color-alert-surface: #3b2326;
+  --color-focus: #a5ebe5;
+  --color-status-good: #7ee2b8;
+}
+
+:root[data-theme="high-contrast"],
+:root[data-theme="high-contrast"][data-mode="light"] {
+  color-scheme: light;
+  --color-canvas: #ffffff;
+  --color-surface: #ffffff;
+  --color-surface-subtle: #f2f2f2;
+  --color-text: #000000;
+  --color-text-muted: #1f1f1f;
+  --color-border: #000000;
+  --color-border-subtle: #595959;
+  --color-link: #0033a0;
+  --color-primary: #0033a0;
+  --color-primary-contrast: #ffffff;
+  --color-alert-text: #8a0000;
+  --color-alert-surface: #fff0f0;
+  --color-focus: #000000;
+  --color-status-good: #00562b;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-theme="high-contrast"]:not([data-mode="light"]) {
+    color-scheme: dark;
+    --color-canvas: #000000;
+    --color-surface: #000000;
+    --color-surface-subtle: #141414;
+    --color-text: #ffffff;
+    --color-text-muted: #e6e6e6;
+    --color-border: #ffffff;
+    --color-border-subtle: #a6a6a6;
+    --color-link: #9cc3ff;
+    --color-primary: #9cc3ff;
+    --color-primary-contrast: #000000;
+    --color-alert-text: #ff9b94;
+    --color-alert-surface: #2a0000;
+    --color-focus: #ffd400;
+    --color-status-good: #6fe3a6;
+  }
+}
+
+:root[data-theme="high-contrast"][data-mode="dark"] {
+  color-scheme: dark;
+  --color-canvas: #000000;
+  --color-surface: #000000;
+  --color-surface-subtle: #141414;
+  --color-text: #ffffff;
+  --color-text-muted: #e6e6e6;
+  --color-border: #ffffff;
+  --color-border-subtle: #a6a6a6;
+  --color-link: #9cc3ff;
+  --color-primary: #9cc3ff;
+  --color-primary-contrast: #000000;
+  --color-alert-text: #ff9b94;
+  --color-alert-surface: #2a0000;
+  --color-focus: #ffd400;
+  --color-status-good: #6fe3a6;
+}

@@ -3,6 +3,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router";
 import "./styles.css";
+import "./appearance/themes.css";
 import type { AppearanceStorage } from "./appearance/Appearance";
 import { AppearanceContext } from "./appearance/AppearanceContext";
 import { createAppearanceStore } from "./appearance/createAppearanceStore";
