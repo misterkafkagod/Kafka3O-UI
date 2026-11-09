@@ -36,6 +36,21 @@ describe("AppearancePanel", () => {
     expect(root.dataset.mode).toBe("dark");
   });
 
+  it("changes and saves the color theme", async () => {
+    const user = userEvent.setup();
+    const storage = memoryStorage();
+    const { root } = renderPanel(storage);
+    await user.click(screen.getByText("Appearance"));
+    const group = screen.getByRole("group", { name: "Color theme" });
+    expect(within(group).getAllByRole("radio").map((radio) => radio.parentElement?.textContent)).toEqual(["Blue", "Slate", "Teal", "High contrast"]);
+    await user.click(within(group).getByRole("radio", { name: "High contrast" }));
+    expect(root.dataset.theme).toBe("high-contrast");
+    expect(JSON.parse(storage.getItem("kafka3o.appearance.v1")!).theme).toBe("high-contrast");
+    await user.click(screen.getByRole("button", { name: "Reset appearance" }));
+    expect(root.hasAttribute("data-theme")).toBe(false);
+    expect((within(group).getByRole("radio", { name: "Blue" }) as HTMLInputElement).checked).toBe(true);
+  });
+
   it("resets to the defaults", async () => {
     const user = userEvent.setup();
     const { root, store } = renderPanel(memoryStorage());
