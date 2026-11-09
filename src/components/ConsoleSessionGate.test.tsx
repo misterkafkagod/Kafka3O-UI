@@ -8,7 +8,7 @@ import { ConsoleSessionGate } from "./ConsoleSessionGate";
 const restricted: ConsoleSession = {
   accountId: "account-1", username: "admin", mustChangePassword: true, absoluteExpiresAt: "2026-11-06T12:34:56Z",
 };
-const normal: ConsoleSession = { ...restricted, mustChangePassword: false };
+const normal: ConsoleSession = { ...restricted, mustChangePassword: false, administration: { access: false, audit: false } };
 
 function testClient() {
   return {

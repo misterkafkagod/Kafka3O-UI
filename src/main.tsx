@@ -1,10 +1,10 @@
 import { QueryClient } from "@tanstack/react-query";
-import { type ReactNode, StrictMode } from "react";
+import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router";
 import "./styles.css";
 import { App } from "./App";
-import { ConsoleSessionGate } from "./components/ConsoleSessionGate";
+import { ConsoleSessionGate, type SecuredAppChrome } from "./components/ConsoleSessionGate";
 import { loadGatewayConfig } from "./config/loadGatewayConfig";
 import type { ConsoleAdminClient, ConsoleAdminTransport } from "./console/ConsoleAdmin";
 import type { ConsoleAuditClient } from "./console/ConsoleAudit";
@@ -108,7 +108,7 @@ type GatewayAppCredentials = typeof gatewayCredentials;
 
 // gatewayApp is composition-root wiring of the Kafka UI over a chosen Gateway transport.
 function gatewayApp(read: GatewayRead, write: GatewayWrite, credentials: GatewayAppCredentials, loadConfig: () => Promise<GatewayEntry[]>,
-  sessionIndicator?: ReactNode) {
+  chrome?: SecuredAppChrome) {
   return (
     <BrowserRouter>
       <App
@@ -138,7 +138,9 @@ function gatewayApp(read: GatewayRead, write: GatewayWrite, credentials: Gateway
         linkOrigin={window.location.origin}
         copyMessageLink={(text) => navigator.clipboard.writeText(text)}
         statusRefreshMs={statusRefreshMs}
-        sessionIndicator={sessionIndicator}
+        sessionIndicator={chrome?.sessionIndicator}
+        administrationLink={chrome?.administrationLink}
+        administrationPage={chrome?.administrationPage}
       />
     </BrowserRouter>
   );
@@ -153,7 +155,7 @@ const queryClient = new QueryClient();
 // Secured mode sends every Kafka request through the Console; there are no Gateway tokens to enter.
 const consoleSecured = import.meta.env.VITE_KAFKA3O_CONSOLE_SECURED === "true";
 const securedCredentials: GatewayAppCredentials = { read: () => null, save: () => undefined, clear: () => undefined, isAutomatic: () => true };
-function securedApp(sessionEnded: () => void, sessionIndicator: ReactNode) {
+function securedApp(sessionEnded: () => void, chrome: SecuredAppChrome) {
   const ended = () => {
     queryClient.clear();
     sessionEnded();
@@ -177,7 +179,7 @@ function securedApp(sessionEnded: () => void, sessionIndicator: ReactNode) {
   const write: GatewayWrite = (gatewayUrl) => (url, request) =>
     fetchConsoleGatewayJson(window.fetch.bind(window), origin, () => document.cookie, gatewayUrl, url, securedTimeoutMs, ended, request,
       productionReason(gatewayUrl));
-  return gatewayApp(read, write, securedCredentials, loadClusters, sessionIndicator);
+  return gatewayApp(read, write, securedCredentials, loadClusters, chrome);
 }
 
 createRoot(document.getElementById("root")!).render(

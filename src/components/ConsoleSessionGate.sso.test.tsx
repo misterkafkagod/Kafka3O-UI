@@ -73,12 +73,20 @@ describe("ConsoleSessionGate SSO", () => {
     const order: string[] = [];
     browser.replace.mockImplementation((path: string) => { order.push(`replace ${path}`); });
     sso.complete.mockImplementation(async () => { order.push("complete"); return cognitoSession; });
+    client.inspect.mockImplementation(async () => {
+      order.push("inspect");
+      return { ...cognitoSession, administration: { access: false, audit: false } };
+    });
     render(<StrictMode><ConsoleSessionGate client={client} sso={sso} browser={browser} /></StrictMode>);
     expect(await screen.findByRole("group", { name: "Console session" })).toBeDefined();
     expect(sso.complete).toHaveBeenCalledExactlyOnceWith("?code=secret-code&state=secret-state");
     expect(order.slice(0, 2)).toEqual(["replace /auth/cognito/callback", "complete"]);
     expect(browser.replace).toHaveBeenLastCalledWith("/");
-    expect(client.inspect).not.toHaveBeenCalled();
+    // The only session check reads the capabilities after the callback completed.
+    await waitFor(() => expect(order).toContain("inspect"));
+    expect(order.indexOf("inspect")).toBeGreaterThan(order.indexOf("complete"));
+    expect(client.inspect).toHaveBeenCalledOnce();
+    expect(screen.getByRole("group", { name: "Console session" })).toBeDefined();
     expect(document.body.textContent).not.toContain("secret-code");
     expect(document.body.textContent).not.toContain("secret-state");
   });

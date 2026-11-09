@@ -5,9 +5,8 @@ import type { ConsoleSession, ConsoleSessionClient } from "../console/ConsoleSes
 import { ConsoleSessionError } from "../console/ConsoleSessionError";
 import { cognitoCallbackPath, type ConsoleBrowser, type ConsoleSsoClient } from "../console/ConsoleSso";
 import { describeSsoFailure } from "../console/describeSsoFailure";
-import { AccessManagement } from "./AccessManagement";
-import { AuditInvestigation } from "./AuditInvestigation";
-import { ClusterClassification } from "./ClusterClassification";
+import type { ConsoleAdministration } from "../console/ConsoleSession";
+import { AdministrationPage } from "./AdministrationPage";
 import styles from "./ConsoleSessionGate.module.css";
 import { SessionIndicator } from "./SessionIndicator";
 
@@ -18,16 +17,24 @@ type Screen =
   | { kind: "signedIn"; session: ConsoleSession }
   | { kind: "uncertain"; action: "signIn" | "changePassword" | "signOut"; session?: ConsoleSession };
 
+export type SecuredAppChrome = {
+  sessionIndicator: ReactNode;
+  administrationLink: boolean;
+  administrationPage: ReactNode;
+};
+
+const noAdministration: ConsoleAdministration = { access: false, audit: false };
+
 type ConsoleSessionGateProps = {
   client: ConsoleSessionClient;
   sso?: ConsoleSsoClient;
   browser?: ConsoleBrowser;
-  // Administration is shown to every signed-in session; the Console decides who may use it.
+  // Administration sections follow the session's reported capabilities; the Console still authorizes every request.
   admin?: ConsoleAdminClient;
   confirm?: (message: string) => boolean;
   // renderApp shows the secured Kafka UI for a signed-in session; it receives the session-ended callback
-  // and the session indicator to place in the application header.
-  renderApp?: (sessionEnded: () => void, sessionIndicator: ReactNode) => ReactNode;
+  // and the session indicator and administration page to place in the application.
+  renderApp?: (sessionEnded: () => void, chrome: SecuredAppChrome) => ReactNode;
   audit?: ConsoleAuditClient;
 };
 
@@ -286,15 +293,37 @@ export function ConsoleSessionGate({ client, sso, browser, admin, confirm, rende
     setScreen({ kind: "signedOut", notice: "Your session has ended. Sign in again." });
   }, []);
 
+  // Sign-in responses do not report administration capabilities, so a new session is inspected once for them.
+  const needsCapabilities = screen.kind === "signedIn" && !screen.session.mustChangePassword && screen.session.administration === undefined
+    ? screen.session.accountId : undefined;
+  useEffect(() => {
+    if (!needsCapabilities) return;
+    const controller = new AbortController();
+    const apply = (administration: ConsoleAdministration) => setScreen((current) =>
+      current.kind === "signedIn" && current.session.accountId === needsCapabilities && current.session.administration === undefined
+        ? { kind: "signedIn", session: { ...current.session, administration } }
+        : current);
+    client.inspect(controller.signal).then(
+      (session) => {
+        if (controller.signal.aborted) return;
+        if (session === null) {
+          sessionEnded();
+          return;
+        }
+        apply(session.accountId === needsCapabilities ? session.administration ?? noAdministration : noAdministration);
+      },
+      () => { if (!controller.signal.aborted) apply(noAdministration); },
+    );
+    return () => controller.abort();
+  }, [client, needsCapabilities, sessionEnded]);
+
   const activeSession = screen.kind === "signedIn" && !screen.session.mustChangePassword ? screen.session : undefined;
-  const administration = admin && confirm && activeSession ? (
-    <div className={styles.administration} key={activeSession.accountId}>
-      <AccessManagement admin={admin} confirm={confirm} onUnauthorized={sessionEnded} />
-      <ClusterClassification admin={admin} confirm={confirm} onUnauthorized={sessionEnded} />
-      {audit ? <AuditInvestigation audit={audit} onUnauthorized={sessionEnded} /> : null}
-    </div>
-  ) : null;
   if (activeSession) {
+    const administration = (
+      <AdministrationPage key={activeSession.accountId} administration={activeSession.administration}
+        admin={admin} audit={audit} confirm={confirm} onUnauthorized={sessionEnded} />
+    );
+    const flags = activeSession.administration;
     const indicator = <SessionIndicator username={activeSession.username} signingOut={pending === "signOut"} onSignOut={signOut} />;
     const alerts = (
       <>
@@ -308,8 +337,11 @@ export function ConsoleSessionGate({ client, sso, browser, admin, confirm, rende
       return (
         <div className={styles.signedIn}>
           <div className={styles.alerts}>{alerts}</div>
-          <div key={`app-${activeSession.accountId}`}>{renderApp(sessionEnded, indicator)}</div>
-          {administration ? <div className={styles.main}>{administration}</div> : null}
+          <div key={`app-${activeSession.accountId}`}>{renderApp(sessionEnded, {
+            sessionIndicator: indicator,
+            administrationLink: Boolean(flags && ((flags.access && admin && confirm) || (flags.audit && audit))),
+            administrationPage: administration,
+          })}</div>
         </div>
       );
     }
@@ -325,7 +357,7 @@ export function ConsoleSessionGate({ client, sso, browser, admin, confirm, rende
             <p className={styles.notice}>This preview does not open clusters or enforce Kafka permissions. The existing manual interface is separate.</p>
             {alerts}
           </div>
-          {administration}
+          {admin && confirm && flags && (flags.access || flags.audit) ? <div className={styles.administration}>{administration}</div> : null}
         </main>
       </div>
     );
