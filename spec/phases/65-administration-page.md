@@ -2,7 +2,7 @@
 - **Milestone:** M11
 - **Covers:** UI portion of F46-AC2
 - **Discovery:** —
-- **Status:** Building
+- **Status:** Done
 
 ## Demo
 1. Serve the secured build through the local Console fixture and sign in as the global ADMIN.
@@ -24,3 +24,11 @@
   - Done when: `npx vitest run src/components/ConsoleSessionGate` passes, covering the flags reaching the application, no inline sections in the secured app and filtered sections in the preview; then `npm test`, `npm run build` and `KAFKA3O_PREVIEW_INTEGRATION=1 npx vitest run src/console/preview` (with the preview build) pass.
 
 ## Review
+- **Demo:** passed (auto-approved under the user's standing M11 instruction, 2026-11-08; run by Claude, not observed live by the user). The secured build was served by the local Console HTTPS fixture with two registered clusters (EKS-D redeploy not permitted in this session) and driven with Chromium 1194, 14/14 checks: the clusters page has no administration sections; the global ADMIN's header has an Administration link opening `/administration` with Access management, Cluster classification and Audit, with no horizontal overflow at 768 or 320 px; a global OPERATOR has no link, gets "Not permitted" at `/administration` and made no `/api/admin` or `/api/audit` requests; an ADMIN of `prod` only sees Audit and made no access-administration requests. The fixture has no SPA fallback, so `/administration` was opened client-side; the deployed front serves it directly.
+- **Vulnerability scan:** not run; no dependency changes.
+- **Regression:** `npm test` 452 passed (5 opt-in skipped); opt-in preview integration 4 passed (live Cognito skipped); default and secured builds.
+- **Convention check:** `AdministrationPage` is one component; the capability check is one effect in the existing gate.
+- **Notes:**
+  - The shared administration section styles now let tables scroll inside their regions, which also fixes the 320 px overflow seen in P63.
+  - The secured header still shows "Gateway credentials" although secured mode has no tokens to enter; candidate follow-up.
+
