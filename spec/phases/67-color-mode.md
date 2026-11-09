@@ -10,7 +10,7 @@
 3. With browser storage blocked, expect the defaults, a working console and "Preferences can't be saved in this browser" after a change.
 
 ## Tasks
-- [ ] **T67.1 Appearance model, storage and application** — Covers: F45-AC4, F45-AC5, F45-AC6
+- [x] **T67.1 Appearance model, storage and application** — Covers: F45-AC4, F45-AC5, F45-AC6
   - Files: src/appearance/Appearance.ts (new), src/appearance/parseAppearance.ts (new), src/appearance/parseAppearance.test.ts (new), src/appearance/loadAppearance.ts (new), src/appearance/loadAppearance.test.ts (new), src/appearance/saveAppearance.ts (new), src/appearance/saveAppearance.test.ts (new), src/appearance/applyAppearance.ts (new), src/appearance/applyAppearance.test.ts (new)
   - Do: `Appearance` holds `mode`, `theme`, `font`, `textSize` and `density` with enumerated values and defaults (system, blue, system, default, comfortable). `parseAppearance` reads the stored JSON field by field, keeping valid fields and defaulting the rest. `loadAppearance` reads `kafka3o.appearance.v1` from a storage that may be missing or throw. `saveAppearance` writes only the five fields (or removes the entry on reset) and reports whether it succeeded. `applyAppearance` sets `data-mode`, `data-theme`, `data-font`, `data-text-size` and `data-density` on the root, removing each attribute that holds its default.
   - Done when: `npx vitest run src/appearance` passes, covering valid, partial, malformed and unknown values, throwing storage, the written shape and attribute removal for defaults.
