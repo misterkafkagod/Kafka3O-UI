@@ -251,7 +251,7 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
 - **Contracts:** Detailed behaviors and acceptance criteria are in [FUNC-SPEC.md](./FUNC-SPEC.md#f27--local-and-cognito-sign-in-planned-m10); the Gateway trust flow and migration are in [TECH-SPEC.md](./TECH-SPEC.md#m10-identity-authorization-and-audit-planned).
 
 ### M11 — Make the console comfortable and simple to navigate for each user
-- **Status:** Active
+- **Status:** Done
 - **Features:** F46, F45
 - **Phases:**
   - **P63** F46-B1 · Compact signed-in session indicator — Covers: F46-AC1 · Discovery: — · Status: Done
@@ -266,12 +266,12 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
     - Demo: choosing Dark on a light system switches immediately, survives reload and updates another tab; blocked storage falls back to defaults with a notice.
   - **P68** F45-B2 · Preset color themes — Covers: F45-AC2 · Discovery: — · Status: Done
     - Demo: switching between Blue, Slate, Teal and High contrast recolors the console in light and dark; the contrast test passes for every pair.
-  - **P69** F45-B3 + F45-B4 · Font, text size and density — Covers: F45-AC3 · Discovery: — · Status: Building
+  - **P69** F45-B3 + F45-B4 · Font, text size and density — Covers: F45-AC3 · Discovery: — · Status: Done
     - Demo: Hyperlegible at Extra large stays usable at 320 px, and Compact tightens table rows while targets stay at least 24×24 px.
 - **Contracts:** Behaviors and acceptance criteria are in [FUNC-SPEC.md](./FUNC-SPEC.md#f46--streamlined-signed-in-navigation-planned-m11); the session administration flags and appearance mechanism are in [TECH-SPEC.md](./TECH-SPEC.md#m11-navigation-and-appearance-planned).
 
 ## Backlog
-M11 is next. The following items are candidates after M11, not commitments to implement every Redpanda feature. All future writes must use F29/F30 authorization and F31 audit; no candidate silently expands the current bounded reads or changes Kafka connection credentials.
+The following items are candidates after M11, not commitments to implement every Redpanda feature. All future writes must use F29/F30 authorization and F31 audit; no candidate silently expands the current bounded reads or changes Kafka connection credentials.
 
 - **F15 · High:** User can reset a consumer group's offsets to earliest, latest or a timestamp, with a preview and inactive-group checks.
 - **F16 · High:** User can decode Avro/Protobuf values via a Schema Registry.
@@ -288,6 +288,7 @@ M11 is next. The following items are candidates after M11, not commitments to im
 - **F41 · Deferred:** User can inspect genuine broker/partition health diagnostics and available metrics, with explicit unavailable states and a separately configured metrics source.
 - **F42 · Deferred:** User can sign in through additional directly integrated OIDC providers, starting with Keycloak, Authentik, Microsoft Entra ID, Okta and Google Workspace; Cognito federation is not a claim that these integrations have been tested.
 - **F43 · Deferred:** Deployments with compatible brokers can optionally propagate end-user identity to Kafka/upstream APIs instead of a shared service principal; this is not required for Cognito login or M10 application auditing.
+- **F47 · Low:** Secured builds hide the Gateway credentials control, which has nothing to edit when every cluster is reached through the Console.
 - **F44 · Deferred:** An authorized user can inspect client quotas and, after Kafka API discovery, explicitly change supported quotas.
 
 ### Redpanda Console comparison (checked 2026-11-06)
@@ -314,6 +315,7 @@ Compared current official Redpanda documentation (pages identify Console v3.14.0
 Redpanda-only Shadow Links, its Admin API, and Redpanda-specific diagnostic operations are not promised for generic Kafka. Replay/copy workflows and live tailing are not added to scope by this comparison.
 
 ### Existing verification debt
+- **Verification debt:** Deploy M11 to the EKS-D secured stack (`deploy.sh`) and repeat the P63/P65 checks there and in the user's own browser; M11 was verified against the local Console fixture and `vite preview` because the redeploy was not permitted in the building session.
 - **Verification debt:** Run the Docker-only stopped-broker test and P14 browser demo, and verify the remaining cross-cluster and consumer-group browser demos.
 - **Verification debt:** Repeat the P24–P27 browser smoke test with a trusted deployment certificate and complete the producer key/header browser demo.
 - **Verification debt:** Run the built gateway container in a deployment; the image was built and scanned on EKS-D but was not started as a container.
@@ -322,6 +324,10 @@ Redpanda-only Shadow Links, its Admin API, and Redpanda-specific diagnostic oper
 - **Verification debt:** Run the Cognito sign-in, group refresh and logout integration against a real User Pool when an AWS account and app client become available; fixture tests are not evidence of live provider compatibility.
 
 ## Learnings
+- 2026-11-08 (M11 retro): P63–P69 deliver F46 and F45: a compact session indicator, an Administration page shown from Console-reported capabilities (without probing admin endpoints), clusters opening on Topics, and per-browser color mode, four contrast-tested themes, a bundled readable font, text size and density.
+- 2026-11-08 (M11 retro): What worked: small phases (1–3 tasks), a contrast test that reads the real stylesheets, and real-browser checks per phase that measured overflow, target sizes and first-render theme instead of trusting screenshots.
+- 2026-11-08 (M11 retro): What did not: the EKS-D redeploy was not permitted, so live verification fell back to the local Console fixture and synthesized Gateway answers; an opt-in integration test had been failing unnoticed since M10 because it only runs on demand.
+- 2026-11-08 (M11 retro): Next: run the opt-in preview integration tests in every phase review that touches the session gate, deploy M11 to EKS-D, and decide between F47 and the F15–F17/F42–F44 backlog for M12.
 - 2026-11-08 (P63 review): Callbacks passed to components that load data in effects must be stable; an unstable session-ended callback made every gate render reload administration and end revoked sessions early.
 - 2026-11-08 (re-plan): M11 = F46 (streamlined signed-in navigation) then F45 (appearance preferences), added by user request ahead of the backlog; preferences are stored per browser and chosen by each user, and F15–F17 and F42–F44 stay in the backlog.
 - 2026-11-08 (M10 retro): P49–P62 cover F27–F31: local and Cognito-compatible sign-in, global/cluster roles with audited administration, a Console-only mTLS delegation path that every Gateway enforces before Kafka, Production ADMIN-plus-reason writes, and correlated, scoped, exportable audit; the EKS-D cutover kept every Kafka pod and volume untouched.

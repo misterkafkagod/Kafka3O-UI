@@ -2,7 +2,7 @@
 - **Milestone:** M11
 - **Covers:** F45-AC3
 - **Discovery:** —
-- **Status:** Building
+- **Status:** Done
 
 ## Demo
 1. Open Appearance, choose Hyperlegible and Extra large, and view a cluster's topics at 320, 768 and 1440 px.
@@ -20,3 +20,9 @@
   - Done when: `npx vitest run src/appearance/AppearancePanel.test.tsx` passes, covering the density group; `npm test` and `npm run build` pass; and Chromium measures tighter rows with every interactive target at least 24×24 px when compact.
 
 ## Review
+- **Demo:** passed (auto-approved under the user's standing M11 instruction, 2026-11-08; run by Claude). Built UI served by `vite preview` with Gateway answers synthesized inside Chromium 1194, 11/11 checks: Hyperlegible is the active, loaded font with no external requests; Extra large sets a 20 px root; no page-wide overflow on a cluster's topics at 1440, 768 and 320 px; Reset restores the default row height; Compact tightens topic rows (39.8 → 30.4 px; 28.0 px with Small text) while every button, summary, input, navigation link and radio or checkbox label stays at least 24×24 px.
+- **Plan deviations:** T69.2 also capped the Appearance panel's height (it now has five groups) and gave breadcrumb links a 24 px minimum height; the 18 px "Clusters" breadcrumb failed the target check in every density, not only Compact.
+- **Vulnerability scan (milestone close):** `npm audit`: 0 findings; `govulncheck@v1.9.0 -test -tags integration ./...` (Gateway): 0 called, 1 uncalled module advisory (GO-2026-5932, unchanged since M10), within policy. Font asset: `@fontsource/atkinson-hyperlegible` 5.3.0 tarball sha256 `6c22186d…dc2d43`, two WOFF2 files verified by signature, SIL OFL 1.1.
+- **Regression:** `npm test` 493 passed (5 opt-in skipped); default and secured builds; the P63 (10/10) and P65 (14/14) browser demos repeated on the final secured build.
+- **Convention check:** CSS-only changes plus new radio groups through `AppearanceChoice`; the typography test reads the stylesheet as data.
+
