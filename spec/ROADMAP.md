@@ -254,7 +254,7 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
 - **Status:** Active
 - **Features:** F46, F45
 - **Phases:**
-  - **P63** F46-B1 · Compact signed-in session indicator — Covers: F46-AC1 · Discovery: — · Status: Defined
+  - **P63** F46-B1 · Compact signed-in session indicator — Covers: F46-AC1 · Discovery: — · Status: Planned
     - Demo: after signing in, only "Signed in as admin" and Sign out appear in the header corner; signing out shows the sign-in card again.
   - **P64** F46-B2 · Console reports session administration capabilities — Covers: server portion of F46-AC2 · Discovery: — · Status: Defined
     - Demo: `GET /api/session` returns `administration.access/audit` true for a global ADMIN, audit-only for a cluster ADMIN, both false otherwise, and follows grant changes.
