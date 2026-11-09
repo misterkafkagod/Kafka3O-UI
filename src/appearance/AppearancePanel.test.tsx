@@ -51,6 +51,19 @@ describe("AppearancePanel", () => {
     expect((within(group).getByRole("radio", { name: "Blue" }) as HTMLInputElement).checked).toBe(true);
   });
 
+  it("changes the font and text size", async () => {
+    const user = userEvent.setup();
+    const { root } = renderPanel(memoryStorage());
+    await user.click(screen.getByText("Appearance"));
+    const font = screen.getByRole("group", { name: "Font" });
+    expect(within(font).getAllByRole("radio").map((radio) => radio.parentElement?.textContent)).toEqual(["System", "Hyperlegible", "Serif"]);
+    await user.click(within(font).getByRole("radio", { name: "Hyperlegible" }));
+    const size = screen.getByRole("group", { name: "Text size" });
+    expect(within(size).getAllByRole("radio").map((radio) => radio.parentElement?.textContent)).toEqual(["Small", "Default", "Large", "Extra large"]);
+    await user.click(within(size).getByRole("radio", { name: "Extra large" }));
+    expect([root.dataset.font, root.dataset.textSize]).toEqual(["hyperlegible", "extra-large"]);
+  });
+
   it("resets to the defaults", async () => {
     const user = userEvent.setup();
     const { root, store } = renderPanel(memoryStorage());
