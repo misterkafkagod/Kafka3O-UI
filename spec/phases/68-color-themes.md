@@ -9,7 +9,7 @@
 2. Expect the whole console to recolor each time, status labels to keep their text, and `npx vitest run src/appearance/themeContrast.test.ts` to pass for every theme and mode.
 
 ## Tasks
-- [ ] **T68.1 Contrast ratio** — Covers: F45-AC2
+- [x] **T68.1 Contrast ratio** — Covers: F45-AC2
   - Files: src/appearance/contrastRatio.ts (new), src/appearance/contrastRatio.test.ts (new)
   - Do: `contrastRatio` computes the WCAG 2.x contrast ratio of two `#rrggbb` colors and rejects other formats.
   - Done when: `npx vitest run src/appearance/contrastRatio.test.ts` passes, covering black/white (21:1), identical colors (1:1), a known mid pair and invalid input.
