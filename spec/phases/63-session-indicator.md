@@ -2,7 +2,7 @@
 - **Milestone:** M11
 - **Covers:** F46-AC1
 - **Discovery:** —
-- **Status:** Planned
+- **Status:** Building
 
 ## Demo
 1. Build the secured UI and open it through the forwarded Console origin; sign in as `admin`.
@@ -10,7 +10,7 @@
 3. Sign out and expect the sign-in card again; a session that must change its password still shows the full card.
 
 ## Tasks
-- [ ] **T63.1 Session indicator in the application header** — Covers: F46-AC1
+- [x] **T63.1 Session indicator in the application header** — Covers: F46-AC1
   - Files: src/components/SessionIndicator.tsx (new), src/components/SessionIndicator.module.css (new), src/components/SessionIndicator.test.tsx (new), src/components/AppShell.tsx, src/components/AppShell.module.css, src/components/AppShell.test.tsx, src/App.tsx
   - Do: `SessionIndicator` renders "Signed in as <username>" and a Sign out button (pending label "Signing out...", disabled while pending) in a labeled group. `AppShell` and `App` accept an optional `sessionIndicator` node rendered at the end of the header; without it the header is unchanged (legacy and preview builds).
   - Done when: `npx vitest run src/components/SessionIndicator.test.tsx src/components/AppShell.test.tsx` passes, covering name, pending state, the click callback and the header with and without an indicator.

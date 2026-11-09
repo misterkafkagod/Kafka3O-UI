@@ -1,5 +1,5 @@
 import { type QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useState } from "react";
+import { type ReactNode, useState } from "react";
 import { Route, Routes } from "react-router";
 import { AppShell } from "./components/AppShell";
 import type { LoadGatewayConfig } from "./config/loadGatewayConfig";
@@ -38,6 +38,7 @@ type AppProps = {
   linkOrigin: string;
   copyMessageLink: (text: string) => Promise<void>;
   statusRefreshMs: number;
+  sessionIndicator?: ReactNode;
 };
 
 export function App({
@@ -58,6 +59,7 @@ export function App({
   linkOrigin,
   copyMessageLink,
   statusRefreshMs,
+  sessionIndicator,
 }: AppProps) {
   const [connectionPanel, setConnectionPanel] = useState<{ gatewayId?: string } | null>(null);
 
@@ -71,6 +73,7 @@ export function App({
         onOpenConnection={() => setConnectionPanel({})}
         onOpenGatewayConnection={(gatewayId) => setConnectionPanel({ gatewayId })}
         onCloseConnection={() => setConnectionPanel(null)}
+        sessionIndicator={sessionIndicator}
       >
         <Routes>
           <Route
