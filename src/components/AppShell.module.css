@@ -123,6 +123,13 @@
   color: var(--color-text-muted);
 }
 
+/* Breadcrumb links keep a 24 px target at every text size and density. */
+.shell :global(nav[aria-label="Breadcrumb"] a) {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+}
+
 .shell :global(nav[aria-label="Breadcrumb"] [aria-current="page"]) {
   color: var(--color-text-muted);
   font-weight: 650;
@@ -137,7 +144,7 @@
 .shell > .content > :global(main) {
   width: min(100%, 76rem);
   margin: 1.25rem auto 0;
-  padding: clamp(1rem, 2.5vw, 2rem);
+  padding: calc(clamp(1rem, 2.5vw, 2rem) * var(--density));
   border: 1px solid var(--color-border-subtle);
   border-radius: 0.9rem;
   background: var(--color-surface);
@@ -161,7 +168,7 @@
 
 .shell :global(section[aria-label="Search topics across clusters"]) {
   margin-bottom: 1.25rem;
-  padding: 1rem;
+  padding: calc(1rem * var(--density));
   border: 1px solid var(--color-border-subtle);
   border-radius: 0.7rem;
   background: var(--color-surface-subtle);
@@ -169,7 +176,7 @@
 
 .shell :global(article[aria-label]) {
   margin-top: 1rem;
-  padding: 1rem;
+  padding: calc(1rem * var(--density));
   border: 1px solid var(--color-border-subtle);
   border-radius: 0.7rem;
   background: var(--color-surface);
@@ -193,7 +200,7 @@
 
 .shell :global(th),
 .shell :global(td) {
-  padding: 0.65rem 0.75rem;
+  padding: calc(0.65rem * var(--density)) calc(0.75rem * var(--density));
   border-bottom: 1px solid var(--color-border-subtle);
   text-align: left;
   vertical-align: top;

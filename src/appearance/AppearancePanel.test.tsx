@@ -64,6 +64,16 @@ describe("AppearancePanel", () => {
     expect([root.dataset.font, root.dataset.textSize]).toEqual(["hyperlegible", "extra-large"]);
   });
 
+  it("changes the density", async () => {
+    const user = userEvent.setup();
+    const { root } = renderPanel(memoryStorage());
+    await user.click(screen.getByText("Appearance"));
+    const density = screen.getByRole("group", { name: "Density" });
+    expect(within(density).getAllByRole("radio").map((radio) => radio.parentElement?.textContent)).toEqual(["Comfortable", "Compact"]);
+    await user.click(within(density).getByRole("radio", { name: "Compact" }));
+    expect(root.dataset.density).toBe("compact");
+  });
+
   it("resets to the defaults", async () => {
     const user = userEvent.setup();
     const { root, store } = renderPanel(memoryStorage());

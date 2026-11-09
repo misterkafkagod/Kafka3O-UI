@@ -1,4 +1,4 @@
-import { type Appearance, colorModes, colorThemes, fonts, textSizes } from "./Appearance";
+import { type Appearance, colorModes, colorThemes, densities, fonts, textSizes } from "./Appearance";
 import { AppearanceChoice } from "./AppearanceChoice";
 import styles from "./AppearancePanel.module.css";
 import { useAppearance } from "./useAppearance";
@@ -6,6 +6,7 @@ import { useAppearance } from "./useAppearance";
 const modeLabels: Record<Appearance["mode"], string> = { system: "Match system", light: "Light", dark: "Dark" };
 const themeLabels: Record<Appearance["theme"], string> = { blue: "Blue", slate: "Slate", teal: "Teal", "high-contrast": "High contrast" };
 const fontLabels: Record<Appearance["font"], string> = { system: "System", hyperlegible: "Hyperlegible", serif: "Serif" };
+const densityLabels: Record<Appearance["density"], string> = { comfortable: "Comfortable", compact: "Compact" };
 const textSizeLabels: Record<Appearance["textSize"], string> = { small: "Small", default: "Default", large: "Large", "extra-large": "Extra large" };
 
 export function AppearancePanel() {
@@ -24,6 +25,8 @@ export function AppearancePanel() {
           value={state.appearance.font} onChange={(font) => store.update({ font })} />
         <AppearanceChoice legend="Text size" name="kafka3o-text-size" options={textSizes} labels={textSizeLabels}
           value={state.appearance.textSize} onChange={(textSize) => store.update({ textSize })} />
+        <AppearanceChoice legend="Density" name="kafka3o-density" options={densities} labels={densityLabels}
+          value={state.appearance.density} onChange={(density) => store.update({ density })} />
         <button type="button" className={styles.reset} onClick={() => store.reset()}>Reset appearance</button>
         {state.saveFailed ? <p role="status" className={styles.notice}>Preferences can't be saved in this browser.</p> : null}
       </div>
