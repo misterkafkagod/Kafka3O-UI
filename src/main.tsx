@@ -3,6 +3,9 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router";
 import "./styles.css";
+import type { AppearanceStorage } from "./appearance/Appearance";
+import { AppearanceContext } from "./appearance/AppearanceContext";
+import { createAppearanceStore } from "./appearance/createAppearanceStore";
 import { App } from "./App";
 import { ConsoleSessionGate, type SecuredAppChrome } from "./components/ConsoleSessionGate";
 import { loadGatewayConfig } from "./config/loadGatewayConfig";
@@ -182,8 +185,18 @@ function securedApp(sessionEnded: () => void, chrome: SecuredAppChrome) {
   return gatewayApp(read, write, securedCredentials, loadClusters, chrome);
 }
 
+// The saved appearance is applied before the first render, so the page never flashes the default theme.
+let appearanceStorage: AppearanceStorage | null = null;
+try {
+  appearanceStorage = window.localStorage;
+} catch {
+  appearanceStorage = null;
+}
+const appearanceStore = createAppearanceStore(appearanceStorage, document.documentElement, window);
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
+    <AppearanceContext.Provider value={appearanceStore}>
     {consoleSecured ? (
       <ConsoleSessionGate client={consoleSession} sso={consoleSso} browser={consoleBrowser}
         admin={consoleAdmin} confirm={(message) => window.confirm(message)} renderApp={securedApp} audit={consoleAudit} />
@@ -191,5 +204,6 @@ createRoot(document.getElementById("root")!).render(
       <ConsoleSessionGate client={consoleSession} sso={consoleSso} browser={consoleBrowser}
         admin={consoleAdmin} confirm={(message) => window.confirm(message)} audit={consoleAudit} />
     ) : gatewayApp(legacyRead, legacyWrite, gatewayCredentials, () => loadGatewayConfig(boundFetchJson))}
+    </AppearanceContext.Provider>
   </StrictMode>,
 );

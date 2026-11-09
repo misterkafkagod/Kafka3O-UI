@@ -63,11 +63,25 @@ afterEach(() => {
 });
 
 describe("main composition", () => {
+  it("applies the saved appearance before the first render", async () => {
+    document.body.innerHTML = '<div id="root"></div>';
+    window.localStorage.setItem("kafka3o.appearance.v1", JSON.stringify({ mode: "dark" }));
+    let modeAtRender: string | undefined;
+    renderApp.mockImplementationOnce(() => { modeAtRender = document.documentElement.dataset.mode; });
+    try {
+      await import("./main");
+    } finally {
+      window.localStorage.clear();
+      document.documentElement.removeAttribute("data-mode");
+    }
+    expect(modeAtRender).toBe("dark");
+  });
+
   it("forwards positioned reads and message searches", async () => {
     document.body.innerHTML = '<div id="root"></div>';
     await import("./main");
 
-    const tree = renderApp.mock.calls[0][0] as AppTree;
+    const tree = (renderApp.mock.calls[0][0] as ReactElement<{ children: AppTree }>).props.children;
     const listLatestTopicMessages = tree.props.children.props.children.props.listLatestTopicMessages;
     const offset = { partition: 2, offset: 17 };
     const timestamp = { partition: 1, timestamp: 1700000000123 };
@@ -139,7 +153,7 @@ describe("main composition", () => {
     const fetchFn = vi.fn<typeof fetch>(async () => Response.json({ title: "Authentication required", status: 401, code: "unauthorized" }, { status: 401 }));
     vi.stubGlobal("fetch", fetchFn);
     await import("./main");
-    const tree = renderApp.mock.calls[0][0] as ReactElement<{ children: ReactElement<{ client: ConsoleSessionClient }> }>;
+    const tree = (renderApp.mock.calls[0][0] as ReactElement<{ children: ReactElement<{ children: ReactElement<{ client: ConsoleSessionClient }> }> }>).props.children;
     const { ConsoleSessionGate } = await import("./components/ConsoleSessionGate");
     expect(tree.props.children.type).toBe(ConsoleSessionGate);
     await expect(tree.props.children.props.client.inspect()).resolves.toBeNull();
