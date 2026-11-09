@@ -251,9 +251,23 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
 - **Contracts:** Detailed behaviors and acceptance criteria are in [FUNC-SPEC.md](./FUNC-SPEC.md#f27--local-and-cognito-sign-in-planned-m10); the Gateway trust flow and migration are in [TECH-SPEC.md](./TECH-SPEC.md#m10-identity-authorization-and-audit-planned).
 
 ### M11 — Make the console comfortable and simple to navigate for each user
-- **Status:** Planned
+- **Status:** Active
 - **Features:** F46, F45
-- **Phases:** <filled by skill-phase-breakdown>
+- **Phases:**
+  - **P63** F46-B1 · Compact signed-in session indicator — Covers: F46-AC1 · Discovery: — · Status: Defined
+    - Demo: after signing in, only "Signed in as admin" and Sign out appear in the header corner; signing out shows the sign-in card again.
+  - **P64** F46-B2 · Console reports session administration capabilities — Covers: server portion of F46-AC2 · Discovery: — · Status: Defined
+    - Demo: `GET /api/session` returns `administration.access/audit` true for a global ADMIN, audit-only for a cluster ADMIN, both false otherwise, and follows grant changes.
+  - **P65** F46-B2 · Separate Administration page for administrators — Covers: UI portion of F46-AC2 · Discovery: — · Status: Defined
+    - Demo: the global ADMIN opens Administration from the header and sees all three sections; an OPERATOR sees no link and `/administration` shows "Not permitted".
+  - **P66** F46-B3 + F46-B4 · Clusters open on Topics, and Create topic is spaced — Covers: F46-AC3, F46-AC4 · Discovery: — · Status: Defined
+    - Demo: opening Kafka A shows the Topics tab first and selected, Brokers is at `/clusters/kafka-a/brokers`, and Create topic is separated from the filters.
+  - **P67** F45-B1 + F45-B5 + F45-B6 · Saved color mode switch — Covers: F45-AC1, F45-AC4, F45-AC5, F45-AC6 · Discovery: — · Status: Defined
+    - Demo: choosing Dark on a light system switches immediately, survives reload and updates another tab; blocked storage falls back to defaults with a notice.
+  - **P68** F45-B2 · Preset color themes — Covers: F45-AC2 · Discovery: — · Status: Defined
+    - Demo: switching between Blue, Slate, Teal and High contrast recolors the console in light and dark; the contrast test passes for every pair.
+  - **P69** F45-B3 + F45-B4 · Font, text size and density — Covers: F45-AC3 · Discovery: — · Status: Defined
+    - Demo: Hyperlegible at Extra large stays usable at 320 px, and Compact tightens table rows while targets stay at least 24×24 px.
 - **Contracts:** Behaviors and acceptance criteria are in [FUNC-SPEC.md](./FUNC-SPEC.md#f46--streamlined-signed-in-navigation-planned-m11); the session administration flags and appearance mechanism are in [TECH-SPEC.md](./TECH-SPEC.md#m11-navigation-and-appearance-planned).
 
 ## Backlog
