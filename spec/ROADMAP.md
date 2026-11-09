@@ -266,7 +266,7 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
     - Demo: choosing Dark on a light system switches immediately, survives reload and updates another tab; blocked storage falls back to defaults with a notice.
   - **P68** F45-B2 · Preset color themes — Covers: F45-AC2 · Discovery: — · Status: Done
     - Demo: switching between Blue, Slate, Teal and High contrast recolors the console in light and dark; the contrast test passes for every pair.
-  - **P69** F45-B3 + F45-B4 · Font, text size and density — Covers: F45-AC3 · Discovery: — · Status: Defined
+  - **P69** F45-B3 + F45-B4 · Font, text size and density — Covers: F45-AC3 · Discovery: — · Status: Building
     - Demo: Hyperlegible at Extra large stays usable at 320 px, and Compact tightens table rows while targets stay at least 24×24 px.
 - **Contracts:** Behaviors and acceptance criteria are in [FUNC-SPEC.md](./FUNC-SPEC.md#f46--streamlined-signed-in-navigation-planned-m11); the session administration flags and appearance mechanism are in [TECH-SPEC.md](./TECH-SPEC.md#m11-navigation-and-appearance-planned).
 
