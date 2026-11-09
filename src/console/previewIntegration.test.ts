@@ -113,7 +113,7 @@ describe.skipIf(process.env.KAFKA3O_PREVIEW_INTEGRATION !== "1")("built Console 
 
     await user.type(screen.getByLabelText("Password"), "replacement passphrase");
     await user.click(screen.getByRole("button", { name: "Sign in" }));
-    expect(await screen.findByRole("heading", { name: "Signed in" })).toBeDefined();
+    expect(await screen.findByRole("group", { name: "Console session" })).toBeDefined();
     expect(screen.queryByRole("link", { name: "Clusters" })).toBeNull();
     await user.click(screen.getByRole("button", { name: "Sign out" }));
     expect(await screen.findByText("You are signed out.")).toBeDefined();
@@ -123,7 +123,7 @@ describe.skipIf(process.env.KAFKA3O_PREVIEW_INTEGRATION !== "1")("built Console 
 
     await user.type(screen.getByLabelText("Password"), "replacement passphrase");
     await user.click(screen.getByRole("button", { name: "Sign in" }));
-    expect(await screen.findByRole("heading", { name: "Signed in" })).toBeDefined();
+    expect(await screen.findByRole("group", { name: "Console session" })).toBeDefined();
     // Let the signed-in administration reads finish before another client revokes this session.
     expect(await screen.findByRole("region", { name: "Identities and direct grants" })).toBeDefined();
     expect(await screen.findByText(/No clusters are registered/)).toBeDefined();
@@ -157,11 +157,11 @@ describe.skipIf(process.env.KAFKA3O_PREVIEW_INTEGRATION !== "1")("built Console 
     expect((await administrator.fetch(`${origin}/api/session`, options)).status).toBe(200);
     expect(jsdom.cookieJar.getCookiesSync(origin, { http: true })
       .some((cookie) => cookie.key === "__Host-kafka3o_session")).toBe(true);
-    expect(screen.getByRole("heading", { name: "Signed in" })).toBeDefined();
+    expect(screen.getByRole("group", { name: "Console session" })).toBeDefined();
     await user.click(screen.getByRole("button", { name: "Sign out" }));
     expect(await screen.findByText("Your session has ended.")).toBeDefined();
     expect(screen.getByRole("form", { name: "Local sign-in" })).toBeDefined();
-    expect(screen.queryByRole("heading", { name: "Signed in" })).toBeNull();
+    expect(screen.queryByRole("group", { name: "Console session" })).toBeNull();
     expect(jsdom.cookieJar.getCookiesSync(origin, { http: true })
       .filter((cookie) => cookie.key === "__Host-kafka3o_session" || cookie.key === "__Host-kafka3o_csrf")).toHaveLength(0);
     expect(administrator.requests.map(({ method, path, status }) => ({ method, path, status }))).toEqual([

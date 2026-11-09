@@ -1,5 +1,5 @@
 import { QueryClient } from "@tanstack/react-query";
-import { StrictMode } from "react";
+import { type ReactNode, StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router";
 import "./styles.css";
@@ -107,7 +107,8 @@ type GatewayWrite = (gatewayUrl: string) => (url: string, request: GatewayWriteR
 type GatewayAppCredentials = typeof gatewayCredentials;
 
 // gatewayApp is composition-root wiring of the Kafka UI over a chosen Gateway transport.
-function gatewayApp(read: GatewayRead, write: GatewayWrite, credentials: GatewayAppCredentials, loadConfig: () => Promise<GatewayEntry[]>) {
+function gatewayApp(read: GatewayRead, write: GatewayWrite, credentials: GatewayAppCredentials, loadConfig: () => Promise<GatewayEntry[]>,
+  sessionIndicator?: ReactNode) {
   return (
     <BrowserRouter>
       <App
@@ -137,6 +138,7 @@ function gatewayApp(read: GatewayRead, write: GatewayWrite, credentials: Gateway
         linkOrigin={window.location.origin}
         copyMessageLink={(text) => navigator.clipboard.writeText(text)}
         statusRefreshMs={statusRefreshMs}
+        sessionIndicator={sessionIndicator}
       />
     </BrowserRouter>
   );
@@ -151,7 +153,7 @@ const queryClient = new QueryClient();
 // Secured mode sends every Kafka request through the Console; there are no Gateway tokens to enter.
 const consoleSecured = import.meta.env.VITE_KAFKA3O_CONSOLE_SECURED === "true";
 const securedCredentials: GatewayAppCredentials = { read: () => null, save: () => undefined, clear: () => undefined, isAutomatic: () => true };
-function securedApp(sessionEnded: () => void) {
+function securedApp(sessionEnded: () => void, sessionIndicator: ReactNode) {
   const ended = () => {
     queryClient.clear();
     sessionEnded();
@@ -175,7 +177,7 @@ function securedApp(sessionEnded: () => void) {
   const write: GatewayWrite = (gatewayUrl) => (url, request) =>
     fetchConsoleGatewayJson(window.fetch.bind(window), origin, () => document.cookie, gatewayUrl, url, securedTimeoutMs, ended, request,
       productionReason(gatewayUrl));
-  return gatewayApp(read, write, securedCredentials, loadClusters);
+  return gatewayApp(read, write, securedCredentials, loadClusters, sessionIndicator);
 }
 
 createRoot(document.getElementById("root")!).render(

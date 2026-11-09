@@ -1,4 +1,5 @@
 import { act, render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import type { ConsoleAdminClient } from "../console/ConsoleAdmin";
 import { ConsoleAdminError } from "../console/ConsoleAdminError";
@@ -66,10 +67,24 @@ describe("ConsoleSessionGate secured application", () => {
     });
     render(<ConsoleSessionGate client={testClient(normal)} renderApp={renderApp} />);
     expect(await screen.findByText("Kafka application")).toBeDefined();
-    expect(screen.getByText(/Kafka access follows your Console roles/)).toBeDefined();
+    expect(screen.queryByRole("heading", { name: "Signed in" })).toBeNull();
+    expect(screen.queryByText(/Kafka access follows your Console roles/)).toBeNull();
     act(() => ended?.());
     expect(await screen.findByRole("heading", { name: "Sign in" })).toBeDefined();
     expect(screen.queryByText("Kafka application")).toBeNull();
+  });
+
+  it("passes the session indicator to the application and signs out from it", async () => {
+    const user = userEvent.setup();
+    const client = testClient(normal);
+    client.signOut.mockResolvedValue(undefined);
+    render(<ConsoleSessionGate client={client} renderApp={(_ended, indicator) => <header>{indicator}</header>} />);
+    const indicator = await screen.findByRole("group", { name: "Console session" });
+    expect(indicator.textContent).toContain(`Signed in as ${normal.username}`);
+    expect(indicator.closest("header")).not.toBeNull();
+    expect(screen.queryByText("Console access")).toBeNull();
+    await user.click(screen.getByRole("button", { name: "Sign out" }));
+    expect(await screen.findByRole("heading", { name: "Sign in" })).toBeDefined();
   });
 
   it("does not render the application before the temporary password is replaced", async () => {

@@ -9,6 +9,7 @@ import { AccessManagement } from "./AccessManagement";
 import { AuditInvestigation } from "./AuditInvestigation";
 import { ClusterClassification } from "./ClusterClassification";
 import styles from "./ConsoleSessionGate.module.css";
+import { SessionIndicator } from "./SessionIndicator";
 
 type Screen =
   | { kind: "checking" }
@@ -24,8 +25,9 @@ type ConsoleSessionGateProps = {
   // Administration is shown to every signed-in session; the Console decides who may use it.
   admin?: ConsoleAdminClient;
   confirm?: (message: string) => boolean;
-  // renderApp shows the secured Kafka UI for a signed-in session; it receives the session-ended callback.
-  renderApp?: (sessionEnded: () => void) => ReactNode;
+  // renderApp shows the secured Kafka UI for a signed-in session; it receives the session-ended callback
+  // and the session indicator to place in the application header.
+  renderApp?: (sessionEnded: () => void, sessionIndicator: ReactNode) => ReactNode;
   audit?: ConsoleAuditClient;
 };
 
@@ -283,6 +285,51 @@ export function ConsoleSessionGate({ client, sso, browser, admin, confirm, rende
     setScreen({ kind: "signedOut", notice: "Your session has ended. Sign in again." });
   }
 
+  const activeSession = screen.kind === "signedIn" && !screen.session.mustChangePassword ? screen.session : undefined;
+  const administration = admin && confirm && activeSession ? (
+    <div className={styles.administration} key={activeSession.accountId}>
+      <AccessManagement admin={admin} confirm={confirm} onUnauthorized={sessionEnded} />
+      <ClusterClassification admin={admin} confirm={confirm} onUnauthorized={sessionEnded} />
+      {audit ? <AuditInvestigation audit={audit} onUnauthorized={sessionEnded} /> : null}
+    </div>
+  ) : null;
+  if (activeSession) {
+    const indicator = <SessionIndicator username={activeSession.username} signingOut={pending === "signOut"} onSignOut={signOut} />;
+    const alerts = (
+      <>
+        {unresolvedChanges.has(activeSession.accountId) ? (
+          <p role="alert" className={styles.warning}>An earlier password change may still have completed. Check the audit before retrying.</p>
+        ) : null}
+        {error ? <p role="alert" className={styles.error}>{error}</p> : null}
+      </>
+    );
+    if (renderApp) {
+      return (
+        <div className={styles.signedIn}>
+          <div className={styles.alerts}>{alerts}</div>
+          <div key={`app-${activeSession.accountId}`}>{renderApp(sessionEnded, indicator)}</div>
+          {administration ? <div className={styles.main}>{administration}</div> : null}
+        </div>
+      );
+    }
+    return (
+      <div className={styles.shell}>
+        <header className={styles.header}>
+          <span className={styles.brand}>Kafka3O</span>
+          <span className={styles.badge}>Authentication preview</span>
+          {indicator}
+        </header>
+        <main className={styles.main}>
+          <div className={styles.alerts}>
+            <p className={styles.notice}>This preview does not open clusters or enforce Kafka permissions. The existing manual interface is separate.</p>
+            {alerts}
+          </div>
+          {administration}
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.shell}>
       <header className={styles.header}>
@@ -293,8 +340,7 @@ export function ConsoleSessionGate({ client, sso, browser, admin, confirm, rende
         <section className={styles.card} aria-labelledby="console-session-title" aria-busy={pending !== null || screen.kind === "checking"}>
           <p className={styles.eyebrow}>Console access</p>
           <h1 id="console-session-title">
-            {screen.kind === "signedIn" && screen.session.mustChangePassword ? "Change your password"
-              : screen.kind === "signedIn" ? "Signed in"
+            {screen.kind === "signedIn" ? "Change your password"
                 : screen.kind === "uncertain" ? "Check your session"
                   : screen.kind === "unavailable" ? "Sign-in unavailable"
                     : screen.kind === "checking" ? "Checking your session" : "Sign in"}
@@ -379,16 +425,6 @@ export function ConsoleSessionGate({ client, sso, browser, admin, confirm, rende
               <button type="button" className={styles.secondary} onClick={signOut} disabled={pending !== null}>{pending === "signOut" ? "Signing out..." : "Sign out"}</button>
             </>
           ) : null}
-          {screen.kind === "signedIn" && !screen.session.mustChangePassword ? (
-            <>
-              <p role="status" className={styles.notice}>Signed in as <strong>{screen.session.username}</strong>.</p>
-              {unresolvedChanges.has(screen.session.accountId) ? (
-                <p role="alert" className={styles.warning}>An earlier password change may still have completed. Check the audit before retrying.</p>
-              ) : null}
-              {renderApp ? null : <p className={styles.context}>This preview does not open clusters or enforce Kafka permissions. The existing manual interface is separate.</p>}
-              <button type="button" onClick={signOut} disabled={pending !== null}>{pending === "signOut" ? "Signing out..." : "Sign out"}</button>
-            </>
-          ) : null}
           {screen.kind === "uncertain" ? (
             <>
               <p role="alert" className={styles.warning}>
@@ -408,16 +444,6 @@ export function ConsoleSessionGate({ client, sso, browser, admin, confirm, rende
           ) : null}
           {error ? <p role="alert" className={styles.error}>{error}</p> : null}
         </section>
-        {renderApp && screen.kind === "signedIn" && !screen.session.mustChangePassword ? (
-          <div className={styles.application} key={`app-${screen.session.accountId}`}>{renderApp(sessionEnded)}</div>
-        ) : null}
-        {admin && confirm && screen.kind === "signedIn" && !screen.session.mustChangePassword ? (
-          <div className={styles.administration} key={screen.session.accountId}>
-            <AccessManagement admin={admin} confirm={confirm} onUnauthorized={sessionEnded} />
-            <ClusterClassification admin={admin} confirm={confirm} onUnauthorized={sessionEnded} />
-            {audit ? <AuditInvestigation audit={audit} onUnauthorized={sessionEnded} /> : null}
-          </div>
-        ) : null}
       </main>
     </div>
   );

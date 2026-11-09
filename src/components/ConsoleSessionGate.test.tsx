@@ -92,7 +92,7 @@ describe("ConsoleSessionGate", () => {
     expect((screen.getByLabelText("Password") as HTMLInputElement).value).toBe("");
     expect(screen.getByRole("button", { name: "Signing in..." }).matches(":disabled")).toBe(true);
     await act(async () => finishSignIn(normal));
-    expect(await screen.findByRole("heading", { name: "Signed in" })).toBeDefined();
+    expect(await screen.findByRole("group", { name: "Console session" })).toBeDefined();
   });
 
   it("requires an explicit session check after an uncertain sign-in", async () => {
@@ -240,8 +240,10 @@ describe("ConsoleSessionGate", () => {
     client.inspect.mockResolvedValueOnce(normal).mockResolvedValueOnce(normal).mockResolvedValueOnce(null);
     client.signOut.mockRejectedValueOnce(new ConsoleSessionError("outcome_unknown"));
     render(<ConsoleSessionGate client={client} />);
-    expect(await screen.findByRole("heading", { name: "Signed in" })).toBeDefined();
+    expect(await screen.findByRole("group", { name: "Console session" })).toBeDefined();
     expect(screen.getByText(/does not open clusters/)).toBeDefined();
+    expect(screen.queryByText("Console access")).toBeNull();
+    expect(screen.getByRole("banner").contains(screen.getByRole("group", { name: "Console session" }))).toBe(true);
     await user.click(screen.getByRole("button", { name: "Sign out" }));
     expect((await screen.findByRole("alert")).textContent).toContain("could not be confirmed");
     await user.click(screen.getByRole("button", { name: "Check session" }));
@@ -260,7 +262,7 @@ describe("ConsoleSessionGate", () => {
     render(<ConsoleSessionGate client={client} />);
     await user.click(await screen.findByRole("button", { name: "Sign out" }));
     expect((await screen.findByRole("alert")).textContent).toContain("session may still be active");
-    expect(screen.getByRole("heading", { name: "Signed in" })).toBeDefined();
+    expect(screen.getByRole("group", { name: "Console session" })).toBeDefined();
   });
 
   it("treats a confirmed expired session during logout as signed out", async () => {
@@ -272,7 +274,7 @@ describe("ConsoleSessionGate", () => {
     await user.click(await screen.findByRole("button", { name: "Sign out" }));
     expect((await screen.findByRole("status")).textContent).toContain("session has ended");
     expect(screen.getByRole("form", { name: "Local sign-in" })).toBeDefined();
-    expect(screen.queryByRole("heading", { name: "Signed in" })).toBeNull();
+    expect(screen.queryByRole("group", { name: "Console session" })).toBeNull();
     expect(client.inspect).toHaveBeenCalledTimes(1);
     expect(client.signOut).toHaveBeenCalledTimes(1);
   });
@@ -289,6 +291,6 @@ describe("ConsoleSessionGate", () => {
     expect(await screen.findByRole("form", { name: "Local sign-in" })).toBeDefined();
     await act(async () => finish(normal));
     await waitFor(() => expect(screen.getByRole("form", { name: "Local sign-in" })).toBeDefined());
-    expect(screen.queryByRole("heading", { name: "Signed in" })).toBeNull();
+    expect(screen.queryByRole("group", { name: "Console session" })).toBeNull();
   });
 });

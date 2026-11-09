@@ -74,7 +74,7 @@ describe("ConsoleSessionGate SSO", () => {
     browser.replace.mockImplementation((path: string) => { order.push(`replace ${path}`); });
     sso.complete.mockImplementation(async () => { order.push("complete"); return cognitoSession; });
     render(<StrictMode><ConsoleSessionGate client={client} sso={sso} browser={browser} /></StrictMode>);
-    expect(await screen.findByRole("heading", { name: "Signed in" })).toBeDefined();
+    expect(await screen.findByRole("group", { name: "Console session" })).toBeDefined();
     expect(sso.complete).toHaveBeenCalledExactlyOnceWith("?code=secret-code&state=secret-state");
     expect(order.slice(0, 2)).toEqual(["replace /auth/cognito/callback", "complete"]);
     expect(browser.replace).toHaveBeenLastCalledWith("/");
