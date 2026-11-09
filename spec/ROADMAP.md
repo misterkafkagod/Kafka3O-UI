@@ -260,7 +260,7 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
     - Demo: `GET /api/session` returns `administration.access/audit` true for a global ADMIN, audit-only for a cluster ADMIN, both false otherwise, and follows grant changes.
   - **P65** F46-B2 · Separate Administration page for administrators — Covers: UI portion of F46-AC2 · Discovery: — · Status: Done
     - Demo: the global ADMIN opens Administration from the header and sees all three sections; an OPERATOR sees no link and `/administration` shows "Not permitted".
-  - **P66** F46-B3 + F46-B4 · Clusters open on Topics, and Create topic is spaced — Covers: F46-AC3, F46-AC4 · Discovery: — · Status: Building
+  - **P66** F46-B3 + F46-B4 · Clusters open on Topics, and Create topic is spaced — Covers: F46-AC3, F46-AC4 · Discovery: — · Status: Done
     - Demo: opening Kafka A shows the Topics tab first and selected, Brokers is at `/clusters/kafka-a/brokers`, and Create topic is separated from the filters.
   - **P67** F45-B1 + F45-B5 + F45-B6 · Saved color mode switch — Covers: F45-AC1, F45-AC4, F45-AC5, F45-AC6 · Discovery: — · Status: Defined
     - Demo: choosing Dark on a light system switches immediately, survives reload and updates another tab; blocked storage falls back to defaults with a notice.

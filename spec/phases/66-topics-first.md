@@ -2,7 +2,7 @@
 - **Milestone:** M11
 - **Covers:** F46-AC3, F46-AC4
 - **Discovery:** —
-- **Status:** Building
+- **Status:** Done
 
 ## Demo
 1. Open a cluster from the clusters page.
@@ -20,3 +20,8 @@
   - Done when: `npm test` and `npm run build` pass, and Chromium measures at least 16 px between the disclosure and the filters in both states.
 
 ## Review
+- **Demo:** passed (auto-approved under the user's standing M11 instruction, 2026-11-08; run by Claude). Without Docker or a permitted EKS-D redeploy, the built UI was served by `vite preview` and its Gateway answers were synthesized inside Chromium 1194 (no Kafka involved), 6/6 checks: opening Dev from the clusters page lands on `/clusters/dev` with Topics first and selected; tabs read Topics, Brokers, Consumer groups, Broker configuration; Brokers opens `/clusters/dev/brokers` with the broker table; `/clusters/dev/topics/orders` still routes to the topic; 20 px separate Create topic from the filters, collapsed and expanded.
+- **Vulnerability scan:** not run; no dependency changes.
+- **Regression:** `npm test` 452 passed (5 opt-in skipped); default build.
+- **Convention check:** no new action files; one CSS module for the page.
+
