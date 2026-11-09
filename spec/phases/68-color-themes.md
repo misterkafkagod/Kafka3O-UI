@@ -2,7 +2,7 @@
 - **Milestone:** M11
 - **Covers:** F45-AC2
 - **Discovery:** —
-- **Status:** Building
+- **Status:** Done
 
 ## Demo
 1. Open Appearance and switch between Blue, Slate, Teal and High contrast, in Light and in Dark.
@@ -23,3 +23,9 @@
   - Done when: `npx vitest run src/appearance/AppearancePanel.test.tsx` passes, covering the theme change and Reset; then `npm test` passes.
 
 ## Review
+- **Demo:** passed (auto-approved under the user's standing M11 instruction, 2026-11-08; run by Claude). `themeContrast.test.ts` passes 12/12 (four themes, light and dark, full token sets, system dark equal to forced dark), and a deliberately weakened token made it fail (2.33:1) before being restored. In Chromium 1194 against the built UI, switching Blue, Slate, Teal and High contrast in Light and Dark recolored the console to each theme's canvas, 8/8, with the "Gateway unreachable" status keeping its text; Teal light and High contrast dark were checked visually.
+- **Vulnerability scan:** not run; no dependency changes.
+- **Regression:** `npm test` 488 passed (5 opt-in skipped); default build.
+- **Convention check:** `contrastRatio` and `AppearanceChoice` are single-function files with tests; `themes.css` is data.
+- **Note:** lowest ratios: normal text 5.40:1 (Slate light, success status on subtle surface), High contrast 7.93:1; boundaries 4.26:1 (Teal light border on canvas).
+

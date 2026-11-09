@@ -264,7 +264,7 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
     - Demo: opening Kafka A shows the Topics tab first and selected, Brokers is at `/clusters/kafka-a/brokers`, and Create topic is separated from the filters.
   - **P67** F45-B1 + F45-B5 + F45-B6 · Saved color mode switch — Covers: F45-AC1, F45-AC4, F45-AC5, F45-AC6 · Discovery: — · Status: Done
     - Demo: choosing Dark on a light system switches immediately, survives reload and updates another tab; blocked storage falls back to defaults with a notice.
-  - **P68** F45-B2 · Preset color themes — Covers: F45-AC2 · Discovery: — · Status: Building
+  - **P68** F45-B2 · Preset color themes — Covers: F45-AC2 · Discovery: — · Status: Done
     - Demo: switching between Blue, Slate, Teal and High contrast recolors the console in light and dark; the contrast test passes for every pair.
   - **P69** F45-B3 + F45-B4 · Font, text size and density — Covers: F45-AC3 · Discovery: — · Status: Defined
     - Demo: Hyperlegible at Extra large stays usable at 320 px, and Compact tightens table rows while targets stay at least 24×24 px.
