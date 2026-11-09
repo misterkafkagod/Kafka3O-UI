@@ -14,7 +14,7 @@
   - Files: src/components/ClusterTabs.tsx, src/components/ClusterTabs.test.tsx, src/App.tsx, src/components/AppShell.tsx, src/App.test.tsx, src/AdministrationRoutes.test.tsx, src/pages/ClusterPage.test.tsx
   - Do: Tabs are ordered Topics, Brokers, Consumer groups, Broker configuration; Brokers links to `/clusters/<id>/brokers`. `/clusters/<id>` and `/clusters/<id>/topics` render the topic view with Topics selected; `/clusters/<id>/brokers` renders the brokers and controller with a "Brokers" breadcrumb. Tests that opened a cluster expecting brokers use the brokers address.
   - Done when: `npx vitest run src/components/ClusterTabs.test.tsx src/App.test.tsx src/AdministrationRoutes.test.tsx src/pages/ClusterPage.test.tsx` passes, covering tab order, the default Topics view, the brokers address and the breadcrumb.
-- [ ] **T66.2 Space below Create topic** — Covers: F46-AC4
+- [x] **T66.2 Space below Create topic** — Covers: F46-AC4
   - Files: src/pages/ClusterPage.tsx, src/pages/ClusterPage.module.css (new)
   - Do: The "Create topic" disclosure gets a bottom margin of 1.25rem, so it is separated from the topic filters whether collapsed or open.
   - Done when: `npm test` and `npm run build` pass, and Chromium measures at least 16 px between the disclosure and the filters in both states.

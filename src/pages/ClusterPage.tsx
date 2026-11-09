@@ -13,6 +13,7 @@ import type { CreateTopic as CreateAction } from "../gateway/createTopic";
 import type { ListConsumerGroups } from "../gateway/listConsumerGroups";
 import type { ListTopics } from "../gateway/listTopics";
 import { useGatewayConfig } from "../hooks/useGatewayConfig";
+import styles from "./ClusterPage.module.css";
 
 type ClusterPageProps = {
   loadGatewayConfig: LoadGatewayConfig;
@@ -46,7 +47,7 @@ export function ClusterPage({ loadGatewayConfig, getCluster, listTopics, listCon
       ) : view === "topics" ? (
         <main>
           <h2>Topics</h2>
-          <details>
+          <details className={styles.createTopic}>
             <summary>Create topic</summary>
             <CreateTopic key={gateway.id} gateway={gateway} createTopic={createTopic} />
           </details>
