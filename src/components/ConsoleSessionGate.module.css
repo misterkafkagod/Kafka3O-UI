@@ -20,6 +20,14 @@
   margin: 0 auto;
 }
 
+.headerEnd {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-left: auto;
+}
+
 .brand {
   font-size: 1.5rem;
   font-weight: 750;

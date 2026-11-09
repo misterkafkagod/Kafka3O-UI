@@ -4,6 +4,7 @@ import type { LoadGatewayConfig } from "../config/loadGatewayConfig";
 import { findGatewayById } from "../config/findGatewayById";
 import type { GatewayCredentials } from "../gateway/GatewayCredentials";
 import { useGatewayConfig } from "../hooks/useGatewayConfig";
+import { AppearancePanel } from "../appearance/AppearancePanel";
 import styles from "./AppShell.module.css";
 import { GatewayCredentialsPanel } from "./GatewayCredentialsPanel";
 import { GatewayConnectionContext } from "./GatewayConnectionContext";
@@ -80,6 +81,7 @@ export function AppShell({ children, loadGatewayConfig, credentials, connectionO
             </Link>
           ) : null}
         </nav>
+        <AppearancePanel />
         <GatewayCredentialsPanel
           loadGatewayConfig={loadGatewayConfig}
           credentials={credentials}

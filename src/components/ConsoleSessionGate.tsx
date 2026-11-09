@@ -6,6 +6,7 @@ import { ConsoleSessionError } from "../console/ConsoleSessionError";
 import { cognitoCallbackPath, type ConsoleBrowser, type ConsoleSsoClient } from "../console/ConsoleSso";
 import { describeSsoFailure } from "../console/describeSsoFailure";
 import type { ConsoleAdministration } from "../console/ConsoleSession";
+import { AppearancePanel } from "../appearance/AppearancePanel";
 import { AdministrationPage } from "./AdministrationPage";
 import styles from "./ConsoleSessionGate.module.css";
 import { SessionIndicator } from "./SessionIndicator";
@@ -350,7 +351,10 @@ export function ConsoleSessionGate({ client, sso, browser, admin, confirm, rende
         <header className={styles.header}>
           <span className={styles.brand}>Kafka3O</span>
           <span className={styles.badge}>Authentication preview</span>
-          {indicator}
+          <div className={styles.headerEnd}>
+            <AppearancePanel />
+            {indicator}
+          </div>
         </header>
         <main className={styles.main}>
           <div className={styles.alerts}>
@@ -368,6 +372,9 @@ export function ConsoleSessionGate({ client, sso, browser, admin, confirm, rende
       <header className={styles.header}>
         <span className={styles.brand}>Kafka3O</span>
         <span className={styles.badge}>{renderApp ? "Secured" : "Authentication preview"}</span>
+        <div className={styles.headerEnd}>
+          <AppearancePanel />
+        </div>
       </header>
       <main className={styles.main}>
         <section className={styles.card} aria-labelledby="console-session-title" aria-busy={pending !== null || screen.kind === "checking"}>
