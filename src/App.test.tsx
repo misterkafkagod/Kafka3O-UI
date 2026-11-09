@@ -257,14 +257,20 @@ describe("App", () => {
 
     await user.click(await screen.findByRole("link", { name: "Dev" }));
 
+    expect(await screen.findByRole("table", { name: "Topics" })).toBeDefined();
+    const sections = screen.getByRole("navigation", { name: "Cluster sections" });
+    expect(within(sections).getByRole("link", { name: "Topics" }).getAttribute("aria-current")).toBe("page");
+    await user.click(within(sections).getByRole("link", { name: "Brokers" }));
     expect((await screen.findByText("Controller")).nextElementSibling?.textContent).toBe("1");
     expect(screen.getByRole("table", { name: "Brokers" })).toBeDefined();
+    const breadcrumb = screen.getByRole("navigation", { name: "Breadcrumb" });
+    expect(within(breadcrumb).getByText("Brokers").getAttribute("aria-current")).toBe("page");
   });
 
   it("the Topics tab opens the cluster's topic list", async () => {
     const user = userEvent.setup();
     render(
-      <MemoryRouter initialEntries={["/clusters/dev"]}>
+      <MemoryRouter initialEntries={["/clusters/dev/brokers"]}>
         <App
           administration={administration}
           queryClient={new QueryClient()}

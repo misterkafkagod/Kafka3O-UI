@@ -10,7 +10,7 @@
 3. Expect at least 1rem between "Create topic" and the topic filters, collapsed and expanded.
 
 ## Tasks
-- [ ] **T66.1 Topics as the cluster's first tab** — Covers: F46-AC3
+- [x] **T66.1 Topics as the cluster's first tab** — Covers: F46-AC3
   - Files: src/components/ClusterTabs.tsx, src/components/ClusterTabs.test.tsx, src/App.tsx, src/components/AppShell.tsx, src/App.test.tsx, src/AdministrationRoutes.test.tsx, src/pages/ClusterPage.test.tsx
   - Do: Tabs are ordered Topics, Brokers, Consumer groups, Broker configuration; Brokers links to `/clusters/<id>/brokers`. `/clusters/<id>` and `/clusters/<id>/topics` render the topic view with Topics selected; `/clusters/<id>/brokers` renders the brokers and controller with a "Brokers" breadcrumb. Tests that opened a cluster expecting brokers use the brokers address.
   - Done when: `npx vitest run src/components/ClusterTabs.test.tsx src/App.test.tsx src/AdministrationRoutes.test.tsx src/pages/ClusterPage.test.tsx` passes, covering tab order, the default Topics view, the brokers address and the breadcrumb.

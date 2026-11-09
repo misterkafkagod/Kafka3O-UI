@@ -24,7 +24,7 @@ describe("Kafka administration navigation", () => {
     };
     const gateway = { id: "dev", name: "Dev", url: "https://gateway.example" };
     render(
-      <MemoryRouter initialEntries={["/clusters/dev"]}>
+      <MemoryRouter initialEntries={["/clusters/dev/brokers"]}>
         <App
           queryClient={new QueryClient({ defaultOptions: { queries: { retry: false } } })}
           loadGatewayConfig={async () => [gateway]}

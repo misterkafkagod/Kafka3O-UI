@@ -4,10 +4,11 @@ import { renderWithQuery } from "../test/renderWithQuery";
 import { ClusterTabs } from "./ClusterTabs";
 
 describe("ClusterTabs", () => {
-  it("links cluster sections for the gateway", () => {
+  it("links cluster sections for the gateway with Topics first", () => {
     renderWithQuery(<ClusterTabs gatewayId="dev" view="brokers" />);
 
-    expect(screen.getByRole("link", { name: "Brokers" }).getAttribute("href")).toBe("/clusters/dev");
+    expect(screen.getAllByRole("link").map((link) => link.textContent)).toEqual(["Topics", "Brokers", "Consumer groups", "Broker configuration"]);
+    expect(screen.getByRole("link", { name: "Brokers" }).getAttribute("href")).toBe("/clusters/dev/brokers");
     expect(screen.getByRole("link", { name: "Topics" }).getAttribute("href")).toBe("/clusters/dev/topics");
     expect(screen.getByRole("link", { name: "Consumer groups" }).getAttribute("href")).toBe("/clusters/dev/consumer-groups");
   });

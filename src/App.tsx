@@ -105,6 +105,20 @@ export function App({
                 listConsumerGroups={listConsumerGroups}
                 createTopic={createTopic}
                 statusRefreshMs={statusRefreshMs}
+                view="topics"
+              />
+            }
+          />
+          <Route
+            path="/clusters/:gatewayId/brokers"
+            element={
+              <ClusterPage
+                loadGatewayConfig={loadGatewayConfig}
+                getCluster={getCluster}
+                listTopics={listTopics}
+                listConsumerGroups={listConsumerGroups}
+                createTopic={createTopic}
+                statusRefreshMs={statusRefreshMs}
                 view="brokers"
               />
             }
