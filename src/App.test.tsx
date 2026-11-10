@@ -330,6 +330,7 @@ describe("App", () => {
       </MemoryRouter>,
     );
     await user.click(await screen.findByRole("link", { name: "Consumer groups" }));
+    await user.click(await screen.findByRole("link", { name: "orders-group" }));
     expect(await screen.findByRole("heading", { name: "orders-group" })).toBeDefined();
     expect(listGroups).toHaveBeenCalledWith("http://localhost:8081");
   });

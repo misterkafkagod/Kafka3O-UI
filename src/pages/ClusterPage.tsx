@@ -4,6 +4,7 @@ import { ClusterNotFound } from "../components/ClusterNotFound";
 import { ClusterTabs } from "../components/ClusterTabs";
 import { ClusterBackups } from "../components/ClusterBackups";
 import { ConnectConnectors } from "../components/ConnectConnectors";
+import { ConsumerGroupPage } from "../components/ConsumerGroupPage";
 import { ConsumerGroups } from "../components/ConsumerGroups";
 import { CreateTopic } from "../components/CreateTopic";
 import { GatewayConfigError } from "../components/GatewayConfigError";
@@ -40,7 +41,7 @@ type ClusterPageProps = {
 };
 
 export function ClusterPage({ loadGatewayConfig, getCluster, listTopics, listConsumerGroups, createTopic, statusRefreshMs, view, offsetReset, listConnectors = connectNotConfigured, connectorActions, backupActions, listBackups = backupsNotConfigured }: ClusterPageProps) {
-  const { gatewayId } = useParams();
+  const { gatewayId, groupId } = useParams();
   const { data: gateways, isError, refetch } = useGatewayConfig(loadGatewayConfig);
 
   if (isError) {
@@ -60,8 +61,10 @@ export function ClusterPage({ loadGatewayConfig, getCluster, listTopics, listCon
         <ClusterBackups gateway={gateway} listTopics={listTopics} listBackups={listBackups} actions={backupActions} />
       ) : view === "connect" ? (
         <ConnectConnectors gateway={gateway} listConnectors={listConnectors} actions={connectorActions} />
+      ) : view === "consumer-groups" && groupId !== undefined ? (
+        <ConsumerGroupPage key={groupId} gateway={gateway} groupId={groupId} listConsumerGroups={listConsumerGroups} offsetReset={offsetReset} />
       ) : view === "consumer-groups" ? (
-        <ConsumerGroups gateway={gateway} listConsumerGroups={listConsumerGroups} offsetReset={offsetReset} />
+        <ConsumerGroups gateway={gateway} listConsumerGroups={listConsumerGroups} />
       ) : view === "topics" ? (
         <main>
           <h2>Topics</h2>

@@ -25,42 +25,16 @@ describe("ConsumerGroups", () => {
     const alert = await screen.findByRole("alert");
     expect(within(alert).getByText("Gateway unreachable")).toBeDefined();
     await userEvent.click(within(alert).getByRole("button", { name: "Retry" }));
-    expect(await screen.findByRole("heading", { name: "orders" })).toBeDefined();
+    expect(await screen.findByRole("link", { name: "orders" })).toBeDefined();
     expect(list).toHaveBeenCalledTimes(2);
   });
 
-  it("does not display cached groups after a failed refresh", async () => {
-    const list = vi.fn()
-      .mockResolvedValueOnce([{ ...group, error: "temporary group error" }])
-      .mockRejectedValueOnce(new TypeError("Failed to fetch"));
-    renderWithQuery(<ConsumerGroups gateway={gateway} listConsumerGroups={list} />);
-
-    await userEvent.click(within(await screen.findByRole("alert")).getByRole("button", { name: "Retry group data" }));
-    expect(await screen.findByText("Gateway unreachable")).toBeDefined();
-    expect(screen.queryByRole("heading", { name: "orders" })).toBeNull();
-  });
-
-  it("keeps an individual group's error visible and can retry it", async () => {
-    const list = vi.fn().mockResolvedValueOnce([{ ...group, error: "group access denied" }]).mockResolvedValueOnce([group]);
-    renderWithQuery(<ConsumerGroups gateway={gateway} listConsumerGroups={list} />);
-
-    const alert = await screen.findByRole("alert");
-    expect(alert.textContent).toContain("group access denied");
-    await userEvent.click(within(alert).getByRole("button", { name: "Retry group data" }));
-    expect(await screen.findByText("No active members.")).toBeDefined();
-    expect(screen.queryByRole("alert")).toBeNull();
-  });
-
-  it("connects a group's list link to its existing details without another fetch", async () => {
-    const named = { ...group, id: "reader & west/1" };
-    const list = vi.fn(async () => [named]);
-    renderWithQuery(<ConsumerGroups gateway={gateway} listConsumerGroups={list} />);
+  it("lists groups and marks an incomplete group without stacking every group's details", async () => {
+    renderWithQuery(<ConsumerGroups gateway={gateway} listConsumerGroups={async () => [{ ...group, error: "group access denied" }]} />);
 
     const table = await screen.findByRole("table", { name: "Consumer groups" });
-    const link = within(table).getByRole("link", { name: named.id });
-    const details = screen.getByRole("region", { name: `Consumer group ${named.id}` });
-    expect(decodeURIComponent(link.getAttribute("href")!.slice(1))).toBe(details.id);
-    expect(within(details).getByText("No active members.")).toBeDefined();
-    expect(list).toHaveBeenCalledOnce();
+    expect(within(table).getByRole("link", { name: "orders" }).getAttribute("href")).toBe("/clusters/dev/consumer-groups/orders");
+    expect(within(table).getByText("Group data incomplete")).toBeDefined();
+    expect(screen.queryByRole("region", { name: "Consumer group orders" })).toBeNull();
   });
 });

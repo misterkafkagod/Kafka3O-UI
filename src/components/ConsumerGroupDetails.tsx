@@ -1,20 +1,16 @@
-import type { OffsetResetActions } from "../gateway/OffsetResetActions";
 import type { ConsumerGroup } from "../gateway/types";
 import { consumerGroupAnchor } from "../groups/consumerGroupAnchor";
 import { consumerLagStatusLabel } from "../groups/consumerLagStatusLabel";
 import { ConsumerGroupMembers } from "./ConsumerGroupMembers";
-import { OffsetResetPreview } from "./OffsetResetPreview";
 import { ScrollableTableRegion } from "./ScrollableTableRegion";
 import styles from "./ConsumerGroupDetails.module.css";
 
 type ConsumerGroupDetailsProps = {
   group: ConsumerGroup;
   onRetry: () => void;
-  // offsetReset enables the reset section on the cluster's consumer group page.
-  offsetReset?: { gatewayUrl: string; actions: OffsetResetActions };
 };
 
-export function ConsumerGroupDetails({ group, onRetry, offsetReset }: ConsumerGroupDetailsProps) {
+export function ConsumerGroupDetails({ group, onRetry }: ConsumerGroupDetailsProps) {
   return (
     <section id={consumerGroupAnchor(group.id)} tabIndex={-1} aria-label={`Consumer group ${group.id}`} className={styles.detail}>
       <h3>{group.id}</h3>
@@ -60,7 +56,6 @@ export function ConsumerGroupDetails({ group, onRetry, offsetReset }: ConsumerGr
       ) : (
         <p>{group.error ? "Partition lag may be unavailable." : "No partition offsets."}</p>
       )}
-      {offsetReset ? <OffsetResetPreview gatewayUrl={offsetReset.gatewayUrl} group={group} actions={offsetReset.actions} onApplied={onRetry} /> : null}
     </section>
   );
 }

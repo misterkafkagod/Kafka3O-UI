@@ -2,6 +2,15 @@
   font-variant-numeric: tabular-nums;
 }
 
+.row {
+  cursor: pointer;
+}
+
+.row:hover td,
+.row:hover th {
+  background: var(--color-surface-subtle);
+}
+
 .name {
   text-align: start;
   font-weight: 400;

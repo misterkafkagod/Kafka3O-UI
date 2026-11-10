@@ -203,6 +203,21 @@ export function App({
             }
           />
           <Route
+            path="/clusters/:gatewayId/consumer-groups/:groupId"
+            element={
+              <ClusterPage
+                loadGatewayConfig={loadGatewayConfig}
+                getCluster={getCluster}
+                listTopics={listTopics}
+                listConsumerGroups={listConsumerGroups}
+                createTopic={createTopic}
+                statusRefreshMs={statusRefreshMs}
+                view="consumer-groups"
+                offsetReset={offsetReset}
+              />
+            }
+          />
+          <Route
             path="/clusters/:gatewayId/configuration"
             element={<BrokerConfigurationPage loadGatewayConfig={loadGatewayConfig} getCluster={getCluster} administration={administration} statusRefreshMs={statusRefreshMs} />}
           />

@@ -35,6 +35,7 @@ export function AppShell({ children, loadGatewayConfig, credentials, connectionO
   const topicsMatch = useMatch("/clusters/:gatewayId/topics");
   const brokersMatch = useMatch("/clusters/:gatewayId/brokers");
   const consumerGroupsMatch = useMatch("/clusters/:gatewayId/consumer-groups");
+  const consumerGroupMatch = useMatch("/clusters/:gatewayId/consumer-groups/:groupId");
   const connectMatch = useMatch("/clusters/:gatewayId/connect");
   const backupsMatch = useMatch("/clusters/:gatewayId/backups");
   const brokerConfigurationMatch = useMatch("/clusters/:gatewayId/configuration");
@@ -44,7 +45,7 @@ export function AppShell({ children, loadGatewayConfig, credentials, connectionO
   const clusterPath = gateway ? `/clusters/${encodeURIComponent(gateway.id)}` : undefined;
   const gatewayBreadcrumb: Breadcrumb | undefined =
     gateway && clusterPath
-      ? !topicName && !topicsMatch && !brokersMatch && !consumerGroupsMatch && !brokerConfigurationMatch && !connectMatch && !backupsMatch
+      ? !topicName && !topicsMatch && !brokersMatch && !consumerGroupsMatch && !consumerGroupMatch && !brokerConfigurationMatch && !connectMatch && !backupsMatch
         ? { label: gateway.name, current: true }
         : { label: gateway.name, to: clusterPath }
       : undefined;
@@ -60,6 +61,8 @@ export function AppShell({ children, loadGatewayConfig, credentials, connectionO
       breadcrumbs.push({ label: "Brokers", current: true });
     } else if (consumerGroupsMatch) {
       breadcrumbs.push({ label: "Consumer groups", current: true });
+    } else if (consumerGroupMatch && clusterPath) {
+      breadcrumbs.push({ label: "Consumer groups", to: `${clusterPath}/consumer-groups` }, { label: consumerGroupMatch.params.groupId ?? "", current: true });
     } else if (connectMatch) {
       breadcrumbs.push({ label: "Kafka Connect", current: true });
     } else if (backupsMatch) {

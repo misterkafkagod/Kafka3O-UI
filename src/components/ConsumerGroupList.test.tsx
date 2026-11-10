@@ -1,6 +1,9 @@
-import { render, screen, within } from "@testing-library/react";
+import { screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { Route, Routes } from "react-router";
 import { describe, expect, it } from "vitest";
 import type { ConsumerGroup, ConsumerGroupPartition } from "../gateway/types";
+import { renderWithQuery } from "../test/renderWithQuery";
 import { ConsumerGroupList } from "./ConsumerGroupList";
 
 const partition: ConsumerGroupPartition = { topic: "orders", partition: 0, committedOffset: "1", startOffset: "0", endOffset: "4", lag: "3", status: "ok" };
@@ -13,7 +16,7 @@ const groups: ConsumerGroup[] = [
 
 describe("ConsumerGroupList", () => {
   it("lists every group sorted by name with state, members, topics and total lag", () => {
-    render(<ConsumerGroupList groups={groups} />);
+    renderWithQuery(<ConsumerGroupList gatewayId="dev" groups={groups} />);
     const rows = within(screen.getByRole("table", { name: "Consumer groups" })).getAllByRole("row").slice(1);
     expect(rows.map((row) => within(row).getAllByRole("cell").map((cell) => cell.textContent))).toEqual([
       ["Empty", "0", "2", "Unknown (1 partition)"],
@@ -23,9 +26,21 @@ describe("ConsumerGroupList", () => {
     expect(rows.map((row) => within(row).getByRole("link").textContent)).toEqual(["alpha", "idle", "zeta"]);
   });
 
-  it("marks incomplete groups and links each name to its details", () => {
-    render(<ConsumerGroupList groups={[{ ...groups[2], id: "reader & west/1" }]} />);
+  it("marks incomplete groups and links each name to its page", () => {
+    renderWithQuery(<ConsumerGroupList gatewayId="dev a" groups={[{ ...groups[2], id: "reader & west/1" }]} />);
     expect(screen.getByText("Group data incomplete")).toBeDefined();
-    expect(screen.getByRole("link", { name: "reader & west/1" }).getAttribute("href")).toBe(`#${encodeURIComponent("consumer-group-reader & west/1")}`);
+    expect(screen.getByRole("link", { name: "reader & west/1" }).getAttribute("href")).toBe("/clusters/dev%20a/consumer-groups/reader%20%26%20west%2F1");
+  });
+
+  it("opens the group page when a row is clicked", async () => {
+    renderWithQuery(
+      <Routes>
+        <Route path="/clusters/:gatewayId/consumer-groups" element={<ConsumerGroupList gatewayId="dev" groups={groups} />} />
+        <Route path="/clusters/:gatewayId/consumer-groups/:groupId" element={<p>Opened group</p>} />
+      </Routes>,
+      "/clusters/dev/consumer-groups",
+    );
+    await userEvent.click(screen.getByRole("cell", { name: "Stable" }));
+    expect(await screen.findByText("Opened group")).toBeDefined();
   });
 });

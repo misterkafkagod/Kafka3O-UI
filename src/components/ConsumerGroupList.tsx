@@ -1,14 +1,16 @@
+import { Link, useNavigate } from "react-router";
 import type { ConsumerGroup } from "../gateway/types";
-import { consumerGroupAnchor } from "../groups/consumerGroupAnchor";
 import { consumerGroupTotalLag } from "../groups/consumerGroupTotalLag";
 import { ScrollableTableRegion } from "./ScrollableTableRegion";
 import styles from "./ConsumerGroupList.module.css";
 
 type ConsumerGroupListProps = {
+  gatewayId: string;
   groups: ConsumerGroup[];
 };
 
-export function ConsumerGroupList({ groups }: ConsumerGroupListProps) {
+export function ConsumerGroupList({ gatewayId, groups }: ConsumerGroupListProps) {
+  const navigate = useNavigate();
   const sorted = [...groups].sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
   return (
     <ScrollableTableRegion label="Consumer groups table scroll area">
@@ -25,10 +27,14 @@ export function ConsumerGroupList({ groups }: ConsumerGroupListProps) {
         <tbody>
           {sorted.map((group) => {
             const total = consumerGroupTotalLag(group);
+            const groupPath = `/clusters/${encodeURIComponent(gatewayId)}/consumer-groups/${encodeURIComponent(group.id)}`;
             return (
-              <tr key={group.id}>
+              // The name link is the keyboard path; a click anywhere else on the row opens the same page.
+              <tr key={group.id} className={styles.row} onClick={(event) => {
+                if (!(event.target instanceof Element && event.target.closest("a"))) void navigate(groupPath);
+              }}>
                 <th scope="row" className={styles.name}>
-                  <a href={`#${encodeURIComponent(consumerGroupAnchor(group.id))}`}>{group.id}</a>
+                  <Link to={groupPath}>{group.id}</Link>
                   {group.error ? <span className={styles.incomplete}>Group data incomplete</span> : null}
                 </th>
                 <td>{group.state || "Unknown"}</td>

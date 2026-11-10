@@ -31,6 +31,7 @@ function renderClusterPage(route: string, props = pageProps) {
       <Route path="/clusters/:gatewayId" element={<ClusterPage {...props} view="brokers" />} />
       <Route path="/clusters/:gatewayId/topics" element={<ClusterPage {...props} view="topics" />} />
       <Route path="/clusters/:gatewayId/consumer-groups" element={<ClusterPage {...props} view="consumer-groups" />} />
+      <Route path="/clusters/:gatewayId/consumer-groups/:groupId" element={<ClusterPage {...props} view="consumer-groups" />} />
     </Routes>,
     route,
   );
@@ -83,6 +84,9 @@ describe("ClusterPage", () => {
     );
     renderClusterPage("/clusters/dev");
     await userEvent.click(await screen.findByRole("link", { name: "Consumer groups" }));
+    expect(await screen.findByRole("link", { name: "orders-group" })).toBeDefined();
+    expect(screen.getByRole("link", { name: "Consumer groups" }).getAttribute("aria-current")).toBe("page");
+    await userEvent.click(screen.getByRole("link", { name: "orders-group" }));
     expect(await screen.findByRole("heading", { name: "orders-group" })).toBeDefined();
     expect(screen.getByRole("link", { name: "Consumer groups" }).getAttribute("aria-current")).toBe("page");
   });

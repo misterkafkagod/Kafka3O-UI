@@ -61,4 +61,18 @@ describe("AppShell", () => {
     );
     expect(await within(screen.getByRole("banner")).findByRole("button", { name: /Gateway credentials/ })).toBeDefined();
   });
+
+  it("adds the group to the breadcrumb on a consumer group page", async () => {
+    renderWithQuery(
+      <AppShell loadGatewayConfig={async () => [gateway]} credentials={credentials} connectionOpen={false}
+        onOpenConnection={() => undefined} onOpenGatewayConnection={() => undefined} onCloseConnection={() => undefined}>
+        <p>Page content</p>
+      </AppShell>,
+      `/clusters/dev/consumer-groups/${encodeURIComponent("reader & west/1")}`,
+    );
+    const breadcrumb = screen.getByRole("navigation", { name: "Breadcrumb" });
+    expect((await within(breadcrumb).findByRole("link", { name: "Dev" })).getAttribute("href")).toBe("/clusters/dev");
+    expect(within(breadcrumb).getByRole("link", { name: "Consumer groups" }).getAttribute("href")).toBe("/clusters/dev/consumer-groups");
+    expect(within(breadcrumb).getByText("reader & west/1")).toBeDefined();
+  });
 });
