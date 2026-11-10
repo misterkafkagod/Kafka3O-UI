@@ -14,8 +14,8 @@
   - Files: Gateway internal/s3store/get_object.go (new, with test), internal/backup/count_object_records.go (new, with test)
   - Do: `GetObject` streams one object with Signature V4. `CountObjectRecords` gunzips an object and counts its jsonl lines, caching the count by object key and size (backup objects never change), with a bounded cache.
   - Done when: `go test ./internal/s3store ./internal/backup` (per package) passes, covering the stream, gzip errors and cache hits.
-- [ ] **T79.2 Read restore offsets and connector configuration** — Covers: F50-AC3
-  - Files: Gateway internal/connect/fetch_connector_config.go (new, with test), internal/kafka/read_connect_offsets.go (new, with test), internal/config/config.go, internal/config/load_config_test.go
+- [x] **T79.2 Read restore offsets and connector configuration** — Covers: F50-AC3
+  - Files: Gateway internal/connect/fetch_connector_config.go (new, with test), internal/kafka/read_connect_offsets.go (new), internal/kafka/apply_connect_offset_record.go (new, with test; the reading loop needs a broker and is checked live), internal/backup/read_restore_offsets.go (new, interface), internal/config/load_config.go, internal/config/config.go, internal/config/load_config_test.go
   - Do: `FetchConnectorConfig` reads `GET /connectors/{name}/config` (never returned to the browser). `ReadConnectOffsets` reads the Connect offsets topic (`connect.offsetstopic`, default `kafka3o-connect-offsets`) from start to end and returns the latest `recordCount` per object key for one connector, ignoring other connectors and tombstones.
   - Done when: `go test ./internal/connect`, `go test ./internal/kafka -run ConnectOffsets` and `go test ./internal/config` pass.
 - [ ] **T79.3 Restore status and automatic finish** — Covers: F50-AC3
