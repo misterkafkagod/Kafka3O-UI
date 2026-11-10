@@ -2,7 +2,7 @@
 - **Milestone:** M13
 - **Covers:** F49-AC3
 - **Discovery:** —
-- **Status:** Building
+- **Status:** Done
 
 ## Demo
 1. In the Gateway repository, run `go test ./internal/backup`, `go test ./internal/connect` and `go test ./internal/httpapi -run Backup`.
@@ -20,3 +20,8 @@
   - Done when: `npx vitest run src/gateway/runBackupAction.test.ts src/gateway/describeBackupError.test.ts src/components/BackupList.test.tsx` passes; then `npm test` (on its own) and `npm run build` pass.
 
 ## Review
+- **Demo:** steps 1–2 passed (auto-approved under the user's standing M13 instruction, 2026-11-10; run by Claude). Gateway: pause, resume and delete reach `kafka3o-backup-<topic>` (delete as `DELETE /connectors/{name}`, available only to Gateway-managed backups, not the Connect tab); unknown topics map to `not_found`; restart is refused for backups; the three actions are writes in the policy. UI in Chromium 1194 with a synthesized Gateway, 4/4: Pause and Resume follow in the refreshed list; Delete's confirmation says stored objects are kept and the job disappears; requests reach the backup routes. Step 3 (EKS-D) waits for a deploy.
+- **Vulnerability scan:** not run; no dependency changes.
+- **Regression:** Gateway `go test ./...` passed (29 operations in the route catalog); UI `npm test` 538 passed (5 opt-in skipped); default build.
+- **Note:** the unknown-outcome message is now action-neutral ("The change may have been applied") for start, pause, resume and delete.
+
