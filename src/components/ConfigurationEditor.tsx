@@ -9,6 +9,7 @@ import { ErrorWithRetry } from "./ErrorWithRetry";
 import { GatewayErrorRecovery } from "./GatewayErrorRecovery";
 import { ScrollableTableRegion } from "./ScrollableTableRegion";
 import styles from "./KafkaAdministration.module.css";
+import { SettingInfo } from "./SettingInfo";
 
 type Props = {
   gateway: GatewayEntry;
@@ -166,7 +167,7 @@ export function ConfigurationEditor({ gateway, resource, administration, ready =
                   <tr key={entry.name}>
                     <td>
                       <strong>{entry.name}</strong>
-                      {entry.documentation && !entry.sensitive ? <details><summary>About {entry.name}</summary><p>{entry.documentation}</p></details> : null}
+                      {entry.documentation && !entry.sensitive ? <SettingInfo name={entry.name} documentation={entry.documentation} /> : null}
                     </td>
                     <td><code>{entry.sensitive ? "Sensitive value hidden" : entry.value ?? "Not set"}</code></td>
                     <td>{entry.type.toLowerCase()}</td>

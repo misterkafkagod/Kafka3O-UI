@@ -37,10 +37,12 @@ describe("ConfigurationEditor", () => {
     expect(screen.queryByRole("button", { name: "Edit auto.create.topics.enable" })).toBeNull();
     expect(screen.queryByRole("button", { name: "Edit ssl.password" })).toBeNull();
     await user.type(screen.getByRole("searchbox", { name: "Filter settings by name" }), "RETENTION");
-    expect(screen.getByText("log.retention.ms")).toBeDefined();
+    expect(screen.getByText("log.retention.ms", { selector: "strong" })).toBeDefined();
     expect(screen.queryByText("auto.create.topics.enable")).toBeNull();
-    await user.click(screen.getByText("About log.retention.ms"));
-    expect(screen.getByText("Retention time")).toBeDefined();
+    expect(screen.queryByText(/^About /)).toBeNull();
+    await user.click(screen.getByRole("button", { name: "About log.retention.ms" }));
+    expect(within(screen.getByRole("dialog", { name: "log.retention.ms" })).getByText("Retention time")).toBeDefined();
+    await user.click(screen.getByRole("button", { name: "Close" }));
     const edit = screen.getByRole("button", { name: "Edit log.retention.ms" });
     await user.click(edit);
     expect(document.activeElement).toBe(screen.getByRole("form", { name: "Edit log.retention.ms" }));
