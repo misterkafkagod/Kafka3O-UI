@@ -1,0 +1,94 @@
+# Test Kafka Connect worker for the kafka-connect-api discovery (M12). One distributed worker on Kafka A only,
+# with the file connectors bundled in apache/kafka. Remove with: kubectl delete namespace kafka3o-connect-test
+# (and the three kafka3o-connect-* topics on Kafka A).
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kafka-connect-config
+  namespace: kafka3o-connect-test
+data:
+  connect.properties: |
+    bootstrap.servers=kafka-a.kafka3o-test-clusters.svc.cluster.local:9092
+    group.id=kafka3o-connect-test
+    config.storage.topic=kafka3o-connect-configs
+    offset.storage.topic=kafka3o-connect-offsets
+    status.storage.topic=kafka3o-connect-status
+    config.storage.replication.factor=1
+    offset.storage.replication.factor=1
+    status.storage.replication.factor=1
+    key.converter=org.apache.kafka.connect.storage.StringConverter
+    value.converter=org.apache.kafka.connect.storage.StringConverter
+    listeners=http://0.0.0.0:8083
+    plugin.path=/opt/kafka/libs/connect-file-4.3.1.jar
+    config.providers=env
+    config.providers.env.class=org.apache.kafka.common.config.provider.EnvVarConfigProvider
+    security.protocol=SASL_SSL
+    sasl.mechanism=SCRAM-SHA-512
+    sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule required username="kafka3otest-a" password="${env:CONNECT_SASL_PASSWORD}";
+    ssl.truststore.type=PEM
+    ssl.truststore.location=/run/kafka-ca/ca.crt
+    producer.security.protocol=SASL_SSL
+    producer.sasl.mechanism=SCRAM-SHA-512
+    producer.sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule required username="kafka3otest-a" password="${env:CONNECT_SASL_PASSWORD}";
+    producer.ssl.truststore.type=PEM
+    producer.ssl.truststore.location=/run/kafka-ca/ca.crt
+    consumer.security.protocol=SASL_SSL
+    consumer.sasl.mechanism=SCRAM-SHA-512
+    consumer.sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule required username="kafka3otest-a" password="${env:CONNECT_SASL_PASSWORD}";
+    consumer.ssl.truststore.type=PEM
+    consumer.ssl.truststore.location=/run/kafka-ca/ca.crt
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka-connect
+  namespace: kafka3o-connect-test
+  labels: { app.kubernetes.io/name: kafka-connect }
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app.kubernetes.io/name: kafka-connect }
+  template:
+    metadata:
+      labels: { app.kubernetes.io/name: kafka-connect }
+    spec:
+      securityContext: { runAsNonRoot: true, runAsUser: 1000, runAsGroup: 1000, seccompProfile: { type: RuntimeDefault } }
+      containers:
+        - name: connect
+          image: apache/kafka:4.3.1
+          command: ["/opt/kafka/bin/connect-distributed.sh", "/etc/kafka-connect/connect.properties"]
+          env:
+            - name: CONNECT_SASL_PASSWORD
+              valueFrom: { secretKeyRef: { name: kafka-connect-kafka-a, key: sasl.password } }
+            - { name: KAFKA_HEAP_OPTS, value: "-Xms256m -Xmx512m" }
+            - { name: LOG_DIR, value: /tmp/connect-logs }
+          ports:
+            - { containerPort: 8083, name: rest }
+          readinessProbe:
+            httpGet: { path: /, port: 8083 }
+            periodSeconds: 5
+          resources:
+            requests: { cpu: 100m, memory: 512Mi }
+            limits: { memory: 1Gi }
+          securityContext: { allowPrivilegeEscalation: false, capabilities: { drop: ["ALL"] } }
+          volumeMounts:
+            - { name: config, mountPath: /etc/kafka-connect, readOnly: true }
+            - { name: kafka-ca, mountPath: /run/kafka-ca, readOnly: true }
+            - { name: work, mountPath: /tmp }
+      volumes:
+        - name: config
+          configMap: { name: kafka-connect-config }
+        - name: kafka-ca
+          secret: { secretName: kafka-connect-kafka-a, items: [{ key: ca.crt, path: ca.crt }] }
+        - name: work
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka-connect
+  namespace: kafka3o-connect-test
+spec:
+  selector: { app.kubernetes.io/name: kafka-connect }
+  ports:
+    - { name: rest, port: 8083, targetPort: 8083 }

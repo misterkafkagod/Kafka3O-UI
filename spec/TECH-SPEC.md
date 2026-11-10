@@ -243,7 +243,12 @@ Tests live next to the file they test (`*_test.go`, `*.test.ts(x)`).
 
 ## Integrations
 ### Kafka Connect REST API (M12)
-- Source: discovery needed (`kafka-connect-api`, against the EKS-D test worker): connector and task status shapes, error traces, pause/resume/restart semantics and timing, unreachable-Connect behavior.
+- Source: [kafka-connect-api discovery](./discovery/kafka-connect-api.md), against the EKS-D test worker (Connect 4.3.1).
+- Each Gateway has an optional Connect base URL (`KAFKA3O_CONNECT__URL`); without it, Connect routes answer `connect_not_configured`. The test worker is plain HTTP inside the cluster.
+- Reads: `GET /connectors?expand=status` only (never `expand=info` or `/config`); the Gateway returns name, type, connector state and worker, and tasks with id, state, worker and the first trace line cut to 500 characters.
+- Actions: `PUT /connectors/{name}/pause` and `/resume` (202), `POST /connectors/{name}/restart?includeTasks=true&onlyFailed=false` (202/204), `POST /connectors/{name}/tasks/{id}/restart` (204); all asynchronous.
+- Errors: Connect returns `{error_code, message}`; 404 → not found, other 4xx → rejected, 5xx/timeouts/connection failures → `connect_unreachable` for reads and `connect_action_unknown` for actions without a response. Names with `/` are rejected by the Gateway because Connect cannot address them.
+- Tests fake Connect with `httptest` servers built from `spec/discovery/kafka-connect-api/fixtures`.
 
 ### Kafka (behind each gateway)
 - Source: known Kafka admin API; secured broker setup was verified in [P13 discovery](./discovery/kafka-tls-scram-dev.md).
