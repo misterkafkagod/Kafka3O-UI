@@ -169,6 +169,12 @@ This design deliberately uses the existing central store for opaque delegation/i
 - Kafka Connect (F35) is reached only through the cluster's own Gateway, which gains an optional Connect REST base URL and forwards with the Go standard HTTP client (no new dependency). Reads need VIEWER; pause, resume and restart need OPERATOR, or ADMIN plus a reason on Production. Connector configuration values are never returned to the browser. A cluster without Connect reports "not configured".
 - EKS-D test Connect worker: one pod in namespace `kafka3o-connect-test` from `apache/kafka:4.3.1` (already on the node), bootstrapped to Kafka A only, with internal topics `kafka3o-connect-configs`, `-offsets` and `-status` and only the bundled file connectors on synthetic data. Kafka B and existing topics are untouched; deleting the namespace and the three topics removes it.
 
+## M13 topic backups and restores (planned)
+- Storage: MinIO on EKS-D (own namespace and volume) as S3-compatible test storage; real S3 later is a configuration change. Storage credentials live only in the Connect worker (config provider) and in a Secret; the Gateway and Console never return them.
+- Connectors: Aiven's S3 sink and source connectors (Apache 2.0), installed as a Connect plugin on the test worker; exact version, licence and vulnerability status are settled by the `s3-backup-connectors` discovery (`pending scan` until then).
+- The Gateway generates backup and restore connector configurations from a per-cluster backup setting (endpoint, bucket, prefix) and the topic; no free-form configuration is accepted. Backup and restore routes are Kafka writes under the M10 roles, Production rules and audit.
+- Restores target only the backup's own topic, append records (offsets are reassigned), and must not be re-saved by that topic's backup; the mechanism is settled in discovery.
+
 ## Structure
 ```
 Kafka3O-Gateway/
@@ -242,6 +248,9 @@ Tests live next to the file they test (`*_test.go`, `*.test.ts(x)`).
 - Completion evidence: confirm the updated build is served at the EKS-D manual-test URL and record browser/demo outcomes in each phase review. Checks not executed remain `not run`; screenshot review alone does not establish keyboard, accessibility or Kafka behavior.
 
 ## Integrations
+### S3-compatible backup storage (M13)
+- Source: discovery needed (`s3-backup-connectors`): MinIO deployment, Aiven S3 sink/source plugin installation and configuration, object layout and format, restore completion and loop prevention.
+
 ### Kafka Connect REST API (M12)
 - Source: [kafka-connect-api discovery](./discovery/kafka-connect-api.md), against the EKS-D test worker (Connect 4.3.1).
 - Each Gateway has an optional Connect base URL (`KAFKA3O_CONNECT__URL`); without it, Connect routes answer `connect_not_configured`. The test worker is plain HTTP inside the cluster.

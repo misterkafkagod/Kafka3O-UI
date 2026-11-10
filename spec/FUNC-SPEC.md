@@ -510,3 +510,10 @@ Inspect a cluster's Kafka Connect connectors and tasks with their state and erro
 - **F35-AC4** (B3) Lifecycle actions need OPERATOR on non-Production and ADMIN plus a change reason on Production; denials happen before Connect is called, and every attempt is audited with its intent and outcome
 
 **External dependencies:** Kafka Connect REST API behind the cluster's Gateway; `discovery needed` (`kafka-connect-api`, against the EKS-D test worker). Tests fake Connect with an HTTP test server built from discovery fixtures.
+
+### F49 — Topic backups (planned M13)
+Start, list, stop and delete continuous backups of a topic's messages to S3-compatible storage through the cluster's Kafka Connect, with Gateway-generated connector configurations and storage credentials that never reach the browser. · *detailed when M13 starts*
+
+### F50 — Restore a topic's backup (planned M13)
+Restore a topic's backup into that same topic after confirming that restored messages are appended (duplicates possible), under Production ADMIN-plus-reason rules and audit, without the topic's own backup saving the restored copies again. · *detailed when M13 starts*
+
