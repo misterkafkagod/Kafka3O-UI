@@ -1,0 +1,9 @@
+.location {
+  overflow-wrap: anywhere;
+}
+
+.errorRow td {
+  background: var(--color-alert-surface);
+  color: var(--color-alert-text);
+  overflow-wrap: anywhere;
+}

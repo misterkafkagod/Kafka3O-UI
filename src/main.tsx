@@ -50,6 +50,7 @@ import { increasePartitions } from "./gateway/increasePartitions";
 import { listConnectors } from "./gateway/listConnectors";
 import { runConnectorAction } from "./gateway/runConnectorAction";
 import { startBackup } from "./gateway/startBackup";
+import { listBackups } from "./gateway/listBackups";
 import { listConsumerGroups } from "./gateway/listConsumerGroups";
 import { applyOffsetReset } from "./gateway/applyOffsetReset";
 import { previewOffsetReset } from "./gateway/previewOffsetReset";
@@ -137,6 +138,7 @@ function gatewayApp(read: GatewayRead, write: GatewayWrite, credentials: Gateway
         listTopics={(gatewayUrl) => listTopics(read(gatewayUrl), gatewayUrl)}
         listConsumerGroups={(gatewayUrl) => listConsumerGroups(read(gatewayUrl), gatewayUrl)}
         listConnectors={(gatewayUrl) => listConnectors(read(gatewayUrl), gatewayUrl)}
+        listBackups={(gatewayUrl) => listBackups(read(gatewayUrl), gatewayUrl)}
         backupActions={{
           start: (gatewayUrl, topic) => startBackup(write(gatewayUrl), gatewayUrl, topic),
           confirm: (message) => window.confirm(message),
