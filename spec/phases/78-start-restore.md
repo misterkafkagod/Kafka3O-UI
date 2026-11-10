@@ -2,7 +2,7 @@
 - **Milestone:** M13
 - **Covers:** F50-AC1, F50-AC2
 - **Discovery:** [s3-backup-connectors](../discovery/s3-backup-connectors.md)
-- **Status:** Building
+- **Status:** Done
 
 ## Demo
 1. In the Gateway repository, run `mvn -B verify` in `connect-plugins/kafka3o-restore-transform` and `go test ./internal/backup ./internal/httpapi -run Restore` (per package).
@@ -24,3 +24,8 @@
   - Done when: `npx vitest run src/gateway/startRestore.test.ts src/gateway/describeBackupError.test.ts src/components/BackupList.test.tsx` passes; then `npm test` (on its own) and `npm run build` pass.
 
 ## Review
+- **Demo:** steps 1–2 passed (auto-approved under the user's standing M13 instruction, 2026-11-10; run by Claude). Transform: `mvn -B verify` 9/9 JUnit tests (key, value, headers incl. null, timestamp, original partition, the `kafka3o-restore` marker, dropping objects outside the snapshot or with foreign names, malformed lines naming the object, required config). Gateway: the snapshot boundary is the highest object start offset per partition; a running backup is paused (and resumed if creating the restore fails, but not when the outcome is unknown); a paused or missing backup is left alone; in-progress, empty, unreadable-storage and not-configured cases are refused before anything changes; restores use one Connect task per partition (max 8, `distribution.type=partition`). UI in Chromium 1194 with a synthesized Gateway, 3/3: canceling the append/duplicates confirmation sends nothing, a confirmed restore starts, a second one is refused. Step 3 (EKS-D) waits for a deploy and installing the transform jar on the Connect worker; `distribution.type=partition` was not exercised in the discovery and must be confirmed there.
+- **Vulnerability scan:** not run for this phase; the transform adds no runtime dependency (connect-api is provided by the worker; JUnit is test-only). Scanned at milestone close.
+- **Regression:** Gateway `go test ./...` passed (30 operations in the route catalog); UI `npm test` 541 passed (5 opt-in skipped); default build.
+- **Convention check:** Java classes each have one public method besides the `Transformation` lifecycle methods Kafka Connect requires (`BackupObjectKey.parse`, `SnapshotBoundary.includes`, `UnwrapBackupRecord.apply`).
+
