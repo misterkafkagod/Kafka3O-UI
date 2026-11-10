@@ -14,6 +14,7 @@ The console should be comfortable for dense technical data, easy to navigate, an
 - Persistence in the gateway (no database; stateless)
 - Invented metrics or Gateway-to-Kafka connection-setting changes from the UI
 - Direct SSO integrations other than Amazon Cognito in M10; additional providers are in the backlog
+- Adding, removing or retargeting registered clusters from the UI; the cluster registry changes only through a repository change (dropped F17)
 - Appearance preferences synced to a Console account, ADMIN-enforced appearance defaults, free-form color pickers or custom CSS, and fonts loaded from external sites
 
 ## Features
@@ -274,9 +275,8 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
 The following items are candidates after M11, not commitments to implement every Redpanda feature. All future writes must use F29/F30 authorization and F31 audit; no candidate silently expands the current bounded reads or changes Kafka connection credentials.
 
 - **F15 · High:** User can reset a consumer group's offsets to earliest, latest or a timestamp, with a preview and inactive-group checks.
-- **F16 · High:** User can decode Avro/Protobuf values via a Schema Registry.
-- **F17 · Deferred:** User can add or remove registered Gateway endpoints from an authorized Console page instead of a config file; this does not edit a Gateway's Kafka connection settings.
-- **F32 · High:** User can browse Schema Registry subjects, versions and references, check compatibility, and explicitly register or delete schema versions.
+- **F16 · Postponed:** User can decode Avro/Protobuf values via a Schema Registry.
+- **F32 · Postponed:** User can browse Schema Registry subjects, versions and references, check compatibility, and explicitly register or delete schema versions.
 - **F33 · High:** An authorized user can inspect/manage Kafka ACLs and supported broker principals/credentials; Kafka permissions remain distinct from Console roles.
 - **F34 · Medium:** An authorized user can delete inactive consumer groups or selected committed offsets, separately from F15 offset resets.
 - **F35 · Medium:** User can inspect configured Kafka Connect clusters/connectors and explicitly create, update, pause, resume, restart or delete supported connectors/tasks.
@@ -300,7 +300,7 @@ Compared current official Redpanda documentation (pages identify Console v3.14.0
 | OIDC/basic sign-in and Console roles [R2, R3] | Only shared Gateway tokens/local test proxy; no user identity or authorization | M10: F27–F30; other SSO: F42 |
 | API identity forwarding; Redpanda broker audit events [R2, R10] | Kafka3O needs its own user-attributed audit even while Kafka sees a Gateway service account | M10: F31; optional upstream identity: F43 |
 | Consumer offset reset and group/offset management [R1, R3] | Inspection exists; offset and group mutation do not | F15, F34 |
-| Schema-backed decoding and schema lifecycle/compatibility [R4, R5] | Text/JSON/base64 only; no Schema Registry integration | F16, F32 |
+| Schema-backed decoding and schema lifecycle/compatibility [R4, R5] | Text/JSON/base64 only; no Schema Registry integration | F16, F32 (postponed) |
 | ACLs, principals/credential rotation and quota visibility [R1, R3] | No corresponding UI/Gateway APIs | F33, F44 |
 | Kafka Connect lifecycle [R6] | No Connect integration; Redpanda documents it as community-supported | F35 |
 | Programmable record filters and continuous pagination [R7, R8] | Bounded substring search and bounded reads exist; no structured scripting/pagination workflow | F36, F37 |
@@ -324,6 +324,7 @@ Redpanda-only Shadow Links, its Admin API, and Redpanda-specific diagnostic oper
 - **Verification debt:** Run the Cognito sign-in, group refresh and logout integration against a real User Pool when an AWS account and app client become available; fixture tests are not evidence of live provider compatibility.
 
 ## Learnings
+- 2026-11-09 (re-plan): Dropped F17 at the user's request: the cluster registry must change only through a repository change, never from the UI. Postponed the Schema Registry features (F16, F32); they are not candidates for the next milestone.
 - 2026-11-08 (M11 retro): P63–P69 deliver F46 and F45: a compact session indicator, an Administration page shown from Console-reported capabilities (without probing admin endpoints), clusters opening on Topics, and per-browser color mode, four contrast-tested themes, a bundled readable font, text size and density.
 - 2026-11-08 (M11 retro): What worked: small phases (1–3 tasks), a contrast test that reads the real stylesheets, and real-browser checks per phase that measured overflow, target sizes and first-render theme instead of trusting screenshots.
 - 2026-11-08 (M11 retro): What did not: the EKS-D redeploy was not permitted, so live verification fell back to the local Console fixture and synthesized Gateway answers; an opt-in integration test had been failing unnoticed since M10 because it only runs on demand.
