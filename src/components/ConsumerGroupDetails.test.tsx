@@ -53,7 +53,7 @@ describe("ConsumerGroupDetails", () => {
     const { unmount } = renderWithQuery(<ConsumerGroupDetails group={group} onRetry={() => {}} />);
     expect(screen.queryByText("Reset offsets")).toBeNull();
     unmount();
-    renderWithQuery(<ConsumerGroupDetails group={group} onRetry={() => {}} offsetReset={{ gatewayUrl: "https://gw", previewOffsetReset: vi.fn() }} />);
+    renderWithQuery(<ConsumerGroupDetails group={group} onRetry={() => {}} offsetReset={{ gatewayUrl: "https://gw", actions: { preview: vi.fn(), apply: vi.fn(), confirm: vi.fn() } }} />);
     expect(screen.getByText("Reset offsets")).toBeDefined();
   });
 });

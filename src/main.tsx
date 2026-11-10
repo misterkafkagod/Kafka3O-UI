@@ -48,6 +48,7 @@ import { getTopicDetail } from "./gateway/getTopicDetail";
 import { isLocalManualGatewayUrl } from "./gateway/isLocalManualGatewayUrl";
 import { increasePartitions } from "./gateway/increasePartitions";
 import { listConsumerGroups } from "./gateway/listConsumerGroups";
+import { applyOffsetReset } from "./gateway/applyOffsetReset";
 import { previewOffsetReset } from "./gateway/previewOffsetReset";
 import { listLatestTopicMessages } from "./gateway/listLatestTopicMessages";
 import { listTopics } from "./gateway/listTopics";
@@ -132,7 +133,11 @@ function gatewayApp(read: GatewayRead, write: GatewayWrite, credentials: Gateway
         getCluster={(gatewayUrl) => getCluster(read(gatewayUrl), gatewayUrl)}
         listTopics={(gatewayUrl) => listTopics(read(gatewayUrl), gatewayUrl)}
         listConsumerGroups={(gatewayUrl) => listConsumerGroups(read(gatewayUrl), gatewayUrl)}
-        previewOffsetReset={(gatewayUrl, group, topic, target) => previewOffsetReset(read(gatewayUrl), gatewayUrl, group, topic, target)}
+        offsetReset={{
+          preview: (gatewayUrl, group, topic, target) => previewOffsetReset(read(gatewayUrl), gatewayUrl, group, topic, target),
+          apply: (gatewayUrl, preview) => applyOffsetReset(write(gatewayUrl), gatewayUrl, preview),
+          confirm: (message) => window.confirm(message),
+        }}
         getTopicDetail={(gatewayUrl, topicName) => getTopicDetail(read(gatewayUrl), gatewayUrl, topicName)}
         listLatestTopicMessages={(gatewayUrl, topicName, position) =>
           listLatestTopicMessages(read(gatewayUrl), gatewayUrl, topicName, position)

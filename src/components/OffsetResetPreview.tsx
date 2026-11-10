@@ -1,6 +1,7 @@
 import { type FormEvent, useId, useState } from "react";
 import { describeOffsetResetError } from "../gateway/describeOffsetResetError";
-import type { OffsetResetPreview as Preview, OffsetResetTarget, PreviewOffsetReset } from "../gateway/previewOffsetReset";
+import type { OffsetResetActions } from "../gateway/OffsetResetActions";
+import type { OffsetResetPreview as Preview, OffsetResetTarget } from "../gateway/previewOffsetReset";
 import type { ConsumerGroup } from "../gateway/types";
 import styles from "./OffsetResetPreview.module.css";
 import { ScrollableTableRegion } from "./ScrollableTableRegion";
@@ -8,12 +9,14 @@ import { ScrollableTableRegion } from "./ScrollableTableRegion";
 type OffsetResetPreviewProps = {
   gatewayUrl: string;
   group: ConsumerGroup;
-  previewOffsetReset: PreviewOffsetReset;
+  actions: OffsetResetActions;
+  // onApplied reloads the group after a confirmed reset.
+  onApplied: () => void;
 };
 
 const targetLabels = { earliest: "Earliest", latest: "Latest", timestamp: "Date and time" } as const;
 
-export function OffsetResetPreview({ gatewayUrl, group, previewOffsetReset }: OffsetResetPreviewProps) {
+export function OffsetResetPreview({ gatewayUrl, group, actions, onApplied }: OffsetResetPreviewProps) {
   const id = useId();
   const [topic, setTopic] = useState(group.topics[0] ?? "");
   const [kind, setKind] = useState<OffsetResetTarget["kind"]>("earliest");
@@ -21,6 +24,7 @@ export function OffsetResetPreview({ gatewayUrl, group, previewOffsetReset }: Of
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
   const [preview, setPreview] = useState<Preview | null>(null);
+  const [applied, setApplied] = useState("");
 
   async function requestPreview(event: FormEvent) {
     event.preventDefault();
@@ -31,10 +35,31 @@ export function OffsetResetPreview({ gatewayUrl, group, previewOffsetReset }: Of
     }
     setPending(true);
     setError("");
+    setApplied("");
     setPreview(null);
     try {
       const target: OffsetResetTarget = kind === "timestamp" ? { kind, timestamp } : { kind };
-      setPreview(await previewOffsetReset(gatewayUrl, group.id, topic, target));
+      setPreview(await actions.preview(gatewayUrl, group.id, topic, target));
+    } catch (failure) {
+      setError(describeOffsetResetError(failure));
+    } finally {
+      setPending(false);
+    }
+  }
+
+  async function applyPreview() {
+    if (!preview) return;
+    const count = preview.partitions.length;
+    if (!actions.confirm(`Reset ${count} partition${count === 1 ? "" : "s"} of "${preview.topic}" for consumer group "${preview.group}" to the previewed offsets?`)) {
+      return;
+    }
+    setPending(true);
+    setError("");
+    try {
+      await actions.apply(gatewayUrl, preview);
+      setPreview(null);
+      setApplied(`Offsets reset for ${count} partition${count === 1 ? "" : "s"} of ${preview.topic}.`);
+      onApplied();
     } catch (failure) {
       setError(describeOffsetResetError(failure));
     } finally {
@@ -72,6 +97,7 @@ export function OffsetResetPreview({ gatewayUrl, group, previewOffsetReset }: Of
         <button type="submit" disabled={pending}>{pending ? "Previewing..." : "Preview"}</button>
       </form>
       {error ? <p role="alert">{error}</p> : null}
+      {applied ? <p role="status">{applied}</p> : null}
       {preview ? (
         <>
           <p role="status">Preview only. Nothing has been changed.</p>
@@ -95,6 +121,9 @@ export function OffsetResetPreview({ gatewayUrl, group, previewOffsetReset }: Of
               </tbody>
             </table>
           </ScrollableTableRegion>
+          <button type="button" className={styles.apply} onClick={() => void applyPreview()} disabled={pending}>
+            {pending ? "Applying..." : "Apply reset"}
+          </button>
         </>
       ) : null}
     </details>
