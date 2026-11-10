@@ -469,11 +469,44 @@ Choose the console's color mode, color theme, font, text size and density, remem
 **External dependencies:** Browser `localStorage`, the `storage` event and `prefers-color-scheme`; faked in Vitest. One bundled font file (Atkinson Hyperlegible, SIL Open Font License 1.1) served from the UI's own origin.
 
 ### F47 — No Gateway credentials in the secured console (planned M12)
-The secured console has no Gateway credentials control, because every cluster is reached through the Console. · *detailed when M12 starts*
+The secured console has no Gateway credentials control, because every cluster is reached through the Console.
+
+**Behaviors**
+- **F47-B1** User opens the secured console → the header has no Gateway credentials control and no prompt offers token entry; the legacy and preview builds keep their current behavior
+
+**Acceptance criteria**
+- **F47-AC1** (B1) Given the secured build, no page shows a Gateway credentials control or token-entry prompt; given the legacy build, the control still opens the credentials panel
+
+**External dependencies:** none.
 
 ### F15 — Consumer offset reset (planned M12)
-Reset an inactive consumer group's committed offsets for a topic to earliest, latest or a timestamp after previewing the change, under Console roles, Production rules and audit. · *detailed when M12 starts*
+Reset an inactive consumer group's committed offsets for one topic to earliest, latest or a timestamp after previewing the change, under Console roles, Production rules and audit.
+
+**Behaviors**
+- **F15-B1** User opens a consumer group, chooses one of its topics and a target (earliest, latest or a date and time) and asks for a preview → the console shows, per partition, the current committed offset and the offset it would be reset to, without changing anything
+- **F15-B2** User confirms the previewed reset → the Gateway rechecks that the group has no members and commits exactly the previewed target offsets; the console shows the confirmed result and the group's new lag
+- **F15-B3** The group has active members, the topic or group is unknown, or Kafka rejects the commit → nothing is committed (or the outcome is reported as unknown when Kafka may have accepted it) and the user sees why
+
+**Acceptance criteria**
+- **F15-AC1** (B1) Given an inactive group with committed offsets on a topic, a preview for earliest, latest and a timestamp lists every partition with its current and target offsets; a timestamp after the newest record targets the end offset; previews are read-only and need VIEWER
+- **F15-AC2** (B2) Given a preview, confirming commits those target offsets and the group's committed offsets then equal them; offsets that moved since the preview are not silently replaced: the apply request carries the previewed targets and the expected current offsets, and a mismatch is refused as stale
+- **F15-AC3** (B2) Applying needs OPERATOR on a non-Production cluster, and ADMIN plus a change reason on Production; denials happen before Kafka, and every attempt is audited with its intent and outcome
+- **F15-AC4** (B3) Given a group with members at preview or apply time, the reset is refused with "Stop the group's consumers first"; unknown groups or topics return not found; a commit whose outcome is uncertain is reported as unknown with an operation ID
+
+**External dependencies:** Kafka consumer group offset APIs through franz-go/kadm in each Gateway; tests use the existing Kafka integration test setup and fakes.
 
 ### F35 — Kafka Connect inspection and lifecycle (planned M12)
-Inspect a cluster's Kafka Connect connectors and tasks with their state and errors, and pause, resume or restart them under Console roles, Production rules and audit; configuration values stay hidden. · *detailed when M12 starts*
+Inspect a cluster's Kafka Connect connectors and tasks with their state and errors, and pause, resume or restart them under Console roles, Production rules and audit; configuration values stay hidden.
 
+**Behaviors**
+- **F35-B1** User opens a cluster's Connect tab → the console lists its connectors with type, connector state, worker and each task's state, and shows a failed connector's or task's error summary
+- **F35-B2** The cluster has no Connect configured, or Connect is unreachable → the tab says "Kafka Connect is not configured for this cluster" or "Kafka Connect is unreachable", without affecting the rest of the cluster pages
+- **F35-B3** User pauses, resumes or restarts a connector, or restarts one task → after confirmation the action is sent and the list refreshes to the new state
+
+**Acceptance criteria**
+- **F35-AC1** (B1) Given a Connect cluster with running, paused and failed connectors, the list shows each connector's name, type, state and tasks with their states, and a failed item's error summary; no connector configuration value is returned to the browser; reading needs VIEWER
+- **F35-AC2** (B2) Given a cluster without a Connect URL, the tab shows "not configured"; given an unreachable Connect, it shows "unreachable" with retry; other cluster pages keep working
+- **F35-AC3** (B3) Given a running connector, pause then resume changes its state accordingly; restarting a connector or a single task is accepted and the list reflects the result after refresh
+- **F35-AC4** (B3) Lifecycle actions need OPERATOR on non-Production and ADMIN plus a change reason on Production; denials happen before Connect is called, and every attempt is audited with its intent and outcome
+
+**External dependencies:** Kafka Connect REST API behind the cluster's Gateway; `discovery needed` (`kafka-connect-api`, against the EKS-D test worker). Tests fake Connect with an HTTP test server built from discovery fixtures.
