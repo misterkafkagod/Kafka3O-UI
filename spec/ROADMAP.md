@@ -297,14 +297,16 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
 - **Status:** Active
 - **Features:** F49, F50
 - **Phases:**
-  - **P75** F49-B1 · Start a topic backup — Covers: F49-AC1 · Discovery: s3-backup-connectors · Status: Discovery
+  - **P75** F49-B1 · Start a topic backup — Covers: F49-AC1 · Discovery: s3-backup-connectors · Status: Defined
     - Demo: backing up `kafka3o-m10-verify` on Kafka A creates an S3 sink connector with a Gateway-generated configuration, and objects appear in MinIO.
   - **P76** F49-B2 · Backups section — Covers: F49-AC2 · Discovery: — · Status: Defined
     - Demo: Kafka A's Backups tab lists the backup with its state, storage location and last write; Kafka B says backups are not configured.
   - **P77** F49-B3 · Pause, resume and delete a backup — Covers: F49-AC3 · Discovery: — · Status: Defined
     - Demo: pausing, resuming and deleting the backup job changes its state; deleting keeps the stored objects.
-  - **P78** F50-B1 + F50-B2 · Restore into the original topic — Covers: F50-AC1, F50-AC2, F50-AC3 · Discovery: — · Status: Defined
-    - Demo: restoring the backup appends the saved messages after explicit confirmation; the topic's backup does not re-save them; Production needs ADMIN plus a reason; the audit shows intent and outcome.
+  - **P78** F50-B1 · Restore transform and starting a restore — Covers: F50-AC1, F50-AC2 · Discovery: — · Status: Defined
+    - Demo: a confirmed restore pauses the topic's backup and appends the saved messages with their keys, headers and timestamps plus the restore header; newer backup objects are not restored.
+  - **P79** F50-B2 · Restore progress and completion — Covers: F50-AC3 · Discovery: — · Status: Defined
+    - Demo: the Backups tab shows the restore's progress, finishes it (removes the restore and resumes the backup, which skips restored records), refuses a second restore of the same topic, and Production needs ADMIN plus a reason.
 
 ## Backlog
 The following items are candidates after M11, not commitments to implement every Redpanda feature. All future writes must use F29/F30 authorization and F31 audit; no candidate silently expands the current bounded reads or changes Kafka connection credentials.
@@ -358,6 +360,7 @@ Redpanda-only Shadow Links, its Admin API, and Redpanda-specific diagnostic oper
 - **Verification debt:** Run the Cognito sign-in, group refresh and logout integration against a real User Pool when an AWS account and app client become available; fixture tests are not evidence of live provider compatibility.
 
 ## Learnings
+- 2026-11-10 (s3-backup-connectors): MinIO is replaced by SeaweedFS (no MinIO images); Aiven's source alone cannot restore its sink's backups losslessly, so restores use a small Kafka3O Connect transform (user chose this over Gateway-side restores for scale); restored records carry a `kafka3o-restore` header so backups skip them; restores must be bounded to their snapshot and removed before the backup resumes. P78 is split into P78 and P79.
 - 2026-11-10 (re-plan): M13 = F49 (topic backups) and F50 (restore into the original topic) by user choice: MinIO on EKS-D as S3-compatible test storage, Aiven's Apache-2.0 S3 sink and source connectors, records kept losslessly (key, value, headers, timestamp; offsets are reassigned). Restoring into the original topic appends copies, so it needs explicit confirmation, Production ADMIN plus a reason, and protection against the topic's own backup re-saving restored records.
 - 2026-11-10 (M12 retro): P70–P74 deliver F47, F15 and F35: no credentials control in the secured console, a preview-then-apply consumer offset reset that refuses active groups and stale previews, and a Connect tab listing connectors and tasks with error summaries plus pause, resume and restart, all under the M10 roles, Production rules and audit.
 - 2026-11-10 (M12 retro): What worked: a short discovery against a real test worker found two things tests would have missed (Connect cannot address names with `/`; a plain restart does not restart tasks), and the recorded fixtures drove both the Gateway tests and the UI demo.

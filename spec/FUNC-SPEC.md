@@ -524,7 +524,7 @@ Start, list, pause, resume and delete continuous backups of a topic's messages t
 - **F49-AC2** (B2) Given running, paused and failed backups, the list shows each with its state and error summary, storage path and last write time; a cluster without backup storage shows "Backups are not configured for this cluster"
 - **F49-AC3** (B3) Starting, pausing, resuming and deleting backups need OPERATOR on non-Production and ADMIN plus a reason on Production, are denied before Connect when not allowed, and are audited; deleting a backup keeps its stored objects
 
-**External dependencies:** Kafka Connect with Aiven's S3 sink connector and S3-compatible storage (MinIO on EKS-D); `discovery needed` (`s3-backup-connectors`).
+**External dependencies:** Kafka Connect with Aiven's S3 sink connector and S3-compatible storage (SeaweedFS on EKS-D); see the [s3-backup-connectors discovery](./discovery/s3-backup-connectors.md).
 
 ### F50 — Restore a topic's backup (planned M13)
 Restore a topic's backup into that same topic after confirming that restored messages are appended, without the topic's own backup saving the restored copies again.
@@ -534,8 +534,8 @@ Restore a topic's backup into that same topic after confirming that restored mes
 - **F50-B2** A restore is in progress, fails or cannot be confirmed → the Backups tab shows its state and error, a second restore of the same topic is refused, and an uncertain outcome is reported as unknown
 
 **Acceptance criteria**
-- **F50-AC1** (B1) Given a backup with stored records, a confirmed restore appends those records (key, value, headers, timestamp; new offsets) to the original topic; canceling the confirmation sends nothing
+- **F50-AC1** (B1) Given a backup with stored records, a confirmed restore appends those records (key, value, headers, timestamp; new offsets in the original partition) to the original topic, each with one added header `kafka3o-restore` naming the restore; canceling the confirmation sends nothing
 - **F50-AC2** (B1) Records written by a restore are not saved again by the topic's backup, and the restore reads only the objects that existed when it started
 - **F50-AC3** (B2) Restores need OPERATOR on non-Production and ADMIN plus a reason on Production, are audited with intent and outcome, show progress or failure in the Backups tab, and a second concurrent restore of the same topic is refused
 
-**External dependencies:** Aiven's S3 source connector on the same Connect worker; `discovery needed` (`s3-backup-connectors`).
+**External dependencies:** Aiven's S3 source connector with the Kafka3O unwrap transform on the same Connect worker; see the [s3-backup-connectors discovery](./discovery/s3-backup-connectors.md).

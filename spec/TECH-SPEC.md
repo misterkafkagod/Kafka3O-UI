@@ -170,10 +170,11 @@ This design deliberately uses the existing central store for opaque delegation/i
 - EKS-D test Connect worker: one pod in namespace `kafka3o-connect-test` from `apache/kafka:4.3.1` (already on the node), bootstrapped to Kafka A only, with internal topics `kafka3o-connect-configs`, `-offsets` and `-status` and only the bundled file connectors on synthetic data. Kafka B and existing topics are untouched; deleting the namespace and the three topics removes it.
 
 ## M13 topic backups and restores (planned)
-- Storage: MinIO on EKS-D (own namespace and volume) as S3-compatible test storage; real S3 later is a configuration change. Storage credentials live only in the Connect worker (config provider) and in a Secret; the Gateway and Console never return them.
-- Connectors: Aiven's S3 sink and source connectors (Apache 2.0), installed as a Connect plugin on the test worker; exact version, licence and vulnerability status are settled by the `s3-backup-connectors` discovery (`pending scan` until then).
-- The Gateway generates backup and restore connector configurations from a per-cluster backup setting (endpoint, bucket, prefix) and the topic; no free-form configuration is accepted. Backup and restore routes are Kafka writes under the M10 roles, Production rules and audit.
-- Restores target only the backup's own topic, append records (offsets are reassigned), and must not be re-saved by that topic's backup; the mechanism is settled in discovery.
+- Storage: SeaweedFS 4.51 (Apache 2.0) on EKS-D as S3-compatible test storage (MinIO no longer publishes container images); real S3 later is a configuration change. Storage credentials live in Secrets and the Connect worker environment (`${env:...}` in connector configs); the Console and browser never see them.
+- Connectors: Aiven S3 sink and source 3.4.3 (Apache 2.0; SHA-256 checked; CVE status: pending scan of the bundled jars) on the test Connect worker. Backups and restores follow the [s3-backup-connectors recipe](./discovery/s3-backup-connectors.md#recipe).
+- Restore transform: a Kafka Connect transformation in the Gateway repository (`connect-plugins/kafka3o-restore-transform`) that unwraps each backup line into the original record, adds the `kafka3o-restore` header and drops records from objects outside the restore's snapshot. Java 21 (Temurin 21.0.13, matching the worker), Maven 3.9.16, `org.apache.kafka:connect-api` 4.3.1 (provided), JUnit 6.1.3 for tests; CVE status: pending scan. Rejected: Gateway-side restores (one process, no resume after restarts) and the Aiven source without a transform (not lossless).
+- Gateway: generates backup and restore connector configurations from a per-cluster backup setting (S3 endpoint, bucket, prefix) and the topic; no free-form configuration is accepted. It lists the topic's objects and counts their records with a read-only S3 identity (Go standard library with AWS Signature V4; no SDK), and reads restore progress from the Connect offsets topic. Backup and restore routes are Kafka writes under the M10 roles, Production rules and audit.
+- Java conventions: one public class per action with one public method besides the `Transformation` interface's lifecycle methods (`configure`, `config`, `close`, required by Kafka Connect); tests in `src/test/java`, run with `mvn -B verify`.
 
 ## Structure
 ```
@@ -249,7 +250,8 @@ Tests live next to the file they test (`*_test.go`, `*.test.ts(x)`).
 
 ## Integrations
 ### S3-compatible backup storage (M13)
-- Source: discovery needed (`s3-backup-connectors`): MinIO deployment, Aiven S3 sink/source plugin installation and configuration, object layout and format, restore completion and loop prevention.
+- Source: [s3-backup-connectors discovery](./discovery/s3-backup-connectors.md) against SeaweedFS 4.51 on EKS-D.
+- Endpoint `http://seaweedfs-s3.kafka3o-backup-storage.svc.cluster.local:8333`, bucket `kafka3o-backups`, region `us-east-1`; objects `<cluster>/<topic>/<topic>-<partition>-<20-digit start offset>.gz` (gzip jsonl, one per partition per 60 s flush); line `{"key","value","timestamp","headers"}` with base64 bytes.
 
 ### Kafka Connect REST API (M12)
 - Source: [kafka-connect-api discovery](./discovery/kafka-connect-api.md), against the EKS-D test worker (Connect 4.3.1).
