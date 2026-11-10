@@ -2,14 +2,14 @@
 - **Milestone:** M14
 - **Covers:** F52-AC1
 - **Discovery:** —
-- **Status:** Planned
+- **Status:** Building
 
 ## Demo
 1. Run `npx vitest run src/groups/consumerGroupTotalLag.test.ts src/components/ConsumerGroupList.test.tsx src/components/ConsumerGroups.test.tsx`.
 2. In the browser, a cluster's Consumer groups tab opens on a table with one row per group (name, state, members, topics, total lag), sorted by name; a group with an unknown partition lag shows "Unknown (n partitions)".
 
 ## Tasks
-- [ ] **T80.1 Total lag of a group** — Covers: F52-AC1
+- [x] **T80.1 Total lag of a group** — Covers: F52-AC1
   - Files: src/groups/consumerGroupTotalLag.ts (new), src/groups/consumerGroupTotalLag.test.ts (new)
   - Do: Sums the decimal-string lags of a group's partitions with `BigInt`; returns `{ kind: "known", lag }`, `{ kind: "unknown", partitions }` when any partition's lag is null (unknown lags are never counted as zero), or `{ kind: "none" }` when the group has no partition offsets.
   - Done when: `npx vitest run src/groups/consumerGroupTotalLag.test.ts` passes, covering a sum beyond `Number.MAX_SAFE_INTEGER`, unknown partitions and no partitions.
