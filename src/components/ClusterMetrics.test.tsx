@@ -11,6 +11,7 @@ const metrics: Metrics = {
   logDirs: { dirs: [{ broker: 1, dir: "/data", totalBytes: 100, usableBytes: 60, kafkaBytes: 7 }] },
   partitions: { topics: 1, partitions: 3, underReplicated: 0, offline: 0, belowMinIsr: 0, unreadableTopics: [] },
   largestTopics: { topics: [{ topic: "orders", bytes: 7 }] },
+  endOffsets: { topics: [{ topic: "orders", endOffset: "10" }] },
 };
 
 describe("ClusterMetrics", () => {
@@ -31,5 +32,15 @@ describe("ClusterMetrics", () => {
     expect(within(alert).getByText("Gateway unreachable")).toBeDefined();
     await userEvent.click(within(alert).getByRole("button", { name: "Retry" }));
     expect(await screen.findByRole("table", { name: "Broker disk use" })).toBeDefined();
+  });
+
+  it("shows a rate once a second sample arrives", async () => {
+    const list = vi.fn()
+      .mockResolvedValueOnce(metrics)
+      .mockResolvedValue({ ...metrics, readAt: "2026-11-10T12:00:10Z", endOffsets: { topics: [{ topic: "orders", endOffset: "60" }] } });
+    const { container } = renderWithQuery(<ClusterMetrics gateway={gateway} getMetrics={list} />);
+    expect(await screen.findByText("Measuring… a rate needs a second sample.")).toBeDefined();
+    await userEvent.click(within(container).getByRole("button", { name: "Refresh now" }));
+    expect(await screen.findByText("Cluster: 5.0 messages/s over the last 10 seconds")).toBeDefined();
   });
 });

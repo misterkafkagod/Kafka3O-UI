@@ -1,10 +1,12 @@
 import type { GetMetrics } from "../gateway/getMetrics";
 import type { GatewayEntry } from "../gateway/types";
 import { useMetrics } from "../hooks/useMetrics";
+import { useMetricsSamples } from "../hooks/useMetricsSamples";
 import { BrokerDiskUse } from "./BrokerDiskUse";
 import { ErrorWithRetry } from "./ErrorWithRetry";
 import { LargestTopics } from "./LargestTopics";
 import { PartitionHealth } from "./PartitionHealth";
+import { TopicThroughput } from "./TopicThroughput";
 
 type ClusterMetricsProps = {
   gateway: GatewayEntry;
@@ -13,6 +15,7 @@ type ClusterMetricsProps = {
 
 export function ClusterMetrics({ gateway, getMetrics }: ClusterMetricsProps) {
   const { data: metrics, isError, error, refetch } = useMetrics(gateway, getMetrics);
+  const previous = useMetricsSamples(metrics);
 
   return (
     <main>
@@ -24,9 +27,13 @@ export function ClusterMetrics({ gateway, getMetrics }: ClusterMetricsProps) {
         <p role="status">Loading metrics…</p>
       ) : (
         <>
-          <p>Read at {new Date(metrics.readAt).toLocaleString()}</p>
+          <p>
+            Read at {new Date(metrics.readAt).toLocaleString()}{" "}
+            <button type="button" onClick={() => void refetch()}>Refresh now</button>
+          </p>
           <PartitionHealth partitions={metrics.partitions} />
           <BrokerDiskUse logDirs={metrics.logDirs} />
+          <TopicThroughput previous={previous} current={metrics} />
           <LargestTopics largestTopics={metrics.largestTopics} />
         </>
       )}

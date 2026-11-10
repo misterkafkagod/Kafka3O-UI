@@ -13,6 +13,8 @@ export type ClusterMetrics = {
     belowMinIsr: number | null; minIsrError?: string; unreadableTopics: string[];
   };
   largestTopics: { error?: string; topics: { topic: string; bytes: number }[] };
+  // endOffset is the decimal sum of a topic's partition end offsets.
+  endOffsets: { error?: string; topics: { topic: string; endOffset?: string; error?: string }[] };
 };
 
 export type GetMetrics = (gatewayUrl: string) => Promise<ClusterMetrics>;
