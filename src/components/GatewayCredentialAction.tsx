@@ -4,6 +4,7 @@ import { GatewayConnectionContext } from "./GatewayConnectionContext";
 
 export function GatewayCredentialAction({ gateway }: { gateway: GatewayEntry }) {
   const openConnection = useContext(GatewayConnectionContext);
+  if (openConnection === null) return null;
   if (!openConnection) {
     throw new Error("Gateway credential actions require a connection panel provider.");
   }

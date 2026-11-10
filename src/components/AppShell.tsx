@@ -22,11 +22,13 @@ type AppShellProps = {
   sessionIndicator?: ReactNode;
   // administrationLink shows the Administration page in the primary navigation.
   administrationLink?: boolean;
+  // credentialsControl is false in the secured build, where the Console reaches every cluster.
+  credentialsControl?: boolean;
 };
 
 type Breadcrumb = { label: string; to: string } | { label: string; current: true };
 
-export function AppShell({ children, loadGatewayConfig, credentials, connectionOpen, selectedGatewayId, onOpenConnection, onOpenGatewayConnection, onCloseConnection, sessionIndicator, administrationLink }: AppShellProps) {
+export function AppShell({ children, loadGatewayConfig, credentials, connectionOpen, selectedGatewayId, onOpenConnection, onOpenGatewayConnection, onCloseConnection, sessionIndicator, administrationLink, credentialsControl = true }: AppShellProps) {
   const location = useLocation();
   const clusterMatch = useMatch({ path: "/clusters/:gatewayId", end: false });
   const topicMatch = useMatch({ path: "/clusters/:gatewayId/topics/:topicName", end: false });
@@ -82,14 +84,16 @@ export function AppShell({ children, loadGatewayConfig, credentials, connectionO
           ) : null}
         </nav>
         <AppearancePanel />
-        <GatewayCredentialsPanel
-          loadGatewayConfig={loadGatewayConfig}
-          credentials={credentials}
-          open={connectionOpen}
-          selectedGatewayId={selectedGatewayId}
-          onOpen={onOpenConnection}
-          onClose={onCloseConnection}
-        />
+        {credentialsControl ? (
+          <GatewayCredentialsPanel
+            loadGatewayConfig={loadGatewayConfig}
+            credentials={credentials}
+            open={connectionOpen}
+            selectedGatewayId={selectedGatewayId}
+            onOpen={onOpenConnection}
+            onClose={onCloseConnection}
+          />
+        ) : null}
         {sessionIndicator}
       </header>
       {breadcrumbs.length > 0 ? (
@@ -108,7 +112,7 @@ export function AppShell({ children, loadGatewayConfig, credentials, connectionO
         </nav>
       ) : null}
       <div id="main-content" className={styles.content} tabIndex={-1}>
-        <GatewayConnectionContext.Provider value={onOpenGatewayConnection}>
+        <GatewayConnectionContext.Provider value={credentialsControl ? onOpenGatewayConnection : null}>
           {children}
         </GatewayConnectionContext.Provider>
       </div>

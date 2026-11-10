@@ -43,6 +43,7 @@ type AppProps = {
   // administrationPage is the secured build's Administration page; other builds show Not permitted.
   administrationPage?: ReactNode;
   administrationLink?: boolean;
+  credentialsControl?: boolean;
 };
 
 export function App({
@@ -66,6 +67,7 @@ export function App({
   sessionIndicator,
   administrationPage,
   administrationLink,
+  credentialsControl,
 }: AppProps) {
   const [connectionPanel, setConnectionPanel] = useState<{ gatewayId?: string } | null>(null);
 
@@ -81,6 +83,7 @@ export function App({
         onCloseConnection={() => setConnectionPanel(null)}
         sessionIndicator={sessionIndicator}
         administrationLink={administrationLink}
+        credentialsControl={credentialsControl}
       >
         <Routes>
           <Route path="/administration" element={administrationPage ?? <AdministrationPage administration={{ access: false, audit: false }} onUnauthorized={() => undefined} />} />

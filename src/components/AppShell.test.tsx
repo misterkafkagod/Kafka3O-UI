@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { renderWithQuery } from "../test/renderWithQuery";
 import { AppShell } from "./AppShell";
 
+const gateway = { id: "dev", name: "Dev", url: "https://dev.example" };
 const credentials = { read: () => null, save: () => undefined, clear: () => undefined };
 const shell = (sessionIndicator?: React.ReactNode, administrationLink?: boolean) => (
   <AppShell loadGatewayConfig={async () => []} credentials={credentials} connectionOpen={false}
@@ -37,5 +38,27 @@ describe("AppShell", () => {
     unmount();
     renderWithQuery(shell());
     expect(screen.queryByRole("link", { name: "Administration" })).toBeNull();
+  });
+
+  it("leaves out the credentials control in the secured build", async () => {
+    renderWithQuery(
+      <AppShell loadGatewayConfig={async () => [gateway]} credentials={credentials} connectionOpen={false}
+        onOpenConnection={() => undefined} onOpenGatewayConnection={() => undefined} onCloseConnection={() => undefined}
+        credentialsControl={false}>
+        <p>Page content</p>
+      </AppShell>,
+    );
+    expect(await screen.findByText("Page content")).toBeDefined();
+    expect(within(screen.getByRole("banner")).queryByRole("button", { name: /Gateway credentials/ })).toBeNull();
+  });
+
+  it("keeps the credentials control in other builds", async () => {
+    renderWithQuery(
+      <AppShell loadGatewayConfig={async () => [gateway]} credentials={credentials} connectionOpen={false}
+        onOpenConnection={() => undefined} onOpenGatewayConnection={() => undefined} onCloseConnection={() => undefined}>
+        <p>Page content</p>
+      </AppShell>,
+    );
+    expect(await within(screen.getByRole("banner")).findByRole("button", { name: /Gateway credentials/ })).toBeDefined();
   });
 });

@@ -146,6 +146,7 @@ function gatewayApp(read: GatewayRead, write: GatewayWrite, credentials: Gateway
         sessionIndicator={chrome?.sessionIndicator}
         administrationLink={chrome?.administrationLink}
         administrationPage={chrome?.administrationPage}
+        credentialsControl={chrome === undefined}
       />
     </BrowserRouter>
   );
