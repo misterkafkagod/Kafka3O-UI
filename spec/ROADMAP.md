@@ -305,7 +305,7 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
     - Demo: pausing, resuming and deleting the backup job changes its state; deleting keeps the stored objects.
   - **P78** F50-B1 · Restore transform and starting a restore — Covers: F50-AC1, F50-AC2 · Discovery: — · Status: Done
     - Demo: a confirmed restore pauses the topic's backup and appends the saved messages with their keys, headers and timestamps plus the restore header; newer backup objects are not restored.
-  - **P79** F50-B2 · Restore progress and completion — Covers: F50-AC3 · Discovery: — · Status: Defined
+  - **P79** F50-B2 · Restore progress and completion — Covers: F50-AC3 · Discovery: — · Status: Building
     - Demo: the Backups tab shows the restore's progress, finishes it (removes the restore and resumes the backup, which skips restored records), refuses a second restore of the same topic, and Production needs ADMIN plus a reason.
 
 ## Backlog
