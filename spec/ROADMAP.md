@@ -350,6 +350,7 @@ Compared current official Redpanda documentation (pages identify Console v3.14.0
 Redpanda-only Shadow Links, its Admin API, and Redpanda-specific diagnostic operations are not promised for generic Kafka. Replay/copy workflows and live tailing are not added to scope by this comparison.
 
 ### Existing verification debt
+- **Security debt (M13 exception):** Aiven S3 connectors 3.4.3 carry 4 critical and 41 high advisories; allowed only on the EKS-D test cluster by the user's test-only exception (2026-11-10). Replace the vulnerable bundled jars or rebuild the connectors, and rescan, before any production use.
 - **Verification debt:** Deploy M12 to EKS-D (`deploy.sh`) and run the live steps of P71–P74: preview and apply an offset reset for a synthetic inactive group on `kafka3o-m10-verify` on Kafka A and Kafka B (with a reason), check both in the audit, and list, pause, resume and restart the test connectors in `kafka3o-connect-test`. M12 was verified with Gateway unit tests and the built UI against synthesized Gateway answers built from the recorded Connect fixtures.
 - **Verification debt:** Deploy M11 to the EKS-D secured stack (`deploy.sh`) and repeat the P63/P65 checks there and in the user's own browser; M11 was verified against the local Console fixture and `vite preview` because the redeploy was not permitted in the building session.
 - **Verification debt:** Run the Docker-only stopped-broker test and P14 browser demo, and verify the remaining cross-cluster and consumer-group browser demos.
