@@ -2,7 +2,7 @@
 - **Milestone:** M12
 - **Covers:** F15-AC2, F15-AC3, apply portion of F15-AC4
 - **Discovery:** —
-- **Status:** Building
+- **Status:** Done
 
 ## Demo
 1. In the Gateway repository, run `go test ./internal/kafka -run ApplyOffsetReset`, `go test ./internal/httpapi -run OffsetResetApply` and `go test ./cmd/gateway`.
@@ -24,3 +24,8 @@
   - Done when: `npx vitest run src/gateway/applyOffsetReset.test.ts src/gateway/describeOffsetResetError.test.ts src/components/OffsetResetPreview.test.tsx` passes, covering the request body, confirm and cancel, reload after success and each failure message; then `npm test` and `npm run build` pass.
 
 ## Review
+- **Demo:** steps 1–2 passed (auto-approved under the user's standing M12 instruction, 2026-11-09; run by Claude). Gateway: commit, shared membership check, apply route, classifier, policy and route catalog tests pass (stale commits, out-of-range targets, repeated or unknown partitions, membership rechecked, a group that joins during the commit reported as active, rejected commits as failures, lost responses and partial commits as `offset_reset_unknown`). The apply action is a Kafka write, so secured Gateways apply the existing OPERATOR, Production ADMIN-plus-reason and intent/outcome audit rules; `offset_reset_unknown` is recorded as an unknown outcome. UI in Chromium 1194 with a synthesized Gateway, 4/4: canceling the confirmation sends nothing; Apply sends the previewed target with the offset the preview saw; the group reloads with the new committed offset; a stale preview asks to preview again. Step 3 (EKS-D, synthetic group, both clusters, audit) waits for the user's `deploy.sh` and is batched with the Connect phases.
+- **Vulnerability scan:** not run; no dependency changes.
+- **Regression:** Gateway `go test ./...` passed (19 operations in the route catalog); UI `npm test` 509 passed (5 opt-in skipped); default build.
+- **Convention check:** the membership check became its own injected action shared by preview and apply; one action per file.
+
