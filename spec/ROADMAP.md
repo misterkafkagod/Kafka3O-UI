@@ -299,7 +299,7 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
 - **Phases:**
   - **P75** F49-B1 · Start a topic backup — Covers: F49-AC1 · Discovery: s3-backup-connectors · Status: Done
     - Demo: backing up `kafka3o-m10-verify` on Kafka A creates an S3 sink connector with a Gateway-generated configuration, and objects appear in MinIO.
-  - **P76** F49-B2 · Backups section — Covers: F49-AC2 · Discovery: — · Status: Building
+  - **P76** F49-B2 · Backups section — Covers: F49-AC2 · Discovery: — · Status: Done
     - Demo: Kafka A's Backups tab lists the backup with its state, storage location and last write; Kafka B says backups are not configured.
   - **P77** F49-B3 · Pause, resume and delete a backup — Covers: F49-AC3 · Discovery: — · Status: Defined
     - Demo: pausing, resuming and deleting the backup job changes its state; deleting keeps the stored objects.

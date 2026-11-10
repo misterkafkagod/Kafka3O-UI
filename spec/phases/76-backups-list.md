@@ -2,7 +2,7 @@
 - **Milestone:** M13
 - **Covers:** F49-AC2
 - **Discovery:** [s3-backup-connectors](../discovery/s3-backup-connectors.md)
-- **Status:** Building
+- **Status:** Done
 
 ## Demo
 1. In the Gateway repository, run `go test ./internal/s3store`, `go test ./internal/backup` and `go test ./internal/httpapi -run Backup`.
@@ -24,3 +24,8 @@
   - Done when: `npx vitest run src/gateway/listBackups.test.ts src/components/BackupList.test.tsx src/components/ClusterBackups.test.tsx` passes; then `npm test` (on its own) and `npm run build` pass.
 
 ## Review
+- **Demo:** steps 1–2 passed (auto-approved under the user's standing M13 instruction, 2026-11-10; run by Claude). Gateway: Signature V4 matches AWS's published `get-vanilla` vector; the listing pages, signs `x-amz-content-sha256` and reports HTTP, XML and timestamp failures; `ListBackups` keeps only `kafka3o-backup-*` sinks, marks a failed task as FAILED with its error, sums objects and bytes and takes the newest write, and reports storage as unknown without read credentials. UI in Chromium 1194 with a synthesized Gateway, 5/5: two backups with state, location, last write and size; a failed backup's error; no overflow at 320 px; Prod not configured. Step 3 (EKS-D) waits for a deploy and the read-only `kafka3o-backup-read` Secret.
+- **Vulnerability scan:** not run; no dependency changes (the S3 client uses the Go standard library).
+- **Regression:** Gateway `go test ./...` passed (26 operations in the route catalog); UI `npm test` 535 passed (5 opt-in skipped); default build.
+- **Convention check:** the size formatter moved out of `BackupList` into `src/groups/formatBytes.ts`; Signature V4 helpers are their own files.
+
