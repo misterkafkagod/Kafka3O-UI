@@ -1,6 +1,8 @@
-import { Fragment } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
+import { describeConnectorActionError } from "../gateway/describeConnectorActionError";
 import { HttpError } from "../gateway/HttpError";
 import type { ListConnectors } from "../gateway/listConnectors";
+import type { ConnectorAction, ConnectorActions } from "../gateway/runConnectorAction";
 import type { GatewayEntry } from "../gateway/types";
 import { useConnectors } from "../hooks/useConnectors";
 import styles from "./ConnectConnectors.module.css";
@@ -10,11 +12,51 @@ import { ScrollableTableRegion } from "./ScrollableTableRegion";
 type ConnectConnectorsProps = {
   gateway: GatewayEntry;
   listConnectors: ListConnectors;
+  // actions enables pause, resume and restart; without it the tab is read-only.
+  actions?: ConnectorActions;
 };
 
-export function ConnectConnectors({ gateway, listConnectors }: ConnectConnectorsProps) {
+const confirmations: Record<ConnectorAction["kind"], (action: ConnectorAction) => string> = {
+  pause: (action) => `Pause connector "${action.connector}"?`,
+  resume: (action) => `Resume connector "${action.connector}"?`,
+  restart: (action) => `Restart connector "${action.connector}" and its tasks?`,
+  "restart-task": (action) => `Restart task ${"task" in action ? action.task : ""} of connector "${action.connector}"?`,
+};
+
+const requested: Record<ConnectorAction["kind"], (action: ConnectorAction) => string> = {
+  pause: (action) => `Pause requested for ${action.connector}.`,
+  resume: (action) => `Resume requested for ${action.connector}.`,
+  restart: (action) => `Restart requested for ${action.connector}.`,
+  "restart-task": (action) => `Restart requested for task ${"task" in action ? action.task : ""} of ${action.connector}.`,
+};
+
+export function ConnectConnectors({ gateway, listConnectors, actions }: ConnectConnectorsProps) {
   const { data: connectors, isError, error, refetch, isFetching } = useConnectors(gateway, listConnectors);
   const code = error instanceof HttpError ? error.problem?.code : undefined;
+  const [pending, setPending] = useState(false);
+  const [notice, setNotice] = useState("");
+  const [failure, setFailure] = useState("");
+  const timers = useRef<number[]>([]);
+
+  useEffect(() => () => { for (const timer of timers.current) window.clearTimeout(timer); }, []);
+
+  async function run(action: ConnectorAction) {
+    if (!actions || pending || !actions.confirm(confirmations[action.kind](action))) return;
+    setPending(true);
+    setNotice("");
+    setFailure("");
+    try {
+      await actions.run(gateway.url, action);
+      setNotice(requested[action.kind](action));
+      void refetch();
+      // Connect applies actions asynchronously, so the list is read again once the new state has settled.
+      timers.current.push(window.setTimeout(() => void refetch(), 3000));
+    } catch (problem) {
+      setFailure(describeConnectorActionError(problem));
+    } finally {
+      setPending(false);
+    }
+  }
 
   return (
     <main>
@@ -34,6 +76,8 @@ export function ConnectConnectors({ gateway, listConnectors }: ConnectConnectors
         <p>No connectors.</p>
       ) : (
         <>
+          {notice ? <p role="status">{notice}</p> : null}
+          {failure ? <p role="alert">{failure}</p> : null}
           <div className={styles.toolbar}>
             <p>{connectors.length} connector{connectors.length === 1 ? "" : "s"}</p>
             <button type="button" onClick={() => void refetch()} disabled={isFetching}>{isFetching ? "Refreshing…" : "Refresh"}</button>
@@ -47,6 +91,7 @@ export function ConnectConnectors({ gateway, listConnectors }: ConnectConnectors
                   <th scope="col">State</th>
                   <th scope="col">Worker</th>
                   <th scope="col">Tasks</th>
+                  {actions ? <th scope="col">Actions</th> : null}
                 </tr>
               </thead>
               <tbody>
@@ -65,14 +110,40 @@ export function ConnectConnectors({ gateway, listConnectors }: ConnectConnectors
                         <td>
                           {connector.tasks.length === 0 ? "No tasks" : (
                             <ul className={styles.tasks}>
-                              {connector.tasks.map((task) => <li key={task.id}>Task {task.id}: {task.state}</li>)}
+                              {connector.tasks.map((task) => (
+                                <li key={task.id}>
+                                  Task {task.id}: {task.state}
+                                  {actions ? (
+                                    <button type="button" className={styles.taskAction} disabled={pending}
+                                      aria-label={`Restart task ${task.id} of ${connector.name}`}
+                                      onClick={() => void run({ kind: "restart-task", connector: connector.name, task: task.id })}>
+                                      Restart task {task.id}
+                                    </button>
+                                  ) : null}
+                                </li>
+                              ))}
                             </ul>
                           )}
                         </td>
+                        {actions ? (
+                          <td>
+                            <div className={styles.actions}>
+                              {connector.state === "PAUSED" ? (
+                                <button type="button" disabled={pending} aria-label={`Resume ${connector.name}`}
+                                  onClick={() => void run({ kind: "resume", connector: connector.name })}>Resume</button>
+                              ) : (
+                                <button type="button" disabled={pending} aria-label={`Pause ${connector.name}`}
+                                  onClick={() => void run({ kind: "pause", connector: connector.name })}>Pause</button>
+                              )}
+                              <button type="button" disabled={pending} aria-label={`Restart ${connector.name}`}
+                                onClick={() => void run({ kind: "restart", connector: connector.name })}>Restart</button>
+                            </div>
+                          </td>
+                        ) : null}
                       </tr>
                       {errors.length > 0 ? (
                         <tr className={styles.errorRow}>
-                          <td colSpan={5}>
+                          <td colSpan={actions ? 6 : 5}>
                             <ul aria-label={`Errors for ${connector.name}`} className={styles.errors}>
                               {errors.map((message) => <li key={message}>{message}</li>)}
                             </ul>

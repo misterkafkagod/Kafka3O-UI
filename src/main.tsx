@@ -48,6 +48,7 @@ import { getTopicDetail } from "./gateway/getTopicDetail";
 import { isLocalManualGatewayUrl } from "./gateway/isLocalManualGatewayUrl";
 import { increasePartitions } from "./gateway/increasePartitions";
 import { listConnectors } from "./gateway/listConnectors";
+import { runConnectorAction } from "./gateway/runConnectorAction";
 import { listConsumerGroups } from "./gateway/listConsumerGroups";
 import { applyOffsetReset } from "./gateway/applyOffsetReset";
 import { previewOffsetReset } from "./gateway/previewOffsetReset";
@@ -135,6 +136,10 @@ function gatewayApp(read: GatewayRead, write: GatewayWrite, credentials: Gateway
         listTopics={(gatewayUrl) => listTopics(read(gatewayUrl), gatewayUrl)}
         listConsumerGroups={(gatewayUrl) => listConsumerGroups(read(gatewayUrl), gatewayUrl)}
         listConnectors={(gatewayUrl) => listConnectors(read(gatewayUrl), gatewayUrl)}
+        connectorActions={{
+          run: (gatewayUrl, action) => runConnectorAction(write(gatewayUrl), gatewayUrl, action),
+          confirm: (message) => window.confirm(message),
+        }}
         offsetReset={{
           preview: (gatewayUrl, group, topic, target) => previewOffsetReset(read(gatewayUrl), gatewayUrl, group, topic, target),
           apply: (gatewayUrl, preview) => applyOffsetReset(write(gatewayUrl), gatewayUrl, preview),

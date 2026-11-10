@@ -11,6 +11,7 @@ import type { CreateTopic } from "./gateway/createTopic";
 import type { ConfirmTopicDeletion, DeleteTopic } from "./gateway/deleteTopic";
 import type { GatewayCredentials } from "./gateway/GatewayCredentials";
 import type { ListConnectors } from "./gateway/listConnectors";
+import type { ConnectorActions } from "./gateway/runConnectorAction";
 import type { ListConsumerGroups } from "./gateway/listConsumerGroups";
 import type { OffsetResetActions } from "./gateway/OffsetResetActions";
 import type { ListLatestTopicMessages } from "./gateway/listLatestTopicMessages";
@@ -48,6 +49,7 @@ type AppProps = {
   credentialsControl?: boolean;
   offsetReset?: OffsetResetActions;
   listConnectors?: ListConnectors;
+  connectorActions?: ConnectorActions;
 };
 
 export function App({
@@ -74,6 +76,7 @@ export function App({
   credentialsControl,
   offsetReset,
   listConnectors,
+  connectorActions,
 }: AppProps) {
   const [connectionPanel, setConnectionPanel] = useState<{ gatewayId?: string } | null>(null);
 
@@ -158,6 +161,7 @@ export function App({
                 statusRefreshMs={statusRefreshMs}
                 view="connect"
                 listConnectors={listConnectors}
+                connectorActions={connectorActions}
               />
             }
           />

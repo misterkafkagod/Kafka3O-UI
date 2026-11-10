@@ -26,3 +26,17 @@
 .errorRow td {
   background: var(--color-alert-surface);
 }
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.taskAction {
+  margin-left: 0.5rem;
+}
+
+.tasks li + li {
+  margin-top: 0.3rem;
+}
