@@ -47,6 +47,7 @@ import { getConfigurations } from "./gateway/getConfigurations";
 import { getTopicDetail } from "./gateway/getTopicDetail";
 import { isLocalManualGatewayUrl } from "./gateway/isLocalManualGatewayUrl";
 import { increasePartitions } from "./gateway/increasePartitions";
+import { listConnectors } from "./gateway/listConnectors";
 import { listConsumerGroups } from "./gateway/listConsumerGroups";
 import { applyOffsetReset } from "./gateway/applyOffsetReset";
 import { previewOffsetReset } from "./gateway/previewOffsetReset";
@@ -133,6 +134,7 @@ function gatewayApp(read: GatewayRead, write: GatewayWrite, credentials: Gateway
         getCluster={(gatewayUrl) => getCluster(read(gatewayUrl), gatewayUrl)}
         listTopics={(gatewayUrl) => listTopics(read(gatewayUrl), gatewayUrl)}
         listConsumerGroups={(gatewayUrl) => listConsumerGroups(read(gatewayUrl), gatewayUrl)}
+        listConnectors={(gatewayUrl) => listConnectors(read(gatewayUrl), gatewayUrl)}
         offsetReset={{
           preview: (gatewayUrl, group, topic, target) => previewOffsetReset(read(gatewayUrl), gatewayUrl, group, topic, target),
           apply: (gatewayUrl, preview) => applyOffsetReset(write(gatewayUrl), gatewayUrl, preview),

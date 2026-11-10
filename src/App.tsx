@@ -10,6 +10,7 @@ import type { GetTopicDetail } from "./gateway/getTopicDetail";
 import type { CreateTopic } from "./gateway/createTopic";
 import type { ConfirmTopicDeletion, DeleteTopic } from "./gateway/deleteTopic";
 import type { GatewayCredentials } from "./gateway/GatewayCredentials";
+import type { ListConnectors } from "./gateway/listConnectors";
 import type { ListConsumerGroups } from "./gateway/listConsumerGroups";
 import type { OffsetResetActions } from "./gateway/OffsetResetActions";
 import type { ListLatestTopicMessages } from "./gateway/listLatestTopicMessages";
@@ -46,6 +47,7 @@ type AppProps = {
   administrationLink?: boolean;
   credentialsControl?: boolean;
   offsetReset?: OffsetResetActions;
+  listConnectors?: ListConnectors;
 };
 
 export function App({
@@ -71,6 +73,7 @@ export function App({
   administrationLink,
   credentialsControl,
   offsetReset,
+  listConnectors,
 }: AppProps) {
   const [connectionPanel, setConnectionPanel] = useState<{ gatewayId?: string } | null>(null);
 
@@ -140,6 +143,21 @@ export function App({
                 createTopic={createTopic}
                 statusRefreshMs={statusRefreshMs}
                 view="topics"
+              />
+            }
+          />
+          <Route
+            path="/clusters/:gatewayId/connect"
+            element={
+              <ClusterPage
+                loadGatewayConfig={loadGatewayConfig}
+                getCluster={getCluster}
+                listTopics={listTopics}
+                listConsumerGroups={listConsumerGroups}
+                createTopic={createTopic}
+                statusRefreshMs={statusRefreshMs}
+                view="connect"
+                listConnectors={listConnectors}
               />
             }
           />
