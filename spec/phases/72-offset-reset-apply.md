@@ -10,8 +10,8 @@
 3. On EKS-D after the user's `deploy.sh`: reset a synthetic inactive group on `kafka3o-m10-verify` on Kafka A and on Kafka B (with a reason), and find both attempts with their outcomes in the audit.
 
 ## Tasks
-- [ ] **T72.1 Apply in the Gateway** — Covers: F15-AC2, apply portion of F15-AC4
-  - Files: Gateway internal/kafka/ensure_group_inactive.go (new, shared with the preview), internal/kafka/ensure_group_inactive_test.go (new), internal/kafka/compute_offset_reset_preview.go, internal/kafka/commit_offset_reset.go (new), internal/kafka/commit_offset_reset_test.go (new), internal/groups/offset_reset.go, internal/groups/commit_offset_reset.go (new, interface), internal/groups/apply_offset_reset.go (new, timeout wrapper with test)
+- [x] **T72.1 Apply in the Gateway** — Covers: F15-AC2, apply portion of F15-AC4
+  - Files: Gateway internal/kafka/ensure_group_inactive.go (new, shared with the preview), internal/kafka/ensure_group_inactive_test.go (new), internal/kafka/compute_offset_reset_preview.go, internal/kafka/commit_offset_reset.go (new), internal/kafka/commit_offset_reset_test.go (new), internal/groups/offset_reset.go, internal/groups/commit_offset_reset.go (new, interface), internal/groups/apply_offset_reset.go (new, timeout wrapper with test), cmd/gateway/main.go (preview wiring for the shared check)
   - Do: `ApplyOffsetReset.Execute(ctx, group, topic, partitions)` takes each partition's expected current offset (or none) and target. It rechecks that the group exists and has no members, refuses with `ErrStalePreview` when any committed offset differs from the expected one or a target is outside the partition's current start–end range, then commits all targets in one request. A commit error for any partition is returned; a request without a response becomes `ErrOutcomeUnknown`.
   - Done when: `go test ./internal/kafka -run 'ApplyOffsetReset|EnsureGroupInactive' ./internal/groups` (run per package) passes, covering success, stale offsets, out-of-range targets, an active group, partition commit errors and an unknown outcome.
 - [ ] **T72.2 Apply route and authorization** — Covers: F15-AC3, apply portion of F15-AC4
