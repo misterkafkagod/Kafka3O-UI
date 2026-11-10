@@ -10,7 +10,7 @@
 3. On EKS-D after the user's `deploy.sh`: pause, resume and restart `kafka3o-verify-paused` and restart task 0 of `kafka3o-verify-failing` on Kafka A; an OPERATOR on a Production cluster would be denied before Connect; the audit lists each action with its outcome.
 
 ## Tasks
-- [ ] **T74.1 Connector actions in the Gateway** — Covers: F35-AC3
+- [x] **T74.1 Connector actions in the Gateway** — Covers: F35-AC3
   - Files: Gateway internal/connect/connector.go, internal/connect/validate_connector_name.go (new, with test), internal/connect/send_connect_action.go (new), internal/connect/send_connect_action_test.go (new), internal/connect/manage_connector.go (new, interface and timeout wrapper, with test)
   - Do: Implement discovery recipe steps 3–6 for actions: pause (`PUT .../pause`), resume (`PUT .../resume`), restart (`POST .../restart?includeTasks=true&onlyFailed=false`) and task restart (`POST .../tasks/{id}/restart`), with the name validated (1–249 characters, no `/`, no control characters, no surrounding spaces) and path-escaped. 2xx is accepted; Connect 404 → `ErrConnectorNotFound`; other 4xx → `ErrConnectRejected`; 5xx → `ErrConnectUnreachable`; no response (connection reset, timeout after sending) → `ErrConnectActionUnknown`; not configured → `ErrConnectNotConfigured`.
   - Done when: `go test ./internal/connect` passes with an `httptest` Connect, covering each action's method and path, name validation and escaping, and every error mapping.
