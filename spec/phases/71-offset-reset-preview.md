@@ -10,8 +10,8 @@
 3. On EKS-D after the user's `deploy.sh`, preview a synthetic inactive group on `kafka3o-m10-verify` through the secured console.
 
 ## Tasks
-- [ ] **T71.1 Preview computation in the Gateway** — Covers: F15-AC1, preview portion of F15-AC4
-  - Files: Gateway internal/groups/offset_reset.go (new, data types and errors), internal/groups/preview_offset_reset.go (new, interface), internal/kafka/preview_offset_reset.go (new), internal/kafka/preview_offset_reset_test.go (new)
+- [x] **T71.1 Preview computation in the Gateway** — Covers: F15-AC1, preview portion of F15-AC4
+  - Files: Gateway internal/groups/offset_reset.go (new, data types and errors), internal/groups/preview_offset_reset.go (new, interface), internal/groups/compare_partition_offset_resets.go (new, with test), internal/kafka/preview_offset_reset.go (new), internal/kafka/preview_offset_reset_test.go (new)
   - Do: `PreviewOffsetReset.Execute(ctx, group, topic, target)` finds the group's protocol, refuses a group with members (`ErrGroupActive`) or an unknown group or topic (`ErrGroupNotFound`, `ErrTopicNotFound`), reads the committed offsets, and computes each partition's target from the start offsets, end offsets or the first offset at or after the timestamp (the end offset when no record is that new). A partition without a commit reports no current offset. Nothing is written.
   - Done when: `go test ./internal/kafka -run OffsetResetPreview` passes with a fake admin, covering earliest, latest, timestamp, a timestamp after the end, partitions without commits, active classic and consumer-protocol groups, unknown group and unknown topic.
 - [ ] **T71.2 Preview route and authorization** — Covers: F15-AC1, preview portion of F15-AC4
