@@ -19,7 +19,7 @@ data:
     key.converter=org.apache.kafka.connect.storage.StringConverter
     value.converter=org.apache.kafka.connect.storage.StringConverter
     listeners=http://0.0.0.0:8083
-    plugin.path=/opt/kafka/libs/connect-file-4.3.1.jar,/opt/connect-plugins
+    plugin.path=/opt/kafka/libs/connect-file-4.3.2.jar,/opt/connect-plugins
     config.providers=env
     config.providers.env.class=org.apache.kafka.common.config.provider.EnvVarConfigProvider
     security.protocol=SASL_SSL
