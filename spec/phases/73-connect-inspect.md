@@ -2,7 +2,7 @@
 - **Milestone:** M12
 - **Covers:** F35-AC1, F35-AC2
 - **Discovery:** [kafka-connect-api](../discovery/kafka-connect-api.md)
-- **Status:** Building
+- **Status:** Done
 
 ## Demo
 1. In the Gateway repository, run `go test ./internal/connect` and `go test ./internal/httpapi -run Connect`.
@@ -24,3 +24,8 @@
   - Done when: `npx vitest run src/gateway/listConnectors.test.ts src/components/ConnectConnectors.test.tsx src/components/ClusterTabs.test.tsx` passes, covering the table, error summaries, not configured and unreachable with Retry; then `npm test` and `npm run build` pass.
 
 ## Review
+- **Demo:** steps 1–2 passed (auto-approved under the user's standing M12 instruction, 2026-11-09; run by Claude). Gateway: the Connect client maps the fixture recorded from the EKS-D test worker (names sorted, task states, the first trace line only, no configuration), reports not configured, 5xx, malformed JSON, a closed port and a slow worker (timeout) correctly, and the list route returns 404 `connect_not_configured` or 503 `connect_unreachable`. UI in Chromium 1194 with Gateway answers built from that fixture, 8/8: three connectors listed with text states, the failed task's error summary, the "Kafka Connect" breadcrumb, "not configured" for Prod, Retry recovering from an unreachable Connect, and no overflow at 768 or 320 px. Step 3 (EKS-D) waits for the user's `deploy.sh`; the worker and its three connectors are already running in `kafka3o-connect-test`.
+- **Vulnerability scan:** not run; no dependency changes (the Connect client uses the Go standard library).
+- **Regression:** Gateway `go test ./...` passed (20 operations in the route catalog); UI `npm test` 515 passed (5 opt-in skipped); default build.
+- **Convention check:** one action per file in `internal/connect`; data types and errors in `connector.go`.
+
