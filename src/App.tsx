@@ -11,6 +11,7 @@ import type { CreateTopic } from "./gateway/createTopic";
 import type { ConfirmTopicDeletion, DeleteTopic } from "./gateway/deleteTopic";
 import type { GatewayCredentials } from "./gateway/GatewayCredentials";
 import type { ListConsumerGroups } from "./gateway/listConsumerGroups";
+import type { PreviewOffsetReset } from "./gateway/previewOffsetReset";
 import type { ListLatestTopicMessages } from "./gateway/listLatestTopicMessages";
 import type { ListTopics } from "./gateway/listTopics";
 import type { ProduceTopicMessage } from "./gateway/produceTopicMessage";
@@ -44,6 +45,7 @@ type AppProps = {
   administrationPage?: ReactNode;
   administrationLink?: boolean;
   credentialsControl?: boolean;
+  previewOffsetReset?: PreviewOffsetReset;
 };
 
 export function App({
@@ -68,6 +70,7 @@ export function App({
   administrationPage,
   administrationLink,
   credentialsControl,
+  previewOffsetReset,
 }: AppProps) {
   const [connectionPanel, setConnectionPanel] = useState<{ gatewayId?: string } | null>(null);
 
@@ -151,6 +154,7 @@ export function App({
                 createTopic={createTopic}
                 statusRefreshMs={statusRefreshMs}
                 view="consumer-groups"
+                previewOffsetReset={previewOffsetReset}
               />
             }
           />

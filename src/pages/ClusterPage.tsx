@@ -11,6 +11,7 @@ import type { LoadGatewayConfig } from "../config/loadGatewayConfig";
 import type { GetCluster } from "../gateway/getCluster";
 import type { CreateTopic as CreateAction } from "../gateway/createTopic";
 import type { ListConsumerGroups } from "../gateway/listConsumerGroups";
+import type { PreviewOffsetReset } from "../gateway/previewOffsetReset";
 import type { ListTopics } from "../gateway/listTopics";
 import { useGatewayConfig } from "../hooks/useGatewayConfig";
 import styles from "./ClusterPage.module.css";
@@ -23,9 +24,10 @@ type ClusterPageProps = {
   createTopic: CreateAction;
   statusRefreshMs: number;
   view: "brokers" | "topics" | "consumer-groups";
+  previewOffsetReset?: PreviewOffsetReset;
 };
 
-export function ClusterPage({ loadGatewayConfig, getCluster, listTopics, listConsumerGroups, createTopic, statusRefreshMs, view }: ClusterPageProps) {
+export function ClusterPage({ loadGatewayConfig, getCluster, listTopics, listConsumerGroups, createTopic, statusRefreshMs, view, previewOffsetReset }: ClusterPageProps) {
   const { gatewayId } = useParams();
   const { data: gateways, isError, refetch } = useGatewayConfig(loadGatewayConfig);
 
@@ -43,7 +45,7 @@ export function ClusterPage({ loadGatewayConfig, getCluster, listTopics, listCon
     <>
       <ClusterTabs gatewayId={gateway.id} view={view} />
       {view === "consumer-groups" ? (
-        <ConsumerGroups gateway={gateway} listConsumerGroups={listConsumerGroups} />
+        <ConsumerGroups gateway={gateway} listConsumerGroups={listConsumerGroups} previewOffsetReset={previewOffsetReset} />
       ) : view === "topics" ? (
         <main>
           <h2>Topics</h2>

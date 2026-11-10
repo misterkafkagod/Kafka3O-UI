@@ -48,4 +48,12 @@ describe("ConsumerGroupDetails", () => {
     await userEvent.click(screen.getByRole("button", { name: "Retry group data" }));
     expect(retry).toHaveBeenCalledOnce();
   });
+
+  it("offers an offset reset only where it is enabled", () => {
+    const { unmount } = renderWithQuery(<ConsumerGroupDetails group={group} onRetry={() => {}} />);
+    expect(screen.queryByText("Reset offsets")).toBeNull();
+    unmount();
+    renderWithQuery(<ConsumerGroupDetails group={group} onRetry={() => {}} offsetReset={{ gatewayUrl: "https://gw", previewOffsetReset: vi.fn() }} />);
+    expect(screen.getByText("Reset offsets")).toBeDefined();
+  });
 });

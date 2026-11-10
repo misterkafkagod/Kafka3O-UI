@@ -1,4 +1,5 @@
 import type { ListConsumerGroups } from "../gateway/listConsumerGroups";
+import type { PreviewOffsetReset } from "../gateway/previewOffsetReset";
 import type { GatewayEntry } from "../gateway/types";
 import { useConsumerGroups } from "../hooks/useConsumerGroups";
 import { ConsumerGroupDetails } from "./ConsumerGroupDetails";
@@ -8,9 +9,10 @@ import { ErrorWithRetry } from "./ErrorWithRetry";
 type ConsumerGroupsProps = {
   gateway: GatewayEntry;
   listConsumerGroups: ListConsumerGroups;
+  previewOffsetReset?: PreviewOffsetReset;
 };
 
-export function ConsumerGroups({ gateway, listConsumerGroups }: ConsumerGroupsProps) {
+export function ConsumerGroups({ gateway, listConsumerGroups, previewOffsetReset }: ConsumerGroupsProps) {
   const { data: groups, isError, error, refetch } = useConsumerGroups(gateway, listConsumerGroups);
 
   return (
@@ -25,7 +27,10 @@ export function ConsumerGroups({ gateway, listConsumerGroups }: ConsumerGroupsPr
       ) : (
         <>
           <ConsumerGroupSummary groups={groups} />
-          {groups.map((group) => <ConsumerGroupDetails key={group.id} group={group} onRetry={() => void refetch()} />)}
+          {groups.map((group) => (
+            <ConsumerGroupDetails key={group.id} group={group} onRetry={() => void refetch()}
+              offsetReset={previewOffsetReset ? { gatewayUrl: gateway.url, previewOffsetReset } : undefined} />
+          ))}
         </>
       )}
     </main>

@@ -1,0 +1,39 @@
+.reset {
+  margin-top: 1rem;
+}
+
+.form {
+  display: grid;
+  gap: 0.6rem;
+  max-width: 32rem;
+  margin-top: 0.8rem;
+}
+
+.form fieldset {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1rem;
+  margin: 0;
+  padding: 0.6rem 0.8rem;
+}
+
+.form fieldset label,
+.form > label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 24px;
+}
+
+.form > label {
+  display: grid;
+}
+
+.form button {
+  justify-self: start;
+}
+
+.note {
+  margin-top: 1rem;
+  color: var(--color-text-muted);
+}
