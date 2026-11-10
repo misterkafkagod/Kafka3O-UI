@@ -3,7 +3,7 @@
 ## Vision
 Kafka3O is a multi-cluster Kafka console for developers and operators: one web UI (Kafka3O-UI) shows every cluster side by side — health, topics, messages, consumer lag. Each cluster is fronted by its own small, stateless gateway (Kafka3O-Gateway) that owns the broker connection and credentials close to that cluster; the browser never talks to Kafka directly.
 
-The console should be comfortable for dense technical data, easy to navigate, and explicit about connection problems and write outcomes. M6–M8 turn the existing functional pages into a consistent, accessible operator interface without changing the gateway API or the completed M1–M5 behavior. M9 extends the gateway and UI with explicitly confirmed Kafka configuration and partition administration. M10 adds local/Cognito login, global and per-cluster authorization, Production safeguards, and an attributable audit trail. M11 simplifies signed-in navigation and lets each user tailor the console's appearance for comfort and readability, without weakening the accessibility baseline.
+The console should be comfortable for dense technical data, easy to navigate, and explicit about connection problems and write outcomes. M6–M8 turn the existing functional pages into a consistent, accessible operator interface without changing the gateway API or the completed M1–M5 behavior. M9 extends the gateway and UI with explicitly confirmed Kafka configuration and partition administration. M10 adds local/Cognito login, global and per-cluster authorization, Production safeguards, and an attributable audit trail. M11 simplifies signed-in navigation and lets each user tailor the console's appearance for comfort and readability, without weakening the accessibility baseline. M12 lets operators fix stuck consumers and operate Kafka Connect from the console, under the same roles, Production rules and audit as every other write.
 
 ## Out of Scope
 - A gateway serving more than one cluster
@@ -14,6 +14,7 @@ The console should be comfortable for dense technical data, easy to navigate, an
 - Persistence in the gateway (no database; stateless)
 - Invented metrics or Gateway-to-Kafka connection-setting changes from the UI
 - Direct SSO integrations other than Amazon Cognito in M10; additional providers are in the backlog
+- Creating, updating or deleting Kafka Connect connectors in M12 (backlog F48), and showing connector configuration values that may hold secrets
 - Adding, removing or retargeting registered clusters from the UI; the cluster registry changes only through a repository change (dropped F17)
 - Appearance preferences synced to a Console account, ADMIN-enforced appearance defaults, free-form color pickers or custom CSS, and fonts loaded from external sites
 
@@ -47,6 +48,9 @@ The console should be comfortable for dense technical data, easy to navigate, an
 - **F30** An authorized administrator can flag a cluster as Production, where only an ADMIN for that cluster can perform Kafka mutations
 - **F31** An authorized user can inspect an attributable audit trail of authentication, access-control changes, denied actions, and Kafka mutation outcomes
 - **F45** User can choose the console's color mode, color theme, font, text size and density, remembered in their browser
+- **F15** User can reset an inactive consumer group's offsets to earliest, latest or a timestamp, with a preview
+- **F35** User can inspect a cluster's Kafka Connect connectors and tasks and pause, resume or restart them
+- **F47** User of the secured console sees no Gateway credentials control, because every cluster is reached through the Console
 - **F46** User can work signed in with a compact session indicator, a separate administration page shown only to administrators, and clusters that open on their topics
 
 ## Milestones
@@ -271,15 +275,18 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
     - Demo: Hyperlegible at Extra large stays usable at 320 px, and Compact tightens table rows while targets stay at least 24×24 px.
 - **Contracts:** Behaviors and acceptance criteria are in [FUNC-SPEC.md](./FUNC-SPEC.md#f46--streamlined-signed-in-navigation-planned-m11); the session administration flags and appearance mechanism are in [TECH-SPEC.md](./TECH-SPEC.md#m11-navigation-and-appearance-planned).
 
+### M12 — Operate consumer groups and Kafka Connect from the console
+- **Status:** Planned
+- **Features:** F47, F15, F35
+- **Phases:** <filled by skill-phase-breakdown>
+
 ## Backlog
 The following items are candidates after M11, not commitments to implement every Redpanda feature. All future writes must use F29/F30 authorization and F31 audit; no candidate silently expands the current bounded reads or changes Kafka connection credentials.
 
-- **F15 · High:** User can reset a consumer group's offsets to earliest, latest or a timestamp, with a preview and inactive-group checks.
 - **F16 · Postponed:** User can decode Avro/Protobuf values via a Schema Registry.
 - **F32 · Postponed:** User can browse Schema Registry subjects, versions and references, check compatibility, and explicitly register or delete schema versions.
 - **F33 · High:** An authorized user can inspect/manage Kafka ACLs and supported broker principals/credentials; Kafka permissions remain distinct from Console roles.
 - **F34 · Medium:** An authorized user can delete inactive consumer groups or selected committed offsets, separately from F15 offset resets.
-- **F35 · Medium:** User can inspect configured Kafka Connect clusters/connectors and explicitly create, update, pause, resume, restart or delete supported connectors/tasks.
 - **F36 · Medium:** User can filter records by headers/decoded fields and, if justified, sandboxed expressions with CPU/time/scan limits; no unbounded JavaScript execution in a Gateway.
 - **F37 · Medium:** User can continue message browsing with exact-offset cursors and explicit page/session budgets instead of only a single bounded result window.
 - **F38 · Medium:** User can inspect raw bytes in hex, download individual record bytes, and select additional supported key/value/header codecs; complements F16 rather than duplicating schema lifecycle.
@@ -288,7 +295,7 @@ The following items are candidates after M11, not commitments to implement every
 - **F41 · Deferred:** User can inspect genuine broker/partition health diagnostics and available metrics, with explicit unavailable states and a separately configured metrics source.
 - **F42 · Deferred:** User can sign in through additional directly integrated OIDC providers, starting with Keycloak, Authentik, Microsoft Entra ID, Okta and Google Workspace; Cognito federation is not a claim that these integrations have been tested.
 - **F43 · Deferred:** Deployments with compatible brokers can optionally propagate end-user identity to Kafka/upstream APIs instead of a shared service principal; this is not required for Cognito login or M10 application auditing.
-- **F47 · Low:** Secured builds hide the Gateway credentials control, which has nothing to edit when every cluster is reached through the Console.
+- **F48 · Medium:** An authorized user can create, update and delete Kafka Connect connectors, with sensitive configuration values protected.
 - **F44 · Deferred:** An authorized user can inspect client quotas and, after Kafka API discovery, explicitly change supported quotas.
 
 ### Redpanda Console comparison (checked 2026-11-06)
@@ -302,7 +309,7 @@ Compared current official Redpanda documentation (pages identify Console v3.14.0
 | Consumer offset reset and group/offset management [R1, R3] | Inspection exists; offset and group mutation do not | F15, F34 |
 | Schema-backed decoding and schema lifecycle/compatibility [R4, R5] | Text/JSON/base64 only; no Schema Registry integration | F16, F32 (postponed) |
 | ACLs, principals/credential rotation and quota visibility [R1, R3] | No corresponding UI/Gateway APIs | F33, F44 |
-| Kafka Connect lifecycle [R6] | No Connect integration; Redpanda documents it as community-supported | F35 |
+| Kafka Connect lifecycle [R6] | No Connect integration; Redpanda documents it as community-supported | F35 (M12 inspect and lifecycle), F48 |
 | Programmable record filters and continuous pagination [R7, R8] | Bounded substring search and bounded reads exist; no structured scripting/pagination workflow | F36, F37 |
 | Additional deserializers, hex inspection and raw-byte download [R5] | No codec selection beyond text/JSON/base64 or binary download workflow | F38 |
 | Record deletion [R3] | Topic deletion exists, record-range deletion does not | F39 |
@@ -324,6 +331,7 @@ Redpanda-only Shadow Links, its Admin API, and Redpanda-specific diagnostic oper
 - **Verification debt:** Run the Cognito sign-in, group refresh and logout integration against a real User Pool when an AWS account and app client become available; fixture tests are not evidence of live provider compatibility.
 
 ## Learnings
+- 2026-11-09 (re-plan): M12 = F47, F15 and F35 (inspect, pause, resume, restart) by user choice; connector create/update/delete split to F48. A test Kafka Connect worker deployed by Claude on EKS-D (namespace `kafka3o-connect-test`, Kafka A only) serves discovery and demos.
 - 2026-11-09 (re-plan): Dropped F17 at the user's request: the cluster registry must change only through a repository change, never from the UI. Postponed the Schema Registry features (F16, F32); they are not candidates for the next milestone.
 - 2026-11-08 (M11 retro): P63–P69 deliver F46 and F45: a compact session indicator, an Administration page shown from Console-reported capabilities (without probing admin endpoints), clusters opening on Topics, and per-browser color mode, four contrast-tested themes, a bundled readable font, text size and density.
 - 2026-11-08 (M11 retro): What worked: small phases (1–3 tasks), a contrast test that reads the real stylesheets, and real-browser checks per phase that measured overflow, target sizes and first-render theme instead of trusting screenshots.

@@ -467,3 +467,13 @@ Choose the console's color mode, color theme, font, text size and density, remem
 - **F45-AC6** (B5) The stored value contains only the five appearance choices and no identity, cluster or credential; everyone using the same browser profile shares it, signing out does not clear it, and it applies in every build mode including the sign-in screen
 
 **External dependencies:** Browser `localStorage`, the `storage` event and `prefers-color-scheme`; faked in Vitest. One bundled font file (Atkinson Hyperlegible, SIL Open Font License 1.1) served from the UI's own origin.
+
+### F47 — No Gateway credentials in the secured console (planned M12)
+The secured console has no Gateway credentials control, because every cluster is reached through the Console. · *detailed when M12 starts*
+
+### F15 — Consumer offset reset (planned M12)
+Reset an inactive consumer group's committed offsets for a topic to earliest, latest or a timestamp after previewing the change, under Console roles, Production rules and audit. · *detailed when M12 starts*
+
+### F35 — Kafka Connect inspection and lifecycle (planned M12)
+Inspect a cluster's Kafka Connect connectors and tasks with their state and errors, and pause, resume or restart them under Console roles, Production rules and audit; configuration values stay hidden. · *detailed when M12 starts*
+

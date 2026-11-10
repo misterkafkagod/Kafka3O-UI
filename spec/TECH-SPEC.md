@@ -164,6 +164,11 @@ This design deliberately uses the existing central store for opaque delegation/i
 - Tokens: each theme defines light and dark values of the existing `--color-*` tokens in `styles.css`, selected by the root attributes, with no attribute meaning the current Blue/system behavior. Text size sets the root `font-size` (all component sizes and spacing are already in rem). Density adds `--density-*` tokens for table cell, list row and card padding, applied in the components that render those rows.
 - Fonts: System keeps the current stack; Serif uses a system serif stack; Hyperlegible uses the bundled font with the System stack as fallback.
 
+## M12 consumer groups and Kafka Connect (planned)
+- Offset reset (F15) runs in the cluster's Gateway with franz-go/kadm: a preview request computes current and target offsets per partition; a separate apply request rechecks that the group has no members immediately before committing. Both are new routes in the Gateway action catalog (OPERATOR, or ADMIN plus a reason on Production) and use the M10 delegation, intent and outcome audit unchanged.
+- Kafka Connect (F35) is reached only through the cluster's own Gateway, which gains an optional Connect REST base URL and forwards with the Go standard HTTP client (no new dependency). Reads need VIEWER; pause, resume and restart need OPERATOR, or ADMIN plus a reason on Production. Connector configuration values are never returned to the browser. A cluster without Connect reports "not configured".
+- EKS-D test Connect worker: one pod in namespace `kafka3o-connect-test` from `apache/kafka:4.3.1` (already on the node), bootstrapped to Kafka A only, with internal topics `kafka3o-connect-configs`, `-offsets` and `-status` and only the bundled file connectors on synthetic data. Kafka B and existing topics are untouched; deleting the namespace and the three topics removes it.
+
 ## Structure
 ```
 Kafka3O-Gateway/
@@ -237,6 +242,9 @@ Tests live next to the file they test (`*_test.go`, `*.test.ts(x)`).
 - Completion evidence: confirm the updated build is served at the EKS-D manual-test URL and record browser/demo outcomes in each phase review. Checks not executed remain `not run`; screenshot review alone does not establish keyboard, accessibility or Kafka behavior.
 
 ## Integrations
+### Kafka Connect REST API (M12)
+- Source: discovery needed (`kafka-connect-api`, against the EKS-D test worker): connector and task status shapes, error traces, pause/resume/restart semantics and timing, unreachable-Connect behavior.
+
 ### Kafka (behind each gateway)
 - Source: known Kafka admin API; secured broker setup was verified in [P13 discovery](./discovery/kafka-tls-scram-dev.md).
 - Admin API via franz-go/kadm: metadata (brokers, controller, cluster ID, topics, internal flag), ListStartOffsets / ListEndOffsets for approximate message counts
