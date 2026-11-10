@@ -176,6 +176,12 @@ This design deliberately uses the existing central store for opaque delegation/i
 - Gateway: generates backup and restore connector configurations from a per-cluster backup setting (S3 endpoint, bucket, prefix) and the topic; no free-form configuration is accepted. It lists the topic's objects and counts their records with a read-only S3 identity (Go standard library with AWS Signature V4; no SDK), and reads restore progress from the Connect offsets topic. Backup and restore routes are Kafka writes under the M10 roles, Production rules and audit.
 - Java conventions: one public class per action with one public method besides the `Transformation` interface's lifecycle methods (`configure`, `config`, `close`, required by Kafka Connect); tests in `src/test/java`, run with `mvn -B verify`.
 
+## M14 consumer group pages (planned)
+- No Gateway change: the group list and the group page both read the existing consumer-group snapshot through `useConsumerGroups`; the group page selects its group by id from the route `/clusters/:id/consumer-groups/:group` (URL-encoded).
+
+## M15 cluster metrics (planned)
+- Kafka is the only metrics source (user decision 2026-11-10): no CPU or memory, no metrics-server, no JMX exporter, no change to the Kafka StatefulSets. Exact sources and the Prometheus endpoint's authentication are settled by discovery `cluster-metrics-sources` when M15 starts.
+
 ## Structure
 ```
 Kafka3O-Gateway/

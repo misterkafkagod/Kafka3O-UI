@@ -539,3 +539,26 @@ Restore a topic's backup into that same topic after confirming that restored mes
 - **F50-AC3** (B2) Restores need OPERATOR on non-Production and ADMIN plus a reason on Production, are audited with intent and outcome, show progress or failure in the Backups tab, and a second concurrent restore of the same topic is refused
 
 **External dependencies:** Aiven's S3 source connector with the Kafka3O unwrap transform on the same Connect worker; see the [s3-backup-connectors discovery](./discovery/s3-backup-connectors.md).
+
+### F52 — Consumer group list and group page (planned M14)
+Scan a cluster's consumer groups in one list and open a page per group with its members and its offsets per topic and partition.
+
+**Behaviors**
+- **F52-B1** User opens a cluster's Consumer groups tab → a table lists every group with name, state, members, number of topics and total lag, sorted by name
+- **F52-B2** User clicks a group in the list → a page for that group shows its members and, for each topic, a table of partitions with committed offset, log start, log end and lag, and that topic's offset reset
+- **F52-B3** The group does not exist or its data is incomplete → the group page says so, offers Retry and a link back to the list, and shows no invented rows
+- **F52-B4** User clicks a group on a topic's Consumers tab → the same group page opens
+
+**Acceptance criteria**
+- **F52-AC1** (B1) Given consumer groups, the list shows one row per group with name, state, members, topic count and total lag; when any partition's lag is unknown, total lag reads "Unknown (n partitions)" and unknown lag is never counted as zero; loading, empty and Gateway-error states keep their recovery
+- **F52-AC2** (B2) Clicking a group's row opens `/clusters/:id/consumer-groups/:group`, which shows exact decimal offsets per topic and partition; missing and out-of-range commits keep their labels; offset reset works as in F15
+- **F52-AC3** (B3) Given a group name that is not reported, the page says "Consumer group not found" with a link back to the list; a group error shows the error with Retry and no fabricated rows
+- **F52-AC4** (B4) A group name on a topic's Consumers tab links to that group's page
+
+**External dependencies:** The existing consumer-group snapshot API; no new Gateway API.
+
+### F41 — Cluster metrics (planned M15)
+See a cluster's broker disk use, partition health, topic sizes and throughput on a Metrics tab, only as Kafka reports them, with unavailable values shown as unavailable · *detailed when M15 starts*
+
+### F53 — Export cluster metrics (planned M15)
+Export a cluster's metrics as a CSV/JSON download from the Metrics tab and through a Prometheus endpoint on the Gateway · *detailed when M15 starts*
