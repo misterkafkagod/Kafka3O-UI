@@ -1,4 +1,5 @@
 import type { FetchGatewayWrite } from "./GatewayWriteRequest";
+import type { RunBackupAction } from "./runBackupAction";
 
 export type StartedBackup = { topic: string; connector: string; location: string };
 
@@ -6,6 +7,8 @@ export type StartBackup = (gatewayUrl: string, topic: string) => Promise<Started
 
 export type BackupActions = {
   start: StartBackup;
+  // run pauses, resumes or deletes a backup job; optional so older embeddings stay read-only.
+  run?: RunBackupAction;
   confirm: (message: string) => boolean;
 };
 

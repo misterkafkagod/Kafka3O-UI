@@ -8,12 +8,14 @@ export function describeBackupError(error: unknown): string {
   }
   const code = error instanceof HttpError ? error.problem?.code ?? "" : "";
   if (["connect_action_unknown", "gateway_outcome_unknown", "outcome_unknown"].includes(code)) {
-    return "The backup may have been started. Refresh before retrying.";
+    return "The change may have been applied. Refresh before retrying.";
   }
   if (error instanceof HttpError && error.status === 403) {
     return describeAccessDenial(error.problem?.detail);
   }
   switch (code) {
+    case "not_found":
+      return "This topic no longer has a backup. Refresh the list.";
     case "backup_exists":
       return "This topic is already backed up.";
     case "backups_not_configured":

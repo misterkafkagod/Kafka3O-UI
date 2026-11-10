@@ -1,5 +1,8 @@
-import { render, screen, within } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { render, screen, waitFor, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { describe, expect, it, vi } from "vitest";
+import { HttpError } from "../gateway/HttpError";
+import type { RunBackupAction } from "../gateway/runBackupAction";
 import { BackupList } from "./BackupList";
 
 describe("BackupList", () => {
@@ -23,5 +26,38 @@ describe("BackupList", () => {
   it("says when there are no backups", () => {
     render(<BackupList backups={[]} />);
     expect(screen.getByText("No backups yet.")).toBeDefined();
+  });
+
+  it("pauses, resumes and deletes after confirmation, keeping stored data", async () => {
+    const user = userEvent.setup();
+    const run = vi.fn<RunBackupAction>().mockResolvedValue(undefined);
+    const confirm = vi.fn(() => true);
+    const onChanged = vi.fn();
+    render(<BackupList gatewayUrl="https://gw" onChanged={onChanged} actions={{ start: vi.fn(), run, confirm }} backups={[
+      { topic: "orders", connector: "kafka3o-backup-orders", location: "s3://b/kafka-a/orders/", state: "RUNNING" },
+      { topic: "audit", connector: "kafka3o-backup-audit", location: "s3://b/kafka-a/audit/", state: "PAUSED" },
+    ]} />);
+    await user.click(screen.getByRole("button", { name: "Pause the backup of orders" }));
+    expect(run).toHaveBeenLastCalledWith("https://gw", "orders", "pause");
+    expect((await screen.findByRole("status")).textContent).toBe("Pause requested for the backup of orders.");
+    await user.click(screen.getByRole("button", { name: "Resume the backup of audit" }));
+    expect(run).toHaveBeenLastCalledWith("https://gw", "audit", "resume");
+    await user.click(screen.getByRole("button", { name: "Delete the backup job for orders" }));
+    expect(confirm).toHaveBeenLastCalledWith('Delete the backup job for "orders"? The stored objects are kept; only the job stops.');
+    expect(run).toHaveBeenLastCalledWith("https://gw", "orders", "delete");
+    await waitFor(() => expect(onChanged).toHaveBeenCalledTimes(3));
+  });
+
+  it("sends nothing when canceled and explains failures", async () => {
+    const user = userEvent.setup();
+    const run = vi.fn<RunBackupAction>().mockRejectedValue(new HttpError(503, "unknown", { code: "connect_action_unknown" }));
+    const confirm = vi.fn(() => false);
+    render(<BackupList gatewayUrl="https://gw" actions={{ start: vi.fn(), run, confirm }}
+      backups={[{ topic: "orders", connector: "kafka3o-backup-orders", location: "s3://b/kafka-a/orders/", state: "RUNNING" }]} />);
+    await user.click(screen.getByRole("button", { name: "Delete the backup job for orders" }));
+    expect(run).not.toHaveBeenCalled();
+    confirm.mockReturnValue(true);
+    await user.click(screen.getByRole("button", { name: "Delete the backup job for orders" }));
+    expect((await screen.findByRole("alert")).textContent).toBe("The change may have been applied. Refresh before retrying.");
   });
 });

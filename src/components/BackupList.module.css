@@ -7,3 +7,9 @@
   color: var(--color-alert-text);
   overflow-wrap: anywhere;
 }
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
