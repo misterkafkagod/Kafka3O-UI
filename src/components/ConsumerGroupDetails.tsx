@@ -2,6 +2,7 @@ import type { OffsetResetActions } from "../gateway/OffsetResetActions";
 import type { ConsumerGroup } from "../gateway/types";
 import { consumerGroupAnchor } from "../groups/consumerGroupAnchor";
 import { consumerLagStatusLabel } from "../groups/consumerLagStatusLabel";
+import { ConsumerGroupMembers } from "./ConsumerGroupMembers";
 import { OffsetResetPreview } from "./OffsetResetPreview";
 import { ScrollableTableRegion } from "./ScrollableTableRegion";
 import styles from "./ConsumerGroupDetails.module.css";
@@ -24,32 +25,7 @@ export function ConsumerGroupDetails({ group, onRetry, offsetReset }: ConsumerGr
           <button type="button" onClick={onRetry}>Retry group data</button>
         </div>
       ) : null}
-      {group.members.length > 0 ? (
-        <ScrollableTableRegion label={`Members of ${group.id} table scroll area`}>
-          <table aria-label={`Members of ${group.id}`}>
-            <thead>
-              <tr>
-                <th scope="col">Member</th>
-                <th scope="col">Client</th>
-                <th scope="col">Host</th>
-                <th scope="col">Instance</th>
-              </tr>
-            </thead>
-            <tbody>
-              {group.members.map((member) => (
-                <tr key={member.id}>
-                  <td>{member.id}</td>
-                  <td>{member.clientId}</td>
-                  <td>{member.clientHost}</td>
-                  <td>{member.instanceId ?? "—"}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </ScrollableTableRegion>
-      ) : (
-        <p>{group.error ? "Member information may be unavailable." : "No active members."}</p>
-      )}
+      <ConsumerGroupMembers group={group} />
       {group.partitions.length > 0 ? (
         <ScrollableTableRegion label={`Partition lag for ${group.id} table scroll area`}>
           <table aria-label={`Partition lag for ${group.id}`}>
