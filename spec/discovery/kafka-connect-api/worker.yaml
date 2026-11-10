@@ -19,7 +19,7 @@ data:
     key.converter=org.apache.kafka.connect.storage.StringConverter
     value.converter=org.apache.kafka.connect.storage.StringConverter
     listeners=http://0.0.0.0:8083
-    plugin.path=/opt/kafka/libs/connect-file-4.3.1.jar
+    plugin.path=/opt/kafka/libs/connect-file-4.3.1.jar,/opt/connect-plugins
     config.providers=env
     config.providers.env.class=org.apache.kafka.common.config.provider.EnvVarConfigProvider
     security.protocol=SASL_SSL
@@ -60,7 +60,12 @@ spec:
           env:
             - name: CONNECT_SASL_PASSWORD
               valueFrom: { secretKeyRef: { name: kafka-connect-kafka-a, key: sasl.password } }
-            - { name: KAFKA_HEAP_OPTS, value: "-Xms256m -Xmx512m" }
+            # M13 backup storage credentials, referenced by connector configs as ${env:BACKUP_S3_ACCESS_KEY} etc.
+            - name: BACKUP_S3_ACCESS_KEY
+              valueFrom: { secretKeyRef: { name: kafka-connect-backup-s3, key: access-key } }
+            - name: BACKUP_S3_SECRET_KEY
+              valueFrom: { secretKeyRef: { name: kafka-connect-backup-s3, key: secret-key } }
+            - { name: KAFKA_HEAP_OPTS, value: "-Xms256m -Xmx768m" }
             - { name: LOG_DIR, value: /tmp/connect-logs }
           ports:
             - { containerPort: 8083, name: rest }
@@ -69,12 +74,13 @@ spec:
             periodSeconds: 5
           resources:
             requests: { cpu: 100m, memory: 512Mi }
-            limits: { memory: 1Gi }
+            limits: { memory: 1536Mi }
           securityContext: { allowPrivilegeEscalation: false, capabilities: { drop: ["ALL"] } }
           volumeMounts:
             - { name: config, mountPath: /etc/kafka-connect, readOnly: true }
             - { name: kafka-ca, mountPath: /run/kafka-ca, readOnly: true }
             - { name: work, mountPath: /tmp }
+            - { name: plugins, mountPath: /opt/connect-plugins, readOnly: true }
       volumes:
         - name: config
           configMap: { name: kafka-connect-config }
@@ -82,6 +88,9 @@ spec:
           secret: { secretName: kafka-connect-kafka-a, items: [{ key: ca.crt, path: ca.crt }] }
         - name: work
           emptyDir: {}
+        # Aiven S3 sink and source 3.4.3 (Apache 2.0), unpacked on eksd-01 after SHA-256 checks (s3-backup-connectors discovery).
+        - name: plugins
+          hostPath: { path: /var/lib/kafka3o-connect-plugins, type: Directory }
 ---
 apiVersion: v1
 kind: Service
