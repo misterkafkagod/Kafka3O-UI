@@ -1,0 +1,15 @@
+.start {
+  margin-top: 1rem;
+}
+
+.form {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.form select {
+  min-width: 0;
+  max-width: 100%;
+}

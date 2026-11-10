@@ -12,6 +12,7 @@ import type { ConfirmTopicDeletion, DeleteTopic } from "./gateway/deleteTopic";
 import type { GatewayCredentials } from "./gateway/GatewayCredentials";
 import type { ListConnectors } from "./gateway/listConnectors";
 import type { ConnectorActions } from "./gateway/runConnectorAction";
+import type { BackupActions } from "./gateway/startBackup";
 import type { ListConsumerGroups } from "./gateway/listConsumerGroups";
 import type { OffsetResetActions } from "./gateway/OffsetResetActions";
 import type { ListLatestTopicMessages } from "./gateway/listLatestTopicMessages";
@@ -50,6 +51,7 @@ type AppProps = {
   offsetReset?: OffsetResetActions;
   listConnectors?: ListConnectors;
   connectorActions?: ConnectorActions;
+  backupActions?: BackupActions;
 };
 
 export function App({
@@ -77,6 +79,7 @@ export function App({
   offsetReset,
   listConnectors,
   connectorActions,
+  backupActions,
 }: AppProps) {
   const [connectionPanel, setConnectionPanel] = useState<{ gatewayId?: string } | null>(null);
 
@@ -146,6 +149,21 @@ export function App({
                 createTopic={createTopic}
                 statusRefreshMs={statusRefreshMs}
                 view="topics"
+              />
+            }
+          />
+          <Route
+            path="/clusters/:gatewayId/backups"
+            element={
+              <ClusterPage
+                loadGatewayConfig={loadGatewayConfig}
+                getCluster={getCluster}
+                listTopics={listTopics}
+                listConsumerGroups={listConsumerGroups}
+                createTopic={createTopic}
+                statusRefreshMs={statusRefreshMs}
+                view="backups"
+                backupActions={backupActions}
               />
             }
           />

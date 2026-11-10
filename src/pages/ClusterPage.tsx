@@ -2,6 +2,7 @@ import { useParams } from "react-router";
 import { ClusterDetails } from "../components/ClusterDetails";
 import { ClusterNotFound } from "../components/ClusterNotFound";
 import { ClusterTabs } from "../components/ClusterTabs";
+import { ClusterBackups } from "../components/ClusterBackups";
 import { ConnectConnectors } from "../components/ConnectConnectors";
 import { ConsumerGroups } from "../components/ConsumerGroups";
 import { CreateTopic } from "../components/CreateTopic";
@@ -13,6 +14,7 @@ import type { GetCluster } from "../gateway/getCluster";
 import type { CreateTopic as CreateAction } from "../gateway/createTopic";
 import type { ListConnectors } from "../gateway/listConnectors";
 import type { ConnectorActions } from "../gateway/runConnectorAction";
+import type { BackupActions } from "../gateway/startBackup";
 import type { ListConsumerGroups } from "../gateway/listConsumerGroups";
 import { connectNotConfigured } from "../gateway/connectNotConfigured";
 import type { OffsetResetActions } from "../gateway/OffsetResetActions";
@@ -27,13 +29,14 @@ type ClusterPageProps = {
   listConsumerGroups: ListConsumerGroups;
   createTopic: CreateAction;
   statusRefreshMs: number;
-  view: "brokers" | "topics" | "consumer-groups" | "connect";
+  view: "brokers" | "topics" | "consumer-groups" | "connect" | "backups";
+  backupActions?: BackupActions;
   listConnectors?: ListConnectors;
   connectorActions?: ConnectorActions;
   offsetReset?: OffsetResetActions;
 };
 
-export function ClusterPage({ loadGatewayConfig, getCluster, listTopics, listConsumerGroups, createTopic, statusRefreshMs, view, offsetReset, listConnectors = connectNotConfigured, connectorActions }: ClusterPageProps) {
+export function ClusterPage({ loadGatewayConfig, getCluster, listTopics, listConsumerGroups, createTopic, statusRefreshMs, view, offsetReset, listConnectors = connectNotConfigured, connectorActions, backupActions }: ClusterPageProps) {
   const { gatewayId } = useParams();
   const { data: gateways, isError, refetch } = useGatewayConfig(loadGatewayConfig);
 
@@ -50,7 +53,9 @@ export function ClusterPage({ loadGatewayConfig, getCluster, listTopics, listCon
   return (
     <>
       <ClusterTabs gatewayId={gateway.id} view={view} />
-      {view === "connect" ? (
+      {view === "backups" ? (
+        <ClusterBackups gateway={gateway} listTopics={listTopics} actions={backupActions} />
+      ) : view === "connect" ? (
         <ConnectConnectors gateway={gateway} listConnectors={listConnectors} actions={connectorActions} />
       ) : view === "consumer-groups" ? (
         <ConsumerGroups gateway={gateway} listConsumerGroups={listConsumerGroups} offsetReset={offsetReset} />

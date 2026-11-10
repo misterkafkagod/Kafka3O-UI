@@ -2,7 +2,7 @@ import { Link } from "react-router";
 
 type ClusterTabsProps = {
   gatewayId: string;
-  view: "brokers" | "topics" | "consumer-groups" | "configuration" | "connect";
+  view: "brokers" | "topics" | "consumer-groups" | "configuration" | "connect" | "backups";
 };
 
 export function ClusterTabs({ gatewayId, view }: ClusterTabsProps) {
@@ -23,6 +23,9 @@ export function ClusterTabs({ gatewayId, view }: ClusterTabsProps) {
       </Link>{" "}
       <Link to={`${clusterPath}/connect`} aria-current={view === "connect" ? "page" : undefined}>
         Connect
+      </Link>{" "}
+      <Link to={`${clusterPath}/backups`} aria-current={view === "backups" ? "page" : undefined}>
+        Backups
       </Link>
     </nav>
   );
