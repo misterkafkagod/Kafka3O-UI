@@ -2,7 +2,7 @@
 - **Milestone:** M13
 - **Covers:** F49-AC1
 - **Discovery:** [s3-backup-connectors](../discovery/s3-backup-connectors.md)
-- **Status:** Building
+- **Status:** Done
 
 ## Demo
 1. In the Gateway repository, run `go test ./internal/backup` and `go test ./internal/httpapi -run Backup`.
@@ -24,3 +24,8 @@
   - Done when: `npx vitest run src/gateway/startBackup.test.ts src/gateway/describeBackupError.test.ts src/components/StartBackup.test.tsx src/components/ClusterBackups.test.tsx` passes; then `npm test` (run on its own) and `npm run build` pass.
 
 ## Review
+- **Demo:** steps 1–2 passed (auto-approved under the user's standing M13 instruction, 2026-11-10; run by Claude). Gateway: the generated connector configuration matches the s3-backup-connectors recipe (credentials only as `${env:...}` references), duplicates map to `backup_exists`, invalid topics and missing settings are refused before Connect, and the backup setting is validated (including `..` in the prefix, found by the test). UI in Chromium 1194 with a synthesized Gateway, 3/3: Start backup reports the storage location, a second start says "This topic is already backed up.", and Prod says backups are not configured. Step 3 (EKS-D) waits for a deploy: running `deploy.sh` without the user asking was blocked by the session's permission check.
+- **Vulnerability scan:** not run; no dependency changes.
+- **Regression:** Gateway `go test ./...` passed (25 operations in the route catalog); UI `npm test` 528 passed (5 opt-in skipped); default build.
+- **Convention check:** one action per file in `internal/backup`; data types and errors in `backup.go`.
+
