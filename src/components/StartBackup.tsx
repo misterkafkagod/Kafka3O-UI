@@ -4,6 +4,7 @@ import type { ListTopics } from "../gateway/listTopics";
 import type { BackupActions } from "../gateway/startBackup";
 import type { GatewayEntry } from "../gateway/types";
 import { useTopics } from "../hooks/useTopics";
+import { isConnectStorageTopic } from "../groups/isConnectStorageTopic";
 import styles from "./StartBackup.module.css";
 
 type StartBackupProps = {
@@ -11,17 +12,21 @@ type StartBackupProps = {
   listTopics: ListTopics;
   actions: BackupActions;
   onStarted?: () => void;
+  // backedUp lists topics that already have a backup; they are not offered again.
+  backedUp?: string[];
 };
 
-export function StartBackup({ gateway, listTopics, actions, onStarted }: StartBackupProps) {
+export function StartBackup({ gateway, listTopics, actions, onStarted, backedUp = [] }: StartBackupProps) {
   const id = useId();
   const { data: topics } = useTopics(gateway, listTopics);
-  const names = (topics ?? []).filter((topic) => !topic.internal).map((topic) => topic.name);
+  const names = (topics ?? [])
+    .filter((topic) => !topic.internal && !isConnectStorageTopic(topic.name) && !backedUp.includes(topic.name))
+    .map((topic) => topic.name);
   const [topic, setTopic] = useState("");
   const [pending, setPending] = useState(false);
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
-  const selected = topic || names[0] || "";
+  const selected = names.includes(topic) ? topic : names[0] ?? "";
 
   async function start(event: FormEvent) {
     event.preventDefault();

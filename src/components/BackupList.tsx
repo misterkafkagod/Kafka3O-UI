@@ -96,7 +96,7 @@ export function BackupList({ backups, gatewayUrl, actions, onChanged }: BackupLi
             <Fragment key={backup.connector}>
               <tr>
                 <th scope="row">{backup.topic}</th>
-                <td>{backup.state ?? "Unknown"}</td>
+                <td className={styles.state}>{backup.state ?? "Unknown"}</td>
                 <td><code className={styles.location}>{backup.location}</code></td>
                 <td>{backup.storage === undefined ? "Unknown" : backup.storage.lastWrite === null ? "Nothing written yet"
                   : new Date(backup.storage.lastWrite).toLocaleString()}</td>

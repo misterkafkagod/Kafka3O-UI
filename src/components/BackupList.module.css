@@ -18,3 +18,7 @@
   background: var(--color-surface-subtle);
   color: var(--color-text);
 }
+
+.state {
+  white-space: nowrap;
+}

@@ -37,7 +37,7 @@ export function ClusterBackups({ gateway, listTopics, listBackups, actions }: Cl
       ) : (
         <>
           <BackupList backups={backups} gatewayUrl={gateway.url} actions={actions} onChanged={() => void refetch()} />
-          {actions ? <StartBackup gateway={gateway} listTopics={listTopics} actions={actions} onStarted={() => void refetch()} /> : null}
+          {actions ? <StartBackup gateway={gateway} listTopics={listTopics} actions={actions} onStarted={() => void refetch()} backedUp={backups.map((backup) => backup.topic)} /> : null}
         </>
       )}
     </main>

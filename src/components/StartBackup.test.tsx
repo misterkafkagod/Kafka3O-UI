@@ -46,4 +46,15 @@ describe("StartBackup", () => {
     await user.click(screen.getByRole("button", { name: "Start backup" }));
     expect((await screen.findByRole("alert")).textContent).toBe("This topic is already backed up.");
   });
+
+  it("offers neither Connect storage topics nor topics that are already backed up", async () => {
+    const topics = vi.fn<ListTopics>().mockResolvedValue([
+      { name: "kafka3o-connect-configs", partitions: 1, replicationFactor: 1, internal: false, approxMessages: 9 },
+      { name: "kafka3o-m10-verify", partitions: 1, replicationFactor: 1, internal: false, approxMessages: 22 },
+      { name: "orders", partitions: 3, replicationFactor: 1, internal: false, approxMessages: 5 },
+    ]);
+    renderWithQuery(<StartBackup gateway={gateway} listTopics={topics} actions={actions(async () => ({ topic: "", connector: "", location: "" }))} backedUp={["kafka3o-m10-verify"]} />);
+    const select = await screen.findByLabelText("Topic");
+    expect([...select.querySelectorAll("option")].map((option) => option.textContent)).toEqual(["orders"]);
+  });
 });
