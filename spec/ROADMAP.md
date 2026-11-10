@@ -313,14 +313,14 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
     - Demo: the Backups tab shows the restore's progress, finishes it (removes the restore and resumes the backup, which skips restored records), refuses a second restore of the same topic, and Production needs ADMIN plus a reason.
 
 ### M14 — Find a consumer group quickly and see its offsets
-- **Status:** Active
+- **Status:** Done
 - **Features:** F52
 - **Phases:**
-  - **P80** F52-B1 · Consumer group list — Covers: F52-AC1 · Discovery: — · Status: Review
+  - **P80** F52-B1 · Consumer group list — Covers: F52-AC1 · Discovery: — · Status: Done
     - Demo: the Consumer groups tab opens on a table with each group's name, state, members, topic count and total lag; unknown lag reads "Unknown (n partitions)".
-  - **P81** F52-B2 + F52-B3 · Group page — Covers: F52-AC2, F52-AC3 · Discovery: — · Status: Review
+  - **P81** F52-B2 + F52-B3 · Group page — Covers: F52-AC2, F52-AC3 · Discovery: — · Status: Done
     - Demo: clicking a group opens its page with members, offsets per topic and partition, and offset reset; an unknown group name says "Consumer group not found" with a link back.
-  - **P82** F52-B4 · Group links from a topic's consumers — Covers: F52-AC4 · Discovery: — · Status: Review
+  - **P82** F52-B4 · Group links from a topic's consumers — Covers: F52-AC4 · Discovery: — · Status: Done
     - Demo: on a topic's Consumers tab, a group's name opens that group's page.
 
 ### M15 — See and export a cluster's Kafka metrics
@@ -380,6 +380,7 @@ Redpanda-only Shadow Links, its Admin API, and Redpanda-specific diagnostic oper
 - **Verification debt:** Run the Cognito sign-in, group refresh and logout integration against a real User Pool when an AWS account and app client become available; fixture tests are not evidence of live provider compatibility.
 
 ## Learnings
+- 2026-11-10 (M14 retro): P80–P82 deliver F52: the Consumer groups tab is a sortable-by-name table with exact total lag (unknown lag reads "Unknown (n partitions)"), each row opens `/clusters/:id/consumer-groups/:group` with members, offsets per topic and the offset reset, and a topic's Consumers tab links to the same page. What worked: reusing the existing group snapshot meant no Gateway change and no deployment risk. What to watch: the group page still loads every group's snapshot; if clusters have many groups, a single-group Gateway read would be cheaper. Not yet deployed to EKS-D.
 - 2026-11-10 (re-plan): Added M14 (F52 consumer group list and per-group page) and M15 (F41 moved up from the backlog, plus F53 export). EKS-D has no metrics-server, Prometheus or JMX exporter, and the Kafka StatefulSets may not change, so the user chose Kafka-reported metrics only (no CPU or memory) and both a download and a Prometheus endpoint for export. Standing auto-approval for M14.
 - 2026-11-10 (M12 live): through the console on Kafka A, offset-reset previews (earliest, latest), applying a reset from the UI, refusing an active group and a stale preview, and putting the offset back all worked on the synthetic group `connect-kafka3o-backup-probe`; Connect pause, resume, restart and task restart worked and were audited. Moving the test worker to Kafka 4.3.2 had broken the M12 file connectors (plugin.path still named connect-file-4.3.1.jar); fixed. Previews are reads and are not audited, by design.
 - 2026-11-10 (M13 retro): P75–P79 deliver F49 and F50 on EKS-D: a Backups tab that starts, lists (state, location, last write, size), pauses, resumes and deletes Aiven S3 sink backups into SeaweedFS, and restores a backup into its own topic through Aiven's S3 source with the Kafka3O restore transform. Live: the backup wrote 11 records; a confirmed restore paused it, appended exactly those 11 records (offsets 22–32) with original keys, values, headers and timestamps plus `kafka3o-restore`, finished on its own (connector removed, backup resumed), and the resumed backup saved none of the restored copies; Kafka B reports backups not configured; the audit lists backups.start, .pause, .resume and .restore.

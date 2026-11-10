@@ -2,7 +2,7 @@
 - **Milestone:** M14
 - **Covers:** F52-AC1
 - **Discovery:** —
-- **Status:** Review
+- **Status:** Done
 
 ## Demo
 1. Run `npx vitest run src/groups/consumerGroupTotalLag.test.ts src/components/ConsumerGroupList.test.tsx src/components/ConsumerGroups.test.tsx`.
@@ -19,3 +19,7 @@
   - Done when: `npx vitest run src/components/ConsumerGroupList.test.tsx src/components/ConsumerGroups.test.tsx` passes; then `npm test` and `npm run build` pass.
 
 ## Review
+- **Demo:** passed (auto-approved under the user's standing M14 instruction, 2026-11-10; run by Claude). Step 1: the named tests pass. Step 2 in Chromium 1194 with a synthesized Gateway: the tab shows one row per group sorted by name (`analytics` Stable 1 1 0; `billing` Empty 0 2 "Unknown (1 partition)") and no stacked group details.
+- **Regression:** `npm test` 560 passed (5 opt-in skipped); `npm run build` passed.
+- **Convention check:** `consumerGroupTotalLag` and `ConsumerGroupList` are one function each, named after their file.
+- **Vulnerability scan:** no dependency changes; `npm audit`: 0 vulnerabilities (2026-11-10, milestone close).

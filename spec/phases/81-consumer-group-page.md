@@ -2,7 +2,7 @@
 - **Milestone:** M14
 - **Covers:** F52-AC2, F52-AC3
 - **Discovery:** —
-- **Status:** Review
+- **Status:** Done
 
 ## Demo
 1. Run `npx vitest run src/components/ConsumerGroupPage.test.tsx src/components/ConsumerGroupList.test.tsx src/components/AppShell.test.tsx`.
@@ -19,3 +19,7 @@
   - Done when: `npx vitest run src/components/ConsumerGroupList.test.tsx src/components/ConsumerGroups.test.tsx src/components/AppShell.test.tsx` passes; then `npm test` and `npm run build` pass.
 
 ## Review
+- **Demo:** passed (auto-approved under the user's standing M14 instruction, 2026-11-10; run by Claude). Step 1: the named tests pass. Step 2 in Chromium 1194: clicking a row opens `/clusters/dev/consumer-groups/billing` with members, one offsets table per topic (exact `9007199254740993`, "No committed offset"), Reset offsets, the breadcrumb Clusters / Dev / Consumer groups / billing and the Consumer groups tab current; `/consumer-groups/missing` says "Consumer group not found." and its link returns to the list.
+- **Regression:** `npm test` 560 passed; `npm run build` passed.
+- **Convention check:** `ConsumerGroupPage`, `ConsumerGroupTopicOffsets` and `ConsumerGroupMembers` (extracted from `ConsumerGroupDetails` by a plan amendment) are one component each. The offset reset moved from the list's stacked details to the group page, so `ConsumerGroupDetails` no longer takes it.
+- **Vulnerability scan:** no dependency changes; `npm audit`: 0 vulnerabilities (2026-11-10, milestone close).
