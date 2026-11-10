@@ -1,0 +1,28 @@
+import { screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { describe, expect, it, vi } from "vitest";
+import type { ClusterMetrics as Metrics } from "../gateway/getMetrics";
+import { renderWithQuery } from "../test/renderWithQuery";
+import { ClusterMetrics } from "./ClusterMetrics";
+
+const gateway = { id: "dev", name: "Dev", url: "http://localhost:8081" };
+const metrics: Metrics = { readAt: "2026-11-10T12:00:00Z", logDirs: { dirs: [{ broker: 1, dir: "/data", totalBytes: 100, usableBytes: 60, kafkaBytes: 7 }] } };
+
+describe("ClusterMetrics", () => {
+  it("announces loading, then shows the disk use", async () => {
+    const list = vi.fn(async () => metrics);
+    renderWithQuery(<ClusterMetrics gateway={gateway} getMetrics={list} />);
+    expect(screen.getByRole("status").textContent).toBe("Loading metrics…");
+    expect(await screen.findByRole("table", { name: "Broker disk use" })).toBeDefined();
+    expect(list).toHaveBeenCalledWith(gateway.url);
+  });
+
+  it("shows Gateway errors with Retry", async () => {
+    const list = vi.fn().mockRejectedValueOnce(new TypeError("Failed to fetch")).mockResolvedValueOnce(metrics);
+    renderWithQuery(<ClusterMetrics gateway={gateway} getMetrics={list} />);
+    const alert = await screen.findByRole("alert");
+    expect(within(alert).getByText("Gateway unreachable")).toBeDefined();
+    await userEvent.click(within(alert).getByRole("button", { name: "Retry" }));
+    expect(await screen.findByRole("table", { name: "Broker disk use" })).toBeDefined();
+  });
+});

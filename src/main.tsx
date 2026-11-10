@@ -47,6 +47,7 @@ import { getConfigurations } from "./gateway/getConfigurations";
 import { getTopicDetail } from "./gateway/getTopicDetail";
 import { isLocalManualGatewayUrl } from "./gateway/isLocalManualGatewayUrl";
 import { increasePartitions } from "./gateway/increasePartitions";
+import { getMetrics } from "./gateway/getMetrics";
 import { listConnectors } from "./gateway/listConnectors";
 import { runConnectorAction } from "./gateway/runConnectorAction";
 import { startBackup } from "./gateway/startBackup";
@@ -140,6 +141,7 @@ function gatewayApp(read: GatewayRead, write: GatewayWrite, credentials: Gateway
         listTopics={(gatewayUrl) => listTopics(read(gatewayUrl), gatewayUrl)}
         listConsumerGroups={(gatewayUrl) => listConsumerGroups(read(gatewayUrl), gatewayUrl)}
         listConnectors={(gatewayUrl) => listConnectors(read(gatewayUrl), gatewayUrl)}
+        getMetrics={(gatewayUrl) => getMetrics(read(gatewayUrl), gatewayUrl)}
         listBackups={(gatewayUrl) => listBackups(read(gatewayUrl), gatewayUrl)}
         backupActions={{
           start: (gatewayUrl, topic) => startBackup(write(gatewayUrl), gatewayUrl, topic),

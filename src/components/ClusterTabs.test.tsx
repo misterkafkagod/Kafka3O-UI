@@ -7,8 +7,9 @@ describe("ClusterTabs", () => {
   it("links cluster sections for the gateway with Topics first", () => {
     renderWithQuery(<ClusterTabs gatewayId="dev" view="brokers" />);
 
-    expect(screen.getAllByRole("link").map((link) => link.textContent)).toEqual(["Topics", "Brokers", "Consumer groups", "Broker configuration", "Connect", "Backups"]);
+    expect(screen.getAllByRole("link").map((link) => link.textContent)).toEqual(["Topics", "Brokers", "Metrics", "Consumer groups", "Broker configuration", "Connect", "Backups"]);
     expect(screen.getByRole("link", { name: "Backups" }).getAttribute("href")).toBe("/clusters/dev/backups");
+    expect(screen.getByRole("link", { name: "Metrics" }).getAttribute("href")).toBe("/clusters/dev/metrics");
     expect(screen.getByRole("link", { name: "Connect" }).getAttribute("href")).toBe("/clusters/dev/connect");
     expect(screen.getByRole("link", { name: "Brokers" }).getAttribute("href")).toBe("/clusters/dev/brokers");
     expect(screen.getByRole("link", { name: "Topics" }).getAttribute("href")).toBe("/clusters/dev/topics");

@@ -10,6 +10,7 @@ import type { GetTopicDetail } from "./gateway/getTopicDetail";
 import type { CreateTopic } from "./gateway/createTopic";
 import type { ConfirmTopicDeletion, DeleteTopic } from "./gateway/deleteTopic";
 import type { GatewayCredentials } from "./gateway/GatewayCredentials";
+import type { GetMetrics } from "./gateway/getMetrics";
 import type { ListConnectors } from "./gateway/listConnectors";
 import type { ConnectorActions } from "./gateway/runConnectorAction";
 import type { BackupActions } from "./gateway/startBackup";
@@ -51,6 +52,7 @@ type AppProps = {
   credentialsControl?: boolean;
   offsetReset?: OffsetResetActions;
   listConnectors?: ListConnectors;
+  getMetrics?: GetMetrics;
   connectorActions?: ConnectorActions;
   backupActions?: BackupActions;
   listBackups?: ListBackups;
@@ -80,6 +82,7 @@ export function App({
   credentialsControl,
   offsetReset,
   listConnectors,
+  getMetrics,
   connectorActions,
   backupActions,
   listBackups,
@@ -152,6 +155,21 @@ export function App({
                 createTopic={createTopic}
                 statusRefreshMs={statusRefreshMs}
                 view="topics"
+              />
+            }
+          />
+          <Route
+            path="/clusters/:gatewayId/metrics"
+            element={
+              <ClusterPage
+                loadGatewayConfig={loadGatewayConfig}
+                getCluster={getCluster}
+                listTopics={listTopics}
+                listConsumerGroups={listConsumerGroups}
+                createTopic={createTopic}
+                statusRefreshMs={statusRefreshMs}
+                view="metrics"
+                getMetrics={getMetrics}
               />
             }
           />

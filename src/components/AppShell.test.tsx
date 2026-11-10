@@ -75,4 +75,17 @@ describe("AppShell", () => {
     expect(within(breadcrumb).getByRole("link", { name: "Consumer groups" }).getAttribute("href")).toBe("/clusters/dev/consumer-groups");
     expect(within(breadcrumb).getByText("reader & west/1")).toBeDefined();
   });
+
+  it("names the Metrics page in the breadcrumb", async () => {
+    renderWithQuery(
+      <AppShell loadGatewayConfig={async () => [gateway]} credentials={credentials} connectionOpen={false}
+        onOpenConnection={() => undefined} onOpenGatewayConnection={() => undefined} onCloseConnection={() => undefined}>
+        <p>Page content</p>
+      </AppShell>,
+      "/clusters/dev/metrics",
+    );
+    const breadcrumb = screen.getByRole("navigation", { name: "Breadcrumb" });
+    expect((await within(breadcrumb).findByRole("link", { name: "Dev" })).getAttribute("href")).toBe("/clusters/dev");
+    expect(within(breadcrumb).getByText("Metrics")).toBeDefined();
+  });
 });

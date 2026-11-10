@@ -327,7 +327,7 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
 - **Status:** Active
 - **Features:** F41, F53
 - **Phases:**
-  - **P83** F41-B1 + F41-B4 · Metrics tab with broker disk use — Covers: F41-AC1, F41-AC4 · Discovery: cluster-metrics-sources · Status: Building
+  - **P83** F41-B1 + F41-B4 · Metrics tab with broker disk use — Covers: F41-AC1, F41-AC4 · Discovery: cluster-metrics-sources · Status: Review
     - Demo: Kafka A's Metrics tab shows its log directory's total, used and free space and Kafka's data size; a failing log directory read shows "Unavailable" with the reason.
   - **P84** F41-B2 · Partition health and largest topics — Covers: F41-AC2 · Discovery: cluster-metrics-sources · Status: Defined
     - Demo: the tab shows topic and partition counts, under-replicated, below min ISR and offline partitions, and the largest topics by size.

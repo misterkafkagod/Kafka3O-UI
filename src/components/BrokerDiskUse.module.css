@@ -1,0 +1,17 @@
+.note {
+  color: var(--color-text-muted);
+}
+
+.table td:nth-child(n + 3) {
+  font-variant-numeric: tabular-nums;
+}
+
+.path {
+  overflow-wrap: anywhere;
+}
+
+.error {
+  background: var(--color-alert-surface);
+  color: var(--color-alert-text);
+  overflow-wrap: anywhere;
+}

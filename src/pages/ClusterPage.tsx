@@ -1,5 +1,6 @@
 import { useParams } from "react-router";
 import { ClusterDetails } from "../components/ClusterDetails";
+import { ClusterMetrics } from "../components/ClusterMetrics";
 import { ClusterNotFound } from "../components/ClusterNotFound";
 import { ClusterTabs } from "../components/ClusterTabs";
 import { ClusterBackups } from "../components/ClusterBackups";
@@ -13,6 +14,7 @@ import { findGatewayById } from "../config/findGatewayById";
 import type { LoadGatewayConfig } from "../config/loadGatewayConfig";
 import type { GetCluster } from "../gateway/getCluster";
 import type { CreateTopic as CreateAction } from "../gateway/createTopic";
+import type { GetMetrics } from "../gateway/getMetrics";
 import type { ListConnectors } from "../gateway/listConnectors";
 import type { ConnectorActions } from "../gateway/runConnectorAction";
 import type { BackupActions } from "../gateway/startBackup";
@@ -32,7 +34,8 @@ type ClusterPageProps = {
   listConsumerGroups: ListConsumerGroups;
   createTopic: CreateAction;
   statusRefreshMs: number;
-  view: "brokers" | "topics" | "consumer-groups" | "connect" | "backups";
+  view: "brokers" | "metrics" | "topics" | "consumer-groups" | "connect" | "backups";
+  getMetrics?: GetMetrics;
   backupActions?: BackupActions;
   listBackups?: ListBackups;
   listConnectors?: ListConnectors;
@@ -40,7 +43,7 @@ type ClusterPageProps = {
   offsetReset?: OffsetResetActions;
 };
 
-export function ClusterPage({ loadGatewayConfig, getCluster, listTopics, listConsumerGroups, createTopic, statusRefreshMs, view, offsetReset, listConnectors = connectNotConfigured, connectorActions, backupActions, listBackups = backupsNotConfigured }: ClusterPageProps) {
+export function ClusterPage({ loadGatewayConfig, getCluster, listTopics, listConsumerGroups, createTopic, statusRefreshMs, view, offsetReset, getMetrics, listConnectors = connectNotConfigured, connectorActions, backupActions, listBackups = backupsNotConfigured }: ClusterPageProps) {
   const { gatewayId, groupId } = useParams();
   const { data: gateways, isError, refetch } = useGatewayConfig(loadGatewayConfig);
 
@@ -57,7 +60,9 @@ export function ClusterPage({ loadGatewayConfig, getCluster, listTopics, listCon
   return (
     <>
       <ClusterTabs gatewayId={gateway.id} view={view} />
-      {view === "backups" ? (
+      {view === "metrics" ? (
+        getMetrics ? <ClusterMetrics gateway={gateway} getMetrics={getMetrics} /> : <main><h2>Metrics</h2><p>Metrics are not available in this console.</p></main>
+      ) : view === "backups" ? (
         <ClusterBackups gateway={gateway} listTopics={listTopics} listBackups={listBackups} actions={backupActions} />
       ) : view === "connect" ? (
         <ConnectConnectors gateway={gateway} listConnectors={listConnectors} actions={connectorActions} />
