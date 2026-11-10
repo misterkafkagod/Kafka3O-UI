@@ -283,7 +283,7 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
     - Demo: the secured console header has no Gateway credentials control; the legacy build still has it.
   - **P71** F15-B1 + F15-B3 · Preview a consumer offset reset — Covers: F15-AC1, preview portion of F15-AC4 · Discovery: — · Status: Done
     - Demo: previewing earliest, latest and a timestamp for an inactive group lists current and target offsets per partition; an active group is refused.
-  - **P72** F15-B2 + F15-B3 · Apply the previewed reset — Covers: F15-AC2, F15-AC3, apply portion of F15-AC4 · Discovery: — · Status: Defined
+  - **P72** F15-B2 + F15-B3 · Apply the previewed reset — Covers: F15-AC2, F15-AC3, apply portion of F15-AC4 · Discovery: — · Status: Building
     - Demo: confirming a preview commits exactly those offsets; a stale preview or an active group is refused; Production needs ADMIN plus a reason; audit shows intent and outcome.
   - **P73** F35-B1 + F35-B2 · Inspect Kafka Connect — Covers: F35-AC1, F35-AC2 · Discovery: kafka-connect-api · Status: Defined
     - Demo: Kafka A's Connect tab lists the test worker's connectors and task states with error summaries and no configuration values; Kafka B says "not configured".
