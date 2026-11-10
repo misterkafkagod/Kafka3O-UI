@@ -281,7 +281,7 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
 - **Phases:**
   - **P70** F47-B1 · No Gateway credentials in the secured console — Covers: F47-AC1 · Discovery: — · Status: Done
     - Demo: the secured console header has no Gateway credentials control; the legacy build still has it.
-  - **P71** F15-B1 + F15-B3 · Preview a consumer offset reset — Covers: F15-AC1, preview portion of F15-AC4 · Discovery: — · Status: Defined
+  - **P71** F15-B1 + F15-B3 · Preview a consumer offset reset — Covers: F15-AC1, preview portion of F15-AC4 · Discovery: — · Status: Building
     - Demo: previewing earliest, latest and a timestamp for an inactive group lists current and target offsets per partition; an active group is refused.
   - **P72** F15-B2 + F15-B3 · Apply the previewed reset — Covers: F15-AC2, F15-AC3, apply portion of F15-AC4 · Discovery: — · Status: Defined
     - Demo: confirming a preview commits exactly those offsets; a stale preview or an active group is refused; Production needs ADMIN plus a reason; audit shows intent and outcome.
