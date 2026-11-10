@@ -335,7 +335,7 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
     - Demo: producing to a topic while the tab is open shows its messages per second after the second refresh.
   - **P86** F53-B1 · Download metrics — Covers: F53-AC1 · Discovery: — · Status: Review
     - Demo: Download JSON and Download CSV save files with the tab's values and the read time.
-  - **P87** F53-B2 · Prometheus endpoint — Covers: F53-AC2 · Discovery: cluster-metrics-sources · Status: Building
+  - **P87** F53-B2 · Prometheus endpoint — Covers: F53-AC2 · Discovery: cluster-metrics-sources · Status: Review
     - Demo: `curl` with the metrics token returns Prometheus text from Kafka A's Gateway; without it, 401.
 
 ## Backlog
