@@ -2,7 +2,7 @@
 - **Milestone:** M15
 - **Covers:** F41-AC3
 - **Discovery:** —
-- **Status:** Review
+- **Status:** Done
 
 ## Demo
 1. In the Gateway repository, run `go test ./internal/metrics ./internal/kafka -run "EndOffsets|Metrics"`; in the UI, `npx vitest run src/groups/computeThroughput.test.ts src/components/TopicThroughput.test.tsx src/components/ClusterMetrics.test.tsx`.
@@ -19,3 +19,7 @@
   - Done when: `npx vitest run src/groups/computeThroughput.test.ts src/components/TopicThroughput.test.tsx src/components/ClusterMetrics.test.tsx` passes; then `npm test` and `npm run build` pass.
 
 ## Review
+- **Demo:** steps 1–2 passed (auto-approved under the user's standing M15 instruction, 2026-11-10; run by Claude). Gateway: end-offset sums beyond 2^53 as decimal strings, a partition error per topic, an unavailable section. UI: BigInt differences, no rate for a decrease, a new topic, an error or equal read times. Browser: "Measuring…" first; after Refresh now, "Cluster: 25 messages/s over the last 10 seconds" with `kafka3o-m10-verify` 25 messages/s.
+- **Regression:** Gateway `go test ./...` passed; UI `npm test` passed; `npm run build` passed.
+- **Convention check:** `read_end_offsets` (sorting through `CompareTopicEndOffsets`), `computeThroughput`, `useMetricsSamples`, `TopicThroughput`; the tab also gained a Refresh now button (plan amendment noted in T85.2).
+- **Vulnerability scan (milestone close, 2026-11-10):** no new dependencies in either repository (the probe module under `discovery/cluster-metrics-sources/probe` is throwaway and not built into either product); UI `npm audit`: 0; Gateway `govulncheck@v1.9.0 -test -tags integration ./...`: 0 called, 1 uncalled in a required module (GO-2026-5932, unchanged).

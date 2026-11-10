@@ -2,7 +2,7 @@
 - **Milestone:** M15
 - **Covers:** F41-AC2
 - **Discovery:** [cluster-metrics-sources](../discovery/cluster-metrics-sources.md)
-- **Status:** Review
+- **Status:** Done
 
 ## Demo
 1. In the Gateway repository, run `go test ./internal/metrics ./internal/kafka -run "Health|TopicSizes|LogDirs|Metrics" ./internal/httpapi -run Metrics`.
@@ -19,3 +19,7 @@
   - Done when: `npx vitest run src/components/PartitionHealth.test.tsx src/components/LargestTopics.test.tsx src/components/ClusterMetrics.test.tsx` passes; then `npm test` and `npm run build` pass.
 
 ## Review
+- **Demo:** steps 1–2 passed (auto-approved under the user's standing M15 instruction, 2026-11-10; run by Claude). Gateway: offline (no leader or error), under-replicated and below-min-ISR counts, unreadable configuration (below min ISR unknown with the reason), unreadable topics left out and named, top-10 cut by replica size. Browser: Partitions 36, Under-replicated 1 highlighted, Below min ISR "Unknown" with the reason, largest topics `kafka3o-m10-verify` 146.5 KB then `__consumer_offsets`.
+- **Regression:** Gateway `go test ./...` passed; UI `npm test` passed; `npm run build` passed.
+- **Convention check:** `read_partition_health`, `summarize_partition_health`, `largest_topics`, `compare_topic_sizes`; `TopicSizes` is the section type (the name `LargestTopics` belongs to the function).
+- **Vulnerability scan (milestone close, 2026-11-10):** no new dependencies in either repository (the probe module under `discovery/cluster-metrics-sources/probe` is throwaway and not built into either product); UI `npm audit`: 0; Gateway `govulncheck@v1.9.0 -test -tags integration ./...`: 0 called, 1 uncalled in a required module (GO-2026-5932, unchanged).

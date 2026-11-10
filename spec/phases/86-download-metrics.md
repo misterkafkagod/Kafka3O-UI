@@ -2,7 +2,7 @@
 - **Milestone:** M15
 - **Covers:** F53-AC1
 - **Discovery:** —
-- **Status:** Review
+- **Status:** Done
 
 ## Demo
 1. Run `npx vitest run src/metrics src/components/MetricsDownload.test.tsx src/components/ClusterMetrics.test.tsx`.
@@ -15,3 +15,7 @@
   - Done when: `npx vitest run src/metrics src/components/MetricsDownload.test.tsx src/components/ClusterMetrics.test.tsx` passes; then `npm test` and `npm run build` pass.
 
 ## Review
+- **Demo:** steps 1–2 passed (auto-approved under the user's standing M15 instruction, 2026-11-10; run by Claude). Browser: Download JSON saved `dev-metrics-2026-11-10T12-00-10Z.json` with the response and `readAt`; Download CSV saved the `.csv` with `metric,broker,logDir,topic,value` rows, the unknown below-min-ISR count and the failing directory's values empty.
+- **Regression:** UI `npm test` 587 passed (5 opt-in skipped); `npm run build` passed.
+- **Convention check:** `metricsToCsv`, `escapeCsvField`, `metricsFileName`, `saveFile` (injected into `ClusterMetrics`), `MetricsDownload`.
+- **Vulnerability scan (milestone close, 2026-11-10):** no new dependencies in either repository (the probe module under `discovery/cluster-metrics-sources/probe` is throwaway and not built into either product); UI `npm audit`: 0; Gateway `govulncheck@v1.9.0 -test -tags integration ./...`: 0 called, 1 uncalled in a required module (GO-2026-5932, unchanged).

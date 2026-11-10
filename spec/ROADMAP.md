@@ -324,18 +324,18 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
     - Demo: on a topic's Consumers tab, a group's name opens that group's page.
 
 ### M15 — See and export a cluster's Kafka metrics
-- **Status:** Active
+- **Status:** Done
 - **Features:** F41, F53
 - **Phases:**
-  - **P83** F41-B1 + F41-B4 · Metrics tab with broker disk use — Covers: F41-AC1, F41-AC4 · Discovery: cluster-metrics-sources · Status: Review
+  - **P83** F41-B1 + F41-B4 · Metrics tab with broker disk use — Covers: F41-AC1, F41-AC4 · Discovery: cluster-metrics-sources · Status: Done
     - Demo: Kafka A's Metrics tab shows its log directory's total, used and free space and Kafka's data size; a failing log directory read shows "Unavailable" with the reason.
-  - **P84** F41-B2 · Partition health and largest topics — Covers: F41-AC2 · Discovery: cluster-metrics-sources · Status: Review
+  - **P84** F41-B2 · Partition health and largest topics — Covers: F41-AC2 · Discovery: cluster-metrics-sources · Status: Done
     - Demo: the tab shows topic and partition counts, under-replicated, below min ISR and offline partitions, and the largest topics by size.
-  - **P85** F41-B3 · Throughput — Covers: F41-AC3 · Discovery: — · Status: Review
+  - **P85** F41-B3 · Throughput — Covers: F41-AC3 · Discovery: — · Status: Done
     - Demo: producing to a topic while the tab is open shows its messages per second after the second refresh.
-  - **P86** F53-B1 · Download metrics — Covers: F53-AC1 · Discovery: — · Status: Review
+  - **P86** F53-B1 · Download metrics — Covers: F53-AC1 · Discovery: — · Status: Done
     - Demo: Download JSON and Download CSV save files with the tab's values and the read time.
-  - **P87** F53-B2 · Prometheus endpoint — Covers: F53-AC2 · Discovery: cluster-metrics-sources · Status: Review
+  - **P87** F53-B2 · Prometheus endpoint — Covers: F53-AC2 · Discovery: cluster-metrics-sources · Status: Done
     - Demo: `curl` with the metrics token returns Prometheus text from Kafka A's Gateway; without it, 401.
 
 ## Backlog
@@ -380,6 +380,7 @@ Redpanda-only Shadow Links, its Admin API, and Redpanda-specific diagnostic oper
 
 ### Existing verification debt
 - **Security debt (M13 exception):** Aiven S3 connectors 3.4.3 carry 4 critical and 41 high advisories; allowed only on the EKS-D test cluster by the user's test-only exception (2026-11-10). Replace the vulnerable bundled jars or rebuild the connectors, and rescan, before any production use.
+- **Verification debt:** M15 on EKS-D: deploy, then check Kafka A's and Kafka B's Metrics tabs and `curl` gateway-a's `/metrics` with the token from `kafka3o-metrics-token` (and 401 without it).
 - **Verification debt:** M12 on EKS-D (2026-11-10): verified live on Kafka A except a Production offset reset, because Kafka B has no consumer group to reset and creating one from a shell in the cluster was not permitted in that session; Production rules for writes are covered by the Gateway and secured-mode tests.
 - **Verification debt:** Deploy M11 to the EKS-D secured stack (`deploy.sh`) and repeat the P63/P65 checks there and in the user's own browser; M11 was verified against the local Console fixture and `vite preview` because the redeploy was not permitted in the building session.
 - **Verification debt:** Run the Docker-only stopped-broker test and P14 browser demo, and verify the remaining cross-cluster and consumer-group browser demos.
@@ -390,6 +391,7 @@ Redpanda-only Shadow Links, its Admin API, and Redpanda-specific diagnostic oper
 - **Verification debt:** Run the Cognito sign-in, group refresh and logout integration against a real User Pool when an AWS account and app client become available; fixture tests are not evidence of live provider compatibility.
 
 ## Learnings
+- 2026-11-10 (M15 retro): P83–P87 deliver F41 and F53 from Kafka alone: a Metrics tab (refreshed every 10 s) with broker disk use per log directory, partition health (under-replicated, below min ISR, offline), the 10 largest topics, throughput from end-offset changes, JSON/CSV downloads, and a token-protected Prometheus listener on the Gateway. What worked: probing Kafka A with the Gateway's own user before planning confirmed DescribeLogDirs v5 sizes and that internal topics must be counted; keeping every section's error separate let partial answers show instead of a blank page. What didn't: the Production cluster could not be probed from a shell, so Kafka B is first seen through its Gateway after deployment. Next: the log directory sizes on EKS-D are the node's shared filesystem, so "used" includes non-Kafka data, which the tab says.
 - 2026-11-10 (M14 live): deployed to EKS-D at the user's request; as `admin` on Kafka A the Consumer groups table listed the six Connect groups with exact total lag, a row click opened `connect-kafka3o-backup-probe` with its `kafka3o-m10-verify` offsets and Reset offsets, and the topic's Consumers tab linked to the same page.
 - 2026-11-10 (M14 retro): P80–P82 deliver F52: the Consumer groups tab is a sortable-by-name table with exact total lag (unknown lag reads "Unknown (n partitions)"), each row opens `/clusters/:id/consumer-groups/:group` with members, offsets per topic and the offset reset, and a topic's Consumers tab links to the same page. What worked: reusing the existing group snapshot meant no Gateway change and no deployment risk. What to watch: the group page still loads every group's snapshot; if clusters have many groups, a single-group Gateway read would be cheaper. Deployed to EKS-D the same day (see M14 live).
 - 2026-11-10 (re-plan): Added M14 (F52 consumer group list and per-group page) and M15 (F41 moved up from the backlog, plus F53 export). EKS-D has no metrics-server, Prometheus or JMX exporter, and the Kafka StatefulSets may not change, so the user chose Kafka-reported metrics only (no CPU or memory) and both a download and a Prometheus endpoint for export. Standing auto-approval for M14.

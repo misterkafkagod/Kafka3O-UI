@@ -2,7 +2,7 @@
 - **Milestone:** M15
 - **Covers:** F53-AC2
 - **Discovery:** [cluster-metrics-sources](../discovery/cluster-metrics-sources.md)
-- **Status:** Review
+- **Status:** Done
 
 ## Demo
 1. In the Gateway repository, run `go test ./internal/metrics -run Prometheus`, `go test ./internal/httpapi -run Prometheus`, `go test ./internal/config` and `go test ./cmd/gateway -run Metrics`.
@@ -19,3 +19,7 @@
   - Done when: `go test ./internal/httpapi ./internal/config ./cmd/gateway` (per package) passes, covering 401 without the token, 404 for API paths and the start refusal without a token; then `go test ./...` passes.
 
 ## Review
+- **Demo:** step 1 passed (auto-approved under the user's standing M15 instruction, 2026-11-10; run by Claude): Prometheus text for every section, unavailable sections marked `kafka3o_metrics_section_up 0` with their values left out, unknown sizes and below-min-ISR left out, label escaping; the handler serves only `/metrics` (404 for `/api/v1/cluster`, 405 for POST); the listener refuses requests without or with a wrong token over TLS 1.2+; the Gateway refuses to start with `metrics.listen` but no 32-character token, and rejects a token in the config file. Step 2 (EKS-D `curl`) waits for a deploy; `deploy.sh` will create the token Secret `kafka3o-metrics-token` on the node the first time.
+- **Regression:** Gateway `go test ./...` passed.
+- **Convention check:** `write_prometheus_text`, `escape_label_value`, `sum_topic_sizes` (`largest_topics` now cuts it), `new_prometheus_handler`, `new_metrics_http_server`.
+- **Vulnerability scan (milestone close, 2026-11-10):** no new dependencies in either repository (the probe module under `discovery/cluster-metrics-sources/probe` is throwaway and not built into either product); UI `npm audit`: 0; Gateway `govulncheck@v1.9.0 -test -tags integration ./...`: 0 called, 1 uncalled in a required module (GO-2026-5932, unchanged).
