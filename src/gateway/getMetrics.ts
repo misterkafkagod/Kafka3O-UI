@@ -7,6 +7,12 @@ export type LogDir = { broker: number; dir: string; totalBytes: number | null; u
 export type ClusterMetrics = {
   readAt: string;
   logDirs: { error?: string; dirs: LogDir[] };
+  // belowMinIsr is null when a topic's min.insync.replicas could not be read (minIsrError says why).
+  partitions: {
+    error?: string; topics: number; partitions: number; underReplicated: number; offline: number;
+    belowMinIsr: number | null; minIsrError?: string; unreadableTopics: string[];
+  };
+  largestTopics: { error?: string; topics: { topic: string; bytes: number }[] };
 };
 
 export type GetMetrics = (gatewayUrl: string) => Promise<ClusterMetrics>;

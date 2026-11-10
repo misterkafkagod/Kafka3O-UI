@@ -3,6 +3,8 @@ import type { GatewayEntry } from "../gateway/types";
 import { useMetrics } from "../hooks/useMetrics";
 import { BrokerDiskUse } from "./BrokerDiskUse";
 import { ErrorWithRetry } from "./ErrorWithRetry";
+import { LargestTopics } from "./LargestTopics";
+import { PartitionHealth } from "./PartitionHealth";
 
 type ClusterMetricsProps = {
   gateway: GatewayEntry;
@@ -23,7 +25,9 @@ export function ClusterMetrics({ gateway, getMetrics }: ClusterMetricsProps) {
       ) : (
         <>
           <p>Read at {new Date(metrics.readAt).toLocaleString()}</p>
+          <PartitionHealth partitions={metrics.partitions} />
           <BrokerDiskUse logDirs={metrics.logDirs} />
+          <LargestTopics largestTopics={metrics.largestTopics} />
         </>
       )}
     </main>

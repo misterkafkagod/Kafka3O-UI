@@ -6,7 +6,12 @@ import { renderWithQuery } from "../test/renderWithQuery";
 import { ClusterMetrics } from "./ClusterMetrics";
 
 const gateway = { id: "dev", name: "Dev", url: "http://localhost:8081" };
-const metrics: Metrics = { readAt: "2026-11-10T12:00:00Z", logDirs: { dirs: [{ broker: 1, dir: "/data", totalBytes: 100, usableBytes: 60, kafkaBytes: 7 }] } };
+const metrics: Metrics = {
+  readAt: "2026-11-10T12:00:00Z",
+  logDirs: { dirs: [{ broker: 1, dir: "/data", totalBytes: 100, usableBytes: 60, kafkaBytes: 7 }] },
+  partitions: { topics: 1, partitions: 3, underReplicated: 0, offline: 0, belowMinIsr: 0, unreadableTopics: [] },
+  largestTopics: { topics: [{ topic: "orders", bytes: 7 }] },
+};
 
 describe("ClusterMetrics", () => {
   it("announces loading, then shows the disk use", async () => {
@@ -14,6 +19,8 @@ describe("ClusterMetrics", () => {
     renderWithQuery(<ClusterMetrics gateway={gateway} getMetrics={list} />);
     expect(screen.getByRole("status").textContent).toBe("Loading metrics…");
     expect(await screen.findByRole("table", { name: "Broker disk use" })).toBeDefined();
+    expect(screen.getByRole("heading", { name: "Partition health" })).toBeDefined();
+    expect(screen.getByRole("table", { name: "Largest topics" })).toBeDefined();
     expect(list).toHaveBeenCalledWith(gateway.url);
   });
 
