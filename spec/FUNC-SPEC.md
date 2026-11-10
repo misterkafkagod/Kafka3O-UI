@@ -512,8 +512,30 @@ Inspect a cluster's Kafka Connect connectors and tasks with their state and erro
 **External dependencies:** Kafka Connect REST API behind the cluster's Gateway; `discovery needed` (`kafka-connect-api`, against the EKS-D test worker). Tests fake Connect with an HTTP test server built from discovery fixtures.
 
 ### F49 — Topic backups (planned M13)
-Start, list, stop and delete continuous backups of a topic's messages to S3-compatible storage through the cluster's Kafka Connect, with Gateway-generated connector configurations and storage credentials that never reach the browser. · *detailed when M13 starts*
+Start, list, pause, resume and delete continuous backups of a topic's messages to S3-compatible storage through the cluster's Kafka Connect, with Gateway-generated connector configurations and storage credentials that never reach the browser.
+
+**Behaviors**
+- **F49-B1** User starts a backup for a topic → the Gateway creates an S3 sink connector for that topic with a generated configuration, and records are written to the cluster's backup location under the topic's path
+- **F49-B2** User opens a cluster's Backups tab → each backup is listed with topic, state, storage location and the last time data was written; a cluster without backup storage says so
+- **F49-B3** User pauses, resumes or deletes a backup → the connector changes accordingly; deleting removes only the job, never the stored data
+
+**Acceptance criteria**
+- **F49-AC1** (B1) Given a topic without a backup, starting one creates exactly one backup connector for it and objects with the topic's records (key, value, headers, timestamp) appear in storage; starting a second backup for the same topic is refused; no storage credential or connector configuration value is returned to the browser
+- **F49-AC2** (B2) Given running, paused and failed backups, the list shows each with its state and error summary, storage path and last write time; a cluster without backup storage shows "Backups are not configured for this cluster"
+- **F49-AC3** (B3) Starting, pausing, resuming and deleting backups need OPERATOR on non-Production and ADMIN plus a reason on Production, are denied before Connect when not allowed, and are audited; deleting a backup keeps its stored objects
+
+**External dependencies:** Kafka Connect with Aiven's S3 sink connector and S3-compatible storage (MinIO on EKS-D); `discovery needed` (`s3-backup-connectors`).
 
 ### F50 — Restore a topic's backup (planned M13)
-Restore a topic's backup into that same topic after confirming that restored messages are appended (duplicates possible), under Production ADMIN-plus-reason rules and audit, without the topic's own backup saving the restored copies again. · *detailed when M13 starts*
+Restore a topic's backup into that same topic after confirming that restored messages are appended, without the topic's own backup saving the restored copies again.
 
+**Behaviors**
+- **F50-B1** User restores a topic's backup → after a confirmation stating that the restored messages are appended to the topic and may duplicate messages still present, the topic's backup is paused, a source connector writes the backup's records into the topic, and the backup resumes when the restore has finished
+- **F50-B2** A restore is in progress, fails or cannot be confirmed → the Backups tab shows its state and error, a second restore of the same topic is refused, and an uncertain outcome is reported as unknown
+
+**Acceptance criteria**
+- **F50-AC1** (B1) Given a backup with stored records, a confirmed restore appends those records (key, value, headers, timestamp; new offsets) to the original topic; canceling the confirmation sends nothing
+- **F50-AC2** (B1) Records written by a restore are not saved again by the topic's backup, and the restore reads only the objects that existed when it started
+- **F50-AC3** (B2) Restores need OPERATOR on non-Production and ADMIN plus a reason on Production, are audited with intent and outcome, show progress or failure in the Backups tab, and a second concurrent restore of the same topic is refused
+
+**External dependencies:** Aiven's S3 source connector on the same Connect worker; `discovery needed` (`s3-backup-connectors`).

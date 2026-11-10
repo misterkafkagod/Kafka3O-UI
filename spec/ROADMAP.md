@@ -294,9 +294,17 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
     - Demo: pausing, resuming and restarting a test connector and one task changes the listed state; an OPERATOR on Production is denied; audit shows each action.
 
 ### M13 — Back up and restore topic messages through Kafka Connect
-- **Status:** Planned
+- **Status:** Active
 - **Features:** F49, F50
-- **Phases:** <filled by skill-phase-breakdown>
+- **Phases:**
+  - **P75** F49-B1 · Start a topic backup — Covers: F49-AC1 · Discovery: s3-backup-connectors · Status: Discovery
+    - Demo: backing up `kafka3o-m10-verify` on Kafka A creates an S3 sink connector with a Gateway-generated configuration, and objects appear in MinIO.
+  - **P76** F49-B2 · Backups section — Covers: F49-AC2 · Discovery: — · Status: Defined
+    - Demo: Kafka A's Backups tab lists the backup with its state, storage location and last write; Kafka B says backups are not configured.
+  - **P77** F49-B3 · Pause, resume and delete a backup — Covers: F49-AC3 · Discovery: — · Status: Defined
+    - Demo: pausing, resuming and deleting the backup job changes its state; deleting keeps the stored objects.
+  - **P78** F50-B1 + F50-B2 · Restore into the original topic — Covers: F50-AC1, F50-AC2, F50-AC3 · Discovery: — · Status: Defined
+    - Demo: restoring the backup appends the saved messages after explicit confirmation; the topic's backup does not re-save them; Production needs ADMIN plus a reason; the audit shows intent and outcome.
 
 ## Backlog
 The following items are candidates after M11, not commitments to implement every Redpanda feature. All future writes must use F29/F30 authorization and F31 audit; no candidate silently expands the current bounded reads or changes Kafka connection credentials.
