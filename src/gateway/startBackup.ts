@@ -1,5 +1,6 @@
 import type { FetchGatewayWrite } from "./GatewayWriteRequest";
 import type { RunBackupAction } from "./runBackupAction";
+import type { StartRestore } from "./startRestore";
 
 export type StartedBackup = { topic: string; connector: string; location: string };
 
@@ -9,6 +10,7 @@ export type BackupActions = {
   start: StartBackup;
   // run pauses, resumes or deletes a backup job; optional so older embeddings stay read-only.
   run?: RunBackupAction;
+  restore?: StartRestore;
   confirm: (message: string) => boolean;
 };
 

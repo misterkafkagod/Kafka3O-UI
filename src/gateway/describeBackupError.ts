@@ -14,6 +14,12 @@ export function describeBackupError(error: unknown): string {
     return describeAccessDenial(error.problem?.detail);
   }
   switch (code) {
+    case "restore_in_progress":
+      return "A restore of this topic is already running.";
+    case "nothing_to_restore":
+      return "This backup has not stored any messages yet.";
+    case "storage_unavailable":
+      return "The backup storage cannot be read right now. Try again.";
     case "not_found":
       return "This topic no longer has a backup. Refresh the list.";
     case "backup_exists":

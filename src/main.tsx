@@ -51,6 +51,7 @@ import { listConnectors } from "./gateway/listConnectors";
 import { runConnectorAction } from "./gateway/runConnectorAction";
 import { startBackup } from "./gateway/startBackup";
 import { runBackupAction } from "./gateway/runBackupAction";
+import { startRestore } from "./gateway/startRestore";
 import { listBackups } from "./gateway/listBackups";
 import { listConsumerGroups } from "./gateway/listConsumerGroups";
 import { applyOffsetReset } from "./gateway/applyOffsetReset";
@@ -143,6 +144,7 @@ function gatewayApp(read: GatewayRead, write: GatewayWrite, credentials: Gateway
         backupActions={{
           start: (gatewayUrl, topic) => startBackup(write(gatewayUrl), gatewayUrl, topic),
           run: (gatewayUrl, topic, kind) => runBackupAction(write(gatewayUrl), gatewayUrl, topic, kind),
+          restore: (gatewayUrl, topic) => startRestore(write(gatewayUrl), gatewayUrl, topic),
           confirm: (message) => window.confirm(message),
         }}
         connectorActions={{

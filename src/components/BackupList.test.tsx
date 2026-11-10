@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { HttpError } from "../gateway/HttpError";
 import type { RunBackupAction } from "../gateway/runBackupAction";
+import type { StartRestore } from "../gateway/startRestore";
 import { BackupList } from "./BackupList";
 
 describe("BackupList", () => {
@@ -59,5 +60,25 @@ describe("BackupList", () => {
     confirm.mockReturnValue(true);
     await user.click(screen.getByRole("button", { name: "Delete the backup job for orders" }));
     expect((await screen.findByRole("alert")).textContent).toBe("The change may have been applied. Refresh before retrying.");
+  });
+
+  it("restores into the topic only after an explicit append confirmation", async () => {
+    const user = userEvent.setup();
+    const restore = vi.fn<StartRestore>().mockResolvedValue({ topic: "orders", restoreId: "r-1", objects: 2 });
+    const confirm = vi.fn(() => false);
+    const onChanged = vi.fn();
+    render(<BackupList gatewayUrl="https://gw" onChanged={onChanged} actions={{ start: vi.fn(), restore, confirm }}
+      backups={[{ topic: "orders", connector: "kafka3o-backup-orders", location: "s3://b/kafka-a/orders/", state: "RUNNING" }]} />);
+    await user.click(screen.getByRole("button", { name: "Restore the backup of orders" }));
+    expect(confirm).toHaveBeenLastCalledWith(expect.stringContaining("appended to the topic, so messages still in it may be duplicated"));
+    expect(restore).not.toHaveBeenCalled();
+    confirm.mockReturnValue(true);
+    await user.click(screen.getByRole("button", { name: "Restore the backup of orders" }));
+    expect(restore).toHaveBeenCalledWith("https://gw", "orders");
+    expect((await screen.findByRole("status")).textContent).toBe("Restore started for orders from 2 stored objects.");
+    expect(onChanged).toHaveBeenCalledOnce();
+    restore.mockRejectedValueOnce(new HttpError(409, "busy", { code: "restore_in_progress" }));
+    await user.click(screen.getByRole("button", { name: "Restore the backup of orders" }));
+    expect((await screen.findByRole("alert")).textContent).toBe("A restore of this topic is already running.");
   });
 });

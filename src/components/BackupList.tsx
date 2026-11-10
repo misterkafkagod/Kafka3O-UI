@@ -33,6 +33,7 @@ export function BackupList({ backups, gatewayUrl, actions, onChanged }: BackupLi
   const [failure, setFailure] = useState("");
   const timers = useRef<number[]>([]);
   const run = actions?.run;
+  const restore = actions?.restore;
 
   useEffect(() => () => { for (const timer of timers.current) window.clearTimeout(timer); }, []);
 
@@ -53,6 +54,26 @@ export function BackupList({ backups, gatewayUrl, actions, onChanged }: BackupLi
     }
   }
 
+  async function restoreTopic(topic: string) {
+    if (!restore || !actions || !gatewayUrl || pending) return;
+    if (!actions.confirm(`Restore the backup of "${topic}" into "${topic}"? The saved messages are appended to the topic, so messages still in it may be duplicated. The topic's backup pauses until the restore finishes.`)) {
+      return;
+    }
+    setPending(true);
+    setNotice("");
+    setFailure("");
+    try {
+      const started = await restore(gatewayUrl, topic);
+      setNotice(`Restore started for ${started.topic} from ${started.objects} stored object${started.objects === 1 ? "" : "s"}.`);
+      onChanged?.();
+    } catch (problem) {
+      setFailure(describeBackupError(problem));
+    } finally {
+      setPending(false);
+    }
+  }
+
+  const hasActions = Boolean(run || restore);
   if (backups.length === 0) return <p>No backups yet.</p>;
   return (
     <>
@@ -67,7 +88,7 @@ export function BackupList({ backups, gatewayUrl, actions, onChanged }: BackupLi
             <th scope="col">Location</th>
             <th scope="col">Last write</th>
             <th scope="col">Stored</th>
-            {run ? <th scope="col">Actions</th> : null}
+            {hasActions ? <th scope="col">Actions</th> : null}
           </tr>
         </thead>
         <tbody>
@@ -81,22 +102,27 @@ export function BackupList({ backups, gatewayUrl, actions, onChanged }: BackupLi
                   : new Date(backup.storage.lastWrite).toLocaleString()}</td>
                 <td>{backup.storage === undefined ? "Unknown"
                   : `${formatBytes(backup.storage.storedBytes)} in ${backup.storage.objects} object${backup.storage.objects === 1 ? "" : "s"}`}</td>
-                {run ? (
+                {hasActions ? (
                   <td>
                     <div className={styles.actions}>
-                      {backup.state === "PAUSED" ? (
+                      {restore ? (
+                        <button type="button" disabled={pending} aria-label={`Restore the backup of ${backup.topic}`} onClick={() => void restoreTopic(backup.topic)}>Restore</button>
+                      ) : null}
+                      {!run ? null : backup.state === "PAUSED" ? (
                         <button type="button" disabled={pending} aria-label={`Resume the backup of ${backup.topic}`} onClick={() => void act(backup.topic, "resume")}>Resume</button>
                       ) : (
                         <button type="button" disabled={pending} aria-label={`Pause the backup of ${backup.topic}`} onClick={() => void act(backup.topic, "pause")}>Pause</button>
                       )}
-                      <button type="button" disabled={pending} aria-label={`Delete the backup job for ${backup.topic}`} onClick={() => void act(backup.topic, "delete")}>Delete</button>
+                      {run ? (
+                        <button type="button" disabled={pending} aria-label={`Delete the backup job for ${backup.topic}`} onClick={() => void act(backup.topic, "delete")}>Delete</button>
+                      ) : null}
                     </div>
                   </td>
                 ) : null}
               </tr>
               {backup.error ? (
                 <tr className={styles.errorRow}>
-                  <td colSpan={run ? 6 : 5} aria-label={`Error for ${backup.topic}`}>{backup.error}</td>
+                  <td colSpan={hasActions ? 6 : 5} aria-label={`Error for ${backup.topic}`}>{backup.error}</td>
                 </tr>
               ) : null}
             </Fragment>
