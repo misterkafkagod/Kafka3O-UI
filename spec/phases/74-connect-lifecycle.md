@@ -2,7 +2,7 @@
 - **Milestone:** M12
 - **Covers:** F35-AC3, F35-AC4
 - **Discovery:** [kafka-connect-api](../discovery/kafka-connect-api.md)
-- **Status:** Building
+- **Status:** Done
 
 ## Demo
 1. In the Gateway repository, run `go test ./internal/connect`, `go test ./internal/httpapi -run Connect` and `go test ./cmd/gateway`.
@@ -24,3 +24,9 @@
   - Done when: `npx vitest run src/gateway/runConnectorAction.test.ts src/gateway/describeConnectorActionError.test.ts src/components/ConnectConnectors.test.tsx` passes, covering each action's request, confirm and cancel, the refresh and each message; then `npm test` and `npm run build` pass.
 
 ## Review
+- **Demo:** steps 1–2 passed (auto-approved under the user's standing M12 instruction, 2026-11-10; run by Claude). Gateway: each action uses the request recorded in the kafka-connect-api discovery (`PUT` pause/resume, `POST` restart with `includeTasks=true&onlyFailed=false`, `POST` task restart), names are validated and escaped, Connect 404/4xx/5xx and dropped connections map to not found, rejected, unreachable and unknown; the four routes answer 202, are writes in the policy (OPERATOR, Production ADMIN plus reason, intent and outcome audit with `connect_action_unknown` as unknown) and a negative task never reaches Connect. UI in Chromium 1194 with a synthesized Gateway that applies actions asynchronously like Connect, 7/7: canceling sends nothing; Pause then Resume show the requested message and the refreshed list follows; connector and task restarts reach their routes; a Production denial and an unknown outcome are explained; no overflow at 320 px. Step 3 (EKS-D) waits for the user's `deploy.sh`.
+- **Vulnerability scan (milestone close):** `npm audit`: 0 findings; `govulncheck@v1.9.0 -test -tags integration ./...` (Gateway): 0 called, 1 uncalled module advisory (GO-2026-5932, unchanged since M10), within policy; the Connect client adds no dependency.
+- **Regression:** Gateway `go test ./...` passed (24 operations in the route catalog); UI `npm test` 520 passed (5 opt-in skipped); default build.
+- **Convention check:** one action per file in `internal/connect` and `src/gateway`; the Connect tab keeps its handlers inside the component like the other pages.
+- **Note:** a refused connection before Connect answered is reported as an unknown outcome, the cautious choice for a write; the Console audit records it as unknown.
+

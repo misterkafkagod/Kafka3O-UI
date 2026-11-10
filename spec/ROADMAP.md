@@ -276,7 +276,7 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
 - **Contracts:** Behaviors and acceptance criteria are in [FUNC-SPEC.md](./FUNC-SPEC.md#f46--streamlined-signed-in-navigation-planned-m11); the session administration flags and appearance mechanism are in [TECH-SPEC.md](./TECH-SPEC.md#m11-navigation-and-appearance-planned).
 
 ### M12 — Operate consumer groups and Kafka Connect from the console
-- **Status:** Active
+- **Status:** Done
 - **Features:** F47, F15, F35
 - **Phases:**
   - **P70** F47-B1 · No Gateway credentials in the secured console — Covers: F47-AC1 · Discovery: — · Status: Done
@@ -287,7 +287,7 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
     - Demo: confirming a preview commits exactly those offsets; a stale preview or an active group is refused; Production needs ADMIN plus a reason; audit shows intent and outcome.
   - **P73** F35-B1 + F35-B2 · Inspect Kafka Connect — Covers: F35-AC1, F35-AC2 · Discovery: kafka-connect-api · Status: Done
     - Demo: Kafka A's Connect tab lists the test worker's connectors and task states with error summaries and no configuration values; Kafka B says "not configured".
-  - **P74** F35-B3 · Pause, resume and restart connectors and tasks — Covers: F35-AC3, F35-AC4 · Discovery: — · Status: Building
+  - **P74** F35-B3 · Pause, resume and restart connectors and tasks — Covers: F35-AC3, F35-AC4 · Discovery: — · Status: Done
     - Demo: pausing, resuming and restarting a test connector and one task changes the listed state; an OPERATOR on Production is denied; audit shows each action.
 
 ## Backlog
@@ -332,6 +332,7 @@ Compared current official Redpanda documentation (pages identify Console v3.14.0
 Redpanda-only Shadow Links, its Admin API, and Redpanda-specific diagnostic operations are not promised for generic Kafka. Replay/copy workflows and live tailing are not added to scope by this comparison.
 
 ### Existing verification debt
+- **Verification debt:** Deploy M12 to EKS-D (`deploy.sh`) and run the live steps of P71–P74: preview and apply an offset reset for a synthetic inactive group on `kafka3o-m10-verify` on Kafka A and Kafka B (with a reason), check both in the audit, and list, pause, resume and restart the test connectors in `kafka3o-connect-test`. M12 was verified with Gateway unit tests and the built UI against synthesized Gateway answers built from the recorded Connect fixtures.
 - **Verification debt:** Deploy M11 to the EKS-D secured stack (`deploy.sh`) and repeat the P63/P65 checks there and in the user's own browser; M11 was verified against the local Console fixture and `vite preview` because the redeploy was not permitted in the building session.
 - **Verification debt:** Run the Docker-only stopped-broker test and P14 browser demo, and verify the remaining cross-cluster and consumer-group browser demos.
 - **Verification debt:** Repeat the P24–P27 browser smoke test with a trusted deployment certificate and complete the producer key/header browser demo.
@@ -341,6 +342,10 @@ Redpanda-only Shadow Links, its Admin API, and Redpanda-specific diagnostic oper
 - **Verification debt:** Run the Cognito sign-in, group refresh and logout integration against a real User Pool when an AWS account and app client become available; fixture tests are not evidence of live provider compatibility.
 
 ## Learnings
+- 2026-11-10 (M12 retro): P70–P74 deliver F47, F15 and F35: no credentials control in the secured console, a preview-then-apply consumer offset reset that refuses active groups and stale previews, and a Connect tab listing connectors and tasks with error summaries plus pause, resume and restart, all under the M10 roles, Production rules and audit.
+- 2026-11-10 (M12 retro): What worked: a short discovery against a real test worker found two things tests would have missed (Connect cannot address names with `/`; a plain restart does not restart tasks), and the recorded fixtures drove both the Gateway tests and the UI demo.
+- 2026-11-10 (M12 retro): What did not: the live EKS-D steps still depend on the user running `deploy.sh`; one command again chained a commit after a long test run and had to be stopped before it committed.
+- 2026-11-10 (M12 retro): Next: deploy M12 and run the live steps, then consider F48 (connector create/update/delete) or F34 (group and offset deletion), which build on M12.
 - 2026-11-09 (re-plan): M12 = F47, F15 and F35 (inspect, pause, resume, restart) by user choice; connector create/update/delete split to F48. A test Kafka Connect worker deployed by Claude on EKS-D (namespace `kafka3o-connect-test`, Kafka A only) serves discovery and demos.
 - 2026-11-09 (re-plan): Dropped F17 at the user's request: the cluster registry must change only through a repository change, never from the UI. Postponed the Schema Registry features (F16, F32); they are not candidates for the next milestone.
 - 2026-11-08 (M11 retro): P63–P69 deliver F46 and F45: a compact session indicator, an Administration page shown from Console-reported capabilities (without probing admin endpoints), clusters opening on Topics, and per-browser color mode, four contrast-tested themes, a bundled readable font, text size and density.
