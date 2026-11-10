@@ -10,8 +10,8 @@
 3. On EKS-D after deployment: Kafka A lists the `kafka3o-m10-verify` backup with its last write time.
 
 ## Tasks
-- [ ] **T76.1 Read-only S3 listing in the Gateway** — Covers: F49-AC2
-  - Files: Gateway internal/s3store/object.go (new, data types), internal/s3store/sign_v4_request.go (new, with test), internal/s3store/list_objects.go (new, with test), internal/config/load_config.go, internal/config/config.go, internal/config/load_config_test.go
+- [x] **T76.1 Read-only S3 listing in the Gateway** — Covers: F49-AC2
+  - Files: Gateway internal/s3store/object.go (new, data types), internal/s3store/sign_v4_request.go (new, with test), internal/s3store/list_objects.go (new, with test), internal/s3store/encode_uri_component.go and hmac_sha256.go (new, with tests), internal/config/validate_backup_config.go, internal/config/load_config.go, internal/config/config.go, internal/config/load_config_test.go
   - Do: AWS Signature Version 4 signing (standard library only), checked against AWS's published `get-vanilla` test vector; `ListObjects.Execute(ctx, prefix)` pages through ListObjectsV2 (path-style, `x-amz-content-sha256` of the empty body) and returns key, size and last-modified time. The Gateway's read-only credentials come only from `KAFKA3O_BACKUP_S3_ACCESS_KEY` and `KAFKA3O_BACKUP_S3_SECRET_KEY` (never from the config file); without them listings report "unknown".
   - Done when: `go test ./internal/s3store ./internal/config` (per package) passes, covering the test vector, paging, XML errors and HTTP errors.
 - [ ] **T76.2 List backups** — Covers: F49-AC2
