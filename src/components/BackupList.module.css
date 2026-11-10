@@ -13,3 +13,8 @@
   flex-wrap: wrap;
   gap: 0.4rem;
 }
+
+.restoreRow td {
+  background: var(--color-surface-subtle);
+  color: var(--color-text);
+}

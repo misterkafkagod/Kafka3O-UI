@@ -106,7 +106,8 @@ export function BackupList({ backups, gatewayUrl, actions, onChanged }: BackupLi
                   <td>
                     <div className={styles.actions}>
                       {restore ? (
-                        <button type="button" disabled={pending} aria-label={`Restore the backup of ${backup.topic}`} onClick={() => void restoreTopic(backup.topic)}>Restore</button>
+                        <button type="button" disabled={pending || Boolean(backup.restore && !backup.restore.finished)}
+                          aria-label={`Restore the backup of ${backup.topic}`} onClick={() => void restoreTopic(backup.topic)}>Restore</button>
                       ) : null}
                       {!run ? null : backup.state === "PAUSED" ? (
                         <button type="button" disabled={pending} aria-label={`Resume the backup of ${backup.topic}`} onClick={() => void act(backup.topic, "resume")}>Resume</button>
@@ -120,6 +121,15 @@ export function BackupList({ backups, gatewayUrl, actions, onChanged }: BackupLi
                   </td>
                 ) : null}
               </tr>
+              {backup.restore ? (
+                <tr className={backup.restore.error ? styles.errorRow : styles.restoreRow}>
+                  <td colSpan={hasActions ? 6 : 5} aria-label={`Restore of ${backup.topic}`}>
+                    {backup.restore.finished ? `Last restore finished: ${backup.restore.total} records restored.`
+                      : backup.restore.error ? `Restore ${backup.restore.state === "FAILED" ? "failed" : "needs attention"}: ${backup.restore.error}`
+                        : `Restoring ${backup.restore.restored} of ${backup.restore.total} records.`}
+                  </td>
+                </tr>
+              ) : null}
               {backup.error ? (
                 <tr className={styles.errorRow}>
                   <td colSpan={hasActions ? 6 : 5} aria-label={`Error for ${backup.topic}`}>{backup.error}</td>

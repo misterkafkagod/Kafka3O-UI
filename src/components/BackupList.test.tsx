@@ -81,4 +81,25 @@ describe("BackupList", () => {
     await user.click(screen.getByRole("button", { name: "Restore the backup of orders" }));
     expect((await screen.findByRole("alert")).textContent).toBe("A restore of this topic is already running.");
   });
+
+  it("shows restore progress, completion and failure, and blocks a second restore while one runs", () => {
+    const restore = vi.fn<StartRestore>();
+    const { rerender } = render(<BackupList gatewayUrl="https://gw" actions={{ start: vi.fn(), restore, confirm: () => true }} backups={[
+      { topic: "orders", connector: "kafka3o-backup-orders", location: "s3://b/kafka-a/orders/", state: "PAUSED",
+        restore: { restoreId: "r-1", state: "RUNNING", restored: 12, total: 21, finished: false } },
+    ]} />);
+    expect(screen.getByRole("cell", { name: "Restore of orders" }).textContent).toBe("Restoring 12 of 21 records.");
+    expect((screen.getByRole("button", { name: "Restore the backup of orders" }) as HTMLButtonElement).disabled).toBe(true);
+    rerender(<BackupList gatewayUrl="https://gw" actions={{ start: vi.fn(), restore, confirm: () => true }} backups={[
+      { topic: "orders", connector: "kafka3o-backup-orders", location: "s3://b/kafka-a/orders/", state: "RUNNING",
+        restore: { restoreId: "r-1", state: "RUNNING", restored: 21, total: 21, finished: true } },
+    ]} />);
+    expect(screen.getByRole("cell", { name: "Restore of orders" }).textContent).toBe("Last restore finished: 21 records restored.");
+    expect((screen.getByRole("button", { name: "Restore the backup of orders" }) as HTMLButtonElement).disabled).toBe(false);
+    rerender(<BackupList gatewayUrl="https://gw" actions={{ start: vi.fn(), restore, confirm: () => true }} backups={[
+      { topic: "orders", connector: "kafka3o-backup-orders", location: "s3://b/kafka-a/orders/", state: "PAUSED",
+        restore: { restoreId: "r-1", state: "FAILED", restored: 3, total: 21, finished: false, error: "DataException: malformed backup record" } },
+    ]} />);
+    expect(screen.getByRole("cell", { name: "Restore of orders" }).textContent).toBe("Restore failed: DataException: malformed backup record");
+  });
 });

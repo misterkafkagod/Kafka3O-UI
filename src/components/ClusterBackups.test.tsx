@@ -37,4 +37,23 @@ describe("ClusterBackups", () => {
     await user.click(await screen.findByRole("button", { name: "Retry" }));
     expect(await screen.findByText("No backups yet.")).toBeDefined();
   });
+
+  it("follows a running restore until it finishes", async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    try {
+      const running = { topic: "orders", connector: "kafka3o-backup-orders", location: "s3://b/kafka-a/orders/", state: "PAUSED",
+        restore: { restoreId: "r-1", state: "RUNNING", restored: 1, total: 2, finished: false } };
+      const list = vi.fn<ListBackups>().mockResolvedValueOnce([running])
+        .mockResolvedValue([{ ...running, state: "RUNNING", restore: { ...running.restore, restored: 2, finished: true } }]);
+      renderWithQuery(<ClusterBackups gateway={gateway} listTopics={topics} listBackups={list} />);
+      expect(await screen.findByText("Restoring 1 of 2 records.")).toBeDefined();
+      await vi.advanceTimersByTimeAsync(5100);
+      expect(await screen.findByText("Last restore finished: 2 records restored.")).toBeDefined();
+      const calls = list.mock.calls.length;
+      await vi.advanceTimersByTimeAsync(6000);
+      expect(list.mock.calls.length).toBe(calls);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
 });
