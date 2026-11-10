@@ -287,7 +287,7 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
     - Demo: confirming a preview commits exactly those offsets; a stale preview or an active group is refused; Production needs ADMIN plus a reason; audit shows intent and outcome.
   - **P73** F35-B1 + F35-B2 · Inspect Kafka Connect — Covers: F35-AC1, F35-AC2 · Discovery: kafka-connect-api · Status: Done
     - Demo: Kafka A's Connect tab lists the test worker's connectors and task states with error summaries and no configuration values; Kafka B says "not configured".
-  - **P74** F35-B3 · Pause, resume and restart connectors and tasks — Covers: F35-AC3, F35-AC4 · Discovery: — · Status: Defined
+  - **P74** F35-B3 · Pause, resume and restart connectors and tasks — Covers: F35-AC3, F35-AC4 · Discovery: — · Status: Building
     - Demo: pausing, resuming and restarting a test connector and one task changes the listed state; an OPERATOR on Production is denied; audit shows each action.
 
 ## Backlog
