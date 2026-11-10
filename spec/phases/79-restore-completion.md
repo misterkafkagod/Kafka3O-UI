@@ -2,7 +2,7 @@
 - **Milestone:** M13
 - **Covers:** F50-AC3
 - **Discovery:** [s3-backup-connectors](../discovery/s3-backup-connectors.md)
-- **Status:** Building
+- **Status:** Done
 
 ## Demo
 1. In the Gateway repository, run `go test ./internal/s3store`, `go test ./internal/connect`, `go test ./internal/kafka -run ConnectOffsets` and `go test ./internal/backup`.
@@ -28,3 +28,8 @@
   - Done when: `npx vitest run src/components/BackupList.test.tsx src/components/ClusterBackups.test.tsx` passes; then `npm test` (on its own) and `npm run build` pass.
 
 ## Review
+- **Demo:** steps 1–2 passed (auto-approved under the user's standing M13 instruction, 2026-11-10; run by Claude). Gateway: object streaming and cached record counting (gzip errors, cache hits); the Connect offsets parser keeps the latest `recordCount` per object for one connector and honors tombstones; `CheckRestore` counts only snapshot objects, reports progress, finishes a complete running restore (deletes it, resumes the backup only if the restore paused it), leaves failed restores and backups alone, and reports unreadable offsets as an error; the list shows restores whose backup job was deleted. UI in Chromium 1194 with a synthesized Gateway, 3/3: progress shown, the tab refreshes every 5 s while a restore runs, and stops once it finished. The reading loop over the offsets topic needs a broker and is checked live. Step 3 (EKS-D) waits for a deploy.
+- **Regression:** Gateway `go test ./...` passed; UI `npm test` 543 passed (5 opt-in skipped); default build.
+- **Convention check:** one action per file (`check_restore`, `count_object_records`, `parse_backup_object_name`, `parse_snapshot_boundary`, `apply_connect_offset_record`, `read_connect_offsets`, `fetch_connector_config`, `get_object`).
+- **Vulnerability scan (milestone close):** `npm audit`: 0; `govulncheck@v1.9.0`: 0 called, 1 uncalled (GO-2026-5932, unchanged); restore transform (`osv-scanner@v2.7.0`): 0 after moving to connect-api 4.3.2 (4.3.1's kafka-clients brought high lz4-java and snappy-java advisories; the jar bundles none of them). **Aiven S3 sink and source 3.4.3** (the latest release; 114 bundled artifacts checked against osv.dev by their own `pom.properties`): **4 critical** (netty-handler 4.1.115, avro 1.11.0/1.11.3, parquet-avro 1.15.0) and **41 high** (jackson-core/databind 2.13–2.14, netty codec/http/http2/handler 4.1.115, guava 30.1.1, commons-beanutils 1.9.4, dnsjava 3.4.0, aircompressor 2.0.2, nimbus-jose-jwt 9.31, plexus-utils 3.5.1). This violates the CVE policy and blocks M13's close until the user chooses a fix or an exception.
+

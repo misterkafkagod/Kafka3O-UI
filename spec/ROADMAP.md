@@ -305,7 +305,7 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
     - Demo: pausing, resuming and deleting the backup job changes its state; deleting keeps the stored objects.
   - **P78** F50-B1 · Restore transform and starting a restore — Covers: F50-AC1, F50-AC2 · Discovery: — · Status: Done
     - Demo: a confirmed restore pauses the topic's backup and appends the saved messages with their keys, headers and timestamps plus the restore header; newer backup objects are not restored.
-  - **P79** F50-B2 · Restore progress and completion — Covers: F50-AC3 · Discovery: — · Status: Building
+  - **P79** F50-B2 · Restore progress and completion — Covers: F50-AC3 · Discovery: — · Status: Done
     - Demo: the Backups tab shows the restore's progress, finishes it (removes the restore and resumes the backup, which skips restored records), refuses a second restore of the same topic, and Production needs ADMIN plus a reason.
 
 ## Backlog
@@ -360,6 +360,7 @@ Redpanda-only Shadow Links, its Admin API, and Redpanda-specific diagnostic oper
 - **Verification debt:** Run the Cognito sign-in, group refresh and logout integration against a real User Pool when an AWS account and app client become available; fixture tests are not evidence of live provider compatibility.
 
 ## Learnings
+- 2026-11-10 (M13 scan): Aiven's S3 connectors 3.4.3 bundle 4 critical and 41 high advisories (netty, avro, parquet-avro, jackson, guava and others), so M13 stays Active until the user picks a fix (replacing the bundled jars, rebuilding the connectors with newer dependencies) or a recorded test-only exception. Scanning embedded pom.xml files overstates findings; checking each bundled jar's own coordinates is the accurate method.
 - 2026-11-10 (s3-backup-connectors): MinIO is replaced by SeaweedFS (no MinIO images); Aiven's source alone cannot restore its sink's backups losslessly, so restores use a small Kafka3O Connect transform (user chose this over Gateway-side restores for scale); restored records carry a `kafka3o-restore` header so backups skip them; restores must be bounded to their snapshot and removed before the backup resumes. P78 is split into P78 and P79.
 - 2026-11-10 (re-plan): M13 = F49 (topic backups) and F50 (restore into the original topic) by user choice: MinIO on EKS-D as S3-compatible test storage, Aiven's Apache-2.0 S3 sink and source connectors, records kept losslessly (key, value, headers, timestamp; offsets are reassigned). Restoring into the original topic appends copies, so it needs explicit confirmation, Production ADMIN plus a reason, and protection against the topic's own backup re-saving restored records.
 - 2026-11-10 (M12 retro): P70–P74 deliver F47, F15 and F35: no credentials control in the secured console, a preview-then-apply consumer offset reset that refuses active groups and stale previews, and a Connect tab listing connectors and tasks with error summaries plus pause, resume and restart, all under the M10 roles, Production rules and audit.
