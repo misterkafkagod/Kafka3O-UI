@@ -2,7 +2,7 @@
 - **Milestone:** M12
 - **Covers:** F15-AC1, preview portion of F15-AC4
 - **Discovery:** —
-- **Status:** Building
+- **Status:** Done
 
 ## Demo
 1. In the Gateway repository, run `go test ./internal/kafka -run OffsetResetPreview ./internal/httpapi -run OffsetResetPreview ./internal/gatewayauth -run ClassifyRoute -v`.
@@ -24,3 +24,8 @@
   - Done when: `npx vitest run src/gateway/previewOffsetReset.test.ts src/components/OffsetResetPreview.test.tsx` passes, covering the request, the table, no-commit partitions and the 409/404/503 messages; then `npm test` and `npm run build` pass.
 
 ## Review
+- **Demo:** passed for steps 1–2 (auto-approved under the user's standing M12 instruction, 2026-11-09; run by Claude). Gateway: `compute_offset_reset_preview`, the preview route and the classifier tests pass (earliest, latest, timestamp and after-the-end targets, partitions without commits, active classic and consumer-protocol groups, unknown group and topic, invalid targets, precise string offsets, 400/404/409/503). UI in Chromium 1194 against the built UI with synthesized Gateway answers, 5/5: Earliest and Latest previews list current and new offsets, a local date and time is sent as milliseconds, the preview states that nothing changed, and an active group shows "Stop the group's consumers first". Step 3 (EKS-D) waits for the user's `deploy.sh` and is repeated together with P72.
+- **Vulnerability scan:** not run; no dependency changes.
+- **Regression:** Gateway `go test ./...` passed (route catalog now 18 operations); UI `npm test` 505 passed (5 opt-in skipped); default build.
+- **Convention check:** one action per file in both repositories; the Kafka read sits behind a timeout-applying domain action like the other Gateway actions.
+
