@@ -2,7 +2,7 @@
 - **Milestone:** M14
 - **Covers:** F52-AC1
 - **Discovery:** —
-- **Status:** Building
+- **Status:** Review
 
 ## Demo
 1. Run `npx vitest run src/groups/consumerGroupTotalLag.test.ts src/components/ConsumerGroupList.test.tsx src/components/ConsumerGroups.test.tsx`.
@@ -13,7 +13,7 @@
   - Files: src/groups/consumerGroupTotalLag.ts (new), src/groups/consumerGroupTotalLag.test.ts (new)
   - Do: Sums the decimal-string lags of a group's partitions with `BigInt`; returns `{ kind: "known", lag }`, `{ kind: "unknown", partitions }` when any partition's lag is null (unknown lags are never counted as zero), or `{ kind: "none" }` when the group has no partition offsets.
   - Done when: `npx vitest run src/groups/consumerGroupTotalLag.test.ts` passes, covering a sum beyond `Number.MAX_SAFE_INTEGER`, unknown partitions and no partitions.
-- [ ] **T80.2 Consumer group list table** — Covers: F52-AC1
+- [x] **T80.2 Consumer group list table** — Covers: F52-AC1
   - Files: src/components/ConsumerGroupList.tsx (new), src/components/ConsumerGroupList.module.css (new), src/components/ConsumerGroupList.test.tsx (new), src/components/ConsumerGroups.tsx, src/components/ConsumerGroups.test.tsx
   - Do: A table "Consumer groups" with Group, State, Members, Topics and Total lag, sorted by name; the group name links to the group's details (the existing anchor until P81); an incomplete group is marked. `ConsumerGroups` shows it in place of `ConsumerGroupSummary`; loading, empty and error states stay.
   - Done when: `npx vitest run src/components/ConsumerGroupList.test.tsx src/components/ConsumerGroups.test.tsx` passes; then `npm test` and `npm run build` pass.

@@ -3,7 +3,7 @@ import type { OffsetResetActions } from "../gateway/OffsetResetActions";
 import type { GatewayEntry } from "../gateway/types";
 import { useConsumerGroups } from "../hooks/useConsumerGroups";
 import { ConsumerGroupDetails } from "./ConsumerGroupDetails";
-import { ConsumerGroupSummary } from "./ConsumerGroupSummary";
+import { ConsumerGroupList } from "./ConsumerGroupList";
 import { ErrorWithRetry } from "./ErrorWithRetry";
 
 type ConsumerGroupsProps = {
@@ -26,7 +26,7 @@ export function ConsumerGroups({ gateway, listConsumerGroups, offsetReset }: Con
         <p>No consumer groups.</p>
       ) : (
         <>
-          <ConsumerGroupSummary groups={groups} />
+          <ConsumerGroupList groups={groups} />
           {groups.map((group) => (
             <ConsumerGroupDetails key={group.id} group={group} onRetry={() => void refetch()}
               offsetReset={offsetReset ? { gatewayUrl: gateway.url, actions: offsetReset } : undefined} />

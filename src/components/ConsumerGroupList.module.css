@@ -1,0 +1,19 @@
+.list td:nth-child(n + 3) {
+  font-variant-numeric: tabular-nums;
+}
+
+.name {
+  text-align: start;
+  font-weight: 400;
+  overflow-wrap: anywhere;
+}
+
+.name a {
+  font-weight: 700;
+}
+
+.incomplete {
+  display: block;
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+}
