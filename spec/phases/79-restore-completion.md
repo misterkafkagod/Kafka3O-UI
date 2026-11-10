@@ -10,7 +10,7 @@
 3. On EKS-D after deployment: restoring `kafka3o-m10-verify` finishes on its own, the backup resumes and saves no restored records; the audit lists the restore and its outcome.
 
 ## Tasks
-- [ ] **T79.1 Count backup records** — Covers: F50-AC3
+- [x] **T79.1 Count backup records** — Covers: F50-AC3
   - Files: Gateway internal/s3store/get_object.go (new, with test), internal/backup/count_object_records.go (new, with test)
   - Do: `GetObject` streams one object with Signature V4. `CountObjectRecords` gunzips an object and counts its jsonl lines, caching the count by object key and size (backup objects never change), with a bounded cache.
   - Done when: `go test ./internal/s3store ./internal/backup` (per package) passes, covering the stream, gzip errors and cache hits.
