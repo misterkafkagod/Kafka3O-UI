@@ -333,7 +333,7 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
     - Demo: the tab shows topic and partition counts, under-replicated, below min ISR and offline partitions, and the largest topics by size.
   - **P85** F41-B3 · Throughput — Covers: F41-AC3 · Discovery: — · Status: Review
     - Demo: producing to a topic while the tab is open shows its messages per second after the second refresh.
-  - **P86** F53-B1 · Download metrics — Covers: F53-AC1 · Discovery: — · Status: Defined
+  - **P86** F53-B1 · Download metrics — Covers: F53-AC1 · Discovery: — · Status: Review
     - Demo: Download JSON and Download CSV save files with the tab's values and the read time.
   - **P87** F53-B2 · Prometheus endpoint — Covers: F53-AC2 · Discovery: cluster-metrics-sources · Status: Defined
     - Demo: `curl` with the metrics token returns Prometheus text from Kafka A's Gateway; without it, 401.

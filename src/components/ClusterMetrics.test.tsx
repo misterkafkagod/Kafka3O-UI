@@ -43,4 +43,11 @@ describe("ClusterMetrics", () => {
     await userEvent.click(within(container).getByRole("button", { name: "Refresh now" }));
     expect(await screen.findByText("Cluster: 5.0 messages/s over the last 10 seconds")).toBeDefined();
   });
+
+  it("downloads the metrics on screen", async () => {
+    const save = vi.fn();
+    renderWithQuery(<ClusterMetrics gateway={gateway} getMetrics={async () => metrics} saveFile={save} />);
+    await userEvent.click(await screen.findByRole("button", { name: "Download CSV" }));
+    expect(save).toHaveBeenCalledWith("dev-metrics-2026-11-10T12-00-00Z.csv", "text/csv", expect.stringContaining("topic_end_offset,,,orders,10"));
+  });
 });
