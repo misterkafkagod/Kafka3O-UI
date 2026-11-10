@@ -24,4 +24,4 @@
 - **Vulnerability scan:** not run; no dependency changes.
 - **Regression:** Gateway `go test ./...` passed (29 operations in the route catalog); UI `npm test` 538 passed (5 opt-in skipped); default build.
 - **Note:** the unknown-outcome message is now action-neutral ("The change may have been applied") for start, pause, resume and delete.
-
+- **Live check (EKS-D, 2026-11-10, after the user's "deploy M13"):** passed in Chromium 1194 through the forwarded console as `admin` on `kafka3o-m10-verify` (Kafka A): see the M13 milestone review in ROADMAP.md.

@@ -28,4 +28,4 @@
 - **Vulnerability scan:** not run for this phase; the transform adds no runtime dependency (connect-api is provided by the worker; JUnit is test-only). Scanned at milestone close.
 - **Regression:** Gateway `go test ./...` passed (30 operations in the route catalog); UI `npm test` 541 passed (5 opt-in skipped); default build.
 - **Convention check:** Java classes each have one public method besides the `Transformation` lifecycle methods Kafka Connect requires (`BackupObjectKey.parse`, `SnapshotBoundary.includes`, `UnwrapBackupRecord.apply`).
-
+- **Live check (EKS-D, 2026-11-10, after the user's "deploy M13"):** passed in Chromium 1194 through the forwarded console as `admin` on `kafka3o-m10-verify` (Kafka A): see the M13 milestone review in ROADMAP.md.

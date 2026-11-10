@@ -294,7 +294,7 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
     - Demo: pausing, resuming and restarting a test connector and one task changes the listed state; an OPERATOR on Production is denied; audit shows each action.
 
 ### M13 — Back up and restore topic messages through Kafka Connect
-- **Status:** Active
+- **Status:** Done
 - **Features:** F49, F50
 - **Phases:**
   - **P75** F49-B1 · Start a topic backup — Covers: F49-AC1 · Discovery: s3-backup-connectors · Status: Done
@@ -361,6 +361,10 @@ Redpanda-only Shadow Links, its Admin API, and Redpanda-specific diagnostic oper
 - **Verification debt:** Run the Cognito sign-in, group refresh and logout integration against a real User Pool when an AWS account and app client become available; fixture tests are not evidence of live provider compatibility.
 
 ## Learnings
+- 2026-11-10 (M13 retro): P75–P79 deliver F49 and F50 on EKS-D: a Backups tab that starts, lists (state, location, last write, size), pauses, resumes and deletes Aiven S3 sink backups into SeaweedFS, and restores a backup into its own topic through Aiven's S3 source with the Kafka3O restore transform. Live: the backup wrote 11 records; a confirmed restore paused it, appended exactly those 11 records (offsets 22–32) with original keys, values, headers and timestamps plus `kafka3o-restore`, finished on its own (connector removed, backup resumed), and the resumed backup saved none of the restored copies; Kafka B reports backups not configured; the audit lists backups.start, .pause, .resume and .restore.
+- 2026-11-10 (M13 retro): What worked: probing the real connectors before planning found the lossy restore, the restore loop and the progress signal early; checking each bundled jar's own coordinates gave an honest vulnerability picture.
+- 2026-11-10 (M13 retro): What did not: MinIO's images were gone, the restore needed a custom Java transform and a Gateway S3 client, and finishing a restore in the background had to piggyback on list reads; the Aiven connectors carry 4 critical and 41 high advisories, allowed only under the recorded test-only exception.
+- 2026-11-10 (M13 retro): Next: fix the Aiven connector advisories before any production use, measure restore throughput on a larger backup, and finish the M12 live checks (offset reset, Connect actions).
 - 2026-11-10 (M13 scan): Aiven's S3 connectors 3.4.3 bundle 4 critical and 41 high advisories (netty, avro, parquet-avro, jackson, guava and others), so M13 stays Active until the user picks a fix (replacing the bundled jars, rebuilding the connectors with newer dependencies) or a recorded test-only exception. Scanning embedded pom.xml files overstates findings; checking each bundled jar's own coordinates is the accurate method.
 - 2026-11-10 (s3-backup-connectors): MinIO is replaced by SeaweedFS (no MinIO images); Aiven's source alone cannot restore its sink's backups losslessly, so restores use a small Kafka3O Connect transform (user chose this over Gateway-side restores for scale); restored records carry a `kafka3o-restore` header so backups skip them; restores must be bounded to their snapshot and removed before the backup resumes. P78 is split into P78 and P79.
 - 2026-11-10 (re-plan): M13 = F49 (topic backups) and F50 (restore into the original topic) by user choice: MinIO on EKS-D as S3-compatible test storage, Aiven's Apache-2.0 S3 sink and source connectors, records kept losslessly (key, value, headers, timestamp; offsets are reassigned). Restoring into the original topic appends copies, so it needs explicit confirmation, Production ADMIN plus a reason, and protection against the topic's own backup re-saving restored records.

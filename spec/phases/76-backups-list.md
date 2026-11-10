@@ -28,4 +28,4 @@
 - **Vulnerability scan:** not run; no dependency changes (the S3 client uses the Go standard library).
 - **Regression:** Gateway `go test ./...` passed (26 operations in the route catalog); UI `npm test` 535 passed (5 opt-in skipped); default build.
 - **Convention check:** the size formatter moved out of `BackupList` into `src/groups/formatBytes.ts`; Signature V4 helpers are their own files.
-
+- **Live check (EKS-D, 2026-11-10, after the user's "deploy M13"):** passed in Chromium 1194 through the forwarded console as `admin` on `kafka3o-m10-verify` (Kafka A): see the M13 milestone review in ROADMAP.md.

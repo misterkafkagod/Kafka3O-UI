@@ -28,4 +28,4 @@
 - **Vulnerability scan:** not run; no dependency changes.
 - **Regression:** Gateway `go test ./...` passed (25 operations in the route catalog); UI `npm test` 528 passed (5 opt-in skipped); default build.
 - **Convention check:** one action per file in `internal/backup`; data types and errors in `backup.go`.
-
+- **Live check (EKS-D, 2026-11-10, after the user's "deploy M13"):** passed in Chromium 1194 through the forwarded console as `admin` on `kafka3o-m10-verify` (Kafka A): see the M13 milestone review in ROADMAP.md.
