@@ -1,3 +1,4 @@
+import { Link } from "react-router";
 import type { ConsumerGroup } from "../gateway/types";
 import { consumerGroupAnchor } from "../groups/consumerGroupAnchor";
 import { consumerLagStatusLabel } from "../groups/consumerLagStatusLabel";
@@ -8,12 +9,14 @@ import styles from "./ConsumerGroupDetails.module.css";
 type ConsumerGroupDetailsProps = {
   group: ConsumerGroup;
   onRetry: () => void;
+  // groupPath links the heading to the group's own page.
+  groupPath?: string;
 };
 
-export function ConsumerGroupDetails({ group, onRetry }: ConsumerGroupDetailsProps) {
+export function ConsumerGroupDetails({ group, onRetry, groupPath }: ConsumerGroupDetailsProps) {
   return (
     <section id={consumerGroupAnchor(group.id)} tabIndex={-1} aria-label={`Consumer group ${group.id}`} className={styles.detail}>
-      <h3>{group.id}</h3>
+      <h3>{groupPath ? <Link to={groupPath}>{group.id}</Link> : group.id}</h3>
       <p>State: {group.state || "Unknown"} · Protocol: {group.protocol}</p>
       {group.error ? (
         <div role="alert">

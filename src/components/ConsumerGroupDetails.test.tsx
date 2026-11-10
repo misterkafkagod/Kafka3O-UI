@@ -53,4 +53,12 @@ describe("ConsumerGroupDetails", () => {
     renderWithQuery(<ConsumerGroupDetails group={group} onRetry={() => {}} />);
     expect(screen.queryByText("Reset offsets")).toBeNull();
   });
+
+  it("links the heading to the group page when given its path", () => {
+    const { unmount } = renderWithQuery(<ConsumerGroupDetails group={group} onRetry={() => {}} />);
+    expect(screen.queryByRole("link", { name: "orders-group" })).toBeNull();
+    unmount();
+    renderWithQuery(<ConsumerGroupDetails group={group} onRetry={() => {}} groupPath="/clusters/dev/consumer-groups/orders-group" />);
+    expect(within(screen.getByRole("heading", { name: "orders-group" })).getByRole("link").getAttribute("href")).toBe("/clusters/dev/consumer-groups/orders-group");
+  });
 });

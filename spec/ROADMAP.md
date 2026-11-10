@@ -320,7 +320,7 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
     - Demo: the Consumer groups tab opens on a table with each group's name, state, members, topic count and total lag; unknown lag reads "Unknown (n partitions)".
   - **P81** F52-B2 + F52-B3 · Group page — Covers: F52-AC2, F52-AC3 · Discovery: — · Status: Review
     - Demo: clicking a group opens its page with members, offsets per topic and partition, and offset reset; an unknown group name says "Consumer group not found" with a link back.
-  - **P82** F52-B4 · Group links from a topic's consumers — Covers: F52-AC4 · Discovery: — · Status: Planned
+  - **P82** F52-B4 · Group links from a topic's consumers — Covers: F52-AC4 · Discovery: — · Status: Review
     - Demo: on a topic's Consumers tab, a group's name opens that group's page.
 
 ### M15 — See and export a cluster's Kafka metrics

@@ -37,7 +37,8 @@ export function TopicConsumerGroups({ gateway, topicName, listConsumerGroups }: 
             <>
               <ConsumerGroupSummary groups={filtered.associated} />
               {filtered.associated.map((group) => (
-                <ConsumerGroupDetails key={group.id} group={group} onRetry={() => void refetch()} />
+                <ConsumerGroupDetails key={group.id} group={group} onRetry={() => void refetch()}
+                  groupPath={`/clusters/${encodeURIComponent(gateway.id)}/consumer-groups/${encodeURIComponent(group.id)}`} />
               ))}
             </>
           )}

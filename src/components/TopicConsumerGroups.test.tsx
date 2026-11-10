@@ -1,5 +1,6 @@
 import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { Route, Routes, useParams } from "react-router";
 import { describe, expect, it, vi } from "vitest";
 import type { ConsumerGroup } from "../gateway/types";
 import { renderWithQuery } from "../test/renderWithQuery";
@@ -64,4 +65,21 @@ describe("TopicConsumerGroups", () => {
     expect((await screen.findByRole("alert")).textContent).toContain("partial offsets");
     expect(await screen.findByRole("table", { name: "Partition lag for reader" })).toBeDefined();
   });
+
+  it("opens a group's page from its name", async () => {
+    renderWithQuery(
+      <Routes>
+        <Route path="/clusters/:gatewayId/topics/:topicName/consumers" element={<TopicConsumerGroups gateway={gateway} topicName="orders" listConsumerGroups={async () => [{ ...reader, id: "reader & west/1" }]} />} />
+        <Route path="/clusters/:gatewayId/consumer-groups/:groupId" element={<GroupParam />} />
+      </Routes>,
+      "/clusters/dev/topics/orders/consumers",
+    );
+    const heading = await screen.findByRole("heading", { name: "reader & west/1" });
+    await userEvent.click(within(heading).getByRole("link"));
+    expect(await screen.findByText("Group page for reader & west/1")).toBeDefined();
+  });
 });
+
+function GroupParam() {
+  return <p>Group page for {useParams().groupId}</p>;
+}
