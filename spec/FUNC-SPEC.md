@@ -558,7 +558,31 @@ Scan a cluster's consumer groups in one list and open a page per group with its 
 **External dependencies:** The existing consumer-group snapshot API; no new Gateway API.
 
 ### F41 — Cluster metrics (planned M15)
-See a cluster's broker disk use, partition health, topic sizes and throughput on a Metrics tab, only as Kafka reports them, with unavailable values shown as unavailable · *detailed when M15 starts*
+See a cluster's broker disk use, partition health, topic sizes and throughput on a Metrics tab, only as Kafka reports them, with unavailable values shown as unavailable.
+
+**Behaviors**
+- **F41-B1** User opens a cluster's Metrics tab → for each broker and log directory the tab shows the volume's total, used and free space (with % used) and the space Kafka's data takes, refreshed every 10 seconds
+- **F41-B2** User looks at partition health → the tab shows the number of topics and partitions, and how many partitions are under-replicated, below min ISR or offline, plus the 10 largest topics by size on disk
+- **F41-B3** User keeps the tab open → messages per second for the cluster and per topic are worked out from end offsets between two refreshes; the first refresh says "Measuring…"
+- **F41-B4** Kafka cannot answer part of the metrics (access denied, timeout, log directory error) → that part says "Unavailable" with the reason; the other parts still show
+
+**Acceptance criteria**
+- **F41-AC1** (B1) Given brokers with log directories, the tab shows one row per broker and directory with total, used (total − free), free and Kafka data size in readable units and % used; values Kafka reports as unknown (-1) read "Unknown", never 0
+- **F41-AC2** (B2) Given topics including internal ones, the counts match Kafka's metadata (offline: no leader or partition error; under-replicated: ISR smaller than replicas; below min ISR: ISR smaller than the topic's `min.insync.replicas`), and the largest topics are sorted by total replica size
+- **F41-AC3** (B3) Given two refreshes, each topic's rate is (end offset sum change) ÷ (seconds between samples); a decrease (topic recreated or truncated) shows no rate instead of a negative one
+- **F41-AC4** (B4) Given a log directory or configuration read that fails, only the affected section reads "Unavailable: <reason>"; a Gateway error shows the usual error with Retry; viewers can see the tab and nothing is audited
+
+**External dependencies:** Kafka admin API through the cluster's Gateway (DescribeLogDirs v5, Metadata, DescribeConfigs, ListOffsets); see the [cluster-metrics-sources discovery](./discovery/cluster-metrics-sources.md).
 
 ### F53 — Export cluster metrics (planned M15)
-Export a cluster's metrics as a CSV/JSON download from the Metrics tab and through a Prometheus endpoint on the Gateway · *detailed when M15 starts*
+Export a cluster's metrics as a CSV/JSON download from the Metrics tab and through a Prometheus endpoint on the Gateway.
+
+**Behaviors**
+- **F53-B1** User clicks Download JSON or Download CSV on the Metrics tab → the browser saves the current metrics with the time they were read
+- **F53-B2** A monitoring system scrapes the Gateway's metrics endpoint with its token → it receives the same metrics in Prometheus text format
+
+**Acceptance criteria**
+- **F53-AC1** (B1) The JSON file holds the same values as the tab plus `readAt`; the CSV has one row per value (`metric,broker,logDir,topic,value`); files are named `<cluster>-metrics-<UTC time>.json|csv`; unavailable values are left empty, not 0
+- **F53-AC2** (B2) With a metrics listener and token configured, `GET /metrics` with `Authorization: Bearer <token>` returns Prometheus text with gauges for log directory bytes, partition counts by state and topic size, and a counter of topic end offsets; a missing or wrong token gets 401; without configuration the listener does not start; the listener serves nothing else
+
+**External dependencies:** the F41 metrics read; Prometheus text exposition format 0.0.4 (no Prometheus server is installed on EKS-D, so checks use `curl`).

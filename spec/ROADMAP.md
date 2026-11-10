@@ -324,9 +324,19 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
     - Demo: on a topic's Consumers tab, a group's name opens that group's page.
 
 ### M15 — See and export a cluster's Kafka metrics
-- **Status:** Planned
+- **Status:** Active
 - **Features:** F41, F53
-- **Phases:** <filled by skill-phase-breakdown>
+- **Phases:**
+  - **P83** F41-B1 + F41-B4 · Metrics tab with broker disk use — Covers: F41-AC1, F41-AC4 · Discovery: cluster-metrics-sources · Status: Defined
+    - Demo: Kafka A's Metrics tab shows its log directory's total, used and free space and Kafka's data size; a failing log directory read shows "Unavailable" with the reason.
+  - **P84** F41-B2 · Partition health and largest topics — Covers: F41-AC2 · Discovery: cluster-metrics-sources · Status: Defined
+    - Demo: the tab shows topic and partition counts, under-replicated, below min ISR and offline partitions, and the largest topics by size.
+  - **P85** F41-B3 · Throughput — Covers: F41-AC3 · Discovery: — · Status: Defined
+    - Demo: producing to a topic while the tab is open shows its messages per second after the second refresh.
+  - **P86** F53-B1 · Download metrics — Covers: F53-AC1 · Discovery: — · Status: Defined
+    - Demo: Download JSON and Download CSV save files with the tab's values and the read time.
+  - **P87** F53-B2 · Prometheus endpoint — Covers: F53-AC2 · Discovery: cluster-metrics-sources · Status: Defined
+    - Demo: `curl` with the metrics token returns Prometheus text from Kafka A's Gateway; without it, 401.
 
 ## Backlog
 The following items are candidates after M11, not commitments to implement every Redpanda feature. All future writes must use F29/F30 authorization and F31 audit; no candidate silently expands the current bounded reads or changes Kafka connection credentials.

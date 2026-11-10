@@ -180,7 +180,10 @@ This design deliberately uses the existing central store for opaque delegation/i
 - No Gateway change: the group list and the group page both read the existing consumer-group snapshot through `useConsumerGroups`; the group page selects its group by id from the route `/clusters/:id/consumer-groups/:group` (URL-encoded).
 
 ## M15 cluster metrics (planned)
-- Kafka is the only metrics source (user decision 2026-11-10): no CPU or memory, no metrics-server, no JMX exporter, no change to the Kafka StatefulSets. Exact sources and the Prometheus endpoint's authentication are settled by discovery `cluster-metrics-sources` when M15 starts.
+- Kafka is the only metrics source (user decision 2026-11-10): no CPU or memory, no metrics-server, no JMX exporter, no change to the Kafka StatefulSets. Reads follow the [cluster-metrics-sources recipe](./discovery/cluster-metrics-sources.md#recipe).
+- Gateway: `GET /api/v1/metrics` (cluster read, VIEWER; not audited) returns `readAt`, log directories per broker, partition health, topic sizes and end-offset sums; each section carries its own `error` instead of values when Kafka cannot answer. No state is kept between requests; the UI computes throughput from consecutive samples.
+- Prometheus: an optional second listener `metrics.listen` (empty = off) on the Gateway's TLS certificate, serving only `GET /metrics` behind `httpapi.WithBearerAuth` with the token from `KAFKA3O_METRICS_TOKEN` (environment only; the listener refuses to start without it). Text exposition format 0.0.4 written with the Go standard library. Rejected: `prometheus/client_golang` (a dependency tree for a few gauges); serving `/metrics` on the API listener (secured Gateways accept only Console delegations).
+- UI: a Metrics tab per cluster polling every 10 seconds; downloads are built in the browser from the last response (`Blob` + object URL), no extra request.
 
 ## Structure
 ```
