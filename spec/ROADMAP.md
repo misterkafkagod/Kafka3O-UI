@@ -371,9 +371,9 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
     - Demo: the Brokers section shows leaders, replicas and non-preferred leaders per broker, matching the partition count.
   - **P96** F57-B1 · Consumer group metrics — Covers: F57-AC1 · Discovery: — · Status: Done
     - Demo: the Consumer groups section lists each group's state, members and lag; the CSV and `/metrics` carry the same numbers.
-  - **P97** F59-B1 · Kafka Connect health — Covers: F59-AC1 · Discovery: — · Status: Building
+  - **P97** F59-B1 · Kafka Connect health — Covers: F59-AC1 · Discovery: — · Status: Done
     - Demo: the Kafka Connect section counts connectors and tasks by state and lists the failing test connector.
-  - **P98** F59-B2 · Backup health — Covers: F59-AC2 · Discovery: — · Status: Defined
+  - **P98** F59-B2 · Backup health — Covers: F59-AC2 · Discovery: — · Status: Building
     - Demo: the Backups section shows each backup's state, last write age and size; scraping `/metrics` during a restore does not finish it.
 
 ## Backlog

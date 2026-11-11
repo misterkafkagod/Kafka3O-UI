@@ -2,7 +2,7 @@
 - **Milestone:** M17
 - **Covers:** F59-AC1
 - **Discovery:** —
-- **Status:** Building
+- **Status:** Done
 
 ## Demo
 1. Kafka A's Metrics tab: the Kafka Connect section counts connectors and tasks by state and lists `kafka3o-verify-failing`'s failed task with its error.
@@ -19,3 +19,9 @@
   - Done when: `npx vitest run src/components/ConnectMetrics src/metrics/metricsToCsv` passes.
 
 ## Review
+- **Demo:** unit and component tests cover the demo (mixed states, failed connector and task, not configured, unreachable; CSV and Prometheus rows); live checks run with the milestone (auto-approval, 2026-11-11)
+- **Tests:** Gateway `go test ./...` and `go test -race ./internal/metrics/` passed; UI 640 passed (5 skipped); `tsc -b` clean
+- **Conventions:** `SummarizeConnect`, `ConnectMetrics` are single actions
+- **Vulnerability scan:** not needed
+- **Notes:** with seven sections the metrics read now runs them concurrently under its one timeout, so a slow section cannot starve the others.
+
