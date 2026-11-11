@@ -592,7 +592,7 @@ Set up and manage a topic's backup on that topic's Backup tab, choosing from a f
 
 **Behaviors**
 - **F54-B1** User opens a topic's Backup tab (after Configuration & partitions) → it shows the topic's backup with state, location, last write, size and its settings, or "No backup" with a Start form; a cluster without backup storage says so
-- **F54-B2** User starts a backup with settings (start point: oldest message or from now on; compression: gzip, zstd, snappy or none; maximum records per file; flush interval) → the Gateway builds the connector configuration from these choices only
+- **F54-B2** User starts a backup with settings (start point: oldest message or from now on; compression: gzip, zstd, snappy or none; maximum records per file, which also makes files be written as messages arrive instead of every 60 s) → the Gateway builds the connector configuration from these choices only
 - **F54-B3** User pauses, resumes or deletes the backup from the tab → the same actions as F49-B3 under the same rules
 
 **Acceptance criteria**
@@ -600,7 +600,7 @@ Set up and manage a topic's backup on that topic's Backup tab, choosing from a f
 - **F54-AC2** (B2) An invalid or out-of-range setting is refused before Connect is called, with a message naming it; the defaults produce exactly the M13 configuration; no browser value reaches the connector configuration except the validated settings
 - **F54-AC3** (B3) Starting, pausing, resuming and deleting need the F49-AC3 roles and Production rules and are audited; the start's audit records the chosen settings
 
-**External dependencies:** Aiven S3 sink connector; per-connector flush time `discovery needed` (backup-settings-and-restore-filters).
+**External dependencies:** Aiven S3 sink connector; see the [backup-settings-and-restore-filters discovery](./discovery/backup-settings-and-restore-filters.md) (a flush time cannot be set per connector, so it is not offered).
 
 ### F55 — Restore with a time range or partitions (planned M16)
 Restore a topic's backup from its Backup tab: everything, only messages in a time range, only chosen partitions, or both.
@@ -612,9 +612,9 @@ Restore a topic's backup from its Backup tab: everything, only messages in a tim
 **Acceptance criteria**
 - **F55-AC1** (B1) Behaves as F50-AC1 to F50-AC3, started and followed from the topic's Backup tab
 - **F55-AC2** (B2) Only records inside the time range and the chosen partitions are appended, each with `kafka3o-restore`; progress and the automatic finish still work; an empty partition selection, an unknown partition, or a range whose start is after its end is refused before Connect
-- **F55-AC3** (B1, B2) A backup written with any offered compression restores losslessly
+- **F55-AC3** (B1, B2) A backup written with any offered compression restores losslessly; the restore reads the objects written with the backup's current compression, and the tab says older objects in another compression are not restored
 
-**External dependencies:** Aiven S3 source connector and the Kafka3O restore transform; filtering and compression support `discovery needed` (backup-settings-and-restore-filters).
+**External dependencies:** Aiven S3 source connector and the Kafka3O restore transform; see the [backup-settings-and-restore-filters discovery](./discovery/backup-settings-and-restore-filters.md).
 
 ### F56 — Cluster Backups overview (planned M16)
 The cluster's Backups tab lists every backup and leads to each topic's Backup tab.
