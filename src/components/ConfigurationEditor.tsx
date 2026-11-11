@@ -161,7 +161,7 @@ export function ConfigurationEditor({ gateway, resource, administration, ready =
           {entries.length === 0 ? <p>No matching settings.</p> : null}
           <ScrollableTableRegion label="Kafka configuration table scroll area">
             <table aria-label="Kafka configuration">
-              <thead><tr><th scope="col">Setting</th><th scope="col">Effective value</th><th scope="col">Type</th><th scope="col">Source</th><th scope="col">Access</th></tr></thead>
+              <thead><tr><th scope="col">Setting</th><th scope="col">Effective value</th><th scope="col">Type</th><th scope="col">Source</th><th scope="col" className={styles.access}>Access</th></tr></thead>
               <tbody>
                 {entries.map((entry) => (
                   <tr key={entry.name}>
@@ -172,7 +172,7 @@ export function ConfigurationEditor({ gateway, resource, administration, ready =
                     <td><code>{entry.sensitive ? "Sensitive value hidden" : entry.value ?? "Not set"}</code></td>
                     <td>{entry.type.toLowerCase()}</td>
                     <td>{entry.source.replaceAll("_", " ").toLowerCase()}</td>
-                    <td>
+                    <td className={styles.access}>
                       {entry.sensitive ? "Sensitive" : entry.readOnly ? "Read-only" : (
                         <button type="button" disabled={pending || uncertain || !ready} aria-label={`Edit ${entry.name}`} onClick={(event) => edit(entry, event.currentTarget)}>Edit</button>
                       )}

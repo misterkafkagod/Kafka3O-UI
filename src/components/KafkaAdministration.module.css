@@ -51,3 +51,8 @@
   border-left: 0.25rem solid var(--color-alert-text);
   background: var(--color-alert-surface);
 }
+
+/* The Access column holds "Edit", "Read-only" or "Sensitive"; none of them may wrap. */
+.access {
+  white-space: nowrap;
+}
