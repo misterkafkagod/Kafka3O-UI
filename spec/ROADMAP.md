@@ -367,7 +367,7 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
 - **Phases:**
   - **P94** F58-B2 · Controller quorum — Covers: F58-AC2 · Discovery: quorum-and-leader-metrics · Status: Done
     - Demo: Kafka A's Metrics tab shows the quorum leader and each voter's lag; `curl /metrics` has `kafka3o_quorum_replica_lag`.
-  - **P95** F58-B1 · Leader balance per broker — Covers: F58-AC1 · Discovery: — · Status: Defined
+  - **P95** F58-B1 · Leader balance per broker — Covers: F58-AC1 · Discovery: — · Status: Building
     - Demo: the Brokers section shows leaders, replicas and non-preferred leaders per broker, matching the partition count.
   - **P96** F57-B1 · Consumer group metrics — Covers: F57-AC1 · Discovery: — · Status: Defined
     - Demo: the Consumer groups section lists each group's state, members and lag; the CSV and `/metrics` carry the same numbers.
