@@ -10,7 +10,7 @@
 3. Open a topic without a backup: "No backup for this topic." Kafka B: "Backups are not configured for this cluster."
 
 ## Tasks
-- [ ] **T88.1 Gateway: effective backup settings in the list** — Covers: F54-AC1
+- [x] **T88.1 Gateway: effective backup settings in the list** — Covers: F54-AC1
   - Files: Kafka3O-Gateway internal/backup/backup.go, internal/backup/read_backup_options.go (new), internal/backup/read_backup_options_test.go (new), internal/backup/list_backups.go, internal/backup/list_backups_test.go, cmd/gateway/main.go
   - Do: `BackupOptions{StartFrom, Compression, RecordsPerFile}` (json `settings`, omitted when unread); `ReadBackupOptions(config)` maps only `consumer.override.auto.offset.reset` (default earliest), `file.compression.type` (default gzip) and `file.max.records` (default 0, unparsable → 0); `ListBackups` takes a `connect.FetchConnectorConfig` and fills settings per existing backup job; a failed read leaves settings out without failing the list.
   - Done when: `go test ./internal/backup/ -run 'ReadBackupOptions|ListBackups'` passes covering defaults, each key, a failed config read and "NO JOB" backups without settings.
