@@ -10,7 +10,7 @@
 3. A start after its end, an empty or unknown partition is refused with a message, and nothing is sent to Connect.
 
 ## Tasks
-- [ ] **T92.1 Restore transform: time window** — Covers: F55-AC2
+- [x] **T92.1 Restore transform: time window** — Covers: F55-AC2
   - Files: connect-plugins/kafka3o-restore-transform/src/main/java/dev/kafka3o/connect/UnwrapBackupRecord.java, src/main/java/dev/kafka3o/connect/TimeWindow.java (new), src/test/java/dev/kafka3o/connect/UnwrapBackupRecordTest.java, src/test/java/dev/kafka3o/connect/TimeWindowTest.java (new), README.md
   - Do: optional `time.from` / `time.to` (epoch ms, `[from, to)`); records outside are dropped after unwrapping; invalid or reversed values fail `configure`.
   - Done when: `mvn -B verify` passes covering inside, outside, the bounds, only-from, only-to and invalid windows.
