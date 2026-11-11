@@ -10,7 +10,7 @@
 3. The restored copies keep key, value, headers and timestamp plus `kafka3o-restore`; the backup does not save them again.
 
 ## Tasks
-- [ ] **T91.1 Gateway: read every backup compression** — Covers: F55-AC3
+- [x] **T91.1 Gateway: read every backup compression** — Covers: F55-AC3
   - Files: Kafka3O-Gateway go.mod, internal/backup/parse_backup_object_name.go, internal/backup/parse_backup_object_name_test.go, internal/backup/backup_object_compression.go (new), internal/backup/backup_object_compression_test.go (new), internal/backup/open_backup_object.go (new), internal/backup/open_backup_object_test.go (new), internal/backup/xerial_snappy_reader.go (new), internal/backup/xerial_snappy_reader_test.go (new), internal/backup/count_object_records.go, internal/backup/count_object_records_test.go
   - Do: object names may end in `.gz`, `.zst`, `.snappy` or nothing; `BackupObjectCompression` maps the name to gzip/zstd/snappy/none; `OpenBackupObject` decompresses by that compression (klauspost `zstd`, xerial snappy stream with `snappy` block decode, gzip, plain); `CountObjectRecords` uses it; a corrupt object is a storage error.
   - Done when: `go test ./internal/backup/ -run 'ParseBackupObjectName|BackupObjectCompression|OpenBackupObject|XerialSnappy|CountObjectRecords'` passes with fixtures for each compression (the snappy fixture built in the xerial layout seen in the discovery) and corrupt input.
