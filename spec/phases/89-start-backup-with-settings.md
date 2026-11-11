@@ -2,7 +2,7 @@
 - **Milestone:** M16
 - **Covers:** F54-AC2
 - **Discovery:** discovery/backup-settings-and-restore-filters.md
-- **Status:** Building
+- **Status:** Done
 
 ## Demo
 1. On a topic without a backup, open the Backup tab, choose "Messages from now on", zstd and 100 records per file, and start.
@@ -20,3 +20,9 @@
   - Done when: `npx vitest run src/gateway/startBackup src/gateway/describeBackupError src/components/StartTopicBackup src/components/TopicBackup` passes covering default and chosen settings in the request, an invalid record limit not sent, cancel sends nothing, and the Gateway's refusal shown.
 
 ## Review
+- **Demo:** Gateway and component tests cover the demo (settings sent and mapped, M13 defaults, invalid field named, unknown fields refused before the action); live `.zst` objects were seen in the discovery; the browser and EKS-D demo run with the milestone (auto-approval, 2026-11-11)
+- **Tests:** Gateway `go test ./...` passed; UI 606 passed (5 skipped); `tsc -b` clean
+- **Conventions:** `ValidateBackupOptions` and `StartTopicBackup` are single actions; `main.tsx` also changed to pass the settings through (one line, not in the Files list)
+- **Vulnerability scan:** not needed (no dependency change)
+- **Notes:** Huma refuses unknown fields and wrong types with 422 before the action, so only the three settings reach the Gateway's validation.
+
