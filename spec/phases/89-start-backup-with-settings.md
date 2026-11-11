@@ -10,7 +10,7 @@
 3. Enter 0 < records ≤ 1,000,000 rule violations (e.g. 2,000,000): the form names the field; a direct request with `compression: "lz4"` gets 400 `invalid_backup_settings` naming `compression`.
 
 ## Tasks
-- [ ] **T89.1 Gateway: validated backup settings** — Covers: F54-AC2
+- [x] **T89.1 Gateway: validated backup settings** — Covers: F54-AC2
   - Files: Kafka3O-Gateway internal/backup/backup.go, internal/backup/validate_backup_options.go (new), internal/backup/validate_backup_options_test.go (new), internal/backup/backup_connector_config.go, internal/backup/backup_connector_config_test.go, internal/backup/start_backup.go, internal/backup/start_backup_test.go, internal/httpapi/register_start_backup.go, internal/httpapi/register_start_backup_test.go, internal/httpapi/new_backup_problem.go
   - Do: optional `settings {startFrom, compression, recordsPerFile}` in the start request; `ValidateBackupOptions` fills defaults and refuses other values with `ErrInvalidBackupSettings` naming the field (400 `invalid_backup_settings`); unknown fields refused; `BackupConnectorConfig` maps the options (no `file.max.records` when 0), so defaults equal the M13 configuration; validation happens before Connect.
   - Done when: `go test ./internal/backup/ ./internal/httpapi/ -run 'ValidateBackupOptions|BackupConnectorConfig|StartBackup|BackupStart'` passes covering defaults = M13 map, each option, each invalid field, unknown fields, and no Connect call on invalid input.
