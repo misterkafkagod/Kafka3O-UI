@@ -42,6 +42,13 @@ export function metricsToCsv(metrics: ClusterMetrics): string {
     }
   }
   // name holds a group, replica role, connector or state for rows that need one.
+  for (const broker of metrics.brokers?.error ? [] : metrics.brokers?.brokers ?? []) {
+    rows.push(
+      ["broker_leaders", String(broker.broker), "", "", "", String(broker.leaders)],
+      ["broker_replicas", String(broker.broker), "", "", "", String(broker.replicas)],
+      ["broker_non_preferred_leaders", String(broker.broker), "", "", "", String(broker.nonPreferredLeaders)],
+    );
+  }
   const header = "metric,broker,logDir,topic,name,value";
   return [header, ...rows.map((row) => row.map(escapeCsvField).join(","))].join("\r\n") + "\r\n";
 }

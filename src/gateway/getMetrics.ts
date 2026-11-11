@@ -17,7 +17,10 @@ export type ClusterMetrics = {
   endOffsets: { error?: string; topics: { topic: string; endOffset?: string; error?: string }[] };
   // M17 sections are optional so an older Gateway's answer still renders.
   quorum?: Quorum;
+  brokers?: { error?: string; brokers: BrokerLeaders[] };
 };
+
+export type BrokerLeaders = { broker: number; leaders: number; replicas: number; nonPreferredLeaders: number };
 
 // lag is how far a replica's log end is behind the leader's (null when the leader's is unknown); times are ISO or null.
 export type QuorumReplica = { id: number; role: string; logEndOffset: number; lag: number | null; lastFetch: string | null; lastCaughtUp: string | null };

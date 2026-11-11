@@ -59,5 +59,11 @@ describe("metricsToCsv", () => {
     expect(failed).toContain("quorum_leader,,,,,");
     expect(failed).toContain("quorum_high_watermark,,,,,");
   });
+
+  it("writes leaders, replicas and non-preferred leaders per broker", () => {
+    const lines = metricsToCsv({ ...metrics, brokers: { brokers: [{ broker: 1, leaders: 39, replicas: 40, nonPreferredLeaders: 2 }] } }).split("\r\n");
+    expect(lines).toEqual(expect.arrayContaining(["broker_leaders,1,,,,39", "broker_replicas,1,,,,40", "broker_non_preferred_leaders,1,,,,2"]));
+    expect(metricsToCsv({ ...metrics, brokers: { error: "timeout", brokers: [] } })).not.toContain("broker_leaders");
+  });
 });
 

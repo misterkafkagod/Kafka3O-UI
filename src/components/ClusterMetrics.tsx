@@ -4,6 +4,7 @@ import { useMetrics } from "../hooks/useMetrics";
 import { useMetricsSamples } from "../hooks/useMetricsSamples";
 import { saveFile as browserSaveFile, type SaveFile } from "../metrics/saveFile";
 import { BrokerDiskUse } from "./BrokerDiskUse";
+import { BrokerLeaders } from "./BrokerLeaders";
 import { ErrorWithRetry } from "./ErrorWithRetry";
 import { LargestTopics } from "./LargestTopics";
 import { MetricsDownload } from "./MetricsDownload";
@@ -39,6 +40,7 @@ export function ClusterMetrics({ gateway, getMetrics, saveFile = browserSaveFile
           <PartitionHealth partitions={metrics.partitions} />
           {metrics.quorum ? <QuorumHealth quorum={metrics.quorum} /> : null}
           <BrokerDiskUse logDirs={metrics.logDirs} />
+          {metrics.brokers ? <BrokerLeaders brokers={metrics.brokers} /> : null}
           <TopicThroughput previous={previous} current={metrics} />
           <LargestTopics largestTopics={metrics.largestTopics} />
         </>
