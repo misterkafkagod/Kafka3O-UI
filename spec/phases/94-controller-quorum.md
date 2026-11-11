@@ -10,7 +10,7 @@
 3. `curl` gateway-a's `/metrics`: `kafka3o_quorum_leader 1` and `kafka3o_quorum_replica_lag{replica="1",role="voter"} 0`.
 
 ## Tasks
-- [ ] **T94.1 Gateway: quorum section** — Covers: F58-AC2
+- [x] **T94.1 Gateway: quorum section** — Covers: F58-AC2
   - Files: Kafka3O-Gateway internal/metrics/metrics.go, internal/metrics/sources.go (new), internal/metrics/read_quorum.go (new), internal/metrics/get_metrics.go, internal/metrics/get_metrics_test.go, internal/metrics/write_prometheus_text.go, internal/metrics/write_prometheus_text_test.go, internal/kafka/read_quorum.go (new), internal/kafka/read_quorum_test.go (new), cmd/gateway/main.go
   - Do: `NewGetMetrics` takes a `Sources` struct (data-only) so new sections don't grow its argument list; `ReadQuorum` sends DescribeQuorum per the recipe, maps errors (top level, partition, missing partition), and gives each voter and observer its lag behind the leader's LEO (nil when the leader is unknown) and its last fetch/caught-up times (nil for −1); a failed read is the section's `error`; Prometheus gets `section_up{section="quorum"}`, `kafka3o_quorum_leader`, `kafka3o_quorum_high_watermark`, `kafka3o_quorum_replica_lag{replica,role}`.
   - Done when: `go test ./internal/metrics/ ./internal/kafka/ -run 'Quorum|GetMetrics|WritePrometheusText'` passes covering a healthy quorum, a lagging follower and an observer, an unknown leader, each error kind, and Prometheus output with and without the section.
