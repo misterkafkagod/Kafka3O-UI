@@ -8,6 +8,7 @@ import { ErrorWithRetry } from "./ErrorWithRetry";
 import { LargestTopics } from "./LargestTopics";
 import { MetricsDownload } from "./MetricsDownload";
 import { PartitionHealth } from "./PartitionHealth";
+import { QuorumHealth } from "./QuorumHealth";
 import { TopicThroughput } from "./TopicThroughput";
 
 type ClusterMetricsProps = {
@@ -36,6 +37,7 @@ export function ClusterMetrics({ gateway, getMetrics, saveFile = browserSaveFile
           </p>
           <MetricsDownload clusterId={gateway.id} metrics={metrics} saveFile={saveFile} />
           <PartitionHealth partitions={metrics.partitions} />
+          {metrics.quorum ? <QuorumHealth quorum={metrics.quorum} /> : null}
           <BrokerDiskUse logDirs={metrics.logDirs} />
           <TopicThroughput previous={previous} current={metrics} />
           <LargestTopics largestTopics={metrics.largestTopics} />

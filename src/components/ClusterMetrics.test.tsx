@@ -25,6 +25,12 @@ describe("ClusterMetrics", () => {
     expect(list).toHaveBeenCalledWith(gateway.url);
   });
 
+  it("shows the controller quorum when the Gateway reports it", async () => {
+    const withQuorum = { ...metrics, quorum: { leaderId: 1, leaderEpoch: 3, highWatermark: 9, replicas: [{ id: 1, role: "voter", logEndOffset: 9, lag: 0, lastFetch: null, lastCaughtUp: null }] } };
+    renderWithQuery(<ClusterMetrics gateway={gateway} getMetrics={async () => withQuorum} />);
+    expect(await screen.findByRole("table", { name: "Controller quorum replicas" })).toBeDefined();
+  });
+
   it("shows Gateway errors with Retry", async () => {
     const list = vi.fn().mockRejectedValueOnce(new TypeError("Failed to fetch")).mockResolvedValueOnce(metrics);
     renderWithQuery(<ClusterMetrics gateway={gateway} getMetrics={list} />);
@@ -48,6 +54,6 @@ describe("ClusterMetrics", () => {
     const save = vi.fn();
     renderWithQuery(<ClusterMetrics gateway={gateway} getMetrics={async () => metrics} saveFile={save} />);
     await userEvent.click(await screen.findByRole("button", { name: "Download CSV" }));
-    expect(save).toHaveBeenCalledWith("dev-metrics-2026-11-10T12-00-00Z.csv", "text/csv", expect.stringContaining("topic_end_offset,,,orders,10"));
+    expect(save).toHaveBeenCalledWith("dev-metrics-2026-11-10T12-00-00Z.csv", "text/csv", expect.stringContaining("topic_end_offset,,,orders,,10"));
   });
 });

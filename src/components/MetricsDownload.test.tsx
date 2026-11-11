@@ -24,6 +24,6 @@ describe("MetricsDownload", () => {
     expect(save.mock.calls[0][1]).toBe("application/json");
     expect(JSON.parse(save.mock.calls[0][2])).toEqual(metrics);
     expect(save.mock.calls[1].slice(0, 2)).toEqual(["kafka-a-metrics-2026-11-10T12-00-00Z.csv", "text/csv"]);
-    expect(save.mock.calls[1][2]).toContain("read_at,,,,2026-11-10T12:00:00Z");
+    expect(save.mock.calls[1][2]).toContain("read_at,,,,,2026-11-10T12:00:00Z");
   });
 });

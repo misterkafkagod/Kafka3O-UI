@@ -15,7 +15,14 @@ export type ClusterMetrics = {
   largestTopics: { error?: string; topics: { topic: string; bytes: number }[] };
   // endOffset is the decimal sum of a topic's partition end offsets.
   endOffsets: { error?: string; topics: { topic: string; endOffset?: string; error?: string }[] };
+  // M17 sections are optional so an older Gateway's answer still renders.
+  quorum?: Quorum;
 };
+
+// lag is how far a replica's log end is behind the leader's (null when the leader's is unknown); times are ISO or null.
+export type QuorumReplica = { id: number; role: string; logEndOffset: number; lag: number | null; lastFetch: string | null; lastCaughtUp: string | null };
+
+export type Quorum = { error?: string; leaderId: number | null; leaderEpoch: number; highWatermark: number; replicas: QuorumReplica[] };
 
 export type GetMetrics = (gatewayUrl: string) => Promise<ClusterMetrics>;
 

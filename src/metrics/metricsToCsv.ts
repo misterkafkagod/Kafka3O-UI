@@ -1,16 +1,16 @@
 import type { ClusterMetrics } from "../gateway/getMetrics";
 import { escapeCsvField } from "./escapeCsvField";
 
-type Row = [metric: string, broker: string, logDir: string, topic: string, value: string];
+type Row = [metric: string, broker: string, logDir: string, topic: string, name: string, value: string];
 
 const value = (number: number | null | undefined) => (number === null || number === undefined ? "" : String(number));
 
 // metricsToCsv writes one row per value; a value Kafka did not report, or a section it could not answer, is empty.
 export function metricsToCsv(metrics: ClusterMetrics): string {
-  const rows: Row[] = [["read_at", "", "", "", metrics.readAt]];
+  const rows: Row[] = [["read_at", "", "", "", "", metrics.readAt]];
   for (const dir of metrics.logDirs.dirs) {
     const known = !dir.error && dir.totalBytes !== null && dir.usableBytes !== null;
-    const where = (metric: string, number: number | null): Row => [metric, String(dir.broker), dir.dir, "", dir.error ? "" : value(number)];
+    const where = (metric: string, number: number | null): Row => [metric, String(dir.broker), dir.dir, "", "", dir.error ? "" : value(number)];
     rows.push(
       where("log_dir_total_bytes", dir.totalBytes),
       where("log_dir_used_bytes", known ? dir.totalBytes! - dir.usableBytes! : null),
@@ -19,7 +19,7 @@ export function metricsToCsv(metrics: ClusterMetrics): string {
     );
   }
   const partitions = metrics.partitions;
-  const count = (metric: string, number: number | null): Row => [metric, "", "", "", partitions.error ? "" : value(number)];
+  const count = (metric: string, number: number | null): Row => [metric, "", "", "", "", partitions.error ? "" : value(number)];
   rows.push(
     count("topics", partitions.topics),
     count("partitions", partitions.partitions),
@@ -28,11 +28,20 @@ export function metricsToCsv(metrics: ClusterMetrics): string {
     count("partitions_offline", partitions.offline),
   );
   for (const topic of metrics.largestTopics.topics) {
-    rows.push(["topic_size_bytes", "", "", topic.topic, String(topic.bytes)]);
+    rows.push(["topic_size_bytes", "", "", topic.topic, "", String(topic.bytes)]);
   }
   for (const topic of metrics.endOffsets.topics) {
-    rows.push(["topic_end_offset", "", "", topic.topic, topic.endOffset ?? ""]);
+    rows.push(["topic_end_offset", "", "", topic.topic, "", topic.endOffset ?? ""]);
   }
-  const header = "metric,broker,logDir,topic,value";
+  const quorum = metrics.quorum;
+  if (quorum) {
+    rows.push(["quorum_leader", "", "", "", "", quorum.error ? "" : value(quorum.leaderId)]);
+    rows.push(["quorum_high_watermark", "", "", "", "", quorum.error ? "" : value(quorum.highWatermark)]);
+    for (const replica of quorum.error ? [] : quorum.replicas) {
+      rows.push(["quorum_replica_lag", String(replica.id), "", "", replica.role, value(replica.lag)]);
+    }
+  }
+  // name holds a group, replica role, connector or state for rows that need one.
+  const header = "metric,broker,logDir,topic,name,value";
   return [header, ...rows.map((row) => row.map(escapeCsvField).join(","))].join("\r\n") + "\r\n";
 }
