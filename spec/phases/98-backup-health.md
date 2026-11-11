@@ -2,7 +2,7 @@
 - **Milestone:** M17
 - **Covers:** F59-AC2
 - **Discovery:** —
-- **Status:** Building
+- **Status:** Done
 
 ## Demo
 1. Kafka A's Metrics tab: the Backups section lists `kafka3o-m10-verify` (and `tert`) with state, time since last write, stored size and whether a restore runs; each topic links to its Backup tab. Kafka B: "Backups are not configured for this cluster."
@@ -19,3 +19,8 @@
   - Done when: `npx vitest run src/components/BackupMetrics src/metrics/metricsToCsv` passes.
 
 ## Review
+- **Demo:** milestone browser demo against a simulated Gateway, 8/8 checks: quorum, leaders per broker, group lag with a partly unknown lower bound, Connect counts and the failing task, backup health with last-write age and its link to the topic's Backup tab, CSV with every new section, and "not configured" for Connect and backups on the second cluster (auto-approval, 2026-11-11). The live EKS-D check waits for the deployment.
+- **Tests:** Gateway `go test ./...` and `-race` on the touched packages passed; UI 645 passed (5 skipped); `tsc -b` clean
+- **Conventions:** `SummarizeBackups`, `BackupMetrics`, `formatAge` are single actions (`formatAge` was added for the last-write age, not in the Files list)
+- **Vulnerability scan (milestone):** `npm audit`: 0; `govulncheck@v1.9.0 ./...` found GO-2026-6859 (`net/http`, called) with Go 1.27.3 → moved to Go 1.27.4 (go.mod, Dockerfile): 0 called, 1 uncalled (unchanged GO-2026-5932)
+

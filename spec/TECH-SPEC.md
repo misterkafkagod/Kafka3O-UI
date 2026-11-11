@@ -7,12 +7,12 @@ Covers both repositories: **Kafka3O-Gateway** (one per Kafka cluster) and **Kafk
 
 ## Stack
 ### Gateway (Kafka3O-Gateway)
-- Runtime: Go 1.27.3 — small static binary, strong concurrency, continuity with the earlier attempt; CVE status: `govulncheck` v1.9.0 2026-11-05: 0 called vulnerabilities. This version fixes GO-2026-6809 / CVE-2026-111943 in `crypto/x509`.
+- Runtime: Go 1.27.4 — small static binary, strong concurrency, continuity with the earlier attempt; CVE status: `govulncheck` v1.9.0 2026-11-11: 0 called vulnerabilities. 1.27.4 fixes GO-2026-6859 (`net/http` HTTP/1 server crash, called by the Gateway and Console; found by the M17 milestone scan); 1.27.3 fixed GO-2026-6809 / CVE-2026-111943 in `crypto/x509`.
 - Kafka client: franz-go v1.22.2 + kadm v1.19.0 — pure Go, complete admin API (metadata, start/end offsets); CVE status: `govulncheck` v1.9.0 2026-10-20: 0 affecting
 - HTTP: Huma v2.39.1 on the stdlib `net/http` mux — typed handlers, OpenAPI 3.1 generated from code, RFC 9457 problem errors; CVE status: `govulncheck` v1.9.0 2026-10-20: 0 affecting
 - Module path: `github.com/misterkafkagod/Kafka3O-Gateway`
 - Config: koanf v2.3.8 with providers/file v1.2.1, providers/env/v2 v2.0.2, parsers/yaml v1.1.1 (YAML file + `KAFKA3O_*` env overrides, `__` separates nested keys; secrets only from env) — v2.4.1 released 2026-10-18, not adopted yet; CVE status: `govulncheck` v1.9.0 2026-10-20: 0 affecting
-- Container images: `golang:1.27.3` (build), `gcr.io/distroless/static-debian12:nonroot` (runtime), `apache/kafka:4.3.1` (dev/test); CVE status: the current gateway image was built on EKS-D with Kaniko and scanned with Trivy 0.75.0 on 2026-11-05: 0 critical/high in the Debian packages and Go binary. Lower/unknown severities were not included. The image was not pushed or started as a container. The `golang` and `apache/kafka` images have not been scanned (build/dev only).
+- Container images: `golang:1.27.4` (build), `gcr.io/distroless/static-debian12:nonroot` (runtime), `apache/kafka:4.3.1` (dev/test); CVE status: the current gateway image was built on EKS-D with Kaniko and scanned with Trivy 0.75.0 on 2026-11-05: 0 critical/high in the Debian packages and Go binary. Lower/unknown severities were not included. The image was not pushed or started as a container. The `golang` and `apache/kafka` images have not been scanned (build/dev only).
 - Logging: stdlib `log/slog` (JSON)
 - Planned Console persistence: `modernc.org/sqlite` v1.61.1 (pure Go, SQLite 3.54.1; `modernc.org/libc` v1.79.0) — single-instance durable store on a dedicated local filesystem. `CGO_ENABLED=0 go run golang.org/x/vuln/cmd/govulncheck@v1.9.0 -test -tags integration ./...` on 2026-11-06: 0 called vulnerabilities and 1 uncalled module-level advisory; the eventual Console container image has not been built or scanned.
 - Console process locking: `golang.org/x/sys` v0.49.0 (previously transitive) — operating-system file locks prevent concurrent Console owners of the same canonical store. A focused `govulncheck -test` reported 0 called vulnerabilities and 1 uncalled module-level advisory; the eventual deployed volume has not been tested for lock support.
@@ -192,10 +192,11 @@ This design deliberately uses the existing central store for opaque delegation/i
 - Restores: optional `from`/`to` (RFC 3339, `[from, to)`) and `partitions` in the restore request. The source's `file.compression.type` and template extension follow the backup's compression. Partitions narrow the snapshot boundary and the expected objects. For a time range the transform drops records outside it (`transforms.unwrap.time.from`/`time.to`, epoch ms) and the Gateway expects, per object, the line number of the last line in range, leaving out objects without one; the finish rule is unchanged. The transform (1.1.0) also accepts every extension; it bundles no runtime dependencies (connect-api provided), and installing it replaces 1.0.0 on the test worker.
 - UI: route `/clusters/:id/topics/:topic/backup` reusing the backup components; the cluster Backups tab becomes a read-only overview with links.
 
-## M17 alert-worthy metrics (planned)
+## M17 alert-worthy metrics
 - `GET /api/v1/metrics` gains sections `consumerGroups`, `brokers`, `quorum`, `connect` and `backups`, each with its own `error`; the Prometheus writer, CSV and UI follow the M15 rules (unknown is left out, never 0; `kafka3o_metrics_section_up` per section).
 - Sources: the consumer-group snapshot reader, the partition metadata already read for health (leaders, replicas, preferred replica = first replica), DescribeQuorum (quorum-and-leader-metrics discovery), Connect's connector list, and the backup list built without the restore check so a metrics read or scrape has no side effects.
 - Prometheus label cardinality is bounded by the cluster's groups, brokers, connectors and backups.
+- The sections are read concurrently under the metrics timeout; a cluster without Connect or backup storage reports `notConfigured` and has no `section_up` line for that section. A partly unknown group lag is shown as a lower bound on the tab and left out of the CSV and Prometheus.
 - Quorum and leaders follow the [quorum-and-leader-metrics recipe](./discovery/quorum-and-leader-metrics.md#recipe): `kmsg.DescribeQuorumRequest` for `__cluster_metadata`/0 (no kadm helper), each replica's lag = leader LEO − its LEO; leaders, replicas and non-preferred leaders per broker from the partition metadata already read.
 
 ## Structure

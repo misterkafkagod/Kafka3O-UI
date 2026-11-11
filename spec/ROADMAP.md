@@ -362,7 +362,7 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
     - Demo: the cluster's Backups tab lists backups without actions, and a topic's name opens its Backup tab.
 
 ### M17 — Alert-worthy cluster metrics
-- **Status:** Active
+- **Status:** Done
 - **Features:** F57, F58, F59
 - **Phases:**
   - **P94** F58-B2 · Controller quorum — Covers: F58-AC2 · Discovery: quorum-and-leader-metrics · Status: Done
@@ -373,7 +373,7 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
     - Demo: the Consumer groups section lists each group's state, members and lag; the CSV and `/metrics` carry the same numbers.
   - **P97** F59-B1 · Kafka Connect health — Covers: F59-AC1 · Discovery: — · Status: Done
     - Demo: the Kafka Connect section counts connectors and tasks by state and lists the failing test connector.
-  - **P98** F59-B2 · Backup health — Covers: F59-AC2 · Discovery: — · Status: Building
+  - **P98** F59-B2 · Backup health — Covers: F59-AC2 · Discovery: — · Status: Done
     - Demo: the Backups section shows each backup's state, last write age and size; scraping `/metrics` during a restore does not finish it.
 
 ## Backlog
@@ -428,6 +428,8 @@ Redpanda-only Shadow Links, its Admin API, and Redpanda-specific diagnostic oper
 - **Verification debt:** Run the Cognito sign-in, group refresh and logout integration against a real User Pool when an AWS account and app client become available; fixture tests are not evidence of live provider compatibility.
 
 ## Learnings
+- 2026-11-11 (M17 retro): P94–P98 deliver F57–F59: the Metrics tab, downloads and Prometheus endpoint add the controller quorum (DescribeQuorum through kmsg), leaders/replicas/non-preferred leaders per broker, consumer group states and exact lag, Kafka Connect connector and task states with failures, and backup health (state, last write, size, restoring). What worked: probing DescribeQuorum with the Gateway's own user first; reusing the existing group, Connect and backup reads; a backup list without the restore check keeps scrapes free of side effects. What didn't: seven sequential reads under one timeout would starve the last ones, so the sections now run concurrently; the CSV needed a `name` column. Security: the milestone scan found GO-2026-6859 in net/http; the Gateway moved to Go 1.27.4. Next: deploy and check Kafka B's quorum permission through its Gateway.
+- **Verification debt (M17):** deploy, then check both clusters' new Metrics sections and gateway-a's `/metrics` lines; Kafka B's DescribeQuorum permission is unverified.
 - 2026-11-11 (re-plan): Added M17 (F57 consumer group lag and states, F58 controller quorum and leader balance, F59 Connect and backup health) on the Metrics tab, in the downloads and in the Prometheus endpoint; still Kafka-reported only (plus the console's own Connect and backup reads), no JMX. Standing auto-approval for M17.
 - 2026-11-11 (user request): configuration rows show a plain "Edit" button (each keeps the accessible name "Edit <property>"), and Messages is the first topic tab.
 - 2026-11-11 (M15 + M16 live): deployed to EKS-D at the user's request with restore transform 1.1.0 on the test Connect worker (1.0.0 kept in `~/kafka3o-rollback`). M15: both clusters' Metrics tabs show disk use and partition health (Kafka A 6 topics/39 partitions, Kafka B 2/4, nothing under-replicated or offline); gateway-a's `/metrics` answers 200 Prometheus text with the token and 401 without it, with a wrong one and on other paths. M16: `kafka3o-m10-verify`'s Backup tab showed the M13 job's settings; its job was replaced from the tab by a zstd one (10 records per file); 6 produced records were stored as `.zst` objects; a full restore appended them losslessly with `kafka3o-restore` and skipped 8 older gzip objects with a notice; a restore of partition 3 between 03:29 and 03:30 UTC appended exactly its 3 records; Kafka B says backups are not configured. Found and fixed (P92 T92.4): a second restore of a topic reused the first restore's connector name and Connect offsets, finishing at once without writing; restores now get their own connector names. Corrected: records per file does not make files be written earlier (objects follow the 60 s commit), and a backup started again resumes where the previous job stopped.
