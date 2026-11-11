@@ -342,8 +342,21 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
     - Demo: `curl` with the metrics token returns Prometheus text from Kafka A's Gateway; without it, 401.
 
 ### M16 — Back up and restore a topic from its own page
-- **Status:** Planned
+- **Status:** Active
 - **Features:** F54, F55, F56
+- **Phases:**
+  - **P88** F54-B1 · Topic Backup tab — Covers: F54-AC1 · Discovery: — · Status: Defined
+    - Demo: `kafka3o-m10-verify`'s Backup tab shows its backup's state, location, last write, size and settings; a topic without a backup shows "No backup"; Kafka B says backups are not configured.
+  - **P89** F54-B2 · Start a backup with settings — Covers: F54-AC2 · Discovery: backup-settings-and-restore-filters · Status: Defined
+    - Demo: starting a backup with zstd and from-now-on writes zstd objects with only new messages; an out-of-range setting is refused with its name.
+  - **P90** F54-B3 · Pause, resume and delete from the topic — Covers: F54-AC3 · Discovery: — · Status: Defined
+    - Demo: the topic's Backup tab pauses, resumes and deletes the backup; the audit shows the start's settings.
+  - **P91** F55-B1 · Restore everything from the topic — Covers: F55-AC1, F55-AC3 · Discovery: backup-settings-and-restore-filters · Status: Defined
+    - Demo: restoring a zstd backup from the topic's Backup tab appends its records, shows progress and finishes on its own.
+  - **P92** F55-B2 · Restore a time range or chosen partitions — Covers: F55-AC2 · Discovery: backup-settings-and-restore-filters · Status: Defined
+    - Demo: restoring partition 0 between two times appends only those records and finishes; a reversed range is refused.
+  - **P93** F56-B1 · Cluster Backups overview — Covers: F56-AC1 · Discovery: — · Status: Defined
+    - Demo: the cluster's Backups tab lists backups without actions, and a topic's name opens its Backup tab.
 
 ## Backlog
 The following items are candidates after M11, not commitments to implement every Redpanda feature. All future writes must use F29/F30 authorization and F31 audit; no candidate silently expands the current bounded reads or changes Kafka connection credentials.
