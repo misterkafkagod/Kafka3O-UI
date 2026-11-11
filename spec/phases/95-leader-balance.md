@@ -2,7 +2,7 @@
 - **Milestone:** M17
 - **Covers:** F58-AC1
 - **Discovery:** discovery/quorum-and-leader-metrics.md
-- **Status:** Building
+- **Status:** Done
 
 ## Demo
 1. Kafka A's Metrics tab: the Brokers section shows broker 1 leading 39 partitions, holding 39 replicas, 0 non-preferred leaders.
@@ -19,3 +19,8 @@
   - Done when: `npx vitest run src/components/BrokerLeaders src/metrics/metricsToCsv` passes.
 
 ## Review
+- **Demo:** adapter and component tests cover the demo (balanced, skewed, non-preferred, idle broker, offline partition, failed read; CSV and Prometheus rows); live checks run with the milestone (auto-approval, 2026-11-11)
+- **Tests:** Gateway `go test ./...` passed; UI 634 passed (5 skipped); `tsc -b` clean
+- **Conventions:** `ReadBrokerLeaders` (port + adapter), `CompareBrokerLeaders`, `BrokerLeaders` are single actions
+- **Vulnerability scan:** not needed
+
