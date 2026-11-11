@@ -196,6 +196,7 @@ This design deliberately uses the existing central store for opaque delegation/i
 - `GET /api/v1/metrics` gains sections `consumerGroups`, `brokers`, `quorum`, `connect` and `backups`, each with its own `error`; the Prometheus writer, CSV and UI follow the M15 rules (unknown is left out, never 0; `kafka3o_metrics_section_up` per section).
 - Sources: the consumer-group snapshot reader, the partition metadata already read for health (leaders, replicas, preferred replica = first replica), DescribeQuorum (quorum-and-leader-metrics discovery), Connect's connector list, and the backup list built without the restore check so a metrics read or scrape has no side effects.
 - Prometheus label cardinality is bounded by the cluster's groups, brokers, connectors and backups.
+- Quorum and leaders follow the [quorum-and-leader-metrics recipe](./discovery/quorum-and-leader-metrics.md#recipe): `kmsg.DescribeQuorumRequest` for `__cluster_metadata`/0 (no kadm helper), each replica's lag = leader LEO − its LEO; leaders, replicas and non-preferred leaders per broker from the partition metadata already read.
 
 ## Structure
 ```
