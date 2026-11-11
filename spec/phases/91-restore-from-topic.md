@@ -18,7 +18,7 @@
   - Files: internal/backup/backup.go, internal/backup/snapshot_boundary.go, internal/backup/snapshot_boundary_test.go, internal/backup/restore_connector_config.go, internal/backup/restore_connector_config_test.go, internal/backup/start_restore.go, internal/backup/start_restore_test.go, internal/backup/check_restore.go, internal/backup/check_restore_test.go, cmd/gateway/main.go
   - Do: the restore's compression is the backup job's `file.compression.type` (default gzip), or, without a job, the newest object's; the snapshot holds only objects of that compression and `Restore.skipped` counts the others; the source config uses that compression and template extension; `CheckRestore` counts only objects of the restore's `file.compression.type`.
   - Done when: `go test ./internal/backup/ -run 'SnapshotBoundary|RestoreConnectorConfig|StartRestore|CheckRestore'` passes covering zstd and none restores, mixed compressions (skipped, and finish not blocked), and the gzip default identical to M13.
-- [ ] **T91.3 Restore transform: every extension** — Covers: F55-AC3
+- [x] **T91.3 Restore transform: every extension** — Covers: F55-AC3
   - Files: connect-plugins/kafka3o-restore-transform/pom.xml, src/main/java/dev/kafka3o/connect/BackupObjectKey.java, src/test/java/dev/kafka3o/connect/BackupObjectKeyTest.java, README.md
   - Do: object names may end in `.gz`, `.zst`, `.snappy` or nothing; version 1.1.0.
   - Done when: `mvn -B verify` passes with the new name cases.
