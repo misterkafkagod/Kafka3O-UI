@@ -146,7 +146,7 @@ function gatewayApp(read: GatewayRead, write: GatewayWrite, credentials: Gateway
         backupActions={{
           start: (gatewayUrl, topic, settings) => startBackup(write(gatewayUrl), gatewayUrl, topic, settings),
           run: (gatewayUrl, topic, kind) => runBackupAction(write(gatewayUrl), gatewayUrl, topic, kind),
-          restore: (gatewayUrl, topic) => startRestore(write(gatewayUrl), gatewayUrl, topic),
+          restore: (gatewayUrl, topic, selection) => startRestore(write(gatewayUrl), gatewayUrl, topic, selection),
           confirm: (message) => window.confirm(message),
         }}
         connectorActions={{

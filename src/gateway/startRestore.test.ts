@@ -18,4 +18,11 @@ describe("startRestore", () => {
     const write = vi.fn<FetchGatewayWrite>().mockResolvedValue({ topic: "orders", restoreId: "r-1", objects: 2, skipped: 3 });
     await expect(startRestore(write, "https://gw", "orders")).resolves.toEqual({ topic: "orders", restoreId: "r-1", objects: 2, skipped: 3 });
   });
+
+  it("sends a selection", async () => {
+    const write = vi.fn<FetchGatewayWrite>().mockResolvedValue({ topic: "orders", restoreId: "r-1", objects: 1 });
+    await startRestore(write, "https://gw", "orders", { from: "2026-11-11T01:00:00.000Z", partitions: [0] });
+    expect(write).toHaveBeenCalledWith("https://gw/api/v1/backups/orders/restore", { method: "POST",
+      body: JSON.stringify({ from: "2026-11-11T01:00:00.000Z", partitions: [0] }) });
+  });
 });
