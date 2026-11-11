@@ -9,7 +9,7 @@
 2. Download CSV: `broker_leaders`, `broker_replicas`, `broker_non_preferred_leaders` rows for broker 1; `/metrics` has `kafka3o_broker_leaders{broker="1"} 39`.
 
 ## Tasks
-- [ ] **T95.1 Gateway: brokers section** — Covers: F58-AC1
+- [x] **T95.1 Gateway: brokers section** — Covers: F58-AC1
   - Files: Kafka3O-Gateway internal/metrics/metrics.go, internal/metrics/sources.go, internal/metrics/read_broker_leaders.go (new), internal/metrics/get_metrics.go, internal/metrics/get_metrics_test.go, internal/metrics/write_prometheus_text.go, internal/metrics/write_prometheus_text_test.go, internal/kafka/read_broker_leaders.go (new), internal/kafka/read_broker_leaders_test.go (new), cmd/gateway/main.go
   - Do: one `kadm` Metadata read (internal topics included); per broker, partitions led, replicas held and leaders that are not the first replica; brokers without partitions appear with zeros; offline partitions are not counted as led; sorted by broker; Prometheus `kafka3o_broker_leaders`, `kafka3o_broker_replicas`, `kafka3o_broker_non_preferred_leaders` and `section_up{section="brokers"}`.
   - Done when: `go test ./internal/metrics/ ./internal/kafka/ -run 'BrokerLeaders|GetMetrics|WritePrometheusText'` passes covering balanced, skewed and non-preferred leaders, an idle broker, an offline partition and a failed read.
