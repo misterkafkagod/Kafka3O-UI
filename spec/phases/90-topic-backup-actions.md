@@ -2,7 +2,7 @@
 - **Milestone:** M16
 - **Covers:** F54-AC3
 - **Discovery:** —
-- **Status:** Building
+- **Status:** Done
 
 ## Demo
 1. On `kafka3o-m10-verify`'s Backup tab, pause the backup, then resume it: the state follows.
@@ -16,3 +16,8 @@
   - Done when: `npx vitest run src/components/TopicBackupActions src/components/TopicBackup` passes covering pause, resume, delete, cancel sends nothing, a Production cancel ("Canceled; nothing was sent."), a 403 denial, and no buttons without `run`.
 
 ## Review
+- **Demo:** component tests cover pause, resume, delete, cancel, Production cancel and a 403; the live demo runs with the milestone (auto-approval, 2026-11-11)
+- **Tests:** UI 612 passed (5 skipped); `tsc -b` clean; no Gateway change
+- **Conventions:** `TopicBackupActions` is one component; the cluster list's copy of the action logic goes away in P93
+- **Vulnerability scan:** not needed
+
