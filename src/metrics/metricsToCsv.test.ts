@@ -65,5 +65,20 @@ describe("metricsToCsv", () => {
     expect(lines).toEqual(expect.arrayContaining(["broker_leaders,1,,,,39", "broker_replicas,1,,,,40", "broker_non_preferred_leaders,1,,,,2"]));
     expect(metricsToCsv({ ...metrics, brokers: { error: "timeout", brokers: [] } })).not.toContain("broker_leaders");
   });
+
+  it("writes group states and lags, leaving a partly unknown lag empty", () => {
+    const lines = metricsToCsv({ ...metrics, consumerGroups: { states: [{ state: "Stable", count: 2 }], groups: [
+      { group: "orders", state: "Stable", members: 2, lag: "9007199254740993", maxPartitionLag: "9007199254740990", unknownPartitions: 0 },
+      { group: "a,b", state: "Stable", members: 0, lag: "3", maxPartitionLag: "3", unknownPartitions: 1 },
+    ] } }).split("\r\n");
+    expect(lines).toEqual(expect.arrayContaining([
+      "consumer_groups,,,,Stable,2",
+      "consumer_group_members,,,,orders,2",
+      "consumer_group_lag,,,,orders,9007199254740993",
+      "consumer_group_max_partition_lag,,,,orders,9007199254740990",
+      'consumer_group_lag,,,,"a,b",',
+      'consumer_group_unknown_lag_partitions,,,,"a,b",1',
+    ]));
+  });
 });
 

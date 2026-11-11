@@ -18,7 +18,11 @@ export type ClusterMetrics = {
   // M17 sections are optional so an older Gateway's answer still renders.
   quorum?: Quorum;
   brokers?: { error?: string; brokers: BrokerLeaders[] };
+  consumerGroups?: { error?: string; states: { state: string; count: number }[]; groups: GroupLag[] };
 };
+
+// lag and maxPartitionLag are exact decimal sums of the partitions with known lag; unknownPartitions makes lag a lower bound.
+export type GroupLag = { group: string; state: string; members: number; lag: string | null; maxPartitionLag: string | null; unknownPartitions: number; error?: string };
 
 export type BrokerLeaders = { broker: number; leaders: number; replicas: number; nonPreferredLeaders: number };
 

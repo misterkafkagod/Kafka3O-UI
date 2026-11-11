@@ -49,6 +49,20 @@ export function metricsToCsv(metrics: ClusterMetrics): string {
       ["broker_non_preferred_leaders", String(broker.broker), "", "", "", String(broker.nonPreferredLeaders)],
     );
   }
+  const consumerGroups = metrics.consumerGroups;
+  for (const state of consumerGroups?.error ? [] : consumerGroups?.states ?? []) {
+    rows.push(["consumer_groups", "", "", "", state.state, String(state.count)]);
+  }
+  for (const group of consumerGroups?.error ? [] : consumerGroups?.groups ?? []) {
+    // A partly known lag is a lower bound, so it is left empty like any value Kafka did not fully report.
+    const known = group.unknownPartitions === 0 && !group.error;
+    rows.push(
+      ["consumer_group_members", "", "", "", group.group, String(group.members)],
+      ["consumer_group_lag", "", "", "", group.group, known ? group.lag ?? "" : ""],
+      ["consumer_group_max_partition_lag", "", "", "", group.group, known ? group.maxPartitionLag ?? "" : ""],
+      ["consumer_group_unknown_lag_partitions", "", "", "", group.group, String(group.unknownPartitions)],
+    );
+  }
   const header = "metric,broker,logDir,topic,name,value";
   return [header, ...rows.map((row) => row.map(escapeCsvField).join(","))].join("\r\n") + "\r\n";
 }
