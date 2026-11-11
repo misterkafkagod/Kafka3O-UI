@@ -13,4 +13,9 @@ describe("startRestore", () => {
     const write = vi.fn<FetchGatewayWrite>().mockResolvedValue({ topic: "other", restoreId: "r-1" });
     await expect(startRestore(write, "https://gw", "orders")).rejects.toThrow("invalid restore response");
   });
+
+  it("returns the skipped object count", async () => {
+    const write = vi.fn<FetchGatewayWrite>().mockResolvedValue({ topic: "orders", restoreId: "r-1", objects: 2, skipped: 3 });
+    await expect(startRestore(write, "https://gw", "orders")).resolves.toEqual({ topic: "orders", restoreId: "r-1", objects: 2, skipped: 3 });
+  });
 });

@@ -1,6 +1,7 @@
 import type { FetchGatewayWrite } from "./GatewayWriteRequest";
 
-export type StartedRestore = { topic: string; restoreId: string; objects: number };
+// skipped counts stored objects written with another compression, which this restore does not read.
+export type StartedRestore = { topic: string; restoreId: string; objects: number; skipped?: number };
 
 export type StartRestore = (gatewayUrl: string, topic: string) => Promise<StartedRestore>;
 

@@ -9,6 +9,7 @@ import { describeBackupSettings } from "./describeBackupSettings";
 import { ErrorWithRetry } from "./ErrorWithRetry";
 import { StartTopicBackup } from "./StartTopicBackup";
 import { TopicBackupActions } from "./TopicBackupActions";
+import { TopicRestore } from "./TopicRestore";
 
 type TopicBackupProps = {
   gateway: GatewayEntry;
@@ -66,6 +67,7 @@ export function TopicBackup({ gateway, topicName, listBackups, actions }: TopicB
           </dl>
           {backup.error ? <p role="alert">{backup.error}</p> : null}
           {actions ? <TopicBackupActions backup={backup} gatewayUrl={gateway.url} actions={actions} onChanged={() => void refetch()} /> : null}
+          {actions ? <TopicRestore backup={backup} gatewayUrl={gateway.url} actions={actions} onStarted={() => void refetch()} /> : null}
           {backup.restore ? (
             <p role="status">
               {backup.restore.finished ? `Last restore finished: ${backup.restore.total} records restored.`

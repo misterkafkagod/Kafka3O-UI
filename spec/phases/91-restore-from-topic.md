@@ -22,7 +22,7 @@
   - Files: connect-plugins/kafka3o-restore-transform/pom.xml, src/main/java/dev/kafka3o/connect/BackupObjectKey.java, src/test/java/dev/kafka3o/connect/BackupObjectKeyTest.java, README.md
   - Do: object names may end in `.gz`, `.zst`, `.snappy` or nothing; version 1.1.0.
   - Done when: `mvn -B verify` passes with the new name cases.
-- [ ] **T91.4 UI: Restore on the topic's Backup tab** — Covers: F55-AC1
+- [x] **T91.4 UI: Restore on the topic's Backup tab** — Covers: F55-AC1
   - Files: src/gateway/startRestore.ts, src/gateway/startRestore.test.ts, src/components/TopicRestore.tsx (new), src/components/TopicRestore.test.tsx (new), src/components/TopicBackup.tsx, src/components/TopicBackup.test.tsx
   - Do: Restore button (disabled while a restore runs) with the F50 confirmation; notice names the stored objects and, when `skipped > 0`, says that many older objects in another compression are not restored; progress follows through `useBackups` polling.
   - Done when: `npx vitest run src/gateway/startRestore src/components/TopicRestore src/components/TopicBackup` passes covering start, skipped notice, cancel, a running restore disabling the button, and errors.

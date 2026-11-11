@@ -94,5 +94,16 @@ describe("TopicBackup", () => {
     expect(await screen.findByText("PAUSED")).toBeDefined();
     expect(screen.getByRole("button", { name: "Resume" })).toBeDefined();
   });
+
+  it("restores from the topic's tab and follows the progress", async () => {
+    const user = userEvent.setup();
+    const list = vi.fn<ListBackups>().mockResolvedValueOnce([orders])
+      .mockResolvedValue([{ ...orders, state: "PAUSED", restore: { restoreId: "r-1", state: "RUNNING", restored: 0, total: 5, finished: false } }]);
+    const restore = vi.fn().mockResolvedValue({ topic: "orders", restoreId: "r-1", objects: 2, skipped: 0 });
+    renderWithQuery(<TopicBackup gateway={gateway} topicName="orders" listBackups={list} actions={{ start: vi.fn(), restore, confirm: () => true }} />);
+    await user.click(await screen.findByRole("button", { name: "Restore" }));
+    expect(await screen.findByText("Restoring 0 of 5 records.")).toBeDefined();
+    expect((screen.getByRole("button", { name: "Restore running…" }) as HTMLButtonElement).disabled).toBe(true);
+  });
 });
 
