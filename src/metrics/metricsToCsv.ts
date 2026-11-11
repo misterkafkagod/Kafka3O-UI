@@ -68,6 +68,17 @@ export function metricsToCsv(metrics: ClusterMetrics): string {
     for (const state of connect.connectors) rows.push(["connect_connectors", "", "", "", state.state, String(state.count)]);
     for (const state of connect.tasks) rows.push(["connect_tasks", "", "", "", state.state, String(state.count)]);
   }
+  const backups = metrics.backups;
+  if (backups && !backups.notConfigured && !backups.error) {
+    for (const backup of backups.backups) {
+      rows.push(
+        ["backup_up", "", "", backup.topic, backup.state, backup.state === "RUNNING" ? "1" : "0"],
+        ["backup_restoring", "", "", backup.topic, "", backup.restoring ? "1" : "0"],
+        ["backup_stored_bytes", "", "", backup.topic, "", value(backup.storedBytes)],
+        ["backup_last_write", "", "", backup.topic, "", backup.lastWrite ?? ""],
+      );
+    }
+  }
   const header = "metric,broker,logDir,topic,name,value";
   return [header, ...rows.map((row) => row.map(escapeCsvField).join(","))].join("\r\n") + "\r\n";
 }

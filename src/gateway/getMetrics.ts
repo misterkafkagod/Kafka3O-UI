@@ -20,6 +20,12 @@ export type ClusterMetrics = {
   brokers?: { error?: string; brokers: BrokerLeaders[] };
   consumerGroups?: { error?: string; states: StateCount[]; groups: GroupLag[] };
   connect?: { error?: string; notConfigured?: boolean; connectors: StateCount[]; tasks: StateCount[]; failures: ConnectFailure[] };
+  backups?: { error?: string; notConfigured?: boolean; backups: BackupHealth[] };
+};
+
+// objects, storedBytes and lastWrite are null when the storage was not listed (storageListed false); lastWrite also when nothing was written.
+export type BackupHealth = {
+  topic: string; state: string; error?: string; storageListed: boolean; objects: number | null; storedBytes: number | null; lastWrite: string | null; restoring: boolean;
 };
 
 export type StateCount = { state: string; count: number };

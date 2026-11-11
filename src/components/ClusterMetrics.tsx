@@ -3,6 +3,7 @@ import type { GatewayEntry } from "../gateway/types";
 import { useMetrics } from "../hooks/useMetrics";
 import { useMetricsSamples } from "../hooks/useMetricsSamples";
 import { saveFile as browserSaveFile, type SaveFile } from "../metrics/saveFile";
+import { BackupMetrics } from "./BackupMetrics";
 import { BrokerDiskUse } from "./BrokerDiskUse";
 import { BrokerLeaders } from "./BrokerLeaders";
 import { ConnectMetrics } from "./ConnectMetrics";
@@ -45,6 +46,7 @@ export function ClusterMetrics({ gateway, getMetrics, saveFile = browserSaveFile
           {metrics.brokers ? <BrokerLeaders brokers={metrics.brokers} /> : null}
           {metrics.consumerGroups ? <ConsumerGroupMetrics gatewayId={gateway.id} consumerGroups={metrics.consumerGroups} /> : null}
           {metrics.connect ? <ConnectMetrics connect={metrics.connect} /> : null}
+          {metrics.backups ? <BackupMetrics gatewayId={gateway.id} readAt={metrics.readAt} backups={metrics.backups} /> : null}
           <TopicThroughput previous={previous} current={metrics} />
           <LargestTopics largestTopics={metrics.largestTopics} />
         </>

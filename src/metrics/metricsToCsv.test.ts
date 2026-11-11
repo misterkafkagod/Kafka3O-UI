@@ -86,5 +86,17 @@ describe("metricsToCsv", () => {
     expect(lines).toEqual(expect.arrayContaining(["connect_connectors,,,,RUNNING,4", "connect_tasks,,,,FAILED,1"]));
     expect(metricsToCsv({ ...metrics, connect: { notConfigured: true, connectors: [], tasks: [], failures: [] } })).not.toContain("connect_");
   });
+
+  it("writes each backup's health with the topic", () => {
+    const lines = metricsToCsv({ ...metrics, backups: { backups: [
+      { topic: "orders", state: "RUNNING", storageListed: true, objects: 10, storedBytes: 1900, lastWrite: "2026-11-11T03:30:30Z", restoring: false },
+      { topic: "paused", state: "PAUSED", storageListed: false, objects: null, storedBytes: null, lastWrite: null, restoring: true },
+    ] } }).split("\r\n");
+    expect(lines).toEqual(expect.arrayContaining([
+      "backup_up,,,orders,RUNNING,1", "backup_stored_bytes,,,orders,,1900", "backup_last_write,,,orders,,2026-11-11T03:30:30Z",
+      "backup_up,,,paused,PAUSED,0", "backup_restoring,,,paused,,1", "backup_stored_bytes,,,paused,,",
+    ]));
+    expect(metricsToCsv({ ...metrics, backups: { notConfigured: true, backups: [] } })).not.toContain("backup_");
+  });
 });
 
