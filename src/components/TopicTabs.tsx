@@ -20,6 +20,8 @@ export function TopicTabs({ gateway, topicName }: TopicTabsProps) {
       <NavLink to={`${topicPath}/consumers`}>Consumers</NavLink>
       {" | "}
       <NavLink to={`${topicPath}/configuration`}>Configuration &amp; partitions</NavLink>
+      {" | "}
+      <NavLink to={`${topicPath}/backup`}>Backup</NavLink>
     </nav>
   );
 }

@@ -26,6 +26,7 @@ import { BrokerConfigurationPage } from "./pages/BrokerConfigurationPage";
 import { ClustersPage } from "./pages/ClustersPage";
 import { TopicPage } from "./pages/TopicPage";
 import { TopicAdministrationPage } from "./pages/TopicAdministrationPage";
+import { TopicBackupPage } from "./pages/TopicBackupPage";
 
 type AppProps = {
   queryClient: QueryClient;
@@ -295,6 +296,10 @@ export function App({
           <Route
             path="/clusters/:gatewayId/topics/:topicName/configuration"
             element={<TopicAdministrationPage loadGatewayConfig={loadGatewayConfig} getCluster={getCluster} getTopicDetail={getTopicDetail} administration={administration} statusRefreshMs={statusRefreshMs} />}
+          />
+          <Route
+            path="/clusters/:gatewayId/topics/:topicName/backup"
+            element={<TopicBackupPage loadGatewayConfig={loadGatewayConfig} listBackups={listBackups} />}
           />
         </Routes>
       </AppShell>

@@ -13,4 +13,12 @@ describe("TopicTabs", () => {
     expect(tab.getAttribute("href")).toBe("/clusters/dev%20%26%20west/topics/orders%20%26%20audit/consumers");
     expect(tab.getAttribute("aria-current")).toBe("page");
   });
+
+  it("links the Backup tab", () => {
+    renderWithQuery(<TopicTabs gateway={{ id: "dev", name: "Dev", url: "http://localhost:8081" }} topicName="orders" />, "/clusters/dev/topics/orders/backup");
+    const tab = screen.getByRole("link", { name: "Backup" });
+    expect(tab.getAttribute("href")).toBe("/clusters/dev/topics/orders/backup");
+    expect(tab.getAttribute("aria-current")).toBe("page");
+    expect(screen.getByRole("link", { name: "Details" }).getAttribute("aria-current")).toBeNull();
+  });
 });

@@ -11,6 +11,13 @@ export type BackupRestore = {
   error?: string;
 };
 
+export type BackupSettings = {
+  startFrom: string;
+  compression: string;
+  // 0 means no limit: files are written at Kafka Connect's 60-second commit.
+  recordsPerFile: number;
+};
+
 export type TopicBackup = {
   topic: string;
   connector: string;
@@ -21,6 +28,8 @@ export type TopicBackup = {
   storage?: BackupStorage;
   // restore is present while a restore runs, and once when it has just finished.
   restore?: BackupRestore;
+  // settings are absent when the Gateway could not read the backup job's configuration.
+  settings?: BackupSettings;
 };
 
 export type ListBackups = (gatewayUrl: string) => Promise<TopicBackup[]>;
