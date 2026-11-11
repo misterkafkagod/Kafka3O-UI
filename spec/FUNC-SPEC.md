@@ -598,7 +598,7 @@ Set up and manage a topic's backup on that topic's Backup tab, choosing from a f
 **Acceptance criteria**
 - **F54-AC1** (B1) Running, paused, failed and missing backups each show their state and error, and the settings shown are the ones the connector actually uses
 - **F54-AC2** (B2) An invalid or out-of-range setting is refused before Connect is called, with a message naming it; the defaults produce exactly the M13 configuration; no browser value reaches the connector configuration except the validated settings
-- **F54-AC3** (B3) Starting, pausing, resuming and deleting need the F49-AC3 roles and Production rules and are audited; the start's audit records the chosen settings
+- **F54-AC3** (B3) Starting, pausing, resuming and deleting need the F49-AC3 roles and Production rules and are audited like every other write; the chosen settings stay visible on the topic's Backup tab
 
 **External dependencies:** Aiven S3 sink connector; see the [backup-settings-and-restore-filters discovery](./discovery/backup-settings-and-restore-filters.md) (a flush time cannot be set per connector, so it is not offered).
 
