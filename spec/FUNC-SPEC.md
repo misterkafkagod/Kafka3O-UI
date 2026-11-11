@@ -582,7 +582,7 @@ Export a cluster's metrics as a CSV/JSON download from the Metrics tab and throu
 - **F53-B2** A monitoring system scrapes the Gateway's metrics endpoint with its token → it receives the same metrics in Prometheus text format
 
 **Acceptance criteria**
-- **F53-AC1** (B1) The JSON file holds the same values as the tab plus `readAt`; the CSV has one row per value (`metric,broker,logDir,topic,value`); files are named `<cluster>-metrics-<UTC time>.json|csv`; unavailable values are left empty, not 0
+- **F53-AC1** (B1) The JSON file holds the same values as the tab plus `readAt`; the CSV has one row per value (`metric,broker,logDir,topic,name,value`; `name` holds a group, replica role, connector or state for M17 rows); files are named `<cluster>-metrics-<UTC time>.json|csv`; unavailable values are left empty, not 0
 - **F53-AC2** (B2) With a metrics listener and token configured, `GET /metrics` with `Authorization: Bearer <token>` returns Prometheus text with gauges for log directory bytes, partition counts by state and topic size, and a counter of topic end offsets; a missing or wrong token gets 401; without configuration the listener does not start; the listener serves nothing else
 
 **External dependencies:** the F41 metrics read; Prometheus text exposition format 0.0.4 (no Prometheus server is installed on EKS-D, so checks use `curl`).
