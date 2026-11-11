@@ -185,7 +185,6 @@ export function App({
                 createTopic={createTopic}
                 statusRefreshMs={statusRefreshMs}
                 view="backups"
-                backupActions={backupActions}
                 listBackups={listBackups}
               />
             }

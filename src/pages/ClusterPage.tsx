@@ -17,7 +17,6 @@ import type { CreateTopic as CreateAction } from "../gateway/createTopic";
 import type { GetMetrics } from "../gateway/getMetrics";
 import type { ListConnectors } from "../gateway/listConnectors";
 import type { ConnectorActions } from "../gateway/runConnectorAction";
-import type { BackupActions } from "../gateway/startBackup";
 import type { ListBackups } from "../gateway/listBackups";
 import { backupsNotConfigured } from "../gateway/backupsNotConfigured";
 import type { ListConsumerGroups } from "../gateway/listConsumerGroups";
@@ -36,14 +35,13 @@ type ClusterPageProps = {
   statusRefreshMs: number;
   view: "brokers" | "metrics" | "topics" | "consumer-groups" | "connect" | "backups";
   getMetrics?: GetMetrics;
-  backupActions?: BackupActions;
   listBackups?: ListBackups;
   listConnectors?: ListConnectors;
   connectorActions?: ConnectorActions;
   offsetReset?: OffsetResetActions;
 };
 
-export function ClusterPage({ loadGatewayConfig, getCluster, listTopics, listConsumerGroups, createTopic, statusRefreshMs, view, offsetReset, getMetrics, listConnectors = connectNotConfigured, connectorActions, backupActions, listBackups = backupsNotConfigured }: ClusterPageProps) {
+export function ClusterPage({ loadGatewayConfig, getCluster, listTopics, listConsumerGroups, createTopic, statusRefreshMs, view, offsetReset, getMetrics, listConnectors = connectNotConfigured, connectorActions, listBackups = backupsNotConfigured }: ClusterPageProps) {
   const { gatewayId, groupId } = useParams();
   const { data: gateways, isError, refetch } = useGatewayConfig(loadGatewayConfig);
 
@@ -63,7 +61,7 @@ export function ClusterPage({ loadGatewayConfig, getCluster, listTopics, listCon
       {view === "metrics" ? (
         getMetrics ? <ClusterMetrics gateway={gateway} getMetrics={getMetrics} /> : <main><h2>Metrics</h2><p>Metrics are not available in this console.</p></main>
       ) : view === "backups" ? (
-        <ClusterBackups gateway={gateway} listTopics={listTopics} listBackups={listBackups} actions={backupActions} />
+        <ClusterBackups gateway={gateway} listBackups={listBackups} />
       ) : view === "connect" ? (
         <ConnectConnectors gateway={gateway} listConnectors={listConnectors} actions={connectorActions} />
       ) : view === "consumer-groups" && groupId !== undefined ? (

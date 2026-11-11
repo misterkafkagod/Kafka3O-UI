@@ -1,14 +1,11 @@
-import { render, screen, waitFor, within } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { describe, expect, it, vi } from "vitest";
-import { HttpError } from "../gateway/HttpError";
-import type { RunBackupAction } from "../gateway/runBackupAction";
-import type { StartRestore } from "../gateway/startRestore";
+import { screen, within } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
+import { renderWithQuery } from "../test/renderWithQuery";
 import { BackupList } from "./BackupList";
 
 describe("BackupList", () => {
   it("lists state, location, last write and stored size, with errors below their row", () => {
-    render(<BackupList backups={[
+    renderWithQuery(<BackupList gatewayId="kafka-a" backups={[
       { topic: "orders", connector: "kafka3o-backup-orders", location: "s3://b/kafka-a/orders/", state: "RUNNING",
         storage: { objects: 2, storedBytes: 3072, lastWrite: "2026-11-10T08:01:00Z" } },
       { topic: "payments", connector: "kafka3o-backup-payments", location: "s3://b/kafka-a/payments/", state: "FAILED", error: "ConnectException: bucket gone",
@@ -22,84 +19,32 @@ describe("BackupList", () => {
     expect(within(row("payments")).getAllByRole("cell").slice(2).map((cell) => cell.textContent)).toEqual(["Nothing written yet", "0 B in 0 objects"]);
     expect(screen.getByRole("cell", { name: "Error for payments" }).textContent).toBe("ConnectException: bucket gone");
     expect(within(row("audit")).getAllByRole("cell").slice(2).map((cell) => cell.textContent)).toEqual(["Unknown", "Unknown"]);
+    expect(screen.queryByRole("button")).toBeNull();
+  });
+
+  it("links each topic to its Backup tab", () => {
+    renderWithQuery(<BackupList gatewayId="dev & west" backups={[
+      { topic: "orders & audit", connector: "kafka3o-backup-orders", location: "s3://b/x/", state: "RUNNING" }]} />);
+    expect(screen.getByRole("link", { name: "orders & audit" }).getAttribute("href")).toBe("/clusters/dev%20%26%20west/topics/orders%20%26%20audit/backup");
   });
 
   it("says when there are no backups", () => {
-    render(<BackupList backups={[]} />);
+    renderWithQuery(<BackupList gatewayId="kafka-a" backups={[]} />);
     expect(screen.getByText("No backups yet.")).toBeDefined();
   });
 
-  it("pauses, resumes and deletes after confirmation, keeping stored data", async () => {
-    const user = userEvent.setup();
-    const run = vi.fn<RunBackupAction>().mockResolvedValue(undefined);
-    const confirm = vi.fn(() => true);
-    const onChanged = vi.fn();
-    render(<BackupList gatewayUrl="https://gw" onChanged={onChanged} actions={{ start: vi.fn(), run, confirm }} backups={[
-      { topic: "orders", connector: "kafka3o-backup-orders", location: "s3://b/kafka-a/orders/", state: "RUNNING" },
-      { topic: "audit", connector: "kafka3o-backup-audit", location: "s3://b/kafka-a/audit/", state: "PAUSED" },
-    ]} />);
-    await user.click(screen.getByRole("button", { name: "Pause the backup of orders" }));
-    expect(run).toHaveBeenLastCalledWith("https://gw", "orders", "pause");
-    expect((await screen.findByRole("status")).textContent).toBe("Pause requested for the backup of orders.");
-    await user.click(screen.getByRole("button", { name: "Resume the backup of audit" }));
-    expect(run).toHaveBeenLastCalledWith("https://gw", "audit", "resume");
-    await user.click(screen.getByRole("button", { name: "Delete the backup job for orders" }));
-    expect(confirm).toHaveBeenLastCalledWith('Delete the backup job for "orders"? The stored objects are kept; only the job stops.');
-    expect(run).toHaveBeenLastCalledWith("https://gw", "orders", "delete");
-    await waitFor(() => expect(onChanged).toHaveBeenCalledTimes(3));
-  });
-
-  it("sends nothing when canceled and explains failures", async () => {
-    const user = userEvent.setup();
-    const run = vi.fn<RunBackupAction>().mockRejectedValue(new HttpError(503, "unknown", { code: "connect_action_unknown" }));
-    const confirm = vi.fn(() => false);
-    render(<BackupList gatewayUrl="https://gw" actions={{ start: vi.fn(), run, confirm }}
-      backups={[{ topic: "orders", connector: "kafka3o-backup-orders", location: "s3://b/kafka-a/orders/", state: "RUNNING" }]} />);
-    await user.click(screen.getByRole("button", { name: "Delete the backup job for orders" }));
-    expect(run).not.toHaveBeenCalled();
-    confirm.mockReturnValue(true);
-    await user.click(screen.getByRole("button", { name: "Delete the backup job for orders" }));
-    expect((await screen.findByRole("alert")).textContent).toBe("The change may have been applied. Refresh before retrying.");
-  });
-
-  it("restores into the topic only after an explicit append confirmation", async () => {
-    const user = userEvent.setup();
-    const restore = vi.fn<StartRestore>().mockResolvedValue({ topic: "orders", restoreId: "r-1", objects: 2 });
-    const confirm = vi.fn(() => false);
-    const onChanged = vi.fn();
-    render(<BackupList gatewayUrl="https://gw" onChanged={onChanged} actions={{ start: vi.fn(), restore, confirm }}
-      backups={[{ topic: "orders", connector: "kafka3o-backup-orders", location: "s3://b/kafka-a/orders/", state: "RUNNING" }]} />);
-    await user.click(screen.getByRole("button", { name: "Restore the backup of orders" }));
-    expect(confirm).toHaveBeenLastCalledWith(expect.stringContaining("appended to the topic, so messages still in it may be duplicated"));
-    expect(restore).not.toHaveBeenCalled();
-    confirm.mockReturnValue(true);
-    await user.click(screen.getByRole("button", { name: "Restore the backup of orders" }));
-    expect(restore).toHaveBeenCalledWith("https://gw", "orders");
-    expect((await screen.findByRole("status")).textContent).toBe("Restore started for orders from 2 stored objects.");
-    expect(onChanged).toHaveBeenCalledOnce();
-    restore.mockRejectedValueOnce(new HttpError(409, "busy", { code: "restore_in_progress" }));
-    await user.click(screen.getByRole("button", { name: "Restore the backup of orders" }));
-    expect((await screen.findByRole("alert")).textContent).toBe("A restore of this topic is already running.");
-  });
-
-  it("shows restore progress, completion and failure, and blocks a second restore while one runs", () => {
-    const restore = vi.fn<StartRestore>();
-    const { rerender } = render(<BackupList gatewayUrl="https://gw" actions={{ start: vi.fn(), restore, confirm: () => true }} backups={[
-      { topic: "orders", connector: "kafka3o-backup-orders", location: "s3://b/kafka-a/orders/", state: "PAUSED",
-        restore: { restoreId: "r-1", state: "RUNNING", restored: 12, total: 21, finished: false } },
-    ]} />);
+  it("shows restore progress, completion and failure", () => {
+    const backup = { topic: "orders", connector: "kafka3o-backup-orders", location: "s3://b/kafka-a/orders/", state: "PAUSED" };
+    const { unmount } = renderWithQuery(<BackupList gatewayId="kafka-a" backups={[
+      { ...backup, restore: { restoreId: "r-1", state: "RUNNING", restored: 12, total: 21, finished: false } }]} />);
     expect(screen.getByRole("cell", { name: "Restore of orders" }).textContent).toBe("Restoring 12 of 21 records.");
-    expect((screen.getByRole("button", { name: "Restore the backup of orders" }) as HTMLButtonElement).disabled).toBe(true);
-    rerender(<BackupList gatewayUrl="https://gw" actions={{ start: vi.fn(), restore, confirm: () => true }} backups={[
-      { topic: "orders", connector: "kafka3o-backup-orders", location: "s3://b/kafka-a/orders/", state: "RUNNING",
-        restore: { restoreId: "r-1", state: "RUNNING", restored: 21, total: 21, finished: true } },
-    ]} />);
+    unmount();
+    const finished = renderWithQuery(<BackupList gatewayId="kafka-a" backups={[
+      { ...backup, state: "RUNNING", restore: { restoreId: "r-1", state: "RUNNING", restored: 21, total: 21, finished: true } }]} />);
     expect(screen.getByRole("cell", { name: "Restore of orders" }).textContent).toBe("Last restore finished: 21 records restored.");
-    expect((screen.getByRole("button", { name: "Restore the backup of orders" }) as HTMLButtonElement).disabled).toBe(false);
-    rerender(<BackupList gatewayUrl="https://gw" actions={{ start: vi.fn(), restore, confirm: () => true }} backups={[
-      { topic: "orders", connector: "kafka3o-backup-orders", location: "s3://b/kafka-a/orders/", state: "PAUSED",
-        restore: { restoreId: "r-1", state: "FAILED", restored: 3, total: 21, finished: false, error: "DataException: malformed backup record" } },
-    ]} />);
+    finished.unmount();
+    renderWithQuery(<BackupList gatewayId="kafka-a" backups={[
+      { ...backup, restore: { restoreId: "r-1", state: "FAILED", restored: 3, total: 21, finished: false, error: "DataException: malformed backup record" } }]} />);
     expect(screen.getByRole("cell", { name: "Restore of orders" }).textContent).toBe("Restore failed: DataException: malformed backup record");
   });
 });
