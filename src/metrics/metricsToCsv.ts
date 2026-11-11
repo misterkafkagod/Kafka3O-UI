@@ -63,6 +63,11 @@ export function metricsToCsv(metrics: ClusterMetrics): string {
       ["consumer_group_unknown_lag_partitions", "", "", "", group.group, String(group.unknownPartitions)],
     );
   }
+  const connect = metrics.connect;
+  if (connect && !connect.notConfigured && !connect.error) {
+    for (const state of connect.connectors) rows.push(["connect_connectors", "", "", "", state.state, String(state.count)]);
+    for (const state of connect.tasks) rows.push(["connect_tasks", "", "", "", state.state, String(state.count)]);
+  }
   const header = "metric,broker,logDir,topic,name,value";
   return [header, ...rows.map((row) => row.map(escapeCsvField).join(","))].join("\r\n") + "\r\n";
 }

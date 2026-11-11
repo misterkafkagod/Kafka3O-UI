@@ -80,5 +80,11 @@ describe("metricsToCsv", () => {
       'consumer_group_unknown_lag_partitions,,,,"a,b",1',
     ]));
   });
+
+  it("writes Connect states, and nothing without Connect", () => {
+    const lines = metricsToCsv({ ...metrics, connect: { connectors: [{ state: "RUNNING", count: 4 }], tasks: [{ state: "FAILED", count: 1 }], failures: [] } }).split("\r\n");
+    expect(lines).toEqual(expect.arrayContaining(["connect_connectors,,,,RUNNING,4", "connect_tasks,,,,FAILED,1"]));
+    expect(metricsToCsv({ ...metrics, connect: { notConfigured: true, connectors: [], tasks: [], failures: [] } })).not.toContain("connect_");
+  });
 });
 

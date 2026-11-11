@@ -18,8 +18,14 @@ export type ClusterMetrics = {
   // M17 sections are optional so an older Gateway's answer still renders.
   quorum?: Quorum;
   brokers?: { error?: string; brokers: BrokerLeaders[] };
-  consumerGroups?: { error?: string; states: { state: string; count: number }[]; groups: GroupLag[] };
+  consumerGroups?: { error?: string; states: StateCount[]; groups: GroupLag[] };
+  connect?: { error?: string; notConfigured?: boolean; connectors: StateCount[]; tasks: StateCount[]; failures: ConnectFailure[] };
 };
+
+export type StateCount = { state: string; count: number };
+
+// task is null for a failed connector.
+export type ConnectFailure = { connector: string; task: number | null; error: string };
 
 // lag and maxPartitionLag are exact decimal sums of the partitions with known lag; unknownPartitions makes lag a lower bound.
 export type GroupLag = { group: string; state: string; members: number; lag: string | null; maxPartitionLag: string | null; unknownPartitions: number; error?: string };
