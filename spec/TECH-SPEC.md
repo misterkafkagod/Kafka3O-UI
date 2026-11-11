@@ -185,6 +185,11 @@ This design deliberately uses the existing central store for opaque delegation/i
 - Prometheus: an optional second listener `metrics.listen` (empty = off) on the Gateway's TLS certificate, serving only `GET /metrics` behind `httpapi.WithBearerAuth` with the token from `KAFKA3O_METRICS_TOKEN` (environment only; the listener refuses to start without it). Text exposition format 0.0.4 written with the Go standard library. Rejected: `prometheus/client_golang` (a dependency tree for a few gauges); serving `/metrics` on the API listener (secured Gateways accept only Console delegations).
 - UI: a Metrics tab per cluster polling every 10 seconds; downloads are built in the browser from the last response (`Blob` + object URL), no extra request.
 
+## M16 topic backup tab (planned)
+- Gateway: `POST /api/v1/backups` accepts optional `settings` validated against an allowlist (enums and bounded integers; unknown fields refused) and merged into the generated configuration; defaults give the M13 configuration. Backups are listed with their effective settings read back from Connect's connector configuration (only allowlisted keys). The restore request accepts optional `from`/`to` (RFC 3339) and `partitions`. No new dependencies. Details follow the backup-settings-and-restore-filters discovery.
+- Restore transform: may gain time and partition filtering (a jar update on the test worker, rescanned).
+- UI: route `/clusters/:id/topics/:topic/backup` reusing the backup components; the cluster Backups tab becomes a read-only overview with links.
+
 ## Structure
 ```
 Kafka3O-Gateway/

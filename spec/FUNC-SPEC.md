@@ -586,3 +586,43 @@ Export a cluster's metrics as a CSV/JSON download from the Metrics tab and throu
 - **F53-AC2** (B2) With a metrics listener and token configured, `GET /metrics` with `Authorization: Bearer <token>` returns Prometheus text with gauges for log directory bytes, partition counts by state and topic size, and a counter of topic end offsets; a missing or wrong token gets 401; without configuration the listener does not start; the listener serves nothing else
 
 **External dependencies:** the F41 metrics read; Prometheus text exposition format 0.0.4 (no Prometheus server is installed on EKS-D, so checks use `curl`).
+
+### F54 — Topic Backup tab with settings (planned M16)
+Set up and manage a topic's backup on that topic's Backup tab, choosing from a fixed set of settings that the Gateway turns into the connector configuration.
+
+**Behaviors**
+- **F54-B1** User opens a topic's Backup tab (after Configuration & partitions) → it shows the topic's backup with state, location, last write, size and its settings, or "No backup" with a Start form; a cluster without backup storage says so
+- **F54-B2** User starts a backup with settings (start point: oldest message or from now on; compression: gzip, zstd, snappy or none; maximum records per file; flush interval) → the Gateway builds the connector configuration from these choices only
+- **F54-B3** User pauses, resumes or deletes the backup from the tab → the same actions as F49-B3 under the same rules
+
+**Acceptance criteria**
+- **F54-AC1** (B1) Running, paused, failed and missing backups each show their state and error, and the settings shown are the ones the connector actually uses
+- **F54-AC2** (B2) An invalid or out-of-range setting is refused before Connect is called, with a message naming it; the defaults produce exactly the M13 configuration; no browser value reaches the connector configuration except the validated settings
+- **F54-AC3** (B3) Starting, pausing, resuming and deleting need the F49-AC3 roles and Production rules and are audited; the start's audit records the chosen settings
+
+**External dependencies:** Aiven S3 sink connector; per-connector flush time `discovery needed` (backup-settings-and-restore-filters).
+
+### F55 — Restore with a time range or partitions (planned M16)
+Restore a topic's backup from its Backup tab: everything, only messages in a time range, only chosen partitions, or both.
+
+**Behaviors**
+- **F55-B1** User restores everything from the topic's Backup tab → the F50 restore runs
+- **F55-B2** User restores a time range (from/to on message timestamps), chosen partitions, or both → after a confirmation naming the selection, only matching records are appended
+
+**Acceptance criteria**
+- **F55-AC1** (B1) Behaves as F50-AC1 to F50-AC3, started and followed from the topic's Backup tab
+- **F55-AC2** (B2) Only records inside the time range and the chosen partitions are appended, each with `kafka3o-restore`; progress and the automatic finish still work; an empty partition selection, an unknown partition, or a range whose start is after its end is refused before Connect
+- **F55-AC3** (B1, B2) A backup written with any offered compression restores losslessly
+
+**External dependencies:** Aiven S3 source connector and the Kafka3O restore transform; filtering and compression support `discovery needed` (backup-settings-and-restore-filters).
+
+### F56 — Cluster Backups overview (planned M16)
+The cluster's Backups tab lists every backup and leads to each topic's Backup tab.
+
+**Behaviors**
+- **F56-B1** User opens the cluster's Backups tab → backups are listed as in F49-B2, each topic links to its Backup tab, and the Start form is replaced by a hint to start backups from a topic
+
+**Acceptance criteria**
+- **F56-AC1** (B1) Clicking a backup's topic opens `/clusters/:id/topics/:topic/backup`; the tab offers no start, pause, resume, delete or restore controls
+
+**External dependencies:** none beyond F49.
