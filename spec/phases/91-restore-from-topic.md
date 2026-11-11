@@ -2,7 +2,7 @@
 - **Milestone:** M16
 - **Covers:** F55-AC1, F55-AC3
 - **Discovery:** discovery/backup-settings-and-restore-filters.md
-- **Status:** Building
+- **Status:** Done
 
 ## Demo
 1. Start a zstd backup of a test topic from its Backup tab and produce a few messages.
@@ -28,3 +28,9 @@
   - Done when: `npx vitest run src/gateway/startRestore src/components/TopicRestore src/components/TopicBackup` passes covering start, skipped notice, cancel, a running restore disabling the button, and errors.
 
 ## Review
+- **Demo:** unit tests cover zstd, snappy (including a real sink object from the discovery) and uncompressed reading, compression-aware snapshots and finishing, and the topic tab's restore; the live restore runs with the milestone deploy, which installs transform 1.1.0 (auto-approval, 2026-11-11)
+- **Tests:** Gateway `go test ./...` passed; transform `mvn -B verify` 9 tests passed; UI 620 passed (5 skipped); `tsc -b` clean
+- **Conventions:** one action per file (`BackupObjectCompression`, `OpenBackupObject`, `XerialSnappyReader` with its single `Read`, `TopicRestore`)
+- **Vulnerability scan:** `govulncheck@v1.9.0 ./...`: 0 called, 1 uncalled in required modules (unchanged); `klauspost/compress` v1.20.3 moved from indirect to direct, no advisory
+- **Notes:** objects of an earlier backup written with another compression are not restored; the restore notice says how many.
+

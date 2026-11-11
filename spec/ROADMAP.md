@@ -351,9 +351,9 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
     - Demo: starting a backup with zstd, from now on and 100 records per file writes `.zst` objects with only new messages within seconds; an out-of-range setting is refused with its name.
   - **P90** F54-B3 · Pause, resume and delete from the topic — Covers: F54-AC3 · Discovery: — · Status: Done
     - Demo: the topic's Backup tab pauses, resumes and deletes the backup, and the audit lists each action.
-  - **P91** F55-B1 · Restore everything from the topic — Covers: F55-AC1, F55-AC3 · Discovery: backup-settings-and-restore-filters · Status: Building
+  - **P91** F55-B1 · Restore everything from the topic — Covers: F55-AC1, F55-AC3 · Discovery: backup-settings-and-restore-filters · Status: Done
     - Demo: restoring a zstd backup from the topic's Backup tab appends its records, shows progress and finishes on its own.
-  - **P92** F55-B2 · Restore a time range or chosen partitions — Covers: F55-AC2 · Discovery: backup-settings-and-restore-filters · Status: Defined
+  - **P92** F55-B2 · Restore a time range or chosen partitions — Covers: F55-AC2 · Discovery: backup-settings-and-restore-filters · Status: Building
     - Demo: restoring partition 0 between two times appends only those records and finishes; a reversed range is refused.
   - **P93** F56-B1 · Cluster Backups overview — Covers: F56-AC1 · Discovery: — · Status: Defined
     - Demo: the cluster's Backups tab lists backups without actions, and a topic's name opens its Backup tab.
