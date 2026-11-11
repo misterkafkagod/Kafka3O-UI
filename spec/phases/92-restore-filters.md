@@ -22,6 +22,10 @@
   - Files: src/gateway/startRestore.ts, src/gateway/startRestore.test.ts, src/gateway/describeBackupError.ts, src/gateway/describeBackupError.test.ts, src/components/TopicRestore.tsx, src/components/TopicRestore.test.tsx, src/components/readRestoreFilter.ts (new), src/components/readRestoreFilter.test.ts (new), src/main.tsx
   - Do: "Everything" or "Only some messages" with from/to (`datetime-local`, local time, sent as UTC ISO) and partitions (comma-separated); `readRestoreFilter` validates before sending; the confirmation names the selection; the Gateway's refusal is shown.
   - Done when: `npx vitest run src/gateway/startRestore src/gateway/describeBackupError src/components/TopicRestore src/components/readRestoreFilter` passes covering everything, partitions only, window only, both, reversed window and bad partitions not sent.
+- [x] **T92.4 Fix: a second restore of a topic reused the first restore's offsets** — Covers: F55-AC2, F50-AC3 (found in the M16 live check)
+  - Files: Kafka3O-Gateway internal/backup/restore_connector_name.go, internal/backup/parse_restore_connector_name.go (new), their tests, internal/backup/list_backups.go, internal/backup/start_restore.go, and their tests
+  - Do: each restore's connector is named `kafka3o-restore-<topic>~<restore id>` (Connect keeps a deleted source connector's offsets, so a reused name made the next restore skip already-read objects and finish at once without writing); the topic is parsed back for listing and the one-restore-per-topic rule; older names still parse.
+  - Done when: `go test ./internal/backup/` passes and a second live restore of `kafka3o-m10-verify` appends its records.
 
 ## Review
 - **Demo:** transform, Gateway and component tests cover partitions only, window only, both, a window matching nothing (finishes at once), objects whose last line is outside the window, and every refusal before Connect; the live filtered restore runs with the milestone deploy (auto-approval, 2026-11-11)
