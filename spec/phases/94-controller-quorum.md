@@ -2,7 +2,7 @@
 - **Milestone:** M17
 - **Covers:** F58-AC2
 - **Discovery:** discovery/quorum-and-leader-metrics.md
-- **Status:** Building
+- **Status:** Done
 
 ## Demo
 1. Open Kafka A's Metrics tab: the Controller quorum section shows leader 1, its epoch and high watermark, and voter 1 with lag 0.
@@ -20,3 +20,9 @@
   - Done when: `npx vitest run src/components/QuorumHealth src/components/ClusterMetrics src/metrics/metricsToCsv` passes.
 
 ## Review
+- **Demo:** Gateway, adapter and component tests cover the demo (Kafka A's shape from the discovery, lagging follower, observer, no leader, refused read, CSV and Prometheus rows); the browser and live checks run with the milestone (auto-approval, 2026-11-11)
+- **Tests:** Gateway `go test ./...` passed; UI 631 passed (5 skipped); `tsc -b` clean
+- **Conventions:** `ReadQuorum` (port + adapter), `CompareQuorumReplicas`, `QuorumHealth` are single actions; `Sources` is a data-only struct so later sections do not grow `NewGetMetrics`
+- **Vulnerability scan:** not needed (no dependency change)
+- **Notes:** the CSV now has a `name` column (`metric,broker,logDir,topic,name,value`); earlier rows leave it empty.
+
