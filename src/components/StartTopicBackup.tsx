@@ -69,7 +69,8 @@ export function StartTopicBackup({ gateway, topicName, actions, onStarted }: Sta
           aria-invalid={recordsInvalid} onChange={(event) => setRecords(event.target.value)} />
         <button type="submit" disabled={pending}>{pending ? "Starting…" : "Start backup"}</button>
       </form>
-      <p id={`${id}-records-hint`}>0 means no limit: files are written every 60 seconds. A limit also writes files as messages arrive.</p>
+      <p id={`${id}-records-hint`}>Files are written to the storage every 60 seconds; a limit splits them into smaller files (0 means no limit).
+        If this topic was backed up before, the new backup continues where the previous one stopped.</p>
       {notice ? <p role="status">{notice}</p> : null}
       {error ? <p role="alert">{error}</p> : null}
     </section>

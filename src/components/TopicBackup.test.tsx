@@ -24,7 +24,7 @@ describe("TopicBackup", () => {
     expect(within(details).getByText(`${formatBytes(2048)} in 2 objects`)).toBeDefined();
     expect(within(details).getByText("Messages from when the backup started")).toBeDefined();
     expect(within(details).getByText("zstd")).toBeDefined();
-    expect(within(details).getByText("Up to 100 per file, written as messages arrive")).toBeDefined();
+    expect(within(details).getByText("Up to 100 per file")).toBeDefined();
   });
 
   it("shows paused and failed backups with their error", async () => {

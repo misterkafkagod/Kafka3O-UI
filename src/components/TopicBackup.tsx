@@ -29,7 +29,8 @@ export function TopicBackup({ gateway, topicName, listBackups, actions }: TopicB
   return (
     <section aria-labelledby="topic-backup-heading">
       <h3 id="topic-backup-heading">Backup</h3>
-      <p>The backup copies this topic's messages continuously to the cluster's S3 backup storage through Kafka Connect.</p>
+      <p>The backup copies this topic's messages continuously to the cluster's S3 backup storage through Kafka Connect.
+        New messages reach the storage within about a minute.</p>
       {isError && code === "backups_not_configured" ? (
         <p role="status">Backups are not configured for this cluster.</p>
       ) : isError && code === "connect_unreachable" ? (

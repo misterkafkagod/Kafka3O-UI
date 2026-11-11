@@ -592,7 +592,7 @@ Set up and manage a topic's backup on that topic's Backup tab, choosing from a f
 
 **Behaviors**
 - **F54-B1** User opens a topic's Backup tab (after Configuration & partitions) → it shows the topic's backup with state, location, last write, size and its settings, or "No backup" with a Start form; a cluster without backup storage says so
-- **F54-B2** User starts a backup with settings (start point: oldest message or from now on; compression: gzip, zstd, snappy or none; maximum records per file, which also makes files be written as messages arrive instead of every 60 s) → the Gateway builds the connector configuration from these choices only
+- **F54-B2** User starts a backup with settings (start point: oldest message or from now on; compression: gzip, zstd, snappy or none; maximum records per file, which splits the files written at Kafka Connect's 60-second commit; a backup started again for a topic continues where the topic's previous backup job stopped) → the Gateway builds the connector configuration from these choices only
 - **F54-B3** User pauses, resumes or deletes the backup from the tab → the same actions as F49-B3 under the same rules
 
 **Acceptance criteria**

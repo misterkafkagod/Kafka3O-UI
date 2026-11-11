@@ -11,8 +11,6 @@ export function describeBackupSettings(settings: BackupSettings | undefined): Ba
   return {
     startFrom: settings.startFrom === "latest" ? "Messages from when the backup started" : settings.startFrom === "earliest" ? "From the oldest message" : settings.startFrom,
     compression: compressions[settings.compression] ?? settings.compression,
-    recordsPerFile: settings.recordsPerFile > 0
-      ? `Up to ${settings.recordsPerFile.toLocaleString("en-US")} per file, written as messages arrive`
-      : "No limit, written every 60 seconds",
+    recordsPerFile: settings.recordsPerFile > 0 ? `Up to ${settings.recordsPerFile.toLocaleString("en-US")} per file` : "No limit",
   };
 }

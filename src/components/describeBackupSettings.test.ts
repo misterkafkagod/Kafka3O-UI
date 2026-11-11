@@ -4,12 +4,12 @@ import { describeBackupSettings } from "./describeBackupSettings";
 describe("describeBackupSettings", () => {
   it("describes the defaults", () => {
     expect(describeBackupSettings({ startFrom: "earliest", compression: "gzip", recordsPerFile: 0 })).toEqual({
-      startFrom: "From the oldest message", compression: "gzip", recordsPerFile: "No limit, written every 60 seconds" });
+      startFrom: "From the oldest message", compression: "gzip", recordsPerFile: "No limit" });
   });
 
   it("describes chosen settings", () => {
     expect(describeBackupSettings({ startFrom: "latest", compression: "none", recordsPerFile: 1500 })).toEqual({
-      startFrom: "Messages from when the backup started", compression: "None", recordsPerFile: "Up to 1,500 per file, written as messages arrive" });
+      startFrom: "Messages from when the backup started", compression: "None", recordsPerFile: "Up to 1,500 per file" });
   });
 
   it("shows unexpected values as they are, and unknown settings as Unknown", () => {

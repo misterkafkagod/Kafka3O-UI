@@ -15,7 +15,7 @@
 ### 2. zstd, from now on, 2 records per file — 2026-11-11
 - **Tried:** probe sink `kafka3o-probe-m16-zstd` (prefix `probe-m16/zstd/…`, `file.compression.type=zstd`, `consumer.override.auto.offset.reset=latest`, `file.max.records=2`), then produced 5 and later 5 more records to `kafka3o-m10-verify` from the Connect pod.
 - **Result:** objects `kafka3o-m10-verify-<p>-<offset>.zst` appeared within 1–4 s of producing, both batches (101 s apart, so not the 60 s commit); partition 0's first object starts at offset 33, skipping the 33 older records; a partition with 3 records got files at offsets 33 and 35. The M13 backup (no `file.max.records`) wrote the same partition-1 record 28 s later, at its 60 s commit.
-- **Learned:** `latest` backs up only new messages; `file.max.records` caps records per object and makes the sink write objects as each batch arrives; without it objects are written at the worker's 60 s commit.
+- **Learned:** `latest` backs up only new messages; `file.max.records` caps records per object. (Corrected 2026-11-11 by the M16 live check: objects are written at the worker's 60 s commit either way; these writes only happened to follow commits.)
 
 ### 3. snappy and none — 2026-11-11
 - **Tried:** probe sinks with `snappy` and `none`, 2 records produced.
@@ -41,7 +41,8 @@
 1. Backup settings → sink configuration (defaults give the M13 configuration):
    - start point `earliest` | `latest` → `consumer.override.auto.offset.reset`
    - compression `gzip` | `zstd` | `snappy` | `none` → `file.compression.type`
-   - records per file 0 (unlimited, objects at the worker's 60 s commit) or 1–1,000,000 → `file.max.records` (objects written as batches arrive)
+   - records per file 0 (unlimited) or 1–1,000,000 → `file.max.records`; objects are written at the worker's 60 s commit either way
+   - the sink's consumer group is `connect-<connector name>`, so a backup started again for a topic resumes from the deleted job's committed offsets and the start point applies only to a topic never backed up before
 2. Effective settings are read back from `GET /connectors/<backup>/config` (only these three keys).
 3. Restore: `file.compression.type` and the template's extension follow the backup's compression; the snapshot is the objects with that extension.
 4. Partitions: the snapshot boundary and the expected objects list only the chosen partitions.
