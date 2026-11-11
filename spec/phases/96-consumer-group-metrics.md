@@ -2,7 +2,7 @@
 - **Milestone:** M17
 - **Covers:** F57-AC1
 - **Discovery:** —
-- **Status:** Building
+- **Status:** Done
 
 ## Demo
 1. Kafka A's Metrics tab: the Consumer groups section counts groups by state and lists each group's state, members, total lag and largest partition lag, the largest lag first.
@@ -19,3 +19,9 @@
   - Done when: `npx vitest run src/components/ConsumerGroupMetrics src/metrics/metricsToCsv` passes.
 
 ## Review
+- **Demo:** unit and component tests cover the demo (exact sums above 2^53, partly unknown and unknown lag, erroring and empty groups, ordering, CSV and Prometheus rows, failed read); live checks run with the milestone (auto-approval, 2026-11-11)
+- **Tests:** Gateway `go test ./...` passed; UI 637 passed (5 skipped); `tsc -b` clean
+- **Conventions:** `SummarizeConsumerGroups`, `CompareGroupLags`, `CompareStateCounts`, `ConsumerGroupMetrics` are single actions
+- **Vulnerability scan:** not needed
+- **Notes:** a partly unknown total lag is shown as "At least N" on the tab and left out of Prometheus and the CSV, which carry the unknown partition count instead.
+
