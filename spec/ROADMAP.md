@@ -342,7 +342,7 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
     - Demo: `curl` with the metrics token returns Prometheus text from Kafka A's Gateway; without it, 401.
 
 ### M16 — Back up and restore a topic from its own page
-- **Status:** Active
+- **Status:** Done
 - **Features:** F54, F55, F56
 - **Phases:**
   - **P88** F54-B1 · Topic Backup tab — Covers: F54-AC1 · Discovery: — · Status: Done
@@ -355,7 +355,7 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
     - Demo: restoring a zstd backup from the topic's Backup tab appends its records, shows progress and finishes on its own.
   - **P92** F55-B2 · Restore a time range or chosen partitions — Covers: F55-AC2 · Discovery: backup-settings-and-restore-filters · Status: Done
     - Demo: restoring partition 0 between two times appends only those records and finishes; a reversed range is refused.
-  - **P93** F56-B1 · Cluster Backups overview — Covers: F56-AC1 · Discovery: — · Status: Building
+  - **P93** F56-B1 · Cluster Backups overview — Covers: F56-AC1 · Discovery: — · Status: Done
     - Demo: the cluster's Backups tab lists backups without actions, and a topic's name opens its Backup tab.
 
 ## Backlog
@@ -400,6 +400,7 @@ Redpanda-only Shadow Links, its Admin API, and Redpanda-specific diagnostic oper
 
 ### Existing verification debt
 - **Security debt (M13 exception):** Aiven S3 connectors 3.4.3 carry 4 critical and 41 high advisories; allowed only on the EKS-D test cluster by the user's test-only exception (2026-11-10). Replace the vulnerable bundled jars or rebuild the connectors, and rescan, before any production use.
+- **Verification debt:** M16 on EKS-D: deploy the Gateway and UI and install restore transform 1.1.0 on the test Connect worker (replacing 1.0.0, then restart it), then on Kafka A start a zstd backup of a test topic from its Backup tab, restore it fully and by partition and time range, and check that Kafka B says backups are not configured.
 - **Verification debt:** M15 on EKS-D: deploy, then check Kafka A's and Kafka B's Metrics tabs and `curl` gateway-a's `/metrics` with the token from `kafka3o-metrics-token` (and 401 without it).
 - **Verification debt:** M12 on EKS-D (2026-11-10): verified live on Kafka A except a Production offset reset, because Kafka B has no consumer group to reset and creating one from a shell in the cluster was not permitted in that session; Production rules for writes are covered by the Gateway and secured-mode tests.
 - **Verification debt:** Deploy M11 to the EKS-D secured stack (`deploy.sh`) and repeat the P63/P65 checks there and in the user's own browser; M11 was verified against the local Console fixture and `vite preview` because the redeploy was not permitted in the building session.
@@ -411,6 +412,7 @@ Redpanda-only Shadow Links, its Admin API, and Redpanda-specific diagnostic oper
 - **Verification debt:** Run the Cognito sign-in, group refresh and logout integration against a real User Pool when an AWS account and app client become available; fixture tests are not evidence of live provider compatibility.
 
 ## Learnings
+- 2026-11-11 (M16 retro): P88–P93 deliver F54, F55 and F56: each topic has a Backup tab showing the backup's state and effective settings (read back from Connect), starting a backup with a start point, compression and records per file, pausing, resuming and deleting it, and restoring everything, a time range or chosen partitions; the cluster's Backups tab is a read-only overview linking to each topic. What worked: probing the real connectors first showed that dropped records commit no offset and that `recordCount` is a line number, which kept filtered restores' finish exact; a real snappy object confirmed the xerial layout before shipping the reader. What didn't: recording the settings in the audit would have touched the M10 delegation core, so F54-AC3 was narrowed; the flush time could not be offered per connector. Next: deploy (Gateway, UI, transform 1.1.0) and run the live checks; a windowed restore's progress advances per object.
 - 2026-11-11 (P89 plan): F54-AC3 no longer asks the audit to record the backup settings: Console audit states hold only role or environment tokens and the delegation carries no request details, so recording settings would change the M10 delegation and storage core. The settings stay visible on the topic's Backup tab, read back from Connect.
 - 2026-11-11 (backup-settings-and-restore-filters): compression (gzip, zstd, snappy, none) and records per file are per connector, the flush time is not (worker-wide 60 s), so it is dropped; `file.max.records` also makes the sink write objects as batches arrive. Records dropped by a transform commit no offset and `recordCount` is the last written line number, so filtered restores keep the exact finish check by expecting each object's last matching line. The source reads every compression losslessly.
 - 2026-11-10 (re-plan): Added M16 (F54 topic Backup tab with settings, F55 restores by time range or partitions, F56 cluster Backups as an overview). User choices: settings = start point, compression, records per file and flush time (no editing a running backup; change = delete and start again); restore = everything, a time range, chosen partitions; the cluster Backups tab stays as an overview linking to each topic. Per-connector flush time and the source's compression support need discovery. Standing auto-approval for M16.

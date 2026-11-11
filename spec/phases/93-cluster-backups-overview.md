@@ -2,7 +2,7 @@
 - **Milestone:** M16
 - **Covers:** F56-AC1
 - **Discovery:** —
-- **Status:** Building
+- **Status:** Done
 
 ## Demo
 1. Open Kafka A's Backups tab: every backup is listed with state, location, last write, size and restore progress, and no action buttons.
@@ -19,3 +19,8 @@
   - Done when: `npx vitest run src/components/TopicBackup` passes and the demo screenshot shows label and value on one line.
 
 ## Review
+- **Demo:** local browser demo against a simulated Gateway (vite preview + Chromium 1194), 17/17 checks across P88–P93: settings shown, Start with settings and the refused record limit, pause/resume/delete, restore with progress and the skipped-object notice, a filtered restore (reversed range refused, Gateway refusal shown, selection sent), and the cluster overview's links without actions (auto-approval, 2026-11-11). The live EKS-D demo waits for the deployment.
+- **Tests:** UI 625 passed (5 skipped); `tsc -b` clean
+- **Conventions:** `BackupList` and `ClusterBackups` lost their action code; the unused `StartBackup` and `isConnectStorageTopic` were removed
+- **Vulnerability scan (milestone):** `npm audit`: 0; `govulncheck@v1.9.0 ./...`: 0 called, 1 uncalled (unchanged); restore transform 1.1.0 bundles no runtime dependencies (connect-api provided)
+
