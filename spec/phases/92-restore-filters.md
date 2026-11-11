@@ -2,7 +2,7 @@
 - **Milestone:** M16
 - **Covers:** F55-AC2
 - **Discovery:** discovery/backup-settings-and-restore-filters.md
-- **Status:** Building
+- **Status:** Done
 
 ## Demo
 1. On a backed-up test topic's Backup tab choose "Only some messages", partition 0 and a time range covering part of its messages, and confirm.
@@ -24,3 +24,9 @@
   - Done when: `npx vitest run src/gateway/startRestore src/gateway/describeBackupError src/components/TopicRestore src/components/readRestoreFilter` passes covering everything, partitions only, window only, both, reversed window and bad partitions not sent.
 
 ## Review
+- **Demo:** transform, Gateway and component tests cover partitions only, window only, both, a window matching nothing (finishes at once), objects whose last line is outside the window, and every refusal before Connect; the live filtered restore runs with the milestone deploy (auto-approval, 2026-11-11)
+- **Tests:** transform `mvn -B verify` 14 tests passed; Gateway `go test ./...` passed; UI 631 passed (5 skipped); `tsc -b` clean
+- **Conventions:** `ValidateRestoreFilter`, `ScanObjectRecords` (replaces `CountObjectRecords`), `TimeWindow`, `readRestoreFilter` are single actions; `TimeWindow`'s parsing was folded into its constructor to avoid a private helper
+- **Vulnerability scan:** not needed (no dependency change)
+- **Notes:** progress of a windowed restore counts an object's records once its last matching line is committed, so it advances per object rather than per record.
+
