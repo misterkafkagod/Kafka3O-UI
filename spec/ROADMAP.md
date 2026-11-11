@@ -345,7 +345,7 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
 - **Status:** Active
 - **Features:** F54, F55, F56
 - **Phases:**
-  - **P88** F54-B1 · Topic Backup tab — Covers: F54-AC1 · Discovery: — · Status: Review
+  - **P88** F54-B1 · Topic Backup tab — Covers: F54-AC1 · Discovery: — · Status: Done
     - Demo: `kafka3o-m10-verify`'s Backup tab shows its backup's state, location, last write, size and settings; a topic without a backup shows "No backup"; Kafka B says backups are not configured.
   - **P89** F54-B2 · Start a backup with settings — Covers: F54-AC2 · Discovery: backup-settings-and-restore-filters · Status: Defined
     - Demo: starting a backup with zstd, from now on and 100 records per file writes `.zst` objects with only new messages within seconds; an out-of-range setting is refused with its name.

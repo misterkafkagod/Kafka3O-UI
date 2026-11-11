@@ -2,7 +2,7 @@
 - **Milestone:** M16
 - **Covers:** F54-AC1
 - **Discovery:** discovery/backup-settings-and-restore-filters.md
-- **Status:** Review
+- **Status:** Done
 
 ## Demo
 1. Open `kafka3o-m10-verify` on Kafka A and choose the Backup tab.
@@ -20,3 +20,8 @@
   - Done when: `npx vitest run src/components/TopicBackup src/components/describeBackupSettings src/components/TopicTabs` passes covering running, paused, failed, missing, not-configured and unknown-settings cases.
 
 ## Review
+- **Demo:** component tests cover each demo state (running/paused/failed with settings, no backup, not configured, Connect unreachable); the browser demo runs with the milestone (auto-approval, 2026-11-11)
+- **Tests:** Gateway `go test ./...` passed; UI `vitest run` 598 passed (5 skipped); `tsc -b` clean
+- **Conventions:** one action per file (`ReadBackupOptions`, `describeBackupSettings`, `TopicBackup`, `TopicBackupPage`); `ListBackups` gets the config reader injected
+- **Vulnerability scan:** not needed (no dependency change)
+
