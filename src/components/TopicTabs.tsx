@@ -11,11 +11,11 @@ export function TopicTabs({ gateway, topicName }: TopicTabsProps) {
 
   return (
     <nav aria-label="Topic views">
+      <NavLink to={`${topicPath}/messages`}>Messages</NavLink>
+      {" | "}
       <NavLink to={topicPath} end>
         Details
       </NavLink>
-      {" | "}
-      <NavLink to={`${topicPath}/messages`}>Messages</NavLink>
       {" | "}
       <NavLink to={`${topicPath}/consumers`}>Consumers</NavLink>
       {" | "}

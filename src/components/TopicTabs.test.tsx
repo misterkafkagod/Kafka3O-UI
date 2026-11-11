@@ -21,4 +21,9 @@ describe("TopicTabs", () => {
     expect(tab.getAttribute("aria-current")).toBe("page");
     expect(screen.getByRole("link", { name: "Details" }).getAttribute("aria-current")).toBeNull();
   });
+
+  it("puts Messages first", () => {
+    renderWithQuery(<TopicTabs gateway={{ id: "dev", name: "Dev", url: "http://localhost:8081" }} topicName="orders" />, "/clusters/dev/topics/orders");
+    expect(screen.getAllByRole("link").map((link) => link.textContent)).toEqual(["Messages", "Details", "Consumers", "Configuration & partitions", "Backup"]);
+  });
 });

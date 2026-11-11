@@ -44,6 +44,7 @@ describe("ConfigurationEditor", () => {
     expect(within(screen.getByRole("dialog", { name: "log.retention.ms" })).getByText("Retention time")).toBeDefined();
     await user.click(screen.getByRole("button", { name: "Close" }));
     const edit = screen.getByRole("button", { name: "Edit log.retention.ms" });
+    expect(edit.textContent).toBe("Edit");
     await user.click(edit);
     expect(document.activeElement).toBe(screen.getByRole("form", { name: "Edit log.retention.ms" }));
     await user.click(screen.getByRole("button", { name: "Cancel" }));

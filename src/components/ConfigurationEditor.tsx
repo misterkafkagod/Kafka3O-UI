@@ -174,7 +174,7 @@ export function ConfigurationEditor({ gateway, resource, administration, ready =
                     <td>{entry.source.replaceAll("_", " ").toLowerCase()}</td>
                     <td>
                       {entry.sensitive ? "Sensitive" : entry.readOnly ? "Read-only" : (
-                        <button type="button" disabled={pending || uncertain || !ready} onClick={(event) => edit(entry, event.currentTarget)}>Edit {entry.name}</button>
+                        <button type="button" disabled={pending || uncertain || !ready} aria-label={`Edit ${entry.name}`} onClick={(event) => edit(entry, event.currentTarget)}>Edit</button>
                       )}
                     </td>
                   </tr>
