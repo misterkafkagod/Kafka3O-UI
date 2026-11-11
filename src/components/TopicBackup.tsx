@@ -6,6 +6,7 @@ import { formatBytes } from "../groups/formatBytes";
 import { useBackups } from "../hooks/useBackups";
 import styles from "./BackupList.module.css";
 import { describeBackupSettings } from "./describeBackupSettings";
+import detailStyles from "./TopicBackup.module.css";
 import { ErrorWithRetry } from "./ErrorWithRetry";
 import { StartTopicBackup } from "./StartTopicBackup";
 import { TopicBackupActions } from "./TopicBackupActions";
@@ -47,7 +48,7 @@ export function TopicBackup({ gateway, topicName, listBackups, actions }: TopicB
         </>
       ) : (
         <>
-          <dl aria-label={`Backup of ${topicName}`}>
+          <dl aria-label={`Backup of ${topicName}`} className={detailStyles.details}>
             <dt>State</dt>
             <dd className={styles.state}>{backup.state ?? "Unknown"}</dd>
             <dt>Location</dt>
