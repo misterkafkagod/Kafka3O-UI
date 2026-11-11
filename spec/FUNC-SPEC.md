@@ -626,3 +626,41 @@ The cluster's Backups tab lists every backup and leads to each topic's Backup ta
 - **F56-AC1** (B1) Clicking a backup's topic opens `/clusters/:id/topics/:topic/backup`; the tab offers no start, pause, resume, delete or restore controls
 
 **External dependencies:** none beyond F49.
+
+### F57 — Consumer group metrics (planned M17)
+Each consumer group's state, member count and lag on the Metrics tab, in the JSON/CSV downloads and in the Prometheus endpoint.
+
+**Behaviors**
+- **F57-B1** User opens the Metrics tab → a Consumer groups section shows group counts by state and, per group, its state, members, total lag and largest partition lag, the largest total lag first; a group whose lag is partly unknown says so
+
+**Acceptance criteria**
+- **F57-AC1** (B1) The section, the downloads and Prometheus (`kafka3o_consumer_group_lag`, `kafka3o_consumer_group_max_partition_lag`, `kafka3o_consumer_groups{state}`) show the same values; unknown lag is never written as 0; a failed group read shows "Unavailable" with the reason and `kafka3o_metrics_section_up{section="consumerGroups"} 0`
+
+**External dependencies:** the existing consumer group snapshot (F10/F52).
+
+### F58 — Controller quorum and leader balance (planned M17)
+The KRaft controller quorum's health and how partition leaders are spread over brokers.
+
+**Behaviors**
+- **F58-B1** User opens the Metrics tab → a Brokers section shows, per broker, its partition leaders, replicas and leaders that are not the preferred replica
+- **F58-B2** User opens the Metrics tab → a Controller quorum section shows the leader, each voter and observer with how far it is behind the leader; a quorum Kafka will not describe shows "Unavailable" with the reason
+
+**Acceptance criteria**
+- **F58-AC1** (B1) Leader and replica counts per broker add up to the cluster's partitions and replicas; non-preferred leaders are counted per broker; the same values are in the downloads and Prometheus
+- **F58-AC2** (B2) The quorum section, downloads and Prometheus (`kafka3o_quorum_leader`, `kafka3o_quorum_replica_lag`) show the leader and each replica's lag behind the leader's log end; a refused read shows its reason and `section_up 0`
+
+**External dependencies:** Kafka DescribeQuorum (`discovery needed`: quorum-and-leader-metrics).
+
+### F59 — Connect and backup health (planned M17)
+Kafka Connect connector and task states and each backup's health.
+
+**Behaviors**
+- **F59-B1** User opens the Metrics tab → a Kafka Connect section counts connectors and tasks by state and lists failed ones; a cluster without Connect says so
+- **F59-B2** User opens the Metrics tab → a Backups section shows each backup's state, time since its last write, stored size and any running restore; a cluster without backups says so
+
+**Acceptance criteria**
+- **F59-AC1** (B1) Counts match the Connect tab; the downloads and Prometheus (`kafka3o_connect_connectors{state}`, `kafka3o_connect_tasks{state}`) carry them; an unreachable Connect is "Unavailable", not zero
+- **F59-AC2** (B2) Each backup's state, last write age and stored bytes are on the tab, in the downloads and in Prometheus (`kafka3o_backup_up`, `kafka3o_backup_last_write_timestamp_seconds`, `kafka3o_backup_stored_bytes`); reading metrics never finishes or changes a restore
+
+**External dependencies:** the Gateway's Connect and backup reads (F35, F49).
+

@@ -192,6 +192,11 @@ This design deliberately uses the existing central store for opaque delegation/i
 - Restores: optional `from`/`to` (RFC 3339, `[from, to)`) and `partitions` in the restore request. The source's `file.compression.type` and template extension follow the backup's compression. Partitions narrow the snapshot boundary and the expected objects. For a time range the transform drops records outside it (`transforms.unwrap.time.from`/`time.to`, epoch ms) and the Gateway expects, per object, the line number of the last line in range, leaving out objects without one; the finish rule is unchanged. The transform (1.1.0) also accepts every extension; it bundles no runtime dependencies (connect-api provided), and installing it replaces 1.0.0 on the test worker.
 - UI: route `/clusters/:id/topics/:topic/backup` reusing the backup components; the cluster Backups tab becomes a read-only overview with links.
 
+## M17 alert-worthy metrics (planned)
+- `GET /api/v1/metrics` gains sections `consumerGroups`, `brokers`, `quorum`, `connect` and `backups`, each with its own `error`; the Prometheus writer, CSV and UI follow the M15 rules (unknown is left out, never 0; `kafka3o_metrics_section_up` per section).
+- Sources: the consumer-group snapshot reader, the partition metadata already read for health (leaders, replicas, preferred replica = first replica), DescribeQuorum (quorum-and-leader-metrics discovery), Connect's connector list, and the backup list built without the restore check so a metrics read or scrape has no side effects.
+- Prometheus label cardinality is bounded by the cluster's groups, brokers, connectors and backups.
+
 ## Structure
 ```
 Kafka3O-Gateway/
