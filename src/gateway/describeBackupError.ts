@@ -26,6 +26,10 @@ export function describeBackupError(error: unknown): string {
       return "This topic is already backed up.";
     case "backups_not_configured":
       return "Backups are not configured for this cluster.";
+    case "invalid_backup_settings":
+      // The Gateway's detail names the refused field, e.g. "the backup settings are invalid: compression must be …".
+      return error instanceof HttpError && error.problem?.detail
+        ? `${error.problem.detail.charAt(0).toUpperCase()}${error.problem.detail.slice(1)}.` : "The backup settings are invalid.";
     case "invalid_topic":
       return "Choose a valid topic.";
     case "connect_rejected":

@@ -299,7 +299,7 @@ export function App({
           />
           <Route
             path="/clusters/:gatewayId/topics/:topicName/backup"
-            element={<TopicBackupPage loadGatewayConfig={loadGatewayConfig} listBackups={listBackups} />}
+            element={<TopicBackupPage loadGatewayConfig={loadGatewayConfig} listBackups={listBackups} backupActions={backupActions} />}
           />
         </Routes>
       </AppShell>

@@ -13,6 +13,9 @@ describe("describeBackupError", () => {
     expect(describeBackupError(new HttpError(404, "gone", { code: "not_found" }))).toBe("This topic no longer has a backup. Refresh the list.");
     expect(describeBackupError(new HttpError(404, "none", { code: "backups_not_configured" }))).toBe("Backups are not configured for this cluster.");
     expect(describeBackupError(new HttpError(400, "bad", { code: "invalid_topic" }))).toBe("Choose a valid topic.");
+    expect(describeBackupError(new HttpError(400, "bad", { code: "invalid_backup_settings", detail: "the backup settings are invalid: compression must be gzip, zstd, snappy or none" })))
+      .toBe("The backup settings are invalid: compression must be gzip, zstd, snappy or none.");
+    expect(describeBackupError(new HttpError(400, "bad", { code: "invalid_backup_settings" }))).toBe("The backup settings are invalid.");
     expect(describeBackupError(new HttpError(409, "rejected", { code: "connect_rejected" }))).toBe("Kafka Connect rejected the backup. Check the Connect tab and try again.");
     expect(describeBackupError(new HttpError(503, "unknown", { code: "connect_action_unknown" }))).toBe("The change may have been applied. Refresh before retrying.");
     expect(describeBackupError(new HttpError(403, "denied", { code: "forbidden", detail: "Not permitted: change_reason_required" }))).toBe("Production changes need a recorded change reason.");

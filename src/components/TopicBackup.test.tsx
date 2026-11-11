@@ -68,4 +68,21 @@ describe("TopicBackup", () => {
     await user.click(await screen.findByRole("button", { name: "Retry" }));
     expect(await screen.findByText("No backup for this topic.")).toBeDefined();
   });
+
+  it("offers a Start form for a topic without a backup and shows the new backup", async () => {
+    const user = userEvent.setup();
+    const list = vi.fn<ListBackups>().mockResolvedValueOnce([]).mockResolvedValue([orders]);
+    const start = vi.fn(async (_url: string, topic: string) => ({ topic, connector: `kafka3o-backup-${topic}`, location: orders.location }));
+    renderWithQuery(<TopicBackup gateway={gateway} topicName="orders" listBackups={list} actions={{ start, confirm: () => true }} />);
+    await user.click(await screen.findByRole("button", { name: "Start backup" }));
+    expect(await screen.findByText("RUNNING")).toBeDefined();
+    expect(screen.queryByRole("button", { name: "Start backup" })).toBeNull();
+  });
+
+  it("shows no Start form without actions", async () => {
+    renderWithQuery(<TopicBackup gateway={gateway} topicName="orders" listBackups={vi.fn<ListBackups>().mockResolvedValue([])} />);
+    await screen.findByText("No backup for this topic.");
+    expect(screen.queryByRole("button", { name: "Start backup" })).toBeNull();
+  });
 });
+

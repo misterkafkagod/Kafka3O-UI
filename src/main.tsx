@@ -144,7 +144,7 @@ function gatewayApp(read: GatewayRead, write: GatewayWrite, credentials: Gateway
         getMetrics={(gatewayUrl) => getMetrics(read(gatewayUrl), gatewayUrl)}
         listBackups={(gatewayUrl) => listBackups(read(gatewayUrl), gatewayUrl)}
         backupActions={{
-          start: (gatewayUrl, topic) => startBackup(write(gatewayUrl), gatewayUrl, topic),
+          start: (gatewayUrl, topic, settings) => startBackup(write(gatewayUrl), gatewayUrl, topic, settings),
           run: (gatewayUrl, topic, kind) => runBackupAction(write(gatewayUrl), gatewayUrl, topic, kind),
           restore: (gatewayUrl, topic) => startRestore(write(gatewayUrl), gatewayUrl, topic),
           confirm: (message) => window.confirm(message),

@@ -1,19 +1,23 @@
 import { HttpError } from "../gateway/HttpError";
 import type { ListBackups } from "../gateway/listBackups";
+import type { BackupActions } from "../gateway/startBackup";
 import type { GatewayEntry } from "../gateway/types";
 import { formatBytes } from "../groups/formatBytes";
 import { useBackups } from "../hooks/useBackups";
 import styles from "./BackupList.module.css";
 import { describeBackupSettings } from "./describeBackupSettings";
 import { ErrorWithRetry } from "./ErrorWithRetry";
+import { StartTopicBackup } from "./StartTopicBackup";
 
 type TopicBackupProps = {
   gateway: GatewayEntry;
   topicName: string;
   listBackups: ListBackups;
+  // actions are absent for read-only embeddings; without them no Start form is shown.
+  actions?: BackupActions;
 };
 
-export function TopicBackup({ gateway, topicName, listBackups }: TopicBackupProps) {
+export function TopicBackup({ gateway, topicName, listBackups, actions }: TopicBackupProps) {
   const { data: backups, isError, error, refetch } = useBackups(gateway, listBackups);
   const code = error instanceof HttpError ? error.problem?.code : undefined;
   const backup = backups?.find((candidate) => candidate.topic === topicName);
@@ -35,7 +39,10 @@ export function TopicBackup({ gateway, topicName, listBackups }: TopicBackupProp
       ) : backups === undefined ? (
         <p role="status">Loading the backup…</p>
       ) : backup === undefined ? (
-        <p>No backup for this topic.</p>
+        <>
+          <p>No backup for this topic.</p>
+          {actions ? <StartTopicBackup gateway={gateway} topicName={topicName} actions={actions} onStarted={() => void refetch()} /> : null}
+        </>
       ) : (
         <>
           <dl aria-label={`Backup of ${topicName}`}>
