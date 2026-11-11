@@ -84,5 +84,15 @@ describe("TopicBackup", () => {
     await screen.findByText("No backup for this topic.");
     expect(screen.queryByRole("button", { name: "Start backup" })).toBeNull();
   });
+
+  it("pauses the topic's backup and shows the new state", async () => {
+    const user = userEvent.setup();
+    const list = vi.fn<ListBackups>().mockResolvedValueOnce([orders]).mockResolvedValue([{ ...orders, state: "PAUSED" }]);
+    const run = vi.fn().mockResolvedValue(undefined);
+    renderWithQuery(<TopicBackup gateway={gateway} topicName="orders" listBackups={list} actions={{ start: vi.fn(), run, confirm: () => true }} />);
+    await user.click(await screen.findByRole("button", { name: "Pause" }));
+    expect(await screen.findByText("PAUSED")).toBeDefined();
+    expect(screen.getByRole("button", { name: "Resume" })).toBeDefined();
+  });
 });
 
