@@ -199,6 +199,16 @@ This design deliberately uses the existing central store for opaque delegation/i
 - The sections are read concurrently under the metrics timeout; a cluster without Connect or backup storage reports `notConfigured` and has no `section_up` line for that section. A partly unknown group lag is shown as a lower bound on the tab and left out of the CSV and Prometheus.
 - Quorum and leaders follow the [quorum-and-leader-metrics recipe](./discovery/quorum-and-leader-metrics.md#recipe): `kmsg.DescribeQuorumRequest` for `__cluster_metadata`/0 (no kadm helper), each replica's lag = leader LEO − its LEO; leaders, replicas and non-preferred leaders per broker from the partition metadata already read.
 
+## CLI (Kafka3O-cli, M18–M22) (planned)
+- Repository: `/Users/john/sources/Kafka3O-cli`, module `github.com/misterkafkagod/Kafka3O-cli`, binary `kafka3o`. It reaches clusters only through the secured Console, like the browser: local sign-in, `GET /api/clusters`, and every Gateway call as `/api/clusters/{id}/gateway/<gateway path>`; writes send `Origin` and `X-Kafka3O-CSRF`. No Gateway or Console change is needed.
+- Stack: Go 1.27.4 (as the Gateway; one static binary); `github.com/spf13/cobra` v1.10.2 with `github.com/spf13/pflag` v1.0.10 (subcommands, help, shell completion); `golang.org/x/term` for hidden password input (exact version at planning); CVE status: pending scan. Output with `text/tabwriter` and `encoding/json`. Rejected: the standard `flag` package (no nested subcommands or completion), `urfave/cli` (works, Cobra is the common choice for kubectl-style tools), the OS keychain for the session (per-platform code; backlog).
+- Session: one file in `os.UserConfigDir()/kafka3o/session.json`, mode 0600, holding the Console URL, the session cookies and the CSRF token; never printed or logged.
+- Commands without `--cluster` run on every accessible cluster in parallel; `--output table|json`; exit codes 0 ok, 1 usage or not found, 2 a cluster failed, 3 not signed in.
+- Conventions (in addition to the mandatory ones): one Cobra command per file (`new_<name>_command.go`) that only reads flags and calls one injected action; actions write to an injected `io.Writer`, never `os.Stdout`; all network access goes through a `console` client interface; exit codes come from typed errors.
+- Structure: `cmd/kafka3o/main.go`; `internal/console/` (sign-in, session file, forwarding, CSRF/Origin); `internal/cli/` (commands); `internal/<area>/` (actions and data types: clusters, topics, …); `internal/output/` (table and JSON writers).
+- Testing: `go test ./...` with `httptest` servers faking the Console routes; demos against EKS-D; `go run golang.org/x/vuln/cmd/govulncheck@v1.9.0 ./...`.
+- Integration: Console API — `discovery needed` (cli-console-session): sign-in response and cookies, the `Origin` value (configured as `https://127.0.0.1:8443` on EKS-D), how a laptop reaches the Console, session lifetime, CSRF on writes.
+
 ## Structure
 ```
 Kafka3O-Gateway/

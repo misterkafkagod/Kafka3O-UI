@@ -3,7 +3,7 @@
 ## Vision
 Kafka3O is a multi-cluster Kafka console for developers and operators: one web UI (Kafka3O-UI) shows every cluster side by side — health, topics, messages, consumer lag. Each cluster is fronted by its own small, stateless gateway (Kafka3O-Gateway) that owns the broker connection and credentials close to that cluster; the browser never talks to Kafka directly.
 
-The console should be comfortable for dense technical data, easy to navigate, and explicit about connection problems and write outcomes. M6–M8 turn the existing functional pages into a consistent, accessible operator interface without changing the gateway API or the completed M1–M5 behavior. M9 extends the gateway and UI with explicitly confirmed Kafka configuration and partition administration. M10 adds local/Cognito login, global and per-cluster authorization, Production safeguards, and an attributable audit trail. M11 simplifies signed-in navigation and lets each user tailor the console's appearance for comfort and readability, without weakening the accessibility baseline. M12 lets operators fix stuck consumers and operate Kafka Connect from the console, under the same roles, Production rules and audit as every other write. M13 adds topic backups to S3-compatible storage through Kafka Connect, with restores into the original topic. M14 turns consumer groups into a list with one page per group, and M15 adds a per-cluster Metrics tab with what Kafka itself reports, exportable as a download and for Prometheus. M16 moves backup setup and restores onto the topic page, with a few backup settings and restores limited to a time range or chosen partitions. M17 adds the metrics most worth alerting on: consumer lag per group, controller quorum and leader balance, and Kafka Connect and backup health.
+The console should be comfortable for dense technical data, easy to navigate, and explicit about connection problems and write outcomes. M6–M8 turn the existing functional pages into a consistent, accessible operator interface without changing the gateway API or the completed M1–M5 behavior. M9 extends the gateway and UI with explicitly confirmed Kafka configuration and partition administration. M10 adds local/Cognito login, global and per-cluster authorization, Production safeguards, and an attributable audit trail. M11 simplifies signed-in navigation and lets each user tailor the console's appearance for comfort and readability, without weakening the accessibility baseline. M12 lets operators fix stuck consumers and operate Kafka Connect from the console, under the same roles, Production rules and audit as every other write. M13 adds topic backups to S3-compatible storage through Kafka Connect, with restores into the original topic. M14 turns consumer groups into a list with one page per group, and M15 adds a per-cluster Metrics tab with what Kafka itself reports, exportable as a download and for Prometheus. M16 moves backup setup and restores onto the topic page, with a few backup settings and restores limited to a time range or chosen partitions. M17 adds the metrics most worth alerting on: consumer lag per group, controller quorum and leader balance, and Kafka Connect and backup health. M18–M22 add `kafka3o`, a command-line client (Kafka3O-cli) that gives the UI's information and actions in a terminal across every cluster the user may access, as tables for people and JSON for scripts.
 
 ## Out of Scope
 - A gateway serving more than one cluster
@@ -18,6 +18,7 @@ The console should be comfortable for dense technical data, easy to navigate, an
 - Direct SSO integrations other than Amazon Cognito in M10; additional providers are in the backlog
 - Creating, updating or deleting Kafka Connect connectors in M12 (backlog F48), and showing connector configuration values that may hold secrets
 - Adding, removing or retargeting registered clusters from the UI; the cluster registry changes only through a repository change (dropped F17)
+- The CLI talking to Gateways directly (it always goes through the Console), an interactive full-screen terminal UI, and Cognito sign-in from the CLI (backlog F69)
 - Appearance preferences synced to a Console account, ADMIN-enforced appearance defaults, free-form color pickers or custom CSS, and fonts loaded from external sites
 
 ## Features
@@ -65,6 +66,15 @@ The console should be comfortable for dense technical data, easy to navigate, an
 - **F57** User can see each consumer group's state and lag on the Metrics tab and in its exports
 - **F58** User can see the controller quorum's health and how partition leaders are spread over brokers on the Metrics tab and in its exports
 - **F59** User can see Kafka Connect connector and task states and each backup's health on the Metrics tab and in its exports
+- **F60** User can sign in to the Console from the terminal with a local account, stay signed in between commands, and sign out
+- **F61** User can list every cluster they may access with its health from the terminal
+- **F62** User can list and filter topics across all clusters and inspect one topic (partitions, configuration, consumers, backup) from the terminal
+- **F63** User can inspect a cluster's brokers, broker configuration and metrics from the terminal, and export the metrics as JSON or CSV
+- **F64** User can read a topic's messages (latest, from an offset or a timestamp) and search them from the terminal
+- **F65** User can list consumer groups and see one group's offsets per topic and partition from the terminal
+- **F66** User can make the UI's Kafka changes from the terminal (produce, create or delete a topic, change configuration and partitions, reset offsets) with confirmation and Production reasons
+- **F67** User can operate Kafka Connect connectors and topic backups and restores from the terminal
+- **F68** An administrator can query and export the audit trail and manage accounts, roles and cluster environments from the terminal
 
 ## Milestones
 ### M1 — See all my clusters and what topics they hold, from one screen
@@ -376,9 +386,30 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
   - **P98** F59-B2 · Backup health — Covers: F59-AC2 · Discovery: — · Status: Done
     - Demo: the Backups section shows each backup's state, last write age and size; scraping `/metrics` during a restore does not finish it.
 
+### M18 — Sign in and see every cluster and topic from the terminal
+- **Status:** Planned
+- **Features:** F60, F61, F62
+
+### M19 — Investigate clusters, messages and consumers from the terminal
+- **Status:** Planned
+- **Features:** F63, F64, F65
+
+### M20 — Change Kafka safely from the terminal
+- **Status:** Planned
+- **Features:** F66
+
+### M21 — Operate Connect and backups from the terminal
+- **Status:** Planned
+- **Features:** F67
+
+### M22 — Administer the console from the terminal
+- **Status:** Planned
+- **Features:** F68
+
 ## Backlog
 The following items are candidates after M11, not commitments to implement every Redpanda feature. All future writes must use F29/F30 authorization and F31 audit; no candidate silently expands the current bounded reads or changes Kafka connection credentials.
 
+- **F69 · Medium:** User can sign in to the Console from the CLI with Amazon Cognito through the browser.
 - **F16 · Postponed:** User can decode Avro/Protobuf values via a Schema Registry.
 - **F32 · Postponed:** User can browse Schema Registry subjects, versions and references, check compatibility, and explicitly register or delete schema versions.
 - **F33 · High:** An authorized user can inspect/manage Kafka ACLs and supported broker principals/credentials; Kafka permissions remain distinct from Console roles.
@@ -428,6 +459,7 @@ Redpanda-only Shadow Links, its Admin API, and Redpanda-specific diagnostic oper
 - **Verification debt:** Run the Cognito sign-in, group refresh and logout integration against a real User Pool when an AWS account and app client become available; fixture tests are not evidence of live provider compatibility.
 
 ## Learnings
+- 2026-11-12 (re-plan): Added the Kafka3O-cli project as M18–M22 (F60–F68), user choices: through the secured Console only (local sign-in, `/api/clusters`, `/api/clusters/{id}/gateway/...`, Origin + `X-Kafka3O-CSRF` on writes), Go, specs kept in this shared roadmap, local accounts first (Cognito sign-in F69 in the backlog). Standing auto-approval for M18.
 - 2026-11-11 (M17 live): deployed to EKS-D (Go 1.27.4 build) at the user's request; the forward now goes through the node's VPN address 10.8.0.1 (same host key as 192.168.1.109). Kafka A: quorum leader 1 with lag 0, broker 1 leads 39 of 39, 9 consumer groups (5 Empty, 4 Stable) with exact lag, Connect 5 connectors running and 1 failed task (`kafka3o-verify-failing`), backups `kafka3o-m10-verify` and `tert` running. Kafka B: quorum readable (leader 1, lag 0), broker 1 leads 4 of 4, no groups, Connect and backups not configured. gateway-a's `/metrics` reports every section up with the same values. The discovery probes left empty consumer groups `connect-kafka3o-probe-m16-*` on Kafka A.
 - 2026-11-11 (M17 retro): P94–P98 deliver F57–F59: the Metrics tab, downloads and Prometheus endpoint add the controller quorum (DescribeQuorum through kmsg), leaders/replicas/non-preferred leaders per broker, consumer group states and exact lag, Kafka Connect connector and task states with failures, and backup health (state, last write, size, restoring). What worked: probing DescribeQuorum with the Gateway's own user first; reusing the existing group, Connect and backup reads; a backup list without the restore check keeps scrapes free of side effects. What didn't: seven sequential reads under one timeout would starve the last ones, so the sections now run concurrently; the CSV needed a `name` column. Security: the milestone scan found GO-2026-6859 in net/http; the Gateway moved to Go 1.27.4. Next: deploy and check Kafka B's quorum permission through its Gateway.
 - 2026-11-11 (re-plan): Added M17 (F57 consumer group lag and states, F58 controller quorum and leader balance, F59 Connect and backup health) on the Metrics tab, in the downloads and in the Prometheus endpoint; still Kafka-reported only (plus the console's own Connect and backup reads), no JMX. Standing auto-approval for M17.

@@ -664,3 +664,68 @@ Kafka Connect connector and task states and each backup's health.
 
 **External dependencies:** the Gateway's Connect and backup reads (F35, F49).
 
+### F60 — Sign in from the terminal (planned M18)
+Sign in to the Console from the terminal with a local account, stay signed in between commands, and sign out.
+
+**Behaviors**
+- **F60-B1** User runs `kafka3o login --console <url>` and gives the username and a hidden password (or `--password-stdin`) → the CLI signs in and keeps the session in a file only the user can read, then prints who signed in
+- **F60-B2** Wrong credentials, a disabled account or a required password change → a clear message, nothing stored, non-zero exit
+- **F60-B3** User runs `kafka3o whoami` → the account and its roles per cluster; `kafka3o logout` → the Console session ends and the file is removed
+- **F60-B4** Any command with an expired or revoked session → "Signed out. Run kafka3o login.", the file is removed, exit code 3
+
+**Acceptance criteria**
+- **F60-AC1** (B1) After a successful login the session file exists with mode 0600; the password and the session token are never printed or logged
+- **F60-AC2** (B2) A wrong password exits 3 with "Sign-in failed"; a required password change says to change it in the console; no file is written
+- **F60-AC3** (B3) After `logout` the Console session is ended, so a copy of the old session file is refused
+- **F60-AC4** (B4) An expired session gives exit code 3 with that message and the file is gone
+
+**External dependencies:** the Console session API (`discovery needed`: cli-console-session); tests fake it with `httptest`.
+
+### F61 — Clusters from the terminal (planned M18)
+List every cluster the user may access with its health.
+
+**Behaviors**
+- **F61-B1** User runs `kafka3o clusters` → for every accessible cluster, read in parallel: id, name, Production or not, Gateway reachable, cluster reachable, broker count
+- **F61-B2** User adds `--output json` → the same data as JSON
+- **F61-B3** A Gateway or cluster is unreachable → its row shows the reason, the others still show, exit code 2
+
+**Acceptance criteria**
+- **F61-AC1** (B1) Exactly the clusters `/api/clusters` allows are listed; Production clusters are marked
+- **F61-AC2** (B2) The JSON is valid and holds the same values as the table
+- **F61-AC3** (B3) With one cluster down, the others are complete, the down one shows its reason, exit code 2
+
+**External dependencies:** Console `/api/clusters` and the Gateway cluster endpoint through `/api/clusters/{id}/gateway/...`.
+
+### F62 — Topics from the terminal (planned M18)
+List and filter topics across all clusters and inspect one topic.
+
+**Behaviors**
+- **F62-B1** User runs `kafka3o topics [--cluster id] [--filter text] [--internal]` → cluster, topic, partitions, replication factor and approximate messages across all clusters
+- **F62-B2** User runs `kafka3o topic <cluster> <topic>` → partitions (leader, replicas, ISR, start and end offsets), configuration, consumer groups with lag and backup state
+- **F62-B3** An unknown cluster or topic → "not found" with a non-zero exit; a failing cluster in `topics` is handled as in F61-B3
+
+**Acceptance criteria**
+- **F62-AC1** (B1) The filter matches names case-insensitively; internal topics are hidden unless `--internal`
+- **F62-AC2** (B2) Offsets and lag are exact decimals, as in the UI
+- **F62-AC3** (B3) Exit codes: 0 ok, 1 usage or not found, 2 a cluster failed, 3 not signed in
+
+**External dependencies:** the Gateway topic, consumer group and backup endpoints through the Console.
+
+### F63 — Cluster details from the terminal (planned M19)
+Inspect a cluster's brokers, broker configuration and metrics, and export the metrics as JSON or CSV · *detailed when M19 starts*
+
+### F64 — Messages from the terminal (planned M19)
+Read a topic's messages (latest, from an offset or a timestamp) and search them · *detailed when M19 starts*
+
+### F65 — Consumer groups from the terminal (planned M19)
+List consumer groups and see one group's offsets per topic and partition · *detailed when M19 starts*
+
+### F66 — Kafka changes from the terminal (planned M20)
+Produce, create or delete topics, change configuration and partitions, and reset offsets, with confirmation and Production reasons · *detailed when M20 starts*
+
+### F67 — Connect and backups from the terminal (planned M21)
+Operate Kafka Connect connectors and topic backups and restores · *detailed when M21 starts*
+
+### F68 — Administration from the terminal (planned M22)
+Query and export the audit trail and manage accounts, roles and cluster environments · *detailed when M22 starts*
+
