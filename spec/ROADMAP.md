@@ -390,9 +390,9 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
 - **Status:** Active
 - **Features:** F60, F61, F62
 - **Phases:**
-  - **P99** F60-B1 + F60-B2 · Sign in from the terminal — Covers: F60-AC1, F60-AC2 · Discovery: cli-console-session · Status: Building
+  - **P99** F60-B1 + F60-B2 · Sign in from the terminal — Covers: F60-AC1, F60-AC2 · Discovery: cli-console-session · Status: Done
     - Demo: `kafka3o login --console <url>` as `admin` prints the account and writes a 0600 session file; a wrong password says "Sign-in failed" and writes nothing.
-  - **P100** F60-B3 + F60-B4 · whoami, logout and an expired session — Covers: F60-AC3, F60-AC4 · Discovery: cli-console-session · Status: Defined
+  - **P100** F60-B3 + F60-B4 · whoami, logout and an expired session — Covers: F60-AC3, F60-AC4 · Discovery: cli-console-session · Status: Building
     - Demo: `kafka3o whoami` shows admin's roles; `kafka3o logout` ends the session and a saved copy of the file is refused with exit code 3.
   - **P101** F61-B1 + F61-B2 · Clusters as a table and JSON — Covers: F61-AC1, F61-AC2 · Discovery: — · Status: Defined
     - Demo: `kafka3o clusters` lists Kafka A and Kafka B (Production) with brokers; `--output json` gives the same values.
