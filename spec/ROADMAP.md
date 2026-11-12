@@ -387,7 +387,7 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
     - Demo: the Backups section shows each backup's state, last write age and size; scraping `/metrics` during a restore does not finish it.
 
 ### M18 — Sign in and see every cluster and topic from the terminal
-- **Status:** Active
+- **Status:** Done
 - **Features:** F60, F61, F62
 - **Phases:**
   - **P99** F60-B1 + F60-B2 · Sign in from the terminal — Covers: F60-AC1, F60-AC2 · Discovery: cli-console-session · Status: Done
@@ -400,7 +400,7 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
     - Demo: with one cluster's Gateway failing (faked in a test, or a stopped Gateway), the other row is complete, the failing row shows its reason and the exit code is 2.
   - **P103** F62-B1 · Topics across all clusters — Covers: F62-AC1 · Discovery: — · Status: Done
     - Demo: `kafka3o topics --filter verify` shows `kafka3o-m10-verify` on Kafka A; `--internal` adds `__consumer_offsets`.
-  - **P104** F62-B2 + F62-B3 · One topic, and not found — Covers: F62-AC2, F62-AC3 · Discovery: — · Status: Building
+  - **P104** F62-B2 + F62-B3 · One topic, and not found — Covers: F62-AC2, F62-AC3 · Discovery: — · Status: Done
     - Demo: `kafka3o topic kafka-a kafka3o-m10-verify` shows partitions, configuration, consumer groups with lag and the backup; an unknown topic exits 1 with "not found".
 
 ### M19 — Investigate clusters, messages and consumers from the terminal
@@ -472,6 +472,7 @@ Redpanda-only Shadow Links, its Admin API, and Redpanda-specific diagnostic oper
 - **Verification debt:** Run the Cognito sign-in, group refresh and logout integration against a real User Pool when an AWS account and app client become available; fixture tests are not evidence of live provider compatibility.
 
 ## Learnings
+- 2026-11-12 (M18 retro): P99–P104 deliver F60–F62 in Kafka3O-cli: `kafka3o login/whoami/logout`, `clusters`, `topics` and `topic`, each with `-o json` and the exit codes 0/1/2/3, reading every accessible cluster in parallel through the Console with no Console or Gateway change. Live on EKS-D: sign-in, a refused wrong password, a refused copy of a signed-out session file, both clusters healthy, topics across both clusters, and a full topic view with exact offsets and lag. What worked: a short curl discovery first settled cookies, Origin and CSRF, so the client code needed no rework; the fake Console in tests mirrors the real CSRF rule. What didn't: the new repository's remote used plain `github.com` (fixed to the `github-misterkafkagod` alias); a cluster failure could only be shown with fakes, since the shared Gateways are not stopped for demos. Next: M19 (cluster details and metrics, messages, consumer groups) needs its own approval.
 - 2026-11-12 (cli-console-session): a terminal client can use the Console exactly like the browser through the front proxy (`http://localhost:5173`, `Origin` rewritten): sign-in sets `__Host-kafka3o_session` and `__Host-kafka3o_csrf` (8 h), reads need only the cookies, writes add `X-Kafka3O-CSRF`, sign-out ends the session for every copy of it. No Console or Gateway change is needed for the CLI.
 - 2026-11-12 (re-plan): Added the Kafka3O-cli project as M18–M22 (F60–F68), user choices: through the secured Console only (local sign-in, `/api/clusters`, `/api/clusters/{id}/gateway/...`, Origin + `X-Kafka3O-CSRF` on writes), Go, specs kept in this shared roadmap, local accounts first (Cognito sign-in F69 in the backlog). Standing auto-approval for M18.
 - 2026-11-11 (M17 live): deployed to EKS-D (Go 1.27.4 build) at the user's request; the forward now goes through the node's VPN address 10.8.0.1 (same host key as 192.168.1.109). Kafka A: quorum leader 1 with lag 0, broker 1 leads 39 of 39, 9 consumer groups (5 Empty, 4 Stable) with exact lag, Connect 5 connectors running and 1 failed task (`kafka3o-verify-failing`), backups `kafka3o-m10-verify` and `tert` running. Kafka B: quorum readable (leader 1, lag 0), broker 1 leads 4 of 4, no groups, Connect and backups not configured. gateway-a's `/metrics` reports every section up with the same values. The discovery probes left empty consumer groups `connect-kafka3o-probe-m16-*` on Kafka A.
