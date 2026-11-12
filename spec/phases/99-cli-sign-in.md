@@ -10,7 +10,7 @@
 3. A wrong password: "Sign-in failed: wrong username or password, or the account is disabled.", exit code 3, no file.
 
 ## Tasks
-- [ ] **T99.1 CLI skeleton** — Covers: TECH-SPEC CLI stack and structure
+- [x] **T99.1 CLI skeleton** — Covers: TECH-SPEC CLI stack and structure
   - Files: Kafka3O-cli go.mod (new), go.sum (new), .gitignore (new), README.md (new), cmd/kafka3o/main.go (new), internal/cli/new_root_command.go (new), internal/cli/new_root_command_test.go (new), internal/cli/exit_code.go (new), internal/cli/exit_code_test.go (new), internal/console/errors.go (new)
   - Do: module `github.com/misterkafkagod/Kafka3O-cli` on Go 1.27.4 with Cobra v1.10.2; `main` builds the root command, runs it and exits with `ExitCode(err)` (0 ok, 1 usage or not found, 2 a cluster failed, 3 not signed in or sign-in failed); typed console errors.
   - Done when: `go build ./... && go test ./...` passes, and `go run ./cmd/kafka3o --help` lists the root command.
