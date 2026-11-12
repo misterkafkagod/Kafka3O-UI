@@ -4,6 +4,7 @@ import { useMetrics } from "../hooks/useMetrics";
 import { useMetricsSamples } from "../hooks/useMetricsSamples";
 import { saveFile as browserSaveFile, type SaveFile } from "../metrics/saveFile";
 import { BackupMetrics } from "./BackupMetrics";
+import styles from "./ClusterMetrics.module.css";
 import { BrokerDiskUse } from "./BrokerDiskUse";
 import { BrokerLeaders } from "./BrokerLeaders";
 import { ConnectMetrics } from "./ConnectMetrics";
@@ -40,6 +41,7 @@ export function ClusterMetrics({ gateway, getMetrics, saveFile = browserSaveFile
             <button type="button" onClick={() => void refetch()}>Refresh now</button>
           </p>
           <MetricsDownload clusterId={gateway.id} metrics={metrics} saveFile={saveFile} />
+          <div className={styles.sections}>
           <PartitionHealth partitions={metrics.partitions} />
           {metrics.quorum ? <QuorumHealth quorum={metrics.quorum} /> : null}
           <BrokerDiskUse logDirs={metrics.logDirs} />
@@ -49,6 +51,7 @@ export function ClusterMetrics({ gateway, getMetrics, saveFile = browserSaveFile
           {metrics.backups ? <BackupMetrics gatewayId={gateway.id} readAt={metrics.readAt} backups={metrics.backups} /> : null}
           <TopicThroughput previous={previous} current={metrics} />
           <LargestTopics largestTopics={metrics.largestTopics} />
+          </div>
         </>
       )}
     </main>

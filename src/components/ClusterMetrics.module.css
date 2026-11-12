@@ -1,0 +1,23 @@
+/* Each metrics section stands apart: a gap and a thin divider between them. */
+.sections {
+  display: grid;
+  gap: 2rem;
+  margin-top: 1.5rem;
+}
+
+.sections > section {
+  min-width: 0;
+}
+
+.sections > section + section {
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--color-border-subtle);
+}
+
+.sections > section > h3 {
+  margin-top: 0;
+}
+
+.sections dl + dl {
+  margin-top: 0.65rem;
+}
