@@ -387,8 +387,21 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
     - Demo: the Backups section shows each backup's state, last write age and size; scraping `/metrics` during a restore does not finish it.
 
 ### M18 — Sign in and see every cluster and topic from the terminal
-- **Status:** Planned
+- **Status:** Active
 - **Features:** F60, F61, F62
+- **Phases:**
+  - **P99** F60-B1 + F60-B2 · Sign in from the terminal — Covers: F60-AC1, F60-AC2 · Discovery: cli-console-session · Status: Defined
+    - Demo: `kafka3o login --console <url>` as `admin` prints the account and writes a 0600 session file; a wrong password says "Sign-in failed" and writes nothing.
+  - **P100** F60-B3 + F60-B4 · whoami, logout and an expired session — Covers: F60-AC3, F60-AC4 · Discovery: cli-console-session · Status: Defined
+    - Demo: `kafka3o whoami` shows admin's roles; `kafka3o logout` ends the session and a saved copy of the file is refused with exit code 3.
+  - **P101** F61-B1 + F61-B2 · Clusters as a table and JSON — Covers: F61-AC1, F61-AC2 · Discovery: — · Status: Defined
+    - Demo: `kafka3o clusters` lists Kafka A and Kafka B (Production) with brokers; `--output json` gives the same values.
+  - **P102** F61-B3 · A cluster that cannot be reached — Covers: F61-AC3 · Discovery: — · Status: Defined
+    - Demo: with one cluster's Gateway failing (faked in a test, or a stopped Gateway), the other row is complete, the failing row shows its reason and the exit code is 2.
+  - **P103** F62-B1 · Topics across all clusters — Covers: F62-AC1 · Discovery: — · Status: Defined
+    - Demo: `kafka3o topics --filter verify` shows `kafka3o-m10-verify` on Kafka A; `--internal` adds `__consumer_offsets`.
+  - **P104** F62-B2 + F62-B3 · One topic, and not found — Covers: F62-AC2, F62-AC3 · Discovery: — · Status: Defined
+    - Demo: `kafka3o topic kafka-a kafka3o-m10-verify` shows partitions, configuration, consumer groups with lag and the backup; an unknown topic exits 1 with "not found".
 
 ### M19 — Investigate clusters, messages and consumers from the terminal
 - **Status:** Planned
