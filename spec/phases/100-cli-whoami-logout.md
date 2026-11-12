@@ -9,7 +9,7 @@
 2. Copy the session file, run `kafka3o logout` ("Signed out."), put the copy back and run `kafka3o whoami`: "signed out; run kafka3o login", exit 3, and the file is removed.
 
 ## Tasks
-- [ ] **T100.1 Load the session and call the Console** — Covers: F60-AC4
+- [x] **T100.1 Load the session and call the Console** — Covers: F60-AC4
   - Files: Kafka3O-cli internal/console/load_session.go (new), internal/console/load_session_test.go (new), internal/console/delete_session.go (new), internal/console/delete_session_test.go (new), internal/console/get_json.go (new), internal/console/get_json_test.go (new)
   - Do: `LoadSession` reads the file (missing, unreadable or expired by `expiresAt` → `ErrSignedOut`); `DeleteSession` removes it (missing is fine); `GetJSON` sends a GET with the session cookies to a Console path and decodes the JSON answer; 401 → `ErrSignedOut`; other failures → `ErrConsoleUnavailable` with the status and problem code.
   - Done when: `go test ./internal/console/ -run 'LoadSession|DeleteSession|GetJSON'` passes covering a valid, missing, corrupt and expired file, a 401, a 403 problem and a decode error.
