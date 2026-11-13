@@ -2,7 +2,7 @@
 - **Milestone:** M22
 - **Covers:** F68-AC1
 - **Discovery:** —
-- **Status:** Building
+- **Status:** Done
 
 ## Demo
 1. `kafka3o audit --cluster kafka-a --from <today> --limit 5` lists the first five events of today's demos in order (time, operation, actor, source, cluster, action, resource, decision, outcome, reason) and prints the `--after` value for the next page; the next page continues from there.
@@ -19,3 +19,8 @@
   - Done when: `go test ./internal/cli/ -run 'AuditCommand|AdminError'` passes covering the table, paging hint, JSON, escaping, a denied scope and an unavailable Console.
 
 ## Review
+- **Demo:** live on EKS-D as admin (auto-approval, 2026-11-13): `audit --cluster kafka-a --from 2026-11-13T00:00:00-03:00 --limit 5` listed today's first five Kafka A events (the P111 produce and P112 create, attempted then confirmed) and "More events: --after 453"; `--after 453 --limit 3` continued with the rejected create and the delete; `--outcome maybe`, a reversed range and `--limit 501` were refused before sending; a global `-o json` page started at the bootstrap event
+- **Tests:** `go test -race ./...` passed
+- **Conventions:** `BuildAuditQuery`, `ListAuditEvents`, `adminError` (port of the UI's describeAdminError) and the command are single actions; `audit_event.go` holds data types only
+- **Vulnerability scan:** not needed (no dependency change)
+- **Notes:** the actor column shows the Console's account id (as the audit stores it), not the username; a new exit reason `ErrServiceUnavailable` (exit 2) covers an unavailable Console administration service.
