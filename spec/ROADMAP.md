@@ -441,7 +441,7 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
 - **Phases:**
   - **P116** F67-B1 · Connectors across clusters — Covers: F67-AC1 · Discovery: — · Status: Done
     - Demo: `kafka3o connectors` lists Kafka A's test connectors with their tasks; `--cluster kafka-b` says Connect is not configured (or lists its connectors) without failing.
-  - **P117** F67-B2 · Connector lifecycle — Covers: F67-AC2 · Discovery: — · Status: Planned
+  - **P117** F67-B2 · Connector lifecycle — Covers: F67-AC2 · Discovery: — · Status: Building
     - Demo: `kafka3o connector pause kafka-a kafka3o-verify-paused` then `resume`, `restart` and `restart-task … 0`, each confirmed and visible in `connectors`; an unknown task reads not found.
   - **P118** F67-B3 · Backups across clusters — Covers: F67-AC3 · Discovery: — · Status: Defined
     - Demo: `kafka3o backups` shows the `kafka3o-m10-verify` backup with state, last write, size and settings.

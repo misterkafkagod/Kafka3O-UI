@@ -2,14 +2,14 @@
 - **Milestone:** M21
 - **Covers:** F67-AC2
 - **Discovery:** —
-- **Status:** Planned
+- **Status:** Building
 
 ## Demo
 1. `kafka3o connector pause kafka-a kafka3o-verify-paused` shows `Pause connector "kafka3o-verify-paused"?`, and after "y" prints "Pause requested for kafka3o-verify-paused."; `connectors` then shows it PAUSED; `resume` brings it back to RUNNING.
 2. `kafka3o connector restart kafka-a kafka3o-verify-running --yes` and `restart-task kafka-a kafka3o-verify-running 0 --yes` are requested; `restart-task … 9` reads not found; `restart-task … x` is refused before sending.
 
 ## Tasks
-- [ ] **T117.1 Run a connector action** — Covers: F67-AC2
+- [x] **T117.1 Run a connector action** — Covers: F67-AC2
   - Files: Kafka3O-cli internal/connect/connector_action.go (new), internal/connect/run_connector_action.go (new), internal/connect/run_connector_action_test.go (new), internal/connect/fake_send_test.go (new)
   - Do: `RunConnectorAction` posts (no body) to `/api/v1/connect/connectors/{name}/pause|resume|restart` or `…/tasks/{id}/restart` (name path-escaped) with the reason, and requires the Gateway's `{connector, action[, task]}` echo (a mismatch is "may have been applied"); a `not_found` problem becomes `ErrConnectorNotFound` ("connector X not found on C" or "task N of connector X not found on C"); other problems pass through for `writeError`. `connector_action.go` holds the data types and the not-found error.
   - Done when: `go test ./internal/connect/ -run RunConnectorAction` passes covering the four paths, the reason, an escaped name, the echo check, not found and an unknown outcome.
