@@ -23,4 +23,4 @@
 - **Tests:** `go test -race ./...` passed
 - **Conventions:** new shared `clusters.ReadAcrossClusters` (generic, one function) with `ClusterFailure` and `ErrUnknownCluster` moved to `clusters`; `topics` now uses them (plan change, so every cross-cluster command reads and reports failures the same way); `ListBrokers`, `ReadBrokerConfig` single actions
 - **Vulnerability scan:** not needed
-
+- **Live (2026-11-13):** passed on EKS-D as admin: brokers listed broker 1 on both clusters as controller; broker-config kafka-a 1 --filter log.retention showed 5 settings with value, source and read-only; all 12 sensitive settings of kafka-b were hidden in table and JSON.

@@ -23,4 +23,4 @@
 - **Tests:** `go test -race ./...` passed
 - **Conventions:** `ListGroups`, `TotalLag` (port of the UI's consumerGroupTotalLag), `CompareGroups`, `describeTotalLag` are single actions
 - **Vulnerability scan:** not needed
-
+- **Live (2026-11-13):** passed on EKS-D as admin: groups listed Kafka A's 9 groups (two "unknown (3 partitions)", the probe groups at 58) and none on Kafka B; --filter m16 kept the three probe groups.

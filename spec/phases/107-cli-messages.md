@@ -25,4 +25,4 @@
 - **Conventions:** `ParsePosition`, `ReadMessages`, `FormatValue` (port of the UI's formatMessageValue), `EscapeTerminalText`, `WriteMessages`, `RequireAccessibleCluster`, `topicReadError` are single actions
 - **Vulnerability scan:** not needed
 - **Notes:** a heredoc turned a `\u202e` test expectation into the real character; test files are now checked for raw control bytes.
-
+- **Live (2026-11-13):** passed on EKS-D as admin: latest read returned 50 messages with headers including kafka3o-restore; --partition 0 --offset 61 and --partition 3 --timestamp 2026-11-12T04:08:00Z read from the right place; --value json pretty-printed a JSON value; --offset alone and a missing topic exited 1.

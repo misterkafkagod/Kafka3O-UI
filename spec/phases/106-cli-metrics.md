@@ -23,4 +23,4 @@
 - **Tests:** `go test -race ./...` passed
 - **Conventions:** `ReadMetrics`, `MetricsToCSV`, `EscapeCSVField`, `WriteMetricsText`, `numberText`, `unknownIfEmpty` are single actions; `OutputFormat` takes extra formats per command
 - **Vulnerability scan:** not needed
-
+- **Live (2026-11-13):** passed on EKS-D as admin: metrics kafka-a showed every section (quorum leader 1 lag 0, 39 leaders, 9 groups, Connect's failed task, both backups); for the same live answer the CLI's CSV was byte-for-byte identical to the UI's metricsToCsv (78 lines); -o json kept the Gateway's document.

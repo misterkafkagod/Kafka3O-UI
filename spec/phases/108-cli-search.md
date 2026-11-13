@@ -19,4 +19,4 @@
 - **Tests:** `go test -race ./...` passed
 - **Conventions:** `SearchMessages` is a single action; the command reuses `WriteMessages` and `topicReadError`
 - **Vulnerability scan:** not needed
-
+- **Live (2026-11-13):** passed on EKS-D as admin: search for "check two" found the original and its restored copy and said "Scanned 141 messages."; a missing text said "No messages contain ...".

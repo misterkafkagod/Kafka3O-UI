@@ -19,4 +19,4 @@
 - **Tests:** `go test -race ./...` passed
 - **Conventions:** `StatusLabel` (port of the UI's consumerLagStatusLabel), `WriteGroup`, `offsetText` are single actions
 - **Vulnerability scan (milestone):** `govulncheck@v1.9.0 ./...`: no vulnerabilities (no dependency change in M19)
-
+- **Live (2026-11-13):** passed on EKS-D as admin: group connect-kafka3o-backup-kafka3o-m10-verify showed its member and offsets 65/3/48/25 with lag 0; connect-kafka3o-backup-e2e showed "No committed offset" for three partitions; a missing group exited 1.
