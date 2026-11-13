@@ -407,9 +407,9 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
 - **Status:** Active
 - **Features:** F63, F64, F65
 - **Phases:**
-  - **P105** F63-B1 · Brokers and broker configuration — Covers: F63-AC1 · Discovery: — · Status: Building
+  - **P105** F63-B1 · Brokers and broker configuration — Covers: F63-AC1 · Discovery: — · Status: Done
     - Demo: `kafka3o brokers` lists broker 1 on both clusters as controller; `kafka3o broker-config kafka-a 1 --filter log.retention` shows those settings with source and read-only.
-  - **P106** F63-B2 · Metrics and their export — Covers: F63-AC2 · Discovery: — · Status: Defined
+  - **P106** F63-B2 · Metrics and their export — Covers: F63-AC2 · Discovery: — · Status: Building
     - Demo: `kafka3o metrics kafka-a` shows the Metrics tab's sections; `-o json` and `-o csv` match the UI's downloads.
   - **P107** F64-B1 + F64-B2 · Read messages — Covers: F64-AC1, F64-AC2 · Discovery: — · Status: Defined
     - Demo: `kafka3o messages kafka-a kafka3o-m10-verify` shows the latest messages with headers; `--partition 0 --offset 0` reads from the start; `--value json` pretty-prints JSON values.
@@ -474,6 +474,7 @@ Compared current official Redpanda documentation (pages identify Console v3.14.0
 Redpanda-only Shadow Links, its Admin API, and Redpanda-specific diagnostic operations are not promised for generic Kafka. Replay/copy workflows and live tailing are not added to scope by this comparison.
 
 ### Existing verification debt
+- **Verification debt (M19):** run the M19 demos live on EKS-D (`brokers`, `broker-config`, `metrics`, `messages`, `search`, `groups`, `group`); the node was unreachable when they were built (2026-11-13).
 - **Security debt (M13 exception):** Aiven S3 connectors 3.4.3 carry 4 critical and 41 high advisories; allowed only on the EKS-D test cluster by the user's test-only exception (2026-11-10). Replace the vulnerable bundled jars or rebuild the connectors, and rescan, before any production use.
 - **Verification debt:** M12 on EKS-D (2026-11-10): verified live on Kafka A except a Production offset reset, because Kafka B has no consumer group to reset and creating one from a shell in the cluster was not permitted in that session; Production rules for writes are covered by the Gateway and secured-mode tests.
 - **Verification debt:** Deploy M11 to the EKS-D secured stack (`deploy.sh`) and repeat the P63/P65 checks there and in the user's own browser; M11 was verified against the local Console fixture and `vite preview` because the redeploy was not permitted in the building session.
