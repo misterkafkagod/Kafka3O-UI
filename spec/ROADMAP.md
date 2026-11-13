@@ -424,9 +424,9 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
 - **Status:** Active
 - **Features:** F66
 - **Phases:**
-  - **P111** F66-B1 + F66-B2 · Safe writes and producing a message — Covers: F66-AC1, F66-AC2 · Discovery: — · Status: Building
+  - **P111** F66-B1 + F66-B2 · Safe writes and producing a message — Covers: F66-AC1, F66-AC2 · Discovery: — · Status: Done
     - Demo: `kafka3o produce kafka-a kafka3o-m10-verify --value hello --header source=cli` asks, writes and prints the offset; on Kafka B without a reason nothing is sent.
-  - **P112** F66-B3 · Create and delete a topic — Covers: F66-AC3 · Discovery: — · Status: Defined
+  - **P112** F66-B3 · Create and delete a topic — Covers: F66-AC3 · Discovery: — · Status: Building
     - Demo: a temporary `kafka3o-cli-*` topic is created and then deleted after typing its name; a mistyped name sends nothing.
   - **P113** F66-B4 · Configuration changes — Covers: F66-AC4 · Discovery: — · Status: Defined
     - Demo: `kafka3o config set kafka-a topic <temp> retention.ms 3600000` shows old and new value; `config delete` resets it; a read-only broker setting is refused.
