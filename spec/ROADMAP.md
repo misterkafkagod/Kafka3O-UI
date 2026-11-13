@@ -447,7 +447,7 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
     - Demo: `kafka3o backups` shows the `kafka3o-m10-verify` backup with state, last write, size and settings.
   - **P119** F67-B4 · Start, pause, resume and delete a backup — Covers: F67-AC4 · Discovery: — · Status: Done
     - Demo: on a temporary `kafka3o-cli-*` topic, `backup start … --start-from latest --compression zstd` then pause, resume and delete, each seen in `backups`; a second start is refused; the topic is deleted afterwards.
-  - **P120** F67-B5 · Restore with a selection and progress — Covers: F67-AC5 · Discovery: — · Status: Planned
+  - **P120** F67-B5 · Restore with a selection and progress — Covers: F67-AC5 · Discovery: — · Status: Building
     - Demo: `kafka3o restore kafka-a kafka3o-m10-verify --partitions 1 --wait` restores partition 1's backed-up messages, printing progress to the end; a reversed time range is refused before sending.
 
 ### M22 — Administer the console from the terminal

@@ -2,14 +2,14 @@
 - **Milestone:** M21
 - **Covers:** F67-AC5
 - **Discovery:** —
-- **Status:** Planned
+- **Status:** Building
 
 ## Demo
 1. `kafka3o restore kafka-a kafka3o-m10-verify --partitions 1 --wait` names the selection, says the messages are appended and may be duplicated, asks, prints "Restore started for kafka3o-m10-verify from N stored objects." and then progress lines until "Restore finished: M records restored."; `messages kafka-a kafka3o-m10-verify --partition 1` shows the appended copies with the `kafka3o-restore` header.
 2. `--from 2026-11-13T12:00:00Z --to 2026-11-13T11:00:00Z` and `--partitions x` are refused before sending; a restore on Kafka B without a reason sends nothing.
 
 ## Tasks
-- [ ] **T120.1 Start a restore with a selection** — Covers: F67-AC5
+- [x] **T120.1 Start a restore with a selection** — Covers: F67-AC5
   - Files: Kafka3O-cli internal/backups/restore.go (new), internal/backups/parse_restore_selection.go (new), internal/backups/parse_restore_selection_test.go (new), internal/backups/start_restore.go (new), internal/backups/start_restore_test.go (new)
   - Do: `ParseRestoreSelection(from, to, partitions, chosen)` returns nil (everything) when no selection flag was given; otherwise times are RFC 3339 or Unix milliseconds, the start must be before the end, partitions are comma-separated non-negative numbers (distinct, sorted), and a selection whose flags are all empty is refused like the UI ("Choose a time range or partitions, or restore everything."). `StartRestore` posts the selection (no body for everything) to `/api/v1/backups/{topic}/restore` and requires the answer's topic. `restore.go` holds the data types.
   - Done when: `go test ./internal/backups/ -run 'ParseRestoreSelection|StartRestore'` passes covering everything, each bound, both time forms, a reversed range, bad and repeated partitions, an all-empty selection, the bodies and the echo check.
