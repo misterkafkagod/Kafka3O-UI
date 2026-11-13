@@ -774,7 +774,23 @@ Produce, create or delete topics, change configuration and partitions, and reset
 **External dependencies:** the Gateway write routes through the Console (writes carry `Origin`, `X-Kafka3O-CSRF` and, on Production, `X-Kafka3O-Change-Reason`).
 
 ### F67 — Connect and backups from the terminal (planned M21)
-Operate Kafka Connect connectors and topic backups and restores · *detailed when M21 starts*
+Operate Kafka Connect connectors and topic backups and restores from the terminal, with the UI's confirmations, roles and Production rules.
+
+**Behaviors**
+- **F67-B1** User runs `kafka3o connectors [--cluster ID]` → every accessible cluster's connectors with type, state, worker and each task's state, and a failed connector's or task's error summary
+- **F67-B2** User runs `kafka3o connector pause|resume|restart <cluster> <name>` or `kafka3o connector restart-task <cluster> <name> <task>` → after the F66-B1 confirmation (and reason on Production) the action is requested and "<Action> requested for <name>." is printed; Connect applies it asynchronously
+- **F67-B3** User runs `kafka3o backups [--cluster ID]` → every backup with its cluster, topic, state and error, last write, stored size, settings and restore progress
+- **F67-B4** User runs `kafka3o backup start <cluster> <topic> [--start-from earliest|latest] [--compression gzip|zstd|snappy|none] [--records-per-file N]` or `kafka3o backup pause|resume|delete <cluster> <topic>` → after confirmation the backup is started with only those settings, or paused, resumed or deleted (stored objects are kept)
+- **F67-B5** User runs `kafka3o restore <cluster> <topic> [--from T] [--to T] [--partitions 0,2] [--wait]` → after a confirmation naming the selection and saying the messages are appended, the restore starts and the number of stored objects it reads is printed; `--wait` follows its progress until it finishes or fails
+
+**Acceptance criteria**
+- **F67-AC1** (B1) Running, paused and failed connectors each show cluster, name, type, state, worker and tasks (id and state), with failed items' error summary (terminal-escaped); no configuration value is shown; a cluster without Connect reads "Kafka Connect is not configured for this cluster" and is not a failure; an unreachable Connect is reported for that cluster (exit 2) while the others are still listed; `-o json` gives the same data
+- **F67-AC2** (B2) The confirmation uses the UI's wording; a task id that is not a non-negative integer is refused before sending; an unknown connector or task reads "not found" (exit 1); Connect rejecting the action prints the Gateway's reason; "may have been applied" exits 4; F66-AC1 applies
+- **F67-AC3** (B3) Running, paused and failed backups each show state (with error), last write ("nothing written yet" when none), stored bytes and objects, settings and restore progress; a cluster without backup storage reads "Backups are not configured for this cluster" and is not a failure; `-o json` gives the same data
+- **F67-AC4** (B4) An invalid start point, compression or records per file (outside 0–1,000,000) is refused before sending; the request carries only the chosen settings (none without flags, so the Gateway's defaults apply); a second backup of the topic reads "This topic is already backed up."; deleting says the stored objects are kept; F66-AC1 applies
+- **F67-AC5** (B5) Times are RFC 3339 or Unix milliseconds; a start not before the end, an empty or non-numeric partition list, or no selection with `--from`/`--to`/`--partitions` all empty is refused before sending; the request carries only the selection; skipped objects in another compression are reported; a running restore reads "A restore of this topic is already running."; an empty backup reads "This backup has not stored any messages yet."; `--wait` prints progress until finished (exit 0) or failed (exit 2); F66-AC1 applies
+
+**External dependencies:** the Gateway Connect and backup routes through the Console (`GET /api/v1/connect/connectors`, `POST …/connectors/{name}/pause|resume|restart`, `POST …/tasks/{id}/restart`, `GET|POST /api/v1/backups`, `POST /api/v1/backups/{topic}/pause|resume|restore`, `DELETE /api/v1/backups/{topic}`); no discovery needed, the routes and problem codes are those the UI already uses.
 
 ### F68 — Administration from the terminal (planned M22)
 Query and export the audit trail and manage accounts, roles and cluster environments · *detailed when M22 starts*
