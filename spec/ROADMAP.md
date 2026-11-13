@@ -436,7 +436,7 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
     - Demo: `kafka3o reset-offsets kafka-a connect-kafka3o-backup-probe kafka3o-m10-verify --to latest` shows the preview, applies it, and an active group is refused.
 
 ### M21 — Operate Connect and backups from the terminal
-- **Status:** Active
+- **Status:** Done
 - **Features:** F67
 - **Phases:**
   - **P116** F67-B1 · Connectors across clusters — Covers: F67-AC1 · Discovery: — · Status: Done
@@ -447,7 +447,7 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
     - Demo: `kafka3o backups` shows the `kafka3o-m10-verify` backup with state, last write, size and settings.
   - **P119** F67-B4 · Start, pause, resume and delete a backup — Covers: F67-AC4 · Discovery: — · Status: Done
     - Demo: on a temporary `kafka3o-cli-*` topic, `backup start … --start-from latest --compression zstd` then pause, resume and delete, each seen in `backups`; a second start is refused; the topic is deleted afterwards.
-  - **P120** F67-B5 · Restore with a selection and progress — Covers: F67-AC5 · Discovery: — · Status: Building
+  - **P120** F67-B5 · Restore with a selection and progress — Covers: F67-AC5 · Discovery: — · Status: Done
     - Demo: `kafka3o restore kafka-a kafka3o-m10-verify --partitions 1 --wait` restores partition 1's backed-up messages, printing progress to the end; a reversed time range is refused before sending.
 
 ### M22 — Administer the console from the terminal
@@ -507,6 +507,7 @@ Redpanda-only Shadow Links, its Admin API, and Redpanda-specific diagnostic oper
 - **Verification debt:** Run the Cognito sign-in, group refresh and logout integration against a real User Pool when an AWS account and app client become available; fixture tests are not evidence of live provider compatibility.
 
 ## Learnings
+- 2026-11-13 (M21 retro): P116–P120 deliver F67 in Kafka3O-cli: `connectors`, `connector pause|resume|restart|restart-task`, `backups`, `backup start|pause|resume|delete` and `restore` (selection, `--wait`). What worked: every action reused `PrepareChange`/`SendJSON` and the Gateway's echo checks, and porting the UI's describeBackupError kept the refusal texts identical; each phase was demoed live on the test connectors, `kafka3o-m10-verify` and a temporary topic. What didn't: a deleted backup leaves an empty Connect consumer group (`connect-kafka3o-backup-kafka3o-cli-p119`) that no Gateway route can remove. Learned: the Gateway finishes restores while listing backups, so following a restore means polling the list. govulncheck clean. Next: M22 (administration) under the same auto-approval, with a dedicated test account.
 - 2026-11-13 (M21 breakdown): F67 detailed and split into P116–P120 (connectors, connector actions, backups, backup actions, restore). Demos use only the test connectors and synthetic topics; a temporary topic's backup starts from "latest" so nothing is stored for a topic that is then deleted.
 - 2026-11-13 (M20 retro): P111–P115 deliver F66 in Kafka3O-cli: `produce`, `create-topic`, `delete-topic` (type the name), `config set|reset`, `partitions add|reassign`, `reassignments` and `reset-offsets` (preview, then exactly the preview). What worked: one `PrepareChange` (summary, Production reason, confirmation) and one `SendJSON` (Origin, CSRF, reason header, problem mapping) made every write behave the same, and every live demo used synthetic topics and groups. What didn't: Kafka A has a single broker, so a successful replica move was only tested against a fake. New rule: every `*_unknown` code exits 4 ("may have been applied"). govulncheck clean. Next: M21 (Connect and backups) under the same auto-approval.
 - 2026-11-13 (P113 plan): the Gateway reports an uncertain write with six codes (`topic_write_unknown`, `delivery_unknown`, `configuration_write_unknown`, `partition_write_unknown`, `offset_reset_unknown`, `connect_action_unknown`); the CLI's write path recognised only the Console's, so every `*_unknown` code now means exit 4. Configuration operations are `set` and `reset`, so the command is `config set|reset`.

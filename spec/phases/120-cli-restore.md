@@ -2,7 +2,7 @@
 - **Milestone:** M21
 - **Covers:** F67-AC5
 - **Discovery:** —
-- **Status:** Building
+- **Status:** Done
 
 ## Demo
 1. `kafka3o restore kafka-a kafka3o-m10-verify --partitions 1 --wait` names the selection, says the messages are appended and may be duplicated, asks, prints "Restore started for kafka3o-m10-verify from N stored objects." and then progress lines until "Restore finished: M records restored."; `messages kafka-a kafka3o-m10-verify --partition 1` shows the appended copies with the `kafka3o-restore` header.
@@ -23,3 +23,8 @@
   - Done when: `go test ./internal/cli/ -run RestoreCommand` passes covering everything, a selection, skipped objects, `--wait` to the end and to a failure, a running restore, an empty backup, cancel and Production.
 
 ## Review
+- **Demo:** live on EKS-D as admin (auto-approval, 2026-11-13): a reversed `--from/--to` and `--partitions x` were refused before sending, and Kafka B without a reason sent nothing; `restore kafka-a kafka3o-m10-verify --partitions 1 --wait` named the selection, said the messages are appended and may be duplicated, asked, printed "Restore started for kafka3o-m10-verify from 1 stored object(s).", "restoring 0 of 1 records" and "Restore finished: 1 records restored." (exit 0). `messages … --partition 1` then showed the copy of `m16-k8` at offset 3 with header `kafka3o-restore: r-20261113T210755Z-55b496c7`; the backup was RUNNING again with no restore connector left and still 13 stored objects (the copy was not backed up again)
+- **Tests:** `go test -race ./...` passed
+- **Conventions:** `ParseRestoreSelection`, `StartRestore`, `WaitForRestore`, `Sleep` and the command are single actions; `restore.go` holds data types only
+- **Vulnerability scan:** `govulncheck@v1.9.0 ./...` (milestone close): No vulnerabilities found
+- **Notes:** the Gateway finishes a restore only while backups are listed, so `--wait` (or `kafka3o backups`) is what ends it from the terminal; a restore that is no longer listed is reported as "Restore finished." without a count.
