@@ -2,14 +2,14 @@
 - **Milestone:** M22
 - **Covers:** F68-AC2
 - **Discovery:** —
-- **Status:** Planned
+- **Status:** Building
 
 ## Demo
 1. `kafka3o audit export --cluster kafka-a --from 2026-11-13T00:00:00-03:00 --file <scratch>/audit.csv` prints "Wrote N events to …" and the file (mode 0600) starts with the Console's CSV header; running it again refuses to overwrite.
 2. Without `--file` the CSV goes to standard output unchanged; `--outcome maybe` is refused before sending.
 
 ## Tasks
-- [ ] **T122.1 Download the audit CSV** — Covers: F68-AC2
+- [x] **T122.1 Download the audit CSV** — Covers: F68-AC2
   - Files: Kafka3O-cli internal/console/get_csv.go (new), internal/console/get_csv_test.go (new), internal/audit/export_audit_events.go (new), internal/audit/export_audit_events_test.go (new)
   - Do: `GetCSV` is `GetJSON`'s twin for `text/csv` answers (session cookies, 401 → signed out, problems parsed, a non-CSV success refused); `ExportAuditEvents` reads `/api/audit/export?…` (the filters without limit and cursor) and returns the bytes unchanged with the number of events (CSV records minus the header).
   - Done when: `go test ./internal/console/ ./internal/audit/ -run 'GetCSV|ExportAuditEvents'` passes covering the cookies and Accept header, 401, a problem, a wrong content type, quoted multi-line cells in the count, and the path.
