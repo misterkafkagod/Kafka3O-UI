@@ -13,7 +13,7 @@
   - Files: Kafka3O-cli internal/sessions/admin_session.go (new), internal/sessions/list_sessions.go (new), internal/sessions/list_sessions_test.go (new), internal/sessions/revoke_session.go (new), internal/sessions/revoke_session_test.go (new), internal/sessions/fake_console_test.go (new)
   - Do: `ListSessions` follows `nextCursor` (`limit=100`) over `/api/admin/sessions`; `RevokeSession` posts (no body) to `/api/admin/sessions/{id}/revoke` and requires the operation id.
   - Done when: `go test ./internal/sessions/` passes covering paging, the path and a missing answer.
-- [ ] **T126.2 `kafka3o sessions` and `session revoke`** — Covers: F68-AC6
+- [x] **T126.2 `kafka3o sessions` and `session revoke`** — Covers: F68-AC6
   - Files: internal/cli/new_sessions_command.go (new), internal/cli/new_sessions_command_test.go (new), internal/cli/new_session_command.go (new), internal/cli/new_session_command_test.go (new), cmd/kafka3o/main.go
   - Do: `sessions` prints `USER SOURCE CREATED IDLE EXPIRES EXPIRES CURRENT ID` (local times) or JSON. `session revoke <id>` reads the listing first: an unknown id is not found, the current session is refused ("This is your current session; use kafka3o logout."), otherwise it confirms (user, source, created) and revokes, printing "Revoked; that session must sign in again."; refusals go through `adminError`.
   - Done when: `go test ./internal/cli/ -run 'SessionsCommand|SessionCommand'` passes covering the table, a revocation, the current session, an unknown id, cancel and exit 4.
