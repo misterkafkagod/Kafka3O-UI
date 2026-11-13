@@ -458,7 +458,7 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
     - Demo: `kafka3o audit --cluster kafka-a --limit 5` shows the latest M21 demo events in order with the next-page hint; `--outcome maybe` is refused before sending.
   - **P122** F68-B2 · Audit export — Covers: F68-AC2 · Discovery: — · Status: Done
     - Demo: `kafka3o audit export --cluster kafka-a --from <today> --file audit.csv` writes the Console's CSV (mode 0600); running it again refuses to overwrite.
-  - **P123** F68-B3 · Local accounts — Covers: F68-AC3 · Discovery: — · Status: Planned
+  - **P123** F68-B3 · Local accounts — Covers: F68-AC3 · Discovery: — · Status: Building
     - Demo: create the dedicated test account `kafka3o-cli-test` (temporary password from standard input), list it, reset its password, disable and enable it; a short password and a duplicate username are refused.
   - **P124** F68-B4 · Access grants and group mappings — Covers: F68-AC4 · Discovery: — · Status: Defined
     - Demo: grant `kafka3o-cli-test` VIEWER on kafka-a, see it in `access`, remove it; changing one's own access is refused; a group mapping change is canceled.
