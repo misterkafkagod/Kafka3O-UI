@@ -759,7 +759,7 @@ Produce, create or delete topics, change configuration and partitions, and reset
 - **F66-B1** Any change → the CLI shows what it will do and asks "Proceed? [y/N]" unless `--yes`; on a Production cluster it also needs a change reason (`--reason`, or asked); a no, an empty reason or a closed input sends nothing
 - **F66-B2** User runs `kafka3o produce <cluster> <topic> --value v [--key k] [--header k=v ...]` → the message is written and its partition and exact offset are printed
 - **F66-B3** User runs `kafka3o create-topic <cluster> <topic> --partitions n --replication-factor r` or `kafka3o delete-topic <cluster> <topic>` → the topic is created or deleted; deleting asks for the topic name to be typed again (or `--confirm <topic>`)
-- **F66-B4** User runs `kafka3o config set|delete <cluster> topic <name>|broker <id> <setting> [value]` → the setting is changed or reset to its default, showing the current value first
+- **F66-B4** User runs `kafka3o config set <cluster> topic <name>|broker <id> <setting> <value>` or `kafka3o config reset <cluster> topic <name>|broker <id> <setting>` → the setting is changed or reset to its default (the Gateway's `set`/`reset` operations), showing the current value first
 - **F66-B5** User runs `kafka3o partitions add <cluster> <topic> <total>` or `kafka3o partitions reassign <cluster> <topic> <partition> <broker,…>`, and `kafka3o reassignments <cluster> <topic>` → partitions are added, a partition's replicas are moved, and moves in progress are listed
 - **F66-B6** User runs `kafka3o reset-offsets <cluster> <group> <topic> --to earliest|latest|<time>` → the preview (current and new offset per partition) is shown, then applied with the previewed offsets
 

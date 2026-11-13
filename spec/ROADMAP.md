@@ -426,10 +426,10 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
 - **Phases:**
   - **P111** F66-B1 + F66-B2 · Safe writes and producing a message — Covers: F66-AC1, F66-AC2 · Discovery: — · Status: Done
     - Demo: `kafka3o produce kafka-a kafka3o-m10-verify --value hello --header source=cli` asks, writes and prints the offset; on Kafka B without a reason nothing is sent.
-  - **P112** F66-B3 · Create and delete a topic — Covers: F66-AC3 · Discovery: — · Status: Building
+  - **P112** F66-B3 · Create and delete a topic — Covers: F66-AC3 · Discovery: — · Status: Done
     - Demo: a temporary `kafka3o-cli-*` topic is created and then deleted after typing its name; a mistyped name sends nothing.
-  - **P113** F66-B4 · Configuration changes — Covers: F66-AC4 · Discovery: — · Status: Defined
-    - Demo: `kafka3o config set kafka-a topic <temp> retention.ms 3600000` shows old and new value; `config delete` resets it; a read-only broker setting is refused.
+  - **P113** F66-B4 · Configuration changes — Covers: F66-AC4 · Discovery: — · Status: Building
+    - Demo: `kafka3o config set kafka-a topic <temp> retention.ms 3600000` shows old and new value; `config reset` resets it; a read-only broker setting is refused.
   - **P114** F66-B5 · Partitions and replica placement — Covers: F66-AC5 · Discovery: — · Status: Defined
     - Demo: the temporary topic grows from 1 to 2 partitions; a reassignment to broker 1 is accepted and `reassignments` lists none in progress.
   - **P115** F66-B6 · Offset reset with a preview — Covers: F66-AC6 · Discovery: — · Status: Defined
@@ -496,6 +496,7 @@ Redpanda-only Shadow Links, its Admin API, and Redpanda-specific diagnostic oper
 - **Verification debt:** Run the Cognito sign-in, group refresh and logout integration against a real User Pool when an AWS account and app client become available; fixture tests are not evidence of live provider compatibility.
 
 ## Learnings
+- 2026-11-13 (P113 plan): the Gateway reports an uncertain write with six codes (`topic_write_unknown`, `delivery_unknown`, `configuration_write_unknown`, `partition_write_unknown`, `offset_reset_unknown`, `connect_action_unknown`); the CLI's write path recognised only the Console's, so every `*_unknown` code now means exit 4. Configuration operations are `set` and `reset`, so the command is `config set|reset`.
 - 2026-11-13 (M20–M22): the user asked to run all remaining milestones back to back with auto-approval. F66 detailed and split into P111–P115; a new exit code 4 means the change may have been applied. Live writes stay synthetic (kafka3o-m10-verify, a temporary `kafka3o-cli-*` topic, synthetic groups); Kafka B (Production) is used only to show that nothing is sent without a reason.
 - 2026-11-13 (M19 live): the node was reachable again over the LAN; every M19 command passed live as admin (brokers, broker-config with all 12 sensitive values hidden, metrics with the CLI's CSV byte-for-byte equal to the UI's for the same answer, messages from the latest, an offset and a timestamp, search, groups with exact and unknown lag, group with "No committed offset" rows). The M19 verification debt is closed.
 - 2026-11-13 (M19 retro): P105–P110 deliver F63–F65 in Kafka3O-cli: `brokers`, `broker-config`, `metrics` (text, the Gateway's JSON unchanged, and the UI's CSV row for row), `messages` (latest, from an offset or a timestamp; text/json/base64 like the UI), `search` (the Gateway's bounded scan), `groups` (exact total lag with the UI's unknown rule) and `group`. What worked: porting the UI's own rules (metricsToCsv, formatMessageValue, consumerGroupTotalLag, status labels) and reusing its test expectations kept the CLI and UI identical; one shared `ReadAcrossClusters` now handles every cross-cluster read. What didn't: the EKS-D node was unreachable over the LAN and Tailscale the whole time, so every M19 phase is verified only against a fake Console (verification debt). Added a terminal-safety rule the browser does not need: message content is printed with control characters escaped. Next: run the M19 live checks when the node is back; M20 (writes) needs its own approval.
