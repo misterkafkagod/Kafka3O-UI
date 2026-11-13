@@ -2,7 +2,7 @@
 - **Milestone:** M21
 - **Covers:** F67-AC2
 - **Discovery:** —
-- **Status:** Building
+- **Status:** Done
 
 ## Demo
 1. `kafka3o connector pause kafka-a kafka3o-verify-paused` shows `Pause connector "kafka3o-verify-paused"?`, and after "y" prints "Pause requested for kafka3o-verify-paused."; `connectors` then shows it PAUSED; `resume` brings it back to RUNNING.
@@ -19,3 +19,8 @@
   - Done when: `go test ./internal/cli/ -run ConnectorCommand` passes covering each action, cancel, Production without a reason, a bad task id, not found, a Connect rejection and exit 4.
 
 ## Review
+- **Demo:** live on EKS-D as admin (auto-approval, 2026-11-13): `connector pause kafka-a kafka3o-verify-paused` asked, then printed "Pause requested for kafka3o-verify-paused." and `connectors` showed it and its task PAUSED; `resume --yes` brought both back to RUNNING (as it was before the demo); `restart` and `restart-task … 0` on `kafka3o-verify-running` were requested and it stayed RUNNING; task 9 and an unknown connector read "… was not found on kafka-a" (exit 1); task `x` was refused before sending; `pause kafka-b … --yes` without a reason sent nothing
+- **Tests:** `go test -race ./...` passed
+- **Conventions:** `RunConnectorAction` and the shared `runConnectorChange` (added next to the command, like `runConfigurationChange`, so the four actions share one flow) are single actions; `connector_action.go` holds data types and the not-found error
+- **Vulnerability scan:** not needed (no dependency change)
+- **Notes:** the confirmation drops the UI's trailing "?" because the CLI's own "Proceed? [y/N]" follows it.
