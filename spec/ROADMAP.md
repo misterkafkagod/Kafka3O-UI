@@ -411,9 +411,9 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
     - Demo: `kafka3o brokers` lists broker 1 on both clusters as controller; `kafka3o broker-config kafka-a 1 --filter log.retention` shows those settings with source and read-only.
   - **P106** F63-B2 · Metrics and their export — Covers: F63-AC2 · Discovery: — · Status: Done
     - Demo: `kafka3o metrics kafka-a` shows the Metrics tab's sections; `-o json` and `-o csv` match the UI's downloads.
-  - **P107** F64-B1 + F64-B2 · Read messages — Covers: F64-AC1, F64-AC2 · Discovery: — · Status: Building
+  - **P107** F64-B1 + F64-B2 · Read messages — Covers: F64-AC1, F64-AC2 · Discovery: — · Status: Done
     - Demo: `kafka3o messages kafka-a kafka3o-m10-verify` shows the latest messages with headers; `--partition 0 --offset 0` reads from the start; `--value json` pretty-prints JSON values.
-  - **P108** F64-B3 · Search messages — Covers: F64-AC3 · Discovery: — · Status: Defined
+  - **P108** F64-B3 · Search messages — Covers: F64-AC3 · Discovery: — · Status: Building
     - Demo: `kafka3o search kafka-a kafka3o-m10-verify "check two"` finds the message and its restored copy, with the scanned count.
   - **P109** F65-B1 · Consumer groups across clusters — Covers: F65-AC1 · Discovery: — · Status: Defined
     - Demo: `kafka3o groups` lists Kafka A's groups with exact total lag ("unknown (3 partitions)" where commits are missing).
