@@ -2,14 +2,14 @@
 - **Milestone:** M22
 - **Covers:** F68-AC4
 - **Discovery:** —
-- **Status:** Planned
+- **Status:** Building
 
 ## Demo
 1. `kafka3o access` lists identities (label, source, enabled, grants such as `all:ADMIN`) and the Cognito group mappings.
 2. `kafka3o access grant kafka3o-cli-test kafka-a VIEWER` shows "none → VIEWER", asks, applies and prints the policy revision; `access` shows `kafka-a:VIEWER`; `access grant kafka3o-cli-test kafka-a none --yes` removes it; granting the same role again sends nothing; a group mapping change is canceled at the confirmation.
 
 ## Tasks
-- [ ] **T124.1 Access listing and changes** — Covers: F68-AC4
+- [x] **T124.1 Access listing and changes** — Covers: F68-AC4
   - Files: Kafka3O-cli internal/access/access.go (new), internal/access/list_access.go (new), internal/access/list_access_test.go (new), internal/access/parse_role.go (new), internal/access/parse_role_test.go (new), internal/access/parse_scope.go (new), internal/access/parse_scope_test.go (new), internal/access/find_identity.go (new), internal/access/find_identity_test.go (new), internal/access/change_role_grant.go (new), internal/access/change_group_mapping.go (new), internal/access/change_access_test.go (new), internal/access/fake_console_test.go (new)
   - Do: `ListAccess` follows `nextCursor` (`limit=100`) for identities and keeps the first page's group mappings and truncation flag. `ParseRole` takes VIEWER, OPERATOR, ADMIN or none (case-insensitive; none = ""); `ParseScope` takes `all` (global, "") or a cluster id. `FindIdentity` matches the id exactly or the label case-insensitively (two labels alike → ask for the id). `ChangeRoleGrant` and `ChangeGroupMapping` put every field (`identityId|issuer+group`, `clusterId`, `expectedRole`, `role`) and require the answer's operation id and policy revision.
   - Done when: `go test ./internal/access/` passes covering paging, the role and scope rules, ambiguous and unknown identities, both request bodies and a missing answer.
