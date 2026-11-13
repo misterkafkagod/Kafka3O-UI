@@ -2,7 +2,7 @@
 - **Milestone:** M21
 - **Covers:** F67-AC3
 - **Discovery:** —
-- **Status:** Building
+- **Status:** Done
 
 ## Demo
 1. `kafka3o backups`: the `kafka3o-m10-verify` backup (and any other on Kafka A) with state, last write, stored size, settings and restore; Kafka B says "Backups are not configured for this cluster." (or lists its backups) without failing.
@@ -19,3 +19,8 @@
   - Done when: `go test ./internal/cli/ -run 'BackupsCommand|TopicCommand'` passes covering the table, a running restore, a failed backup, a not-configured cluster, JSON and a failing cluster, with the topic view unchanged.
 
 ## Review
+- **Demo:** live on EKS-D as admin (auto-approval, 2026-11-13): `backups` listed Kafka A's two backups (`kafka3o-m10-verify`: RUNNING, last write 17:40:52, 2382 bytes in 13 objects, oldest message/gzip/no limit, no restore; and `tert`) and "kafka-b: Backups are not configured for this cluster." with exit 0; `-o json` kept the Gateway's names (connector, location, storage, settings) per cluster; `topic kafka-a kafka3o-m10-verify` showed the same backup texts as before
+- **Tests:** `go test -race ./...` passed
+- **Conventions:** `ListBackups`, `CompareBackups`, `describeBackupSettings`, `describeBackupRestore`, `describeLastWrite` are single actions; `backup.go` holds data types only
+- **Vulnerability scan:** not needed (no dependency change)
+- **Notes:** a failed restore's reason stays in the RESTORE column (the shared describer), so the "Errors" list holds backup errors only; restore and settings texts are now terminal-escaped in `topic` too.
