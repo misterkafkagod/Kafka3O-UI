@@ -2,7 +2,7 @@
 - **Milestone:** M21
 - **Covers:** F67-AC1
 - **Discovery:** —
-- **Status:** Building
+- **Status:** Done
 
 ## Demo
 1. `kafka3o connectors`: Kafka A's test connectors with type, state, worker and task states (failed items' errors listed below the table); Kafka B either lists its connectors or says "Kafka Connect is not configured for this cluster." without failing.
@@ -19,3 +19,8 @@
   - Done when: `go test ./internal/cli/ -run ConnectorsCommand` passes covering the table, the errors list, escaping, a not-configured cluster, JSON and a failing cluster.
 
 ## Review
+- **Demo:** live on EKS-D as admin (auto-approval, 2026-11-13): `connectors` listed Kafka A's five connectors (two backup sinks and the three `kafka3o-verify-*` test sinks) with type, state, worker and task states, then the failing task's error ("Couldn't find or create file '/nonexistent-dir/…'"), then "kafka-b: Kafka Connect is not configured for this cluster." with exit 0; `-o json` gave the same per cluster with `notConfigured`
+- **Tests:** `go test -race ./...` passed
+- **Conventions:** `ListConnectors`, `CompareConnectors`, `CompareTasks` are single actions (the two comparisons were added so sorting needs no inline closures); `connector.go` holds data types only
+- **Vulnerability scan:** not needed (no dependency change)
+- **Notes:** an unrecognized cluster problem keeps the existing "(503 code)" suffix from `ClassifyClusterError`, as in every other list.
