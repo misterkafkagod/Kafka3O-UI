@@ -2,14 +2,14 @@
 - **Milestone:** M21
 - **Covers:** F67-AC4
 - **Discovery:** —
-- **Status:** Planned
+- **Status:** Building
 
 ## Demo
 1. Create `kafka3o-cli-p119` on Kafka A; `kafka3o backup start kafka-a kafka3o-cli-p119 --start-from latest --compression zstd --records-per-file 500` shows the settings, asks, and prints "Backup started for kafka3o-cli-p119. Messages are stored in s3://…"; `backups` shows it with those settings; a second start reads "This topic is already backed up."
 2. `backup pause`, `backup resume` and `backup delete` (each confirmed) are seen in `backups`; delete says the stored objects are kept; `--compression lz4` is refused before sending; the topic is deleted afterwards.
 
 ## Tasks
-- [ ] **T119.1 Start a backup and run backup actions** — Covers: F67-AC4
+- [x] **T119.1 Start a backup and run backup actions** — Covers: F67-AC4
   - Files: Kafka3O-cli internal/backups/backup_settings.go (new), internal/backups/validate_backup_settings.go (new), internal/backups/validate_backup_settings_test.go (new), internal/backups/start_backup.go (new), internal/backups/start_backup_test.go (new), internal/backups/run_backup_action.go (new), internal/backups/run_backup_action_test.go (new), internal/backups/fake_send_test.go (new)
   - Do: `ValidateBackupSettings` mirrors the Gateway (start point earliest|latest, compression gzip|zstd|snappy|none, records per file 0–1,000,000; empty = default). `StartBackup` posts `{topic[, settings]}` to `/api/v1/backups` with only the chosen fields (no `settings` without flags) and requires the created backup's topic. `RunBackupAction` posts `…/backups/{topic}/pause|resume` or sends `DELETE …/backups/{topic}` (topic path-escaped) and requires the `{topic, action}` echo; a mismatch is "may have been applied".
   - Done when: `go test ./internal/backups/ -run 'ValidateBackupSettings|StartBackup|RunBackupAction'` passes covering each invalid setting, the body with and without settings, the three actions, the echo check and the reason.
