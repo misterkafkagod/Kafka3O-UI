@@ -409,9 +409,9 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
 - **Phases:**
   - **P105** F63-B1 · Brokers and broker configuration — Covers: F63-AC1 · Discovery: — · Status: Done
     - Demo: `kafka3o brokers` lists broker 1 on both clusters as controller; `kafka3o broker-config kafka-a 1 --filter log.retention` shows those settings with source and read-only.
-  - **P106** F63-B2 · Metrics and their export — Covers: F63-AC2 · Discovery: — · Status: Building
+  - **P106** F63-B2 · Metrics and their export — Covers: F63-AC2 · Discovery: — · Status: Done
     - Demo: `kafka3o metrics kafka-a` shows the Metrics tab's sections; `-o json` and `-o csv` match the UI's downloads.
-  - **P107** F64-B1 + F64-B2 · Read messages — Covers: F64-AC1, F64-AC2 · Discovery: — · Status: Defined
+  - **P107** F64-B1 + F64-B2 · Read messages — Covers: F64-AC1, F64-AC2 · Discovery: — · Status: Building
     - Demo: `kafka3o messages kafka-a kafka3o-m10-verify` shows the latest messages with headers; `--partition 0 --offset 0` reads from the start; `--value json` pretty-prints JSON values.
   - **P108** F64-B3 · Search messages — Covers: F64-AC3 · Discovery: — · Status: Defined
     - Demo: `kafka3o search kafka-a kafka3o-m10-verify "check two"` finds the message and its restored copy, with the scanned count.
@@ -486,6 +486,7 @@ Redpanda-only Shadow Links, its Admin API, and Redpanda-specific diagnostic oper
 - **Verification debt:** Run the Cognito sign-in, group refresh and logout integration against a real User Pool when an AWS account and app client become available; fixture tests are not evidence of live provider compatibility.
 
 ## Learnings
+- 2026-11-13 (P107 plan): message text in the CLI follows the UI's decoding (invalid UTF-8 as replacement characters, not base64 as first written in F64-B2) and adds one terminal rule the browser does not need: control characters are printed escaped, so a message cannot inject terminal escape sequences.
 - 2026-11-13 (M19 start): the user said "continue" to starting M19 with auto-approval; F63–F65 detailed and split into P105–P110 (message reads keep the Gateway's limits: 50 per read, 500 scanned per search).
 - 2026-11-12 (M18 retro): P99–P104 deliver F60–F62 in Kafka3O-cli: `kafka3o login/whoami/logout`, `clusters`, `topics` and `topic`, each with `-o json` and the exit codes 0/1/2/3, reading every accessible cluster in parallel through the Console with no Console or Gateway change. Live on EKS-D: sign-in, a refused wrong password, a refused copy of a signed-out session file, both clusters healthy, topics across both clusters, and a full topic view with exact offsets and lag. What worked: a short curl discovery first settled cookies, Origin and CSRF, so the client code needed no rework; the fake Console in tests mirrors the real CSRF rule. What didn't: the new repository's remote used plain `github.com` (fixed to the `github-misterkafkagod` alias); a cluster failure could only be shown with fakes, since the shared Gateways are not stopped for demos. Next: M19 (cluster details and metrics, messages, consumer groups) needs its own approval.
 - 2026-11-12 (cli-console-session): a terminal client can use the Console exactly like the browser through the front proxy (`http://localhost:5173`, `Origin` rewritten): sign-in sets `__Host-kafka3o_session` and `__Host-kafka3o_csrf` (8 h), reads need only the cookies, writes add `X-Kafka3O-CSRF`, sign-out ends the session for every copy of it. No Console or Gateway change is needed for the CLI.

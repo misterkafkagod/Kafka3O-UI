@@ -729,12 +729,12 @@ Read a topic's messages (latest, from an offset or a timestamp) and search them.
 
 **Behaviors**
 - **F64-B1** User runs `kafka3o messages <cluster> <topic>` → the latest messages (up to 50) with partition, exact offset, timestamp, key, value and headers; `--partition N --offset O` or `--partition N --timestamp T` reads from that position instead
-- **F64-B2** User adds `--value text|json|base64` → values shown as in the UI (text by default; JSON pretty-printed, falling back to text with a note when invalid; bytes that are not UTF-8 shown as base64)
+- **F64-B2** User adds `--value text|json|base64` → values shown as in the UI (text by default with invalid UTF-8 as replacement characters; JSON pretty-printed, falling back to text with a note when invalid; base64 as sent); control characters other than line breaks and tabs are shown escaped (for example `\x1b`) so message content cannot control the terminal
 - **F64-B3** User runs `kafka3o search <cluster> <topic> <text>` → the messages among the 500 most recent whose key or value contains the text (case-sensitive), with how many were scanned and whether the scan was cut short
 
 **Acceptance criteria**
 - **F64-AC1** (B1) Offsets are the exact decimal offsets; an offset or timestamp without `--partition`, or both together, is refused before anything is sent (exit 1)
-- **F64-AC2** (B2) Each format matches the UI's for the same bytes, including the invalid-JSON note and the base64 fallback
+- **F64-AC2** (B2) Each format matches the UI's for the same bytes, including the invalid-JSON note; a value or key with an escape sequence is printed with it escaped, never raw
 - **F64-AC3** (B3) Matches, the scanned count and the truncation note are shown; no match says "No messages contain <text>."
 
 **External dependencies:** Gateway `/api/v1/topics/{topic}/messages` and `/messages/search` through the Console.
