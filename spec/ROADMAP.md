@@ -451,7 +451,7 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
     - Demo: `kafka3o restore kafka-a kafka3o-m10-verify --partitions 1 --wait` restores partition 1's backed-up messages, printing progress to the end; a reversed time range is refused before sending.
 
 ### M22 — Administer the console from the terminal
-- **Status:** Active
+- **Status:** Done
 - **Features:** F68
 - **Phases:**
   - **P121** F68-B1 · Audit query — Covers: F68-AC1 · Discovery: — · Status: Done
@@ -464,13 +464,14 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
     - Demo: grant `kafka3o-cli-test` VIEWER on kafka-a, see it in `access`, remove it; changing one's own access is refused; a group mapping change is canceled.
   - **P125** F68-B5 · Cluster environments — Covers: F68-AC5 · Discovery: — · Status: Done
     - Demo: `kafka3o environments` lists Kafka A and B; `environment set kafka-a production` without a reason is refused and with a reason is canceled at the confirmation (no environment is changed).
-  - **P126** F68-B6 · Sessions — Covers: F68-AC6 · Discovery: — · Status: Building
+  - **P126** F68-B6 · Sessions — Covers: F68-AC6 · Discovery: — · Status: Done
     - Demo: a second CLI sign-in appears in `sessions`; revoking it signs that CLI out on its next command; revoking the current session is refused.
 
 ## Backlog
 The following items are candidates after M11, not commitments to implement every Redpanda feature. All future writes must use F29/F30 authorization and F31 audit; no candidate silently expands the current bounded reads or changes Kafka connection credentials.
 
 - **F69 · Medium:** User can sign in to the Console from the CLI with Amazon Cognito through the browser.
+- **F70 · Medium:** User can change a temporary local password from the CLI at first sign-in (today `kafka3o login` sends them to the browser).
 - **F16 · Postponed:** User can decode Avro/Protobuf values via a Schema Registry.
 - **F32 · Postponed:** User can browse Schema Registry subjects, versions and references, check compatibility, and explicitly register or delete schema versions.
 - **F33 · High:** An authorized user can inspect/manage Kafka ACLs and supported broker principals/credentials; Kafka permissions remain distinct from Console roles.
@@ -520,6 +521,7 @@ Redpanda-only Shadow Links, its Admin API, and Redpanda-specific diagnostic oper
 - **Verification debt:** Run the Cognito sign-in, group refresh and logout integration against a real User Pool when an AWS account and app client become available; fixture tests are not evidence of live provider compatibility.
 
 ## Learnings
+- 2026-11-13 (M22 retro): P121–P126 deliver F68 in Kafka3O-cli: `audit` (filters, paging), `audit export` (the Console's CSV, never overwriting a file), `accounts`/`account create|reset-password|enable|disable`, `access`/`access grant|map-group`, `environments`/`environment set` and `sessions`/`session revoke`. With M18–M22 the CLI now covers every UI behavior through the secured Console. What worked: reading the current role or environment just before a change and sending it as the expected value gives the same conflict safety as the UI; a port of describeAdminError keeps the wording identical; demos touched only the dedicated `kafka3o-cli-test` account (now disabled, no grants) and the CLI's own extra session, and no environment was changed. What didn't: a temporary password cannot be changed from the terminal (backlog F70), so the test account could not sign in; self changes and conflicts were shown with tests only. New: exit 2 also covers an unavailable Console. govulncheck clean.
 - 2026-11-13 (M22 breakdown): F68 detailed and split into P121–P126 (audit query, audit export, local accounts, access, environments, sessions). The Console's local-account and session routes have no UI page yet, but F28-B1 covers them, so the CLI offers them. Demos never change a cluster environment or a real account: a dedicated `kafka3o-cli-test` account is created (it cannot be deleted, so it ends disabled with no grants) and only the CLI's own extra session is revoked.
 - 2026-11-13 (M21 retro): P116–P120 deliver F67 in Kafka3O-cli: `connectors`, `connector pause|resume|restart|restart-task`, `backups`, `backup start|pause|resume|delete` and `restore` (selection, `--wait`). What worked: every action reused `PrepareChange`/`SendJSON` and the Gateway's echo checks, and porting the UI's describeBackupError kept the refusal texts identical; each phase was demoed live on the test connectors, `kafka3o-m10-verify` and a temporary topic. What didn't: a deleted backup leaves an empty Connect consumer group (`connect-kafka3o-backup-kafka3o-cli-p119`) that no Gateway route can remove. Learned: the Gateway finishes restores while listing backups, so following a restore means polling the list. govulncheck clean. Next: M22 (administration) under the same auto-approval, with a dedicated test account.
 - 2026-11-13 (M21 breakdown): F67 detailed and split into P116–P120 (connectors, connector actions, backups, backup actions, restore). Demos use only the test connectors and synthetic topics; a temporary topic's backup starts from "latest" so nothing is stored for a topic that is then deleted.

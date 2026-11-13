@@ -2,7 +2,7 @@
 - **Milestone:** M22
 - **Covers:** F68-AC6
 - **Discovery:** —
-- **Status:** Building
+- **Status:** Done
 
 ## Demo
 1. A second CLI home signs in as admin; `kafka3o sessions` lists both sessions (user, source, created, idle and absolute expiry) with the current one marked.
@@ -19,3 +19,7 @@
   - Done when: `go test ./internal/cli/ -run 'SessionsCommand|SessionCommand'` passes covering the table, a revocation, the current session, an unknown id, cancel and exit 4.
 
 ## Review
+- **Demo:** live on EKS-D as admin (auto-approval, 2026-11-13): a second CLI home signed in as admin; `sessions` listed both admin sessions with creation, idle and absolute expiry, the first marked current; revoking the current one read "this is your current session; use kafka3o logout" and an unknown id "no active session has the id no-such-session" (both exit 1, nothing sent); `session revoke <second id>` asked and printed "Revoked; that session must sign in again."; the second CLI's `whoami` then read "signed out; run kafka3o login" (exit 3) and `sessions` listed only the current one. The confirmation's creation time was then switched to local time like the table
+- **Tests:** `go test -race ./...` passed
+- **Conventions:** `ListSessions`, `RevokeSession` and the two commands are single actions; `admin_session.go` holds data types only
+- **Vulnerability scan:** `govulncheck@v1.9.0 ./...` (milestone close): No vulnerabilities found
