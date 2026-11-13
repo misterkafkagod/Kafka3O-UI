@@ -2,7 +2,7 @@
 - **Milestone:** M21
 - **Covers:** F67-AC4
 - **Discovery:** —
-- **Status:** Building
+- **Status:** Done
 
 ## Demo
 1. Create `kafka3o-cli-p119` on Kafka A; `kafka3o backup start kafka-a kafka3o-cli-p119 --start-from latest --compression zstd --records-per-file 500` shows the settings, asks, and prints "Backup started for kafka3o-cli-p119. Messages are stored in s3://…"; `backups` shows it with those settings; a second start reads "This topic is already backed up."
@@ -19,3 +19,8 @@
   - Done when: `go test ./internal/cli/ -run 'BackupCommand|BackupError'` passes covering start with and without settings, invalid settings, each action, an existing backup, a missing backup, cancel, Production and exit 4.
 
 ## Review
+- **Demo:** live on EKS-D as admin on `kafka3o-cli-p119` (auto-approval, 2026-11-13): `--compression lz4` was refused before sending; `backup start … --start-from latest --compression zstd --records-per-file 500` showed those settings, asked, and printed "Backup started for kafka3o-cli-p119. Messages are stored in s3://kafka3o-backups/kafka-a/kafka3o-cli-p119/."; `backups` showed it RUNNING with "messages from when the backup started, zstd, up to 500 records per file" and nothing written; a second start read "refused: This topic is already backed up."; pause → PAUSED, resume → RUNNING; delete printed "The backup job for kafka3o-cli-p119 was deleted. Its stored objects are kept." and it left the list; deleting again read "topic kafka3o-cli-p119 has no backup on kafka-a"; `start kafka-b … --yes` sent nothing without a reason; the topic was deleted
+- **Tests:** `go test -race ./...` passed
+- **Conventions:** `ValidateBackupSettings`, `StartBackup`, `RunBackupAction`, `backupError` (port of the UI's describeBackupError) and the shared `runBackupChange` are single actions; `backup_settings.go` holds data types and constants only
+- **Vulnerability scan:** not needed (no dependency change)
+- **Notes:** the deleted sink left an empty consumer group `connect-kafka3o-backup-kafka3o-cli-p119` (no topics, no offsets); the Gateway has no route to delete groups, so it stays like the earlier probe groups. Nothing was stored, because the backup started from "latest" and nothing was produced.
