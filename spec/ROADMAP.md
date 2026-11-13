@@ -407,7 +407,7 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
 - **Status:** Active
 - **Features:** F63, F64, F65
 - **Phases:**
-  - **P105** F63-B1 · Brokers and broker configuration — Covers: F63-AC1 · Discovery: — · Status: Defined
+  - **P105** F63-B1 · Brokers and broker configuration — Covers: F63-AC1 · Discovery: — · Status: Building
     - Demo: `kafka3o brokers` lists broker 1 on both clusters as controller; `kafka3o broker-config kafka-a 1 --filter log.retention` shows those settings with source and read-only.
   - **P106** F63-B2 · Metrics and their export — Covers: F63-AC2 · Discovery: — · Status: Defined
     - Demo: `kafka3o metrics kafka-a` shows the Metrics tab's sections; `-o json` and `-o csv` match the UI's downloads.
