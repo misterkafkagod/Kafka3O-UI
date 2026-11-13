@@ -451,8 +451,21 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
     - Demo: `kafka3o restore kafka-a kafka3o-m10-verify --partitions 1 --wait` restores partition 1's backed-up messages, printing progress to the end; a reversed time range is refused before sending.
 
 ### M22 — Administer the console from the terminal
-- **Status:** Planned
+- **Status:** Active
 - **Features:** F68
+- **Phases:**
+  - **P121** F68-B1 · Audit query — Covers: F68-AC1 · Discovery: — · Status: Defined
+    - Demo: `kafka3o audit --cluster kafka-a --limit 5` shows the latest M21 demo events in order with the next-page hint; `--outcome maybe` is refused before sending.
+  - **P122** F68-B2 · Audit export — Covers: F68-AC2 · Discovery: — · Status: Defined
+    - Demo: `kafka3o audit export --cluster kafka-a --from <today> --file audit.csv` writes the Console's CSV (mode 0600); running it again refuses to overwrite.
+  - **P123** F68-B3 · Local accounts — Covers: F68-AC3 · Discovery: — · Status: Defined
+    - Demo: create the dedicated test account `kafka3o-cli-test` (temporary password from standard input), list it, reset its password, disable and enable it; a short password and a duplicate username are refused.
+  - **P124** F68-B4 · Access grants and group mappings — Covers: F68-AC4 · Discovery: — · Status: Defined
+    - Demo: grant `kafka3o-cli-test` VIEWER on kafka-a, see it in `access`, remove it; changing one's own access is refused; a group mapping change is canceled.
+  - **P125** F68-B5 · Cluster environments — Covers: F68-AC5 · Discovery: — · Status: Defined
+    - Demo: `kafka3o environments` lists Kafka A and B; `environment set kafka-a production` without a reason is refused and with a reason is canceled at the confirmation (no environment is changed).
+  - **P126** F68-B6 · Sessions — Covers: F68-AC6 · Discovery: — · Status: Defined
+    - Demo: a second CLI sign-in appears in `sessions`; revoking it signs that CLI out on its next command; revoking the current session is refused.
 
 ## Backlog
 The following items are candidates after M11, not commitments to implement every Redpanda feature. All future writes must use F29/F30 authorization and F31 audit; no candidate silently expands the current bounded reads or changes Kafka connection credentials.
@@ -507,6 +520,7 @@ Redpanda-only Shadow Links, its Admin API, and Redpanda-specific diagnostic oper
 - **Verification debt:** Run the Cognito sign-in, group refresh and logout integration against a real User Pool when an AWS account and app client become available; fixture tests are not evidence of live provider compatibility.
 
 ## Learnings
+- 2026-11-13 (M22 breakdown): F68 detailed and split into P121–P126 (audit query, audit export, local accounts, access, environments, sessions). The Console's local-account and session routes have no UI page yet, but F28-B1 covers them, so the CLI offers them. Demos never change a cluster environment or a real account: a dedicated `kafka3o-cli-test` account is created (it cannot be deleted, so it ends disabled with no grants) and only the CLI's own extra session is revoked.
 - 2026-11-13 (M21 retro): P116–P120 deliver F67 in Kafka3O-cli: `connectors`, `connector pause|resume|restart|restart-task`, `backups`, `backup start|pause|resume|delete` and `restore` (selection, `--wait`). What worked: every action reused `PrepareChange`/`SendJSON` and the Gateway's echo checks, and porting the UI's describeBackupError kept the refusal texts identical; each phase was demoed live on the test connectors, `kafka3o-m10-verify` and a temporary topic. What didn't: a deleted backup leaves an empty Connect consumer group (`connect-kafka3o-backup-kafka3o-cli-p119`) that no Gateway route can remove. Learned: the Gateway finishes restores while listing backups, so following a restore means polling the list. govulncheck clean. Next: M22 (administration) under the same auto-approval, with a dedicated test account.
 - 2026-11-13 (M21 breakdown): F67 detailed and split into P116–P120 (connectors, connector actions, backups, backup actions, restore). Demos use only the test connectors and synthetic topics; a temporary topic's backup starts from "latest" so nothing is stored for a topic that is then deleted.
 - 2026-11-13 (M20 retro): P111–P115 deliver F66 in Kafka3O-cli: `produce`, `create-topic`, `delete-topic` (type the name), `config set|reset`, `partitions add|reassign`, `reassignments` and `reset-offsets` (preview, then exactly the preview). What worked: one `PrepareChange` (summary, Production reason, confirmation) and one `SendJSON` (Origin, CSRF, reason header, problem mapping) made every write behave the same, and every live demo used synthetic topics and groups. What didn't: Kafka A has a single broker, so a successful replica move was only tested against a fake. New rule: every `*_unknown` code exits 4 ("may have been applied"). govulncheck clean. Next: M21 (Connect and backups) under the same auto-approval.

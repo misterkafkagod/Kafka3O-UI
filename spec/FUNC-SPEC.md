@@ -793,5 +793,23 @@ Operate Kafka Connect connectors and topic backups and restores from the termina
 **External dependencies:** the Gateway Connect and backup routes through the Console (`GET /api/v1/connect/connectors`, `POST …/connectors/{name}/pause|resume|restart`, `POST …/tasks/{id}/restart`, `GET|POST /api/v1/backups`, `POST /api/v1/backups/{topic}/pause|resume|restore`, `DELETE /api/v1/backups/{topic}`); no discovery needed, the routes and problem codes are those the UI already uses.
 
 ### F68 — Administration from the terminal (planned M22)
-Query and export the audit trail and manage accounts, roles and cluster environments · *detailed when M22 starts*
+Query and export the audit trail and manage local accounts, sessions, roles and cluster environments from the terminal, under the Console's administrator rules.
+
+**Behaviors**
+- **F68-B1** User runs `kafka3o audit [--cluster ID] [--actor A] [--action X] [--outcome O] [--from T] [--until T] [--limit N] [--after CURSOR]` → the matching events in order (time, operation, actor, source, cluster, action, resource, decision, outcome) and, when there are more, the `--after` value for the next page
+- **F68-B2** User runs `kafka3o audit export [same filters] [--file F]` → the Console's CSV export of the matching events, to standard output or a new file
+- **F68-B3** A local global ADMIN runs `kafka3o accounts`, `kafka3o account create <username>`, `kafka3o account reset-password <username>` or `kafka3o account enable|disable <username>` → local accounts are listed, created or reset with a temporary password the user must change at first sign-in, or enabled or disabled, after confirmation
+- **F68-B4** A local global ADMIN runs `kafka3o access`, `kafka3o access grant <identity> <cluster|all> <VIEWER|OPERATOR|ADMIN|none>` or `kafka3o access map-group <issuer> <group> <cluster|all> <role|none>` → identities with their grants and the Cognito group mappings are listed, or one grant or mapping is changed after a confirmation showing the old and new role
+- **F68-B5** A local global ADMIN runs `kafka3o environments` or `kafka3o environment set <cluster> production|non-production --reason R` → registered clusters are listed with their environment, or one cluster is reclassified after a confirmation showing the old and new environment
+- **F68-B6** A local global ADMIN runs `kafka3o sessions` or `kafka3o session revoke <id>` → active sessions are listed (the current one marked), or another session is revoked after confirmation
+
+**Acceptance criteria**
+- **F68-AC1** (B1) Outcomes, times (RFC 3339 or Unix milliseconds, from before until) and the limit (1–500) are checked before sending; a scope the user may not audit reads "Audit for a cluster requires ADMIN on it; all-cluster audit requires global ADMIN."; texts are terminal-escaped; `-o json` gives the Console's page
+- **F68-AC2** (B2) The CSV is exactly the Console's (its cells already neutralized against spreadsheet formulas); `--file` creates a new file readable only by the user and never overwrites one; denials read as in AC1
+- **F68-AC3** (B3) Passwords are never taken as arguments or shown (hidden prompt or `--password-stdin`) and need at least 12 characters before sending; accounts are named by username; an unknown one reads not found; a duplicate username, the last enabled global ADMIN and a non-administrator are refused with the Console's reason; F66-AC1's confirmation applies; an access-change outcome the Console cannot confirm exits 4 with its operation ID, and an unavailable audit says nothing was changed
+- **F68-AC4** (B4) The change sends the role read just before as the expected role, so a change made meanwhile is refused ("Access changed since it was read; reload and review"); changing one's own access and removing the last global ADMIN are refused; `all` is the global scope and `none` removes the grant; the confirmation names the subject, scope and old → new role
+- **F68-AC5** (B5) A reason is always required (`--reason`, or asked); the expected environment is the one read just before; a cancel sends nothing; the confirmation shows old → new
+- **F68-AC6** (B6) Sessions show user, source, creation and expiry times; revoking another session signs it out on its next request; revoking the current session is refused locally ("use kafka3o logout"); an unknown id reads not found
+
+**External dependencies:** the Console's administration routes (`/api/audit`, `/api/audit/export`, `/api/admin/local-accounts`, `/api/admin/access`, `/api/admin/role-grants`, `/api/admin/group-mappings`, `/api/admin/clusters`, `/api/admin/sessions`); writes carry `Origin` and `X-Kafka3O-CSRF` like every Console write.
 
