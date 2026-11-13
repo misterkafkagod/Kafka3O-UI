@@ -753,7 +753,25 @@ List consumer groups and see one group's offsets per topic and partition.
 **External dependencies:** Gateway `/api/v1/consumer-groups` through the Console.
 
 ### F66 — Kafka changes from the terminal (planned M20)
-Produce, create or delete topics, change configuration and partitions, and reset offsets, with confirmation and Production reasons · *detailed when M20 starts*
+Produce, create or delete topics, change configuration and partitions, and reset offsets, with confirmation and Production reasons.
+
+**Behaviors**
+- **F66-B1** Any change → the CLI shows what it will do and asks "Proceed? [y/N]" unless `--yes`; on a Production cluster it also needs a change reason (`--reason`, or asked); a no, an empty reason or a closed input sends nothing
+- **F66-B2** User runs `kafka3o produce <cluster> <topic> --value v [--key k] [--header k=v ...]` → the message is written and its partition and exact offset are printed
+- **F66-B3** User runs `kafka3o create-topic <cluster> <topic> --partitions n --replication-factor r` or `kafka3o delete-topic <cluster> <topic>` → the topic is created or deleted; deleting asks for the topic name to be typed again (or `--confirm <topic>`)
+- **F66-B4** User runs `kafka3o config set|delete <cluster> topic <name>|broker <id> <setting> [value]` → the setting is changed or reset to its default, showing the current value first
+- **F66-B5** User runs `kafka3o partitions add <cluster> <topic> <total>` or `kafka3o partitions reassign <cluster> <topic> <partition> <broker,…>`, and `kafka3o reassignments <cluster> <topic>` → partitions are added, a partition's replicas are moved, and moves in progress are listed
+- **F66-B6** User runs `kafka3o reset-offsets <cluster> <group> <topic> --to earliest|latest|<time>` → the preview (current and new offset per partition) is shown, then applied with the previewed offsets
+
+**Acceptance criteria**
+- **F66-AC1** (B1) Without `--yes` nothing is sent until "y"; a no prints "Canceled; nothing was sent." (exit 1); on Production a missing or blank reason sends nothing, and with `--yes` but no `--reason` the change is refused before sending; a denied change prints the Console's reason (exit 1); "the change may have been applied" exits 4
+- **F66-AC2** (B2) Headers are repeatable and kept in order; the printed offset is exact
+- **F66-AC3** (B3) Invalid names, partitions or replication factors are refused before sending; a mistyped confirmation name sends nothing
+- **F66-AC4** (B4) Sensitive and read-only settings are refused with the Gateway's reason; the confirmation shows the old and new value
+- **F66-AC5** (B5) A total not above the current partition count is refused before sending; replicas must be distinct broker ids
+- **F66-AC6** (B6) The reset sends exactly the previewed targets with the offsets the preview saw; an active group or a changed basis is refused with the Gateway's reason
+
+**External dependencies:** the Gateway write routes through the Console (writes carry `Origin`, `X-Kafka3O-CSRF` and, on Production, `X-Kafka3O-Change-Reason`).
 
 ### F67 — Connect and backups from the terminal (planned M21)
 Operate Kafka Connect connectors and topic backups and restores · *detailed when M21 starts*
