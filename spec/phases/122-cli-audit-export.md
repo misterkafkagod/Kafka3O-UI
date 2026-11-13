@@ -2,7 +2,7 @@
 - **Milestone:** M22
 - **Covers:** F68-AC2
 - **Discovery:** —
-- **Status:** Building
+- **Status:** Done
 
 ## Demo
 1. `kafka3o audit export --cluster kafka-a --from 2026-11-13T00:00:00-03:00 --file <scratch>/audit.csv` prints "Wrote N events to …" and the file (mode 0600) starts with the Console's CSV header; running it again refuses to overwrite.
@@ -19,3 +19,8 @@
   - Done when: `go test ./internal/cli/ -run AuditExportCommand` passes covering stdout, a new file and its mode, an existing file, a denied scope and a bad filter.
 
 ## Review
+- **Demo:** live on EKS-D as admin (auto-approval, 2026-11-13): `audit export --cluster kafka-a --from 2026-11-13T00:00:00-03:00 --file <scratch>/audit.csv` printed "Wrote 62 events to …", the file was `-rw-------` and began with the Console's header (`sequence,occurred_at,operation_id,…,policy_revision`); the same command refused to overwrite it; without `--file` the CSV went to standard output; `--outcome maybe` was refused before sending; the scratch file was removed
+- **Tests:** `go test -race ./...` passed
+- **Conventions:** `GetCSV`, `ExportAuditEvents`, `WriteNewFile` (added to `internal/output` so the command does no file handling itself) and the command are single actions
+- **Vulnerability scan:** not needed (no dependency change)
+- **Notes:** exports are themselves audited, so a repeated export of an open-ended range grows by those events.
