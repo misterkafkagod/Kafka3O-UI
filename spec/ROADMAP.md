@@ -430,9 +430,9 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
     - Demo: a temporary `kafka3o-cli-*` topic is created and then deleted after typing its name; a mistyped name sends nothing.
   - **P113** F66-B4 · Configuration changes — Covers: F66-AC4 · Discovery: — · Status: Done
     - Demo: `kafka3o config set kafka-a topic <temp> retention.ms 3600000` shows old and new value; `config reset` resets it; a read-only broker setting is refused.
-  - **P114** F66-B5 · Partitions and replica placement — Covers: F66-AC5 · Discovery: — · Status: Building
+  - **P114** F66-B5 · Partitions and replica placement — Covers: F66-AC5 · Discovery: — · Status: Done
     - Demo: the temporary topic grows from 1 to 2 partitions; a reassignment to broker 1 is accepted and `reassignments` lists none in progress.
-  - **P115** F66-B6 · Offset reset with a preview — Covers: F66-AC6 · Discovery: — · Status: Defined
+  - **P115** F66-B6 · Offset reset with a preview — Covers: F66-AC6 · Discovery: — · Status: Building
     - Demo: `kafka3o reset-offsets kafka-a connect-kafka3o-backup-probe kafka3o-m10-verify --to latest` shows the preview, applies it, and an active group is refused.
 
 ### M21 — Operate Connect and backups from the terminal
