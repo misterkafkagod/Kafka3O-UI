@@ -2,7 +2,7 @@
 - **Milestone:** M22
 - **Covers:** F68-AC3
 - **Discovery:** —
-- **Status:** Building
+- **Status:** Done
 
 ## Demo
 1. `kafka3o account create kafka3o-cli-test --password-stdin` (a random temporary password generated locally, never shown or stored in git) asks and prints "Created local account kafka3o-cli-test; it must change its password at first sign-in."; `kafka3o accounts` lists it as enabled with a password to change.
@@ -19,3 +19,8 @@
   - Done when: `go test ./internal/cli/ -run 'AccountsCommand|AccountCommand|ConfirmChange|ReadNewPassword'` passes covering the table, create with stdin and with the hidden prompt, mismatched and short passwords, reset, enable/disable, cancel, a duplicate username, not found and exit 4.
 
 ## Review
+- **Demo:** live on EKS-D as admin (auto-approval, 2026-11-13): `accounts` listed admin and the two M10 verify accounts; a 5-character password and the username "bad name" were refused before sending; `account create kafka3o-cli-test --password-stdin` (random temporary password generated into a 0600 scratch file, never printed) asked and printed "Created local account kafka3o-cli-test; it must change its password at first sign-in."; creating it again read "refused: Local username is already in use"; `accounts` showed it enabled with "must change"; reset-password, disable (shown as "no") and enable (back to "yes") were confirmed and applied; a canceled disable sent nothing; `disable nobody-here` read "no local account is named nobody-here"; signing in as the test account read "password change required: change it in the console first" (exit 3), as F60 specifies
+- **Tests:** `go test -race ./...` passed
+- **Conventions:** `ValidateUsername`, `ValidateTemporaryPassword`, `ListAccounts`, `FindAccount`, `CreateAccount`, `ResetPassword`, `SetAccountEnabled`, `ConfirmChange`, `readNewPassword` and the two commands are single actions; `account.go` holds data types and the not-found error
+- **Vulnerability scan:** not needed (no dependency change)
+- **Notes:** the test account `kafka3o-cli-test` stays (the Console cannot delete accounts); it is disabled at the end of M22. The CLI cannot change a temporary password yet, so the account cannot sign in from the terminal (backlog idea).
