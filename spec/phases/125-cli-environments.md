@@ -2,7 +2,7 @@
 - **Milestone:** M22
 - **Covers:** F68-AC5
 - **Discovery:** —
-- **Status:** Building
+- **Status:** Done
 
 ## Demo
 1. `kafka3o environments` lists Kafka A (Non-production) and Kafka B (Production) with name, active state and Gateway.
@@ -19,3 +19,7 @@
   - Done when: `go test ./internal/cli/ -run 'EnvironmentsCommand|EnvironmentCommand'` passes covering the table, a change, nothing to change, a missing reason with and without `--yes`, cancel, an unknown cluster, a conflict and exit 4.
 
 ## Review
+- **Demo:** live on EKS-D as admin (auto-approval, 2026-11-13): `environments` listed Kafka A (Non-production) and Kafka B (Production), both active, with their Gateways; `environment set kafka-a production --yes` without a reason was refused before sending; with `--reason "P125 demo"` the confirmation showed "Classify Kafka A (kafka-a): Non-production → Production" and the reason, and "n" sent nothing; `environment set kafka-a non-production` printed "Nothing to change"; `environments` afterwards was unchanged. A real reclassification, a conflict and an unknown outcome are covered by tests only
+- **Tests:** `go test -race ./...` passed
+- **Conventions:** `ListRegisteredClusters`, `ParseEnvironment`, `ChangeClusterEnvironment` and the two commands are single actions; `registered_cluster.go` holds data types only
+- **Vulnerability scan:** not needed (no dependency change)
