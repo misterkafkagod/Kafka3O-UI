@@ -404,7 +404,7 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
     - Demo: `kafka3o topic kafka-a kafka3o-m10-verify` shows partitions, configuration, consumer groups with lag and the backup; an unknown topic exits 1 with "not found".
 
 ### M19 — Investigate clusters, messages and consumers from the terminal
-- **Status:** Active
+- **Status:** Done
 - **Features:** F63, F64, F65
 - **Phases:**
   - **P105** F63-B1 · Brokers and broker configuration — Covers: F63-AC1 · Discovery: — · Status: Done
@@ -417,7 +417,7 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
     - Demo: `kafka3o search kafka-a kafka3o-m10-verify "check two"` finds the message and its restored copy, with the scanned count.
   - **P109** F65-B1 · Consumer groups across clusters — Covers: F65-AC1 · Discovery: — · Status: Done
     - Demo: `kafka3o groups` lists Kafka A's groups with exact total lag ("unknown (3 partitions)" where commits are missing).
-  - **P110** F65-B2 · One group's offsets — Covers: F65-AC2 · Discovery: — · Status: Building
+  - **P110** F65-B2 · One group's offsets — Covers: F65-AC2 · Discovery: — · Status: Done
     - Demo: `kafka3o group kafka-a connect-kafka3o-backup-kafka3o-m10-verify` shows its member and offsets per partition; an unknown group exits 1.
 
 ### M20 — Change Kafka safely from the terminal
@@ -486,6 +486,7 @@ Redpanda-only Shadow Links, its Admin API, and Redpanda-specific diagnostic oper
 - **Verification debt:** Run the Cognito sign-in, group refresh and logout integration against a real User Pool when an AWS account and app client become available; fixture tests are not evidence of live provider compatibility.
 
 ## Learnings
+- 2026-11-13 (M19 retro): P105–P110 deliver F63–F65 in Kafka3O-cli: `brokers`, `broker-config`, `metrics` (text, the Gateway's JSON unchanged, and the UI's CSV row for row), `messages` (latest, from an offset or a timestamp; text/json/base64 like the UI), `search` (the Gateway's bounded scan), `groups` (exact total lag with the UI's unknown rule) and `group`. What worked: porting the UI's own rules (metricsToCsv, formatMessageValue, consumerGroupTotalLag, status labels) and reusing its test expectations kept the CLI and UI identical; one shared `ReadAcrossClusters` now handles every cross-cluster read. What didn't: the EKS-D node was unreachable over the LAN and Tailscale the whole time, so every M19 phase is verified only against a fake Console (verification debt). Added a terminal-safety rule the browser does not need: message content is printed with control characters escaped. Next: run the M19 live checks when the node is back; M20 (writes) needs its own approval.
 - 2026-11-13 (P107 plan): message text in the CLI follows the UI's decoding (invalid UTF-8 as replacement characters, not base64 as first written in F64-B2) and adds one terminal rule the browser does not need: control characters are printed escaped, so a message cannot inject terminal escape sequences.
 - 2026-11-13 (M19 start): the user said "continue" to starting M19 with auto-approval; F63–F65 detailed and split into P105–P110 (message reads keep the Gateway's limits: 50 per read, 500 scanned per search).
 - 2026-11-12 (M18 retro): P99–P104 deliver F60–F62 in Kafka3O-cli: `kafka3o login/whoami/logout`, `clusters`, `topics` and `topic`, each with `-o json` and the exit codes 0/1/2/3, reading every accessible cluster in parallel through the Console with no Console or Gateway change. Live on EKS-D: sign-in, a refused wrong password, a refused copy of a signed-out session file, both clusters healthy, topics across both clusters, and a full topic view with exact offsets and lag. What worked: a short curl discovery first settled cookies, Origin and CSRF, so the client code needed no rework; the fake Console in tests mirrors the real CSRF rule. What didn't: the new repository's remote used plain `github.com` (fixed to the `github-misterkafkagod` alias); a cluster failure could only be shown with fakes, since the shared Gateways are not stopped for demos. Next: M19 (cluster details and metrics, messages, consumer groups) needs its own approval.
