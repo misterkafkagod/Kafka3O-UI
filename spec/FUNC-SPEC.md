@@ -712,13 +712,45 @@ List and filter topics across all clusters and inspect one topic.
 **External dependencies:** the Gateway topic, consumer group and backup endpoints through the Console.
 
 ### F63 — Cluster details from the terminal (planned M19)
-Inspect a cluster's brokers, broker configuration and metrics, and export the metrics as JSON or CSV · *detailed when M19 starts*
+Inspect a cluster's brokers, broker configuration and metrics, and export the metrics as JSON or CSV.
+
+**Behaviors**
+- **F63-B1** User runs `kafka3o brokers [--cluster id]` → each cluster's brokers (id, host, port, controller) across every accessible cluster; `kafka3o broker-config <cluster> <broker> [--filter text]` → the broker's settings with value, source and whether they are read-only
+- **F63-B2** User runs `kafka3o metrics <cluster>` → the Metrics tab's sections (partition health, controller quorum, disk use, leaders per broker, consumer groups, Kafka Connect, backups, largest topics), each saying why when unavailable; `-o json` gives the Gateway's metrics document and `-o csv` the rows of the UI's CSV download
+
+**Acceptance criteria**
+- **F63-AC1** (B1) Brokers are listed for every cluster that answers, a failing cluster is reported with exit 2, and sensitive configuration values are never printed
+- **F63-AC2** (B2) The JSON is the Gateway's answer; the CSV has the header `metric,broker,logDir,topic,name,value` and the same rows as the UI's download for the same answer; values Kafka did not report stay empty, never 0
+
+**External dependencies:** Gateway `/api/v1/cluster`, `/api/v1/brokers/{id}/config` and `/api/v1/metrics` through the Console.
 
 ### F64 — Messages from the terminal (planned M19)
-Read a topic's messages (latest, from an offset or a timestamp) and search them · *detailed when M19 starts*
+Read a topic's messages (latest, from an offset or a timestamp) and search them.
+
+**Behaviors**
+- **F64-B1** User runs `kafka3o messages <cluster> <topic>` → the latest messages (up to 50) with partition, exact offset, timestamp, key, value and headers; `--partition N --offset O` or `--partition N --timestamp T` reads from that position instead
+- **F64-B2** User adds `--value text|json|base64` → values shown as in the UI (text by default; JSON pretty-printed, falling back to text with a note when invalid; bytes that are not UTF-8 shown as base64)
+- **F64-B3** User runs `kafka3o search <cluster> <topic> <text>` → the messages among the 500 most recent whose key or value contains the text (case-sensitive), with how many were scanned and whether the scan was cut short
+
+**Acceptance criteria**
+- **F64-AC1** (B1) Offsets are the exact decimal offsets; an offset or timestamp without `--partition`, or both together, is refused before anything is sent (exit 1)
+- **F64-AC2** (B2) Each format matches the UI's for the same bytes, including the invalid-JSON note and the base64 fallback
+- **F64-AC3** (B3) Matches, the scanned count and the truncation note are shown; no match says "No messages contain <text>."
+
+**External dependencies:** Gateway `/api/v1/topics/{topic}/messages` and `/messages/search` through the Console.
 
 ### F65 — Consumer groups from the terminal (planned M19)
-List consumer groups and see one group's offsets per topic and partition · *detailed when M19 starts*
+List consumer groups and see one group's offsets per topic and partition.
+
+**Behaviors**
+- **F65-B1** User runs `kafka3o groups [--cluster id] [--filter text]` → every group across the accessible clusters with cluster, state, members, topics and total lag
+- **F65-B2** User runs `kafka3o group <cluster> <group>` → the group's members and, per topic and partition, committed offset, log start, log end, lag and status; an unknown group exits 1
+
+**Acceptance criteria**
+- **F65-AC1** (B1) Total lag is the exact sum; when any partition's lag is unknown it reads "unknown (n partitions)" and is never counted as 0; a failing cluster is reported with exit 2
+- **F65-AC2** (B2) Offsets and lag are exact decimals; "group <id> was not found on <cluster>" exits 1
+
+**External dependencies:** Gateway `/api/v1/consumer-groups` through the Console.
 
 ### F66 — Kafka changes from the terminal (planned M20)
 Produce, create or delete topics, change configuration and partitions, and reset offsets, with confirmation and Production reasons · *detailed when M20 starts*
