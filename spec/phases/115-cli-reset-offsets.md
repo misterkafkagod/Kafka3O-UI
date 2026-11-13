@@ -2,7 +2,7 @@
 - **Milestone:** M20
 - **Covers:** F66-AC6
 - **Discovery:** —
-- **Status:** Building
+- **Status:** Done
 
 ## Demo
 1. `kafka3o reset-offsets kafka-a connect-kafka3o-backup-probe kafka3o-m10-verify --to latest` shows the preview (partition, current, new), asks, applies and prints the committed offsets; `kafka3o group` shows lag 0.
@@ -15,3 +15,8 @@
   - Done when: `go test ./internal/groups/ ./internal/cli/ -run 'ResetTarget|PreviewOffsetReset|ApplyOffsetReset|ResetOffsetsCommand'` passes covering the three targets, the preview table, the exact apply body, cancel, an active group, a changed basis and Production.
 
 ## Review
+- **Demo:** live on EKS-D as admin (auto-approval, 2026-11-13): `reset-offsets kafka-a connect-kafka3o-backup-probe kafka3o-m10-verify --to latest` previewed 4 partitions (5→66, none→3, none→48, none→25); answering `n` sent nothing (exit 1); answering `y` committed exactly the preview and `group` then showed lag 0 on every partition. The running backup group `connect-kafka3o-backup-kafka3o-m10-verify` was refused with "Stop the group's consumers first" (exit 1), and `--to yesterday` was a usage error before anything was read. Production (reason required, a reason sent) and a changed basis (`stale_preview`) are covered by tests
+- **Tests:** `go test -race ./...` passed
+- **Conventions:** `ParseResetTarget`, `PreviewOffsetReset`, `ApplyOffsetReset` and the command are single actions; `offset_reset.go` holds data types only
+- **Vulnerability scan:** `govulncheck@v1.9.0 ./...` (milestone close): No vulnerabilities found
+- **Notes:** the apply body is built only from the preview (expected = previewed current), so a reset never commits offsets the user did not see.

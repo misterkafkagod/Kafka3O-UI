@@ -421,7 +421,7 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
     - Demo: `kafka3o group kafka-a connect-kafka3o-backup-kafka3o-m10-verify` shows its member and offsets per partition; an unknown group exits 1.
 
 ### M20 — Change Kafka safely from the terminal
-- **Status:** Active
+- **Status:** Done
 - **Features:** F66
 - **Phases:**
   - **P111** F66-B1 + F66-B2 · Safe writes and producing a message — Covers: F66-AC1, F66-AC2 · Discovery: — · Status: Done
@@ -432,7 +432,7 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
     - Demo: `kafka3o config set kafka-a topic <temp> retention.ms 3600000` shows old and new value; `config reset` resets it; a read-only broker setting is refused.
   - **P114** F66-B5 · Partitions and replica placement — Covers: F66-AC5 · Discovery: — · Status: Done
     - Demo: the temporary topic grows from 1 to 2 partitions; a reassignment to broker 1 is accepted and `reassignments` lists none in progress.
-  - **P115** F66-B6 · Offset reset with a preview — Covers: F66-AC6 · Discovery: — · Status: Building
+  - **P115** F66-B6 · Offset reset with a preview — Covers: F66-AC6 · Discovery: — · Status: Done
     - Demo: `kafka3o reset-offsets kafka-a connect-kafka3o-backup-probe kafka3o-m10-verify --to latest` shows the preview, applies it, and an active group is refused.
 
 ### M21 — Operate Connect and backups from the terminal
@@ -496,6 +496,7 @@ Redpanda-only Shadow Links, its Admin API, and Redpanda-specific diagnostic oper
 - **Verification debt:** Run the Cognito sign-in, group refresh and logout integration against a real User Pool when an AWS account and app client become available; fixture tests are not evidence of live provider compatibility.
 
 ## Learnings
+- 2026-11-13 (M20 retro): P111–P115 deliver F66 in Kafka3O-cli: `produce`, `create-topic`, `delete-topic` (type the name), `config set|reset`, `partitions add|reassign`, `reassignments` and `reset-offsets` (preview, then exactly the preview). What worked: one `PrepareChange` (summary, Production reason, confirmation) and one `SendJSON` (Origin, CSRF, reason header, problem mapping) made every write behave the same, and every live demo used synthetic topics and groups. What didn't: Kafka A has a single broker, so a successful replica move was only tested against a fake. New rule: every `*_unknown` code exits 4 ("may have been applied"). govulncheck clean. Next: M21 (Connect and backups) under the same auto-approval.
 - 2026-11-13 (P113 plan): the Gateway reports an uncertain write with six codes (`topic_write_unknown`, `delivery_unknown`, `configuration_write_unknown`, `partition_write_unknown`, `offset_reset_unknown`, `connect_action_unknown`); the CLI's write path recognised only the Console's, so every `*_unknown` code now means exit 4. Configuration operations are `set` and `reset`, so the command is `config set|reset`.
 - 2026-11-13 (M20–M22): the user asked to run all remaining milestones back to back with auto-approval. F66 detailed and split into P111–P115; a new exit code 4 means the change may have been applied. Live writes stay synthetic (kafka3o-m10-verify, a temporary `kafka3o-cli-*` topic, synthetic groups); Kafka B (Production) is used only to show that nothing is sent without a reason.
 - 2026-11-13 (M19 live): the node was reachable again over the LAN; every M19 command passed live as admin (brokers, broker-config with all 12 sensitive values hidden, metrics with the CLI's CSV byte-for-byte equal to the UI's for the same answer, messages from the latest, an offset and a timestamp, search, groups with exact and unknown lag, group with "No committed offset" rows). The M19 verification debt is closed.
