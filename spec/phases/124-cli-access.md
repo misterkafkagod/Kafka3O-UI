@@ -2,7 +2,7 @@
 - **Milestone:** M22
 - **Covers:** F68-AC4
 - **Discovery:** —
-- **Status:** Building
+- **Status:** Done
 
 ## Demo
 1. `kafka3o access` lists identities (label, source, enabled, grants such as `all:ADMIN`) and the Cognito group mappings.
@@ -19,3 +19,7 @@
   - Done when: `go test ./internal/cli/ -run AccessCommand` passes covering the listing, a grant, a removal, nothing to change, a mapping, cancel, a conflict, a self change and exit 4.
 
 ## Review
+- **Demo:** live on EKS-D as admin (auto-approval, 2026-11-13): `access` showed policy revision 3, the four local identities with their grants (admin `all:ADMIN`, operator-verify `all:OPERATOR`, kafka3o-cli-test none) and no Cognito group mappings; `access grant kafka3o-cli-test kafka-a VIEWER` showed "none → VIEWER" and the additive-roles note, asked, and printed "Changed; policy revision 4 (operation …)"; the same grant again printed "Nothing to change" without sending; `… none --yes` removed it (revision 5, back to none); a `map-group` for a made-up issuer was canceled at the confirmation. A self change and a policy conflict are covered by tests only (the real admin account was not touched)
+- **Tests:** `go test -race ./...` passed
+- **Conventions:** `ListAccess`, `ParseRole`, `ParseScope`, `FindIdentity`, `ChangeRoleGrant`, `ChangeGroupMapping`, `confirmAccessChange` (named after its action instead of the planned `run_access_change.go`) and the command are single actions; `access.go` holds data types and the not-found error
+- **Vulnerability scan:** not needed (no dependency change)

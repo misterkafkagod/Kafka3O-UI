@@ -460,9 +460,9 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
     - Demo: `kafka3o audit export --cluster kafka-a --from <today> --file audit.csv` writes the Console's CSV (mode 0600); running it again refuses to overwrite.
   - **P123** F68-B3 · Local accounts — Covers: F68-AC3 · Discovery: — · Status: Done
     - Demo: create the dedicated test account `kafka3o-cli-test` (temporary password from standard input), list it, reset its password, disable and enable it; a short password and a duplicate username are refused.
-  - **P124** F68-B4 · Access grants and group mappings — Covers: F68-AC4 · Discovery: — · Status: Building
+  - **P124** F68-B4 · Access grants and group mappings — Covers: F68-AC4 · Discovery: — · Status: Done
     - Demo: grant `kafka3o-cli-test` VIEWER on kafka-a, see it in `access`, remove it; changing one's own access is refused; a group mapping change is canceled.
-  - **P125** F68-B5 · Cluster environments — Covers: F68-AC5 · Discovery: — · Status: Defined
+  - **P125** F68-B5 · Cluster environments — Covers: F68-AC5 · Discovery: — · Status: Planned
     - Demo: `kafka3o environments` lists Kafka A and B; `environment set kafka-a production` without a reason is refused and with a reason is canceled at the confirmation (no environment is changed).
   - **P126** F68-B6 · Sessions — Covers: F68-AC6 · Discovery: — · Status: Defined
     - Demo: a second CLI sign-in appears in `sessions`; revoking it signs that CLI out on its next command; revoking the current session is refused.
