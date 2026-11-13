@@ -2,14 +2,14 @@
 - **Milestone:** M21
 - **Covers:** F67-AC1
 - **Discovery:** —
-- **Status:** Planned
+- **Status:** Building
 
 ## Demo
 1. `kafka3o connectors`: Kafka A's test connectors with type, state, worker and task states (failed items' errors listed below the table); Kafka B either lists its connectors or says "Kafka Connect is not configured for this cluster." without failing.
 2. `kafka3o connectors -o json`: the same per cluster, with `notConfigured` and the failures.
 
 ## Tasks
-- [ ] **T116.1 Connectors across clusters** — Covers: F67-AC1
+- [x] **T116.1 Connectors across clusters** — Covers: F67-AC1
   - Files: Kafka3O-cli internal/connect/connector.go (new), internal/connect/list_connectors.go (new), internal/connect/list_connectors_test.go (new)
   - Do: `ListConnectors` reads `/api/v1/connect/connectors` on the chosen or every accessible cluster through `clusters.ReadAcrossClusters`; a `connect_not_configured` problem becomes `NotConfigured` for that cluster (not a failure); any other error is that cluster's failure; connectors are sorted by name and tasks by id. Data types only in `connector.go`.
   - Done when: `go test ./internal/connect/` passes covering sorting, a not-configured cluster, an unreachable Connect (a failure) and a signed-out session.
