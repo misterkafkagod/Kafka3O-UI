@@ -454,7 +454,7 @@ M6–M8 preserve existing routes, gateway contracts, exact offsets, bounded read
 - **Status:** Active
 - **Features:** F68
 - **Phases:**
-  - **P121** F68-B1 · Audit query — Covers: F68-AC1 · Discovery: — · Status: Defined
+  - **P121** F68-B1 · Audit query — Covers: F68-AC1 · Discovery: — · Status: Planned
     - Demo: `kafka3o audit --cluster kafka-a --limit 5` shows the latest M21 demo events in order with the next-page hint; `--outcome maybe` is refused before sending.
   - **P122** F68-B2 · Audit export — Covers: F68-AC2 · Discovery: — · Status: Defined
     - Demo: `kafka3o audit export --cluster kafka-a --from <today> --file audit.csv` writes the Console's CSV (mode 0600); running it again refuses to overwrite.
